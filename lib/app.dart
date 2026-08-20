@@ -8,14 +8,14 @@ import 'core/routes/app_routers_import.dart';
 import 'core/routes/routes_name.dart';
 import 'core/theme/style.dart';
 
-class TempApp extends StatefulWidget {
-  const TempApp({super.key});
+class DeltaApp extends StatefulWidget {
+  const DeltaApp({super.key});
 
   @override
-  State<TempApp> createState() => _TempAppState();
+  State<DeltaApp> createState() => _DeltaAppState();
 }
 
-class _TempAppState extends State<TempApp> {
+class _DeltaAppState extends State<DeltaApp> {
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
@@ -24,6 +24,7 @@ class _TempAppState extends State<TempApp> {
       splitScreenMode: true,
       builder: (_, child) {
         return MaterialApp(
+          
           localizationsDelegates: [
             ...context.localizationDelegates,
             CountryLocalizations.delegate,
