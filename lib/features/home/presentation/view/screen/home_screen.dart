@@ -103,9 +103,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
                     colors: [
-                      Color(0xFF1E1B2E),
-                      Color(0xFF0B409C),
-                      Color(0xFF714B67),
+                      Color(0xFF042F2C), // Deep Emerald Night
+                      Color(0xFF0D9488), // Primary Emerald Teal
+                      Color(0xFF0284C7), // Ocean Blue Accent
                     ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
@@ -116,7 +116,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFF714B67).withValues(alpha: 0.25),
+                      color: const Color(0xFF0D9488).withValues(alpha: 0.25),
                       blurRadius: 20,
                       offset: const Offset(0, 10),
                     )
@@ -234,7 +234,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           icon: Icon(
                             Icons.search_rounded,
-                            color: const Color(0xFF714B67),
+                            color: const Color(0xFF0D9488),
                             size: 22.r,
                           ),
                           border: InputBorder.none,
@@ -267,7 +267,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           padding: EdgeInsets.symmetric(
                               horizontal: 10.w, vertical: 4.h),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF714B67).withValues(alpha: 0.1),
+                            color: const Color(0xFF0D9488).withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12.r),
                           ),
                           child: Text(
@@ -275,7 +275,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             style: TextStyle(
                               fontSize: 11.sp,
                               fontWeight: FontWeight.bold,
-                              color: const Color(0xFF714B67),
+                              color: const Color(0xFF0D9488),
                             ),
                           ),
                         ),

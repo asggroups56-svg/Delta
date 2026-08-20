@@ -102,10 +102,10 @@ class _SignupScreenState extends State<SignupScreen> {
                         padding: EdgeInsets.symmetric(
                             horizontal: 12.w, vertical: 6.h),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF714B67).withValues(alpha: 0.1),
+                          color: const Color(0xFF0D9488).withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(20.r),
                           border: Border.all(
-                            color: const Color(0xFF714B67).withValues(alpha: 0.25),
+                            color: const Color(0xFF0D9488).withValues(alpha: 0.25),
                           ),
                         ),
                         child: Row(
@@ -113,7 +113,7 @@ class _SignupScreenState extends State<SignupScreen> {
                             Icon(
                               Icons.language_rounded,
                               size: 16.r,
-                              color: const Color(0xFF714B67),
+                              color: const Color(0xFF0D9488),
                             ),
                             Gap(6.w),
                             Text(
@@ -121,7 +121,7 @@ class _SignupScreenState extends State<SignupScreen> {
                               style: TextStyle(
                                 fontSize: 12.sp,
                                 fontWeight: FontWeight.bold,
-                                color: const Color(0xFF714B67),
+                                color: const Color(0xFF0D9488),
                               ),
                             ),
                           ],
@@ -142,7 +142,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       borderRadius: BorderRadius.circular(24.r),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFF714B67).withValues(alpha: 0.08),
+                          color: const Color(0xFF0D9488).withValues(alpha: 0.08),
                           blurRadius: 30,
                           offset: const Offset(0, 10),
                         ),
@@ -248,7 +248,7 @@ class _SignupScreenState extends State<SignupScreen> {
                               height: 24.h,
                               child: Checkbox(
                                 value: _agreeTerms,
-                                activeColor: const Color(0xFF714B67),
+                                activeColor: const Color(0xFF0D9488),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(4.r),
                                 ),
@@ -280,10 +280,10 @@ class _SignupScreenState extends State<SignupScreen> {
                           child: ElevatedButton(
                             onPressed: _onSignup,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF714B67),
+                              backgroundColor: const Color(0xFF0D9488),
                               elevation: 3,
                               shadowColor:
-                                  const Color(0xFF714B67).withValues(alpha: 0.4),
+                                  const Color(0xFF0D9488).withValues(alpha: 0.4),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(14.r),
                               ),
@@ -325,7 +325,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         style: TextStyle(
                           fontSize: 13.sp,
                           fontWeight: FontWeight.bold,
-                          color: const Color(0xFF714B67),
+                          color: const Color(0xFF0D9488),
                         ),
                       ),
                     ),

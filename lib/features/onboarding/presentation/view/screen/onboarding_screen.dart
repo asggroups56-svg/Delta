@@ -22,19 +22,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         OnboardingItemModel(
           titleKey: 'onboardingTitle1',
           subtitleKey: 'onboardingSubtitle1',
-          accentColor: const Color(0xFF714B67), // Odoo Purple Accent
+          accentColor: const Color(0xFF0D9488), // Emerald Teal Accent
           type: OnboardingType.allInOne,
         ),
         OnboardingItemModel(
           titleKey: 'onboardingTitle2',
           subtitleKey: 'onboardingSubtitle2',
-          accentColor: const Color(0xFF017E84), // Odoo Teal Accent
+          accentColor: const Color(0xFF0284C7), // Ocean Blue Accent
           type: OnboardingType.analytics,
         ),
         OnboardingItemModel(
           titleKey: 'onboardingTitle3',
           subtitleKey: 'onboardingSubtitle3',
-          accentColor: const Color(0xFF0B409C), // Deep Indigo Accent
+          accentColor: const Color(0xFF059669), // Emerald Green Accent
           type: OnboardingType.automation,
         ),
       ];

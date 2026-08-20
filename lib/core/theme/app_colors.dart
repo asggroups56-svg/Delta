@@ -3,20 +3,22 @@ import 'package:flutter/material.dart';
 import 'app_theme.dart';
 
 class AppColor {
+  // Primary App Color: Emerald Teal
   static Color primaryColor(BuildContext context, {bool listen = true}) {
     return AppTheme.getByTheme(
       context,
-      light: const Color(0xff0B409C),
-      dark: const Color(0xff0B409C),
+      light: const Color(0xFF0D9488),
+      dark: const Color(0xFF0D9488),
       listen: listen,
     );
   }
 
+  // Secondary App Color: Ocean Blue
   static Color secondAppColor(BuildContext context, {bool listen = true}) {
     return AppTheme.getByTheme(
       context,
-      light: const Color(0xff23120B),
-      dark: const Color(0xff23120B),
+      light: const Color(0xFF0284C7),
+      dark: const Color(0xFF0284C7),
       listen: listen,
     );
   }
@@ -33,15 +35,17 @@ class AppColor {
   static Color scaffoldColor(BuildContext context, {bool listen = true}) {
     return AppTheme.getByTheme(
       context,
-      light: const Color(0xFFF9F9F9),
-      dark: const Color(0xFFF9F9F9),
+      light: const Color(0xFFF8FAFC),
+      dark: const Color(0xFFF8FAFC),
       listen: listen,
     );
-  }  static Color textFormFillColor(BuildContext context, {bool listen = true}) {
+  }
+
+  static Color textFormFillColor(BuildContext context, {bool listen = true}) {
     return AppTheme.getByTheme(
       context,
-      light: const Color(0xFFF9F9F9),
-      dark: const Color(0xFFF9F9F9),
+      light: const Color(0xFFF8FAFC),
+      dark: const Color(0xFFF8FAFC),
       listen: listen,
     );
   }
@@ -54,6 +58,7 @@ class AppColor {
       listen: listen,
     );
   }
+
   static Color BackColor(BuildContext context, {bool listen = true}) {
     return AppTheme.getByTheme(
       context,
@@ -62,46 +67,52 @@ class AppColor {
       listen: listen,
     );
   }
-   
-   static  Color  DeepColor(BuildContext context, {bool listen = true}) {
-     return AppTheme.getByTheme(
-       context,
-       light: const Color(0xFF1E1B2E),
-       dark: const Color(0xFF1E1B2E),
-       listen: listen,
-     );
-     
-   }          
-   static Color DeepIndigoColor(BuildContext context, {bool listen = true}) {
-     return AppTheme.getByTheme(
-        context,
-        light: const Color(0xFF0B409C), 
-        dark: const Color(0xFF0B409C),
-        listen: listen,
-     );
-   }
-   static Color AccentPurpleColor(BuildContext context, {bool listen = true}) {
-     return AppTheme.getByTheme(
-       context,
-       light: const Color(0xFF714B67),
-       dark: const Color(0xFF714B67),
-       listen: listen,
-     );
-   }
-   static Color AccentIndigoColor(BuildContext context, {bool listen = true}) {
-      return AppTheme.getByTheme(
-        context,
-        light: const Color(0xFF0B409C),
-        dark: const Color(0xFF0B409C),
-        listen: listen,
-      );
-   }
+
+  // Dark Background Base: Rich Deep Emerald
+  static Color DeepColor(BuildContext context, {bool listen = true}) {
+    return AppTheme.getByTheme(
+      context,
+      light: const Color(0xFF042F2C),
+      dark: const Color(0xFF042F2C),
+      listen: listen,
+    );
+  }
+
+  // Primary Gradient Indigo/Teal
+  static Color DeepIndigoColor(BuildContext context, {bool listen = true}) {
+    return AppTheme.getByTheme(
+      context,
+      light: const Color(0xFF0D9488),
+      dark: const Color(0xFF0D9488),
+      listen: listen,
+    );
+  }
+
+  // Accent Color 1: Ocean Blue
+  static Color AccentPurpleColor(BuildContext context, {bool listen = true}) {
+    return AppTheme.getByTheme(
+      context,
+      light: const Color(0xFF0284C7),
+      dark: const Color(0xFF0284C7),
+      listen: listen,
+    );
+  }
+
+  // Accent Color 2: Bright Mint Teal
+  static Color AccentIndigoColor(BuildContext context, {bool listen = true}) {
+    return AppTheme.getByTheme(
+      context,
+      light: const Color(0xFF14B8A6),
+      dark: const Color(0xFF14B8A6),
+      listen: listen,
+    );
+  }
 
   static Color darkTextColor(BuildContext context, {bool listen = true}) {
     return AppTheme.getByTheme(
       context,
-      light: const Color(0xFF616161),
-      dark: const Color(0xFF616161),
+      light: const Color(0xFF64748B),
+      dark: const Color(0xFF64748B),
       listen: listen,
     );
   }
@@ -118,8 +129,8 @@ class AppColor {
   static Color titleFormFiledColor(BuildContext context, {bool listen = true}) {
     return AppTheme.getByTheme(
       context,
-      light: const Color(0xFF000627),
-      dark: const Color(0xFF000627),
+      light: const Color(0xFF0F172A),
+      dark: const Color(0xFF0F172A),
       listen: listen,
     );
   }
@@ -136,8 +147,8 @@ class AppColor {
   static Color textFormBorderColor(BuildContext context, {bool listen = true}) {
     return AppTheme.getByTheme(
       context,
-      light: const Color(0xFFD9D9D9),
-      dark: const Color(0xFFD9D9D9),
+      light: const Color(0xFFE2E8F0),
+      dark: const Color(0xFFE2E8F0),
       listen: listen,
     );
   }
@@ -154,8 +165,8 @@ class AppColor {
   static Color appBarTextColor(BuildContext context, {bool listen = true}) {
     return AppTheme.getByTheme(
       context,
-      light: const Color(0xFF23120B),
-      dark: const Color(0xFF23120B),
+      light: const Color(0xFF0F172A),
+      dark: const Color(0xFF0F172A),
       listen: listen,
     );
   }

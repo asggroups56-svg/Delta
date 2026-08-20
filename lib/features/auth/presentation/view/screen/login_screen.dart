@@ -100,10 +100,10 @@ class _LoginScreenState extends State<LoginScreen> {
                             padding: EdgeInsets.symmetric(
                                 horizontal: 12.w, vertical: 6.h),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF714B67).withValues(alpha: 0.1),
+                              color: const Color(0xFF0D9488).withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(20.r),
                               border: Border.all(
-                                color: const Color(0xFF714B67).withValues(alpha: 0.25),
+                                color: const Color(0xFF0D9488).withValues(alpha: 0.25),
                               ),
                             ),
                             child: Row(
@@ -111,7 +111,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 Icon(
                                   Icons.language_rounded,
                                   size: 16.r,
-                                  color: const Color(0xFF714B67),
+                                  color: const Color(0xFF0D9488),
                                 ),
                                 Gap(6.w),
                                 Text(
@@ -119,7 +119,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   style: TextStyle(
                                     fontSize: 12.sp,
                                     fontWeight: FontWeight.bold,
-                                    color: const Color(0xFF714B67),
+                                    color: const Color(0xFF0D9488),
                                   ),
                                 ),
                               ],
@@ -140,7 +140,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           borderRadius: BorderRadius.circular(24.r),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFF714B67).withValues(alpha: 0.08),
+                              color: const Color(0xFF0D9488).withValues(alpha: 0.08),
                               blurRadius: 30,
                               offset: const Offset(0, 10),
                             ),
@@ -214,7 +214,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       height: 24.h,
                                       child: Checkbox(
                                         value: cubit.rememberMe,
-                                        activeColor: const Color(0xFF714B67),
+                                        activeColor: const Color(0xFF0D9488),
                                         shape: RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(4.r),
@@ -240,7 +240,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     style: TextStyle(
                                       fontSize: 12.sp,
                                       fontWeight: FontWeight.w600,
-                                      color: const Color(0xFF714B67),
+                                      color: const Color(0xFF0D9488),
                                     ),
                                   ),
                                 ),
