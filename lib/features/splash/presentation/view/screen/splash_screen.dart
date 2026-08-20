@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:my_template/core/images/app_images.dart';
+import 'package:my_template/core/routes/routes_name.dart';
 import 'package:my_template/core/theme/app_colors.dart';
+import 'package:my_template/core/utils/navigator_methods.dart';
 import 'package:my_template/features/splash/presentation/view/widget/bottom_progress_indicator_footer_widget.dart';
 import 'package:my_template/features/splash/presentation/view/widget/chip_badge_widget.dart';
 
@@ -18,21 +20,21 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-   // _navigateToNext();
+    _navigateToNext();
   }
 
-  // void _navigateToNext() {
-  //   Future.delayed(const Duration(milliseconds: 3200)).then(
-  //     (value) {
-  //       if (mounted) {
-  //         NavigatorMethods.pushReplacementNamed(
-  //           context,
-  //           RoutesName.onboardingScreen,
-  //         );
-  //       }
-  //     },
-  //   );
-  // }
+  void _navigateToNext() {
+    Future.delayed(const Duration(milliseconds: 3200)).then(
+      (value) {
+        if (mounted) {
+          NavigatorMethods.pushReplacementNamed(
+            context,
+            RoutesName.onboardingScreen,
+          );
+        }
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {

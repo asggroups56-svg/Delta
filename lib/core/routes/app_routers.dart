@@ -16,8 +16,12 @@ class AppRouters {
         return MaterialPageRoute(
           builder: (_) => BlocProvider(
             create: (context) => sl<AuthCubit>(),
-            child: LoginScreen(),
+            child: const LoginScreen(),
           ),
+        );
+      case RoutesName.signupScreen:
+        return MaterialPageRoute(
+          builder: (_) => const SignupScreen(),
         );
 
       default:

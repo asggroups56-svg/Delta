@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_template/core/routes/routes_name.dart';
 import 'package:my_template/features/auth/presentation/view/screen/login_screen.dart';
+import 'package:my_template/features/auth/presentation/view/screen/signup_screen.dart';
 import 'package:my_template/features/home/presentation/view/screen/home_screen.dart';
 import 'package:my_template/features/onboarding/presentation/view/screen/onboarding_screen.dart';
 
