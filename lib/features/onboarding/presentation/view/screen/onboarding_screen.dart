@@ -1,4 +1,5 @@
 import 'package:animate_do/animate_do.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
@@ -17,32 +18,30 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentIndex = 0;
 
-  final List<OnboardingItemModel> _items = [
-    OnboardingItemModel(
-      title: 'إدارة شاملة لجميع أعمالك',
-      subtitle:
-          'منصة واحدة متكاملة تجمع بين المبيعات، إدارة المخزون، الحسابات، وتتبع العملاء بكل سهولة وسلاسة.',
-      accentColor: const Color(0xFF714B67), // Odoo Purple Accent
-      type: OnboardingType.allInOne,
-    ),
-    OnboardingItemModel(
-      title: 'تحليلات وتقارير لحظية',
-      subtitle:
-          'متابعة أداء منظومتك ورسوماتك البيانية أولاً بأول لاتخاذ القرارات الاستراتيجية في الوقت المناسب.',
-      accentColor: const Color(0xFF017E84), // Odoo Teal Accent
-      type: OnboardingType.analytics,
-    ),
-    OnboardingItemModel(
-      title: 'أتمتة وسرعة في الإنجاز',
-      subtitle:
-          'وفّر وقتك وجهدك عبر أتمتة دورات العمل اليومية والمهام المكررة لأداء أكثر كفاءة وإنتاجية.',
-      accentColor: const Color(0xFF0B409C), // Deep Indigo Accent
-      type: OnboardingType.automation,
-    ),
-  ];
+  List<OnboardingItemModel> _getItems() => [
+        OnboardingItemModel(
+          titleKey: 'onboardingTitle1',
+          subtitleKey: 'onboardingSubtitle1',
+          accentColor: const Color(0xFF714B67), // Odoo Purple Accent
+          type: OnboardingType.allInOne,
+        ),
+        OnboardingItemModel(
+          titleKey: 'onboardingTitle2',
+          subtitleKey: 'onboardingSubtitle2',
+          accentColor: const Color(0xFF017E84), // Odoo Teal Accent
+          type: OnboardingType.analytics,
+        ),
+        OnboardingItemModel(
+          titleKey: 'onboardingTitle3',
+          subtitleKey: 'onboardingSubtitle3',
+          accentColor: const Color(0xFF0B409C), // Deep Indigo Accent
+          type: OnboardingType.automation,
+        ),
+      ];
 
   void _onNext() {
-    if (_currentIndex < _items.length - 1) {
+    final items = _getItems();
+    if (_currentIndex < items.length - 1) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 400),
         curve: Curves.easeInOut,
@@ -56,16 +55,26 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     NavigatorMethods.pushReplacementNamed(context, RoutesName.loginScreen);
   }
 
+  void _toggleLanguage() {
+    if (context.locale.languageCode == 'ar') {
+      context.setLocale(const Locale('en'));
+    } else {
+      context.setLocale(const Locale('ar'));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final currentItem = _items[_currentIndex];
+    final items = _getItems();
+    final currentItem = items[_currentIndex];
+    final isArabic = context.locale.languageCode == 'ar';
 
     return Scaffold(
       backgroundColor: AppColor.scaffoldColor(context),
       body: SafeArea(
         child: Column(
           children: [
-            // Top Bar with Skip Button
+            // Top Bar with Brand, Language Switcher, and Skip Button
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
               child: Row(
@@ -83,7 +92,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       ),
                       Gap(8.w),
                       Text(
-                        'DELTA ERP',
+                        'appName'.tr(),
                         style: TextStyle(
                           fontSize: 14.sp,
                           fontWeight: FontWeight.bold,
@@ -93,29 +102,66 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       ),
                     ],
                   ),
-                  if (_currentIndex < _items.length - 1)
-                    TextButton(
-                      onPressed: _navigateToLogin,
-                      style: TextButton.styleFrom(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 16.w, vertical: 6.h),
-                        backgroundColor:
-                            currentItem.accentColor.withOpacity(0.08),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20.r),
+                  Row(
+                    children: [
+                      // Language Toggle Button
+                      InkWell(
+                        onTap: _toggleLanguage,
+                        borderRadius: BorderRadius.circular(20.r),
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 12.w, vertical: 6.h),
+                          decoration: BoxDecoration(
+                            color: currentItem.accentColor.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(20.r),
+                            border: Border.all(
+                              color: currentItem.accentColor.withValues(alpha: 0.25),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.language_rounded,
+                                size: 16.r,
+                                color: currentItem.accentColor,
+                              ),
+                              Gap(6.w),
+                              Text(
+                                isArabic ? 'English' : 'العربية',
+                                style: TextStyle(
+                                  fontSize: 12.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: currentItem.accentColor,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                      child: Text(
-                        'تخطي',
-                        style: TextStyle(
-                          fontSize: 13.sp,
-                          fontWeight: FontWeight.w600,
-                          color: currentItem.accentColor,
+                      Gap(8.w),
+                      if (_currentIndex < items.length - 1)
+                        TextButton(
+                          onPressed: _navigateToLogin,
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 14.w, vertical: 6.h),
+                            backgroundColor:
+                                currentItem.accentColor.withValues(alpha: 0.08),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20.r),
+                            ),
+                          ),
+                          child: Text(
+                            'skip'.tr(),
+                            style: TextStyle(
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.w600,
+                              color: currentItem.accentColor,
+                            ),
+                          ),
                         ),
-                      ),
-                    )
-                  else
-                    SizedBox(height: 32.h),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -124,14 +170,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             Expanded(
               child: PageView.builder(
                 controller: _pageController,
-                itemCount: _items.length,
+                itemCount: items.length,
                 onPageChanged: (index) {
                   setState(() {
                     _currentIndex = index;
                   });
                 },
                 itemBuilder: (context, index) {
-                  return _buildPageSlide(_items[index]);
+                  return _buildPageSlide(items[index]);
                 },
               ),
             ),
@@ -145,7 +191,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   // Animated Page Indicators
                   Row(
                     children: List.generate(
-                      _items.length,
+                      items.length,
                       (index) => AnimatedContainer(
                         duration: const Duration(milliseconds: 300),
                         margin: EdgeInsets.only(right: 6.w),
@@ -154,7 +200,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         decoration: BoxDecoration(
                           color: _currentIndex == index
                               ? currentItem.accentColor
-                              : currentItem.accentColor.withOpacity(0.2),
+                              : currentItem.accentColor.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(4.r),
                         ),
                       ),
@@ -169,12 +215,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       style: ElevatedButton.styleFrom(
                         padding: EdgeInsets.symmetric(
                           horizontal:
-                              _currentIndex == _items.length - 1 ? 28.w : 22.w,
+                              _currentIndex == items.length - 1 ? 28.w : 22.w,
                           vertical: 14.h,
                         ),
                         backgroundColor: currentItem.accentColor,
                         elevation: 4,
-                        shadowColor: currentItem.accentColor.withOpacity(0.4),
+                        shadowColor: currentItem.accentColor.withValues(alpha: 0.4),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30.r),
                         ),
@@ -183,9 +229,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            _currentIndex == _items.length - 1
-                                ? 'ابدأ الآن'
-                                : 'التالي',
+                            _currentIndex == items.length - 1
+                                ? 'startNow'.tr()
+                                : 'next'.tr(),
                             style: TextStyle(
                               fontSize: 15.sp,
                               fontWeight: FontWeight.bold,
@@ -194,9 +240,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           ),
                           Gap(8.w),
                           Icon(
-                            _currentIndex == _items.length - 1
+                            _currentIndex == items.length - 1
                                 ? Icons.rocket_launch_rounded
-                                : Icons.arrow_forward_rounded,
+                                : (isArabic
+                                    ? Icons.arrow_back_rounded
+                                    : Icons.arrow_forward_rounded),
                             size: 18.r,
                             color: Colors.white,
                           ),
@@ -237,7 +285,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   key: ValueKey('title_${item.type}'),
                   duration: const Duration(milliseconds: 400),
                   child: Text(
-                    item.title,
+                    item.titleKey.tr(),
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 22.sp,
@@ -252,7 +300,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   key: ValueKey('subtitle_${item.type}'),
                   duration: const Duration(milliseconds: 500),
                   child: Text(
-                    item.subtitle,
+                    item.subtitleKey.tr(),
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 13.sp,
@@ -293,7 +341,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             height: 240.h,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: color.withOpacity(0.06),
+              color: color.withValues(alpha: 0.06),
             ),
           ),
         ),
@@ -306,14 +354,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             height: 100.h,
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [color, color.withOpacity(0.8)],
+                colors: [color, color.withValues(alpha: 0.8)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: color.withOpacity(0.35),
+                  color: color.withValues(alpha: 0.35),
                   blurRadius: 20,
                   offset: const Offset(0, 10),
                 )
@@ -331,7 +379,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             duration: const Duration(milliseconds: 700),
             child: _buildModuleBadge(
               icon: Icons.point_of_sale_rounded,
-              title: 'المبيعات',
+              titleKey: 'sales',
               badgeColor: const Color(0xFFE056FD),
             ),
           ),
@@ -345,7 +393,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             duration: const Duration(milliseconds: 800),
             child: _buildModuleBadge(
               icon: Icons.inventory_2_rounded,
-              title: 'المخزون',
+              titleKey: 'inventory',
               badgeColor: const Color(0xFFFF9F1A),
             ),
           ),
@@ -359,7 +407,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             duration: const Duration(milliseconds: 900),
             child: _buildModuleBadge(
               icon: Icons.account_balance_rounded,
-              title: 'المحاسبة',
+              titleKey: 'accounting',
               badgeColor: const Color(0xFF2ED573),
             ),
           ),
@@ -373,7 +421,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             duration: const Duration(milliseconds: 1000),
             child: _buildModuleBadge(
               icon: Icons.people_alt_rounded,
-              title: 'العملاء CRM',
+              titleKey: 'crm',
               badgeColor: const Color(0xFF1E90FF),
             ),
           ),
@@ -394,12 +442,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           borderRadius: BorderRadius.circular(24.r),
           boxShadow: [
             BoxShadow(
-              color: color.withOpacity(0.12),
+              color: color.withValues(alpha: 0.12),
               blurRadius: 25,
               offset: const Offset(0, 10),
             )
           ],
-          border: Border.all(color: color.withOpacity(0.15), width: 1.5),
+          border: Border.all(color: color.withValues(alpha: 0.15), width: 1.5),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -413,7 +461,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     Container(
                       padding: EdgeInsets.all(8.r),
                       decoration: BoxDecoration(
-                        color: color.withOpacity(0.1),
+                        color: color.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(10.r),
                       ),
                       child: Icon(Icons.analytics_rounded,
@@ -424,7 +472,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'المبيعات الأسبوعية',
+                          'weeklySales'.tr(),
                           style: TextStyle(
                             fontSize: 13.sp,
                             fontWeight: FontWeight.bold,
@@ -432,7 +480,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           ),
                         ),
                         Text(
-                          'محدث الآن',
+                          'updatedNow'.tr(),
                           style: TextStyle(
                             fontSize: 10.sp,
                             color: Colors.grey,
@@ -446,7 +494,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   padding:
                       EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
                   decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.1),
+                    color: Colors.green.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12.r),
                   ),
                   child: Row(
@@ -474,11 +522,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                _buildChartBar(height: 40.h, color: color.withOpacity(0.4)),
-                _buildChartBar(height: 70.h, color: color.withOpacity(0.6)),
-                _buildChartBar(height: 50.h, color: color.withOpacity(0.5)),
+                _buildChartBar(height: 40.h, color: color.withValues(alpha: 0.4)),
+                _buildChartBar(height: 70.h, color: color.withValues(alpha: 0.6)),
+                _buildChartBar(height: 50.h, color: color.withValues(alpha: 0.5)),
                 _buildChartBar(height: 95.h, color: color),
-                _buildChartBar(height: 65.h, color: color.withOpacity(0.7)),
+                _buildChartBar(height: 65.h, color: color.withValues(alpha: 0.7)),
               ],
             ),
             Gap(16.h),
@@ -493,7 +541,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('إجمالي الأرباح:',
+                  Text('totalProfit'.tr(),
                       style: TextStyle(fontSize: 12.sp, color: Colors.grey[700])),
                   Text('\$48,920.00',
                       style: TextStyle(
@@ -526,20 +574,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               borderRadius: BorderRadius.circular(24.r),
               boxShadow: [
                 BoxShadow(
-                  color: color.withOpacity(0.12),
+                  color: color.withValues(alpha: 0.12),
                   blurRadius: 25,
                   offset: const Offset(0, 10),
                 )
               ],
-              border: Border.all(color: color.withOpacity(0.15), width: 1.5),
+              border: Border.all(color: color.withValues(alpha: 0.15), width: 1.5),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 _buildWorkflowStep(
                   icon: Icons.add_shopping_cart_rounded,
-                  title: 'طلب شراء جديد',
-                  status: 'تم الاستلام تلقائياً',
+                  titleKey: 'newPurchaseOrder',
+                  statusKey: 'receivedAutomatically',
                   stepColor: const Color(0xFF0B409C),
                   isCompleted: true,
                 ),
@@ -556,8 +604,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ),
                 _buildWorkflowStep(
                   icon: Icons.receipt_long_rounded,
-                  title: 'إصدار الفاتورة وتحديث المخزن',
-                  status: 'جاري المعالجة الحظية',
+                  titleKey: 'issueInvoiceUpdateStock',
+                  statusKey: 'realtimeProcessing',
                   stepColor: Colors.orange,
                   isCompleted: true,
                 ),
@@ -574,8 +622,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ),
                 _buildWorkflowStep(
                   icon: Icons.mark_email_read_rounded,
-                  title: 'إرسال التقرير للعميل',
-                  status: 'تم الإرسال بنجاح',
+                  titleKey: 'sendReportToCustomer',
+                  statusKey: 'sentSuccessfully',
                   stepColor: Colors.green,
                   isCompleted: true,
                 ),
@@ -589,7 +637,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   Widget _buildModuleBadge({
     required IconData icon,
-    required String title,
+    required String titleKey,
     required Color badgeColor,
   }) {
     return Container(
@@ -599,7 +647,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 15,
             offset: const Offset(0, 5),
           )
@@ -611,14 +659,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           Container(
             padding: EdgeInsets.all(6.r),
             decoration: BoxDecoration(
-              color: badgeColor.withOpacity(0.12),
+              color: badgeColor.withValues(alpha: 0.12),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, size: 16.r, color: badgeColor),
           ),
           Gap(8.w),
           Text(
-            title,
+            titleKey.tr(),
             style: TextStyle(
               fontSize: 12.sp,
               fontWeight: FontWeight.bold,
@@ -643,8 +691,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   Widget _buildWorkflowStep({
     required IconData icon,
-    required String title,
-    required String status,
+    required String titleKey,
+    required String statusKey,
     required Color stepColor,
     required bool isCompleted,
   }) {
@@ -653,7 +701,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         Container(
           padding: EdgeInsets.all(8.r),
           decoration: BoxDecoration(
-            color: stepColor.withOpacity(0.1),
+            color: stepColor.withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
           child: Icon(icon, size: 18.r, color: stepColor),
@@ -664,7 +712,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                title,
+                titleKey.tr(),
                 style: TextStyle(
                   fontSize: 12.sp,
                   fontWeight: FontWeight.bold,
@@ -672,7 +720,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ),
               ),
               Text(
-                status,
+                statusKey.tr(),
                 style: TextStyle(
                   fontSize: 10.sp,
                   color: stepColor,
@@ -694,14 +742,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 enum OnboardingType { allInOne, analytics, automation }
 
 class OnboardingItemModel {
-  final String title;
-  final String subtitle;
+  final String titleKey;
+  final String subtitleKey;
   final Color accentColor;
   final OnboardingType type;
 
   OnboardingItemModel({
-    required this.title,
-    required this.subtitle,
+    required this.titleKey,
+    required this.subtitleKey,
     required this.accentColor,
     required this.type,
   });

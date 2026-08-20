@@ -57,5 +57,6 @@ class AppImages {
   /// Assets for assetsSvgArrowDown
   /// assets/svg/arrowDown.svg
   static const String assetsSvgArrowDown = "assets/svg/arrowDown.svg";
+  static const String assetsGlobalIconLogoAnimated = "assets/global_icon/logo_animated.gif";
 }
 

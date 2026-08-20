@@ -1,5 +1,31 @@
 {
-  
-    "PleaseCheckYourConnectionAndTryAgain" : "يرجى التحقق من اتصالك ثم المحاولة مرة أخرى."
-  }
-  
+  "PleaseCheckYourConnectionAndTryAgain": "يرجى التحقق من اتصالك ثم المحاولة مرة أخرى.",
+  "appName": "DELTA ERP",
+  "appSubtitle": "نظام إدارة الأعمال المتكامل",
+  "versionPoweredBy": "v1.0.0 • مدعوم بركيزة Odoo",
+  "skip": "تخطي",
+  "next": "التالي",
+  "startNow": "ابدأ الآن",
+  "sales": "المبيعات",
+  "inventory": "المخزون",
+  "accounting": "المحاسبة",
+  "crm": "العملاء CRM",
+  "onboardingTitle1": "إدارة شاملة لجميع أعمالك",
+  "onboardingSubtitle1": "منصة واحدة متكاملة تجمع بين المبيعات، إدارة المخزون، الحسابات، وتتبع العملاء بكل سهولة وسلاسة.",
+  "onboardingTitle2": "تحليلات وتقارير لحظية",
+  "onboardingSubtitle2": "متابعة أداء منظومتك ورسوماتك البيانية أولاً بأول لاتخاذ القرارات الاستراتيجية في الوقت المناسب.",
+  "onboardingTitle3": "أتمتة وسرعة في الإنجاز",
+  "onboardingSubtitle3": "وفّر وقتك وجهدك عبر أتمتة دورات العمل اليومية والمهام المكررة لأداء أكثر كفاءة وإنتاجية.",
+  "weeklySales": "المبيعات الأسبوعية",
+  "updatedNow": "محدث الآن",
+  "totalProfit": "إجمالي الأرباح:",
+  "newPurchaseOrder": "طلب شراء جديد",
+  "receivedAutomatically": "تم الاستلام تلقائياً",
+  "issueInvoiceUpdateStock": "إصدار الفاتورة وتحديث المخزن",
+  "realtimeProcessing": "جاري المعالجة اللحظية",
+  "sendReportToCustomer": "إرسال التقرير للعميل",
+  "sentSuccessfully": "تم الإرسال بنجاح",
+  "changeLanguage": "تغيير اللغة",
+  "arabic": "العربية",
+  "english": "English"
+}

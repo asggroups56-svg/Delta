@@ -1,4 +1,31 @@
 {
- 
-  "PleaseCheckYourConnectionAndTryAgain": "Please check your connection and try again."
+  "PleaseCheckYourConnectionAndTryAgain": "Please check your connection and try again.",
+  "appName": "DELTA ERP",
+  "appSubtitle": "Integrated Business Management Platform",
+  "versionPoweredBy": "v1.0.0 • Powered by Odoo Engine",
+  "skip": "Skip",
+  "next": "Next",
+  "startNow": "Get Started",
+  "sales": "Sales",
+  "inventory": "Inventory",
+  "accounting": "Accounting",
+  "crm": "CRM",
+  "onboardingTitle1": "All-in-One Business Management",
+  "onboardingSubtitle1": "A single integrated platform combining Sales, Inventory, Accounting, and CRM effortlessly.",
+  "onboardingTitle2": "Real-Time Analytics & Reports",
+  "onboardingSubtitle2": "Monitor your business metrics and interactive dashboards live to make strategic decisions on time.",
+  "onboardingTitle3": "Smart Automated Workflows",
+  "onboardingSubtitle3": "Save time and effort by automating daily business processes and repetitive tasks with ease.",
+  "weeklySales": "Weekly Sales",
+  "updatedNow": "Updated Now",
+  "totalProfit": "Total Profit:",
+  "newPurchaseOrder": "New Purchase Order",
+  "receivedAutomatically": "Received Automatically",
+  "issueInvoiceUpdateStock": "Issue Invoice & Update Stock",
+  "realtimeProcessing": "Real-Time Processing",
+  "sendReportToCustomer": "Send Report to Customer",
+  "sentSuccessfully": "Sent Successfully",
+  "changeLanguage": "Change Language",
+  "arabic": "العربية",
+  "english": "English"
 }

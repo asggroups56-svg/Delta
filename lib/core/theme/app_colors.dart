@@ -54,6 +54,48 @@ class AppColor {
       listen: listen,
     );
   }
+  static Color BackColor(BuildContext context, {bool listen = true}) {
+    return AppTheme.getByTheme(
+      context,
+      light: Colors.black,
+      dark: Colors.black,
+      listen: listen,
+    );
+  }
+   
+   static  Color  DeepColor(BuildContext context, {bool listen = true}) {
+     return AppTheme.getByTheme(
+       context,
+       light: const Color(0xFF1E1B2E),
+       dark: const Color(0xFF1E1B2E),
+       listen: listen,
+     );
+     
+   }          
+   static Color DeepIndigoColor(BuildContext context, {bool listen = true}) {
+     return AppTheme.getByTheme(
+        context,
+        light: const Color(0xFF0B409C), 
+        dark: const Color(0xFF0B409C),
+        listen: listen,
+     );
+   }
+   static Color AccentPurpleColor(BuildContext context, {bool listen = true}) {
+     return AppTheme.getByTheme(
+       context,
+       light: const Color(0xFF714B67),
+       dark: const Color(0xFF714B67),
+       listen: listen,
+     );
+   }
+   static Color AccentIndigoColor(BuildContext context, {bool listen = true}) {
+      return AppTheme.getByTheme(
+        context,
+        light: const Color(0xFF0B409C),
+        dark: const Color(0xFF0B409C),
+        listen: listen,
+      );
+   }
 
   static Color darkTextColor(BuildContext context, {bool listen = true}) {
     return AppTheme.getByTheme(
