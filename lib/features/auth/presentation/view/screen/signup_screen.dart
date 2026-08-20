@@ -132,7 +132,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 ),
                 Gap(20.h),
 
-                // Odoo Signup Glassmorphic Card
+                // Enterprise Signup Glassmorphic Card
                 FadeInUp(
                   duration: const Duration(milliseconds: 600),
                   child: Container(
@@ -193,7 +193,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         ),
                         Gap(14.h),
 
-                        // Company / Database Field (Signature Odoo Feature)
+                        // Company / Database Field
                         CustomFormField(
                           controller: _companyController,
                           title: 'companyName'.tr(),

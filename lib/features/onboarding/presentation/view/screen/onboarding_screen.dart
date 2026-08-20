@@ -328,7 +328,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     }
   }
 
-  // Slide 1 Illustration: Floating Odoo Modules Grid
+  // Slide 1 Illustration: Floating Modules Grid
   Widget _buildAllInOneIllustration(Color color) {
     return Stack(
       alignment: Alignment.center,

@@ -1,4 +1,5 @@
 import 'package:animate_do/animate_do.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
@@ -34,7 +35,7 @@ class BottomProgressIndicatorFooterWidget extends StatelessWidget {
             duration: const Duration(milliseconds: 500),
             delay: const Duration(milliseconds: 1100),
             child: Text(
-              'v1.0.0 • Powered by Odoo Engine',
+              'versionPoweredBy'.tr(),
               style: TextStyle(
                 fontSize: 10.sp,
                 color: Colors.white54,

@@ -47,9 +47,9 @@ class _SplashScreenState extends State<SplashScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              AppColor.DeepColor(context), // Deep Odoo Dark Purple
-              AppColor.DeepIndigoColor(context), // Delta Deep Indigo
-              AppColor.AccentPurpleColor(context), // Odoo Accent Purple
+              AppColor.DeepColor(context), // Deep Dark Emerald
+              AppColor.DeepIndigoColor(context), // Delta Primary Emerald
+              AppColor.AccentPurpleColor(context), // Ocean Blue Accent
             ],
             stops: [0.0, 0.6, 1.0],
           ),

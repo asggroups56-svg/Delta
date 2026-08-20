@@ -130,7 +130,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     Gap(32.h),
 
-                    // Odoo Login Glassmorphic Card
+                    // Enterprise Login Glassmorphic Card
                     FadeInUp(
                       duration: const Duration(milliseconds: 600),
                       child: Container(
@@ -248,7 +248,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             Gap(24.h),
 
-                            // Odoo Style Submit Button
+                            // Enterprise Style Submit Button
                             SizedBox(
                               width: double.infinity,
                               height: 48.h,
