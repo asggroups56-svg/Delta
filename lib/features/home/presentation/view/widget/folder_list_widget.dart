@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:my_template/core/theme/app_colors.dart';
+import 'package:my_template/core/theme/app_text_style.dart';
 
 class FolderListWidget extends StatefulWidget {
   const FolderListWidget({super.key, required this.folders});
@@ -23,7 +24,7 @@ class _FolderListWidgetState extends State<FolderListWidget> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text('foldersTitle'.tr(),
-            style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold, color: AppColor.whiteColor(context).withValues(alpha: 0.7))),
+            style: AppTextStyle.bodyMedium(context).copyWith(color: AppColor.whiteColor(context).withValues(alpha: 0.7))),
         Gap(12.h),
         ListView.builder(
           shrinkWrap: true,
@@ -50,8 +51,8 @@ class _FolderListWidgetState extends State<FolderListWidget> {
                     decoration: BoxDecoration(color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10.r)),
                     child: Icon(folder['icon'] as IconData, color: color, size: 22.r),
                   ),
-                  title: Text(name, style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w600, color: AppColor.whiteColor(context))),
-                  subtitle: Text(folder['count'] as String, style: TextStyle(fontSize: 11.sp, color: AppColor.whiteColor(context).withValues(alpha: 0.38))),
+                  title: Text(name, style: AppTextStyle.bodyMedium(context).copyWith(fontWeight: FontWeight.w600)),
+                  subtitle: Text(folder['count'] as String, style: AppTextStyle.text12SDark(context).copyWith(fontSize: 11.sp, color: AppColor.whiteColor(context).withValues(alpha: 0.38))),
                   trailing: IconButton(
                     icon: Icon(
                       isFav ? Icons.star_rounded : Icons.star_border_rounded,

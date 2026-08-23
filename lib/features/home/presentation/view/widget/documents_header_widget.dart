@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:my_template/core/theme/app_colors.dart';
+import 'package:my_template/core/theme/app_text_style.dart';
 
 class DocumentsHeaderWidget extends StatelessWidget {
   const DocumentsHeaderWidget({super.key});
@@ -40,9 +41,9 @@ class DocumentsHeaderWidget extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.add_rounded, size: 14.r, color: Colors.white),
+                  Icon(Icons.add_rounded, size: 14.r, color: AppColor.whiteColor(context)),
                   Gap(3.w),
-                  Text('newBtn'.tr(), style: TextStyle(fontSize: 11.sp, fontWeight: FontWeight.bold, color: Colors.white)),
+                  Text('newBtn'.tr(), style: AppTextStyle.text10SDark(context).copyWith(fontWeight: FontWeight.bold, color: AppColor.whiteColor(context))),
                 ],
               ),
             ),

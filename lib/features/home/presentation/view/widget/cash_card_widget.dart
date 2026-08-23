@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:my_template/core/theme/app_colors.dart';
+import 'package:my_template/core/theme/app_text_style.dart';
 
 class CashCardWidget extends StatelessWidget {
   const CashCardWidget({super.key});
@@ -28,7 +29,7 @@ class CashCardWidget extends StatelessWidget {
               children: [
                 Text(
                   'cashCard'.tr(),
-                  style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold, color: const Color(0xFF00B894)),
+                  style: AppTextStyle.bodyMedium(context).copyWith(fontSize: 16.sp, fontWeight: FontWeight.bold, color: const Color(0xFF00B894)),
                 ),
                 Icon(Icons.more_vert_rounded, color: AppColor.whiteColor(context).withValues(alpha: 0.54), size: 20.r),
               ],
@@ -36,7 +37,7 @@ class CashCardWidget extends StatelessWidget {
             Gap(6.h),
             Text(
               'cashDesc'.tr(),
-              style: TextStyle(fontSize: 11.sp, color: AppColor.whiteColor(context).withValues(alpha: 0.6), height: 1.4),
+              style: AppTextStyle.bodySmall(context).copyWith(fontSize: 11.sp, color: AppColor.whiteColor(context).withValues(alpha: 0.6), height: 1.4),
             ),
           ],
         ),

@@ -26,6 +26,8 @@ class GeminiService {
   static Future<String> generateResponse({
     required String prompt,
     List<Map<String, String>> history = const [],
+    String? base64Image,
+    String? mimeType = 'image/jpeg',
   }) async {
     if (apiKey.trim().isEmpty) {
       return _getFallbackResponse(prompt);
@@ -48,11 +50,22 @@ class GeminiService {
     }
 
     // Append current user prompt
+    final List<Map<String, dynamic>> finalParts = [];
+    
+    if (base64Image != null && base64Image.isNotEmpty) {
+      finalParts.add({
+        'inlineData': {
+          'mimeType': mimeType ?? 'image/jpeg',
+          'data': base64Image,
+        }
+      });
+    }
+    
+    finalParts.add({'text': prompt});
+
     contents.add({
       'role': 'user',
-      'parts': [
-        {'text': prompt}
-      ]
+      'parts': finalParts,
     });
 
     String lastErrorMessage = '';

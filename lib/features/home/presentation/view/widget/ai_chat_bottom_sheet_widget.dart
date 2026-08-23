@@ -5,6 +5,7 @@ import 'package:gap/gap.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:my_template/core/services/gemini_service.dart';
 import 'package:my_template/core/theme/app_colors.dart';
+import 'package:my_template/core/theme/app_text_style.dart';
 import 'package:my_template/core/utils/app_locale_key.dart';
 
 class AiChatBottomSheetWidget extends StatefulWidget {
@@ -51,7 +52,7 @@ class _AiChatBottomSheetWidgetState extends State<AiChatBottomSheetWidget> {
             Gap(8.w),
             Text(
               'Google AI Studio Key',
-              style: TextStyle(fontSize: 14.sp, color: AppColor.whiteColor(ctx), fontWeight: FontWeight.bold),
+              style: AppTextStyle.bodyMedium(ctx).copyWith( color: AppColor.whiteColor(ctx), fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -61,15 +62,15 @@ class _AiChatBottomSheetWidgetState extends State<AiChatBottomSheetWidget> {
           children: [
             Text(
               'أدخل مفتاح API الخاص بك من Google AI Studio لتفعيل نموذج Gemini المباشر:',
-              style: TextStyle(fontSize: 11.sp, color: AppColor.whiteColor(ctx).withValues(alpha: 0.7)),
+              style: AppTextStyle.bodySmall(ctx).copyWith(color: AppColor.whiteColor(ctx).withValues(alpha: 0.7)),
             ),
             Gap(12.h),
             TextField(
               controller: keyController,
-              style: TextStyle(fontSize: 12.sp, color: AppColor.whiteColor(ctx)),
+              style: AppTextStyle.bodySmall(ctx).copyWith(color: AppColor.whiteColor(ctx)),
               decoration: InputDecoration(
                 hintText: 'AIzaSy...',
-                hintStyle: TextStyle(fontSize: 11.sp, color: AppColor.whiteColor(ctx).withValues(alpha: 0.3)),
+                hintStyle: AppTextStyle.bodySmall(ctx).copyWith(color: AppColor.whiteColor(ctx).withValues(alpha: 0.3)),
                 filled: true,
                 fillColor: AppColor.darkSurface,
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10.r), borderSide: BorderSide.none),
@@ -80,7 +81,7 @@ class _AiChatBottomSheetWidgetState extends State<AiChatBottomSheetWidget> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('إلغاء', style: TextStyle(color: AppColor.whiteColor(ctx).withValues(alpha: 0.6))),
+            child: Text('إلغاء', style: AppTextStyle.bodySmall(ctx).copyWith(color: AppColor.whiteColor(ctx).withValues(alpha: 0.6))),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: AppColor.emeraldTeal),
@@ -94,7 +95,7 @@ class _AiChatBottomSheetWidgetState extends State<AiChatBottomSheetWidget> {
                 ),
               );
             },
-            child: const Text('حفظ', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+            child:  Text('حفظ', style: AppTextStyle.bodyMedium(ctx).copyWith(fontWeight: FontWeight.bold, color: AppColor.whiteColor(ctx))),
           ),
         ],
       ),
@@ -204,9 +205,9 @@ class _AiChatBottomSheetWidgetState extends State<AiChatBottomSheetWidget> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(AppLocaleKey.aiAssistantTitle.tr(),
-                          style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold, color: AppColor.whiteColor(context))),
+                          style: AppTextStyle.bodyMedium(context).copyWith(fontWeight: FontWeight.bold, color: AppColor.whiteColor(context))),
                       Text('Google AI Studio • Gemini',
-                          style: TextStyle(fontSize: 10.sp, color: AppColor.emeraldTeal, fontWeight: FontWeight.bold)),
+                          style: AppTextStyle.bodySmall(context).copyWith(color: AppColor.emeraldTeal, fontWeight: FontWeight.bold)),
                     ],
                   ),
                 ),
@@ -245,7 +246,7 @@ class _AiChatBottomSheetWidgetState extends State<AiChatBottomSheetWidget> {
                     child: Center(
                       child: Text(
                         item['label']!,
-                        style: TextStyle(fontSize: 10.sp, color: AppColor.skyBlue),
+                        style: AppTextStyle.bodySmall(context).copyWith(color: AppColor.skyBlue),
                       ),
                     ),
                   ),
@@ -357,7 +358,7 @@ class _AiChatBottomSheetWidgetState extends State<AiChatBottomSheetWidget> {
         child: Text(
           text,
           textAlign: TextAlign.start,
-          style: TextStyle(fontSize: 12.sp, color: AppColor.whiteColor(context).withValues(alpha: 0.95), height: 1.5),
+          style: AppTextStyle.bodySmall(context).copyWith(color: AppColor.whiteColor(context).withValues(alpha: 0.95), height: 1.5),
         ),
       ),
     );

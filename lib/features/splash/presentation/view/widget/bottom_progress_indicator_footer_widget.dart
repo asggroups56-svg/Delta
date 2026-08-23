@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:my_template/core/theme/app_text_style.dart';
 
 class BottomProgressIndicatorFooterWidget extends StatelessWidget {
   const BottomProgressIndicatorFooterWidget({
@@ -36,8 +37,8 @@ class BottomProgressIndicatorFooterWidget extends StatelessWidget {
             delay: const Duration(milliseconds: 1100),
             child: Text(
               'versionPoweredBy'.tr(),
-              style: TextStyle(
-                fontSize: 10.sp,
+              style: AppTextStyle.text10SDark(context).copyWith(
+               
                 color: Colors.white54,
                 letterSpacing: 0.8,
               ),

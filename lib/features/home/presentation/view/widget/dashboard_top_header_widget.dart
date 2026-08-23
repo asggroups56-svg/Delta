@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:my_template/core/theme/app_colors.dart';
+import 'package:my_template/core/theme/app_text_style.dart';
 import 'package:my_template/core/utils/app_locale_key.dart';
 import 'ai_chat_bottom_sheet_widget.dart';
 
@@ -97,7 +98,7 @@ class DashboardTopHeaderWidget extends StatelessWidget {
                   child: Center(
                     child: Text(
                       '1',
-                      style: TextStyle(
+                      style: AppTextStyle.bodySmall(context).copyWith(
                         fontSize: 7.sp,
                         color: AppColor.whiteColor(context),
                         fontWeight: FontWeight.bold,
@@ -137,7 +138,7 @@ class DashboardTopHeaderWidget extends StatelessWidget {
                   Gap(2.w),
                   Text(
                     'AI',
-                    style: TextStyle(
+                    style: AppTextStyle.bodySmall(context).copyWith(
                       fontSize: 9.sp,
                       fontWeight: FontWeight.bold,
                       color: AppColor.whiteColor(context),
@@ -154,8 +155,7 @@ class DashboardTopHeaderWidget extends StatelessWidget {
               textAlign: TextAlign.center,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 14.sp,
+              style: AppTextStyle.bodyMedium(context).copyWith(
                 fontWeight: FontWeight.bold,
                 color: AppColor.whiteColor(context),
               ),
@@ -173,8 +173,7 @@ class DashboardTopHeaderWidget extends StatelessWidget {
               ),
               child: Text(
                 AppLocaleKey.langSwitchShort.tr(),
-                style: TextStyle(
-                  fontSize: 10.sp,
+                style: AppTextStyle.bodySmall(context).copyWith(
                   color: AppColor.whiteColor(context),
                   fontWeight: FontWeight.bold,
                 ),

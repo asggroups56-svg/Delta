@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:my_template/core/theme/app_colors.dart';
+import 'package:my_template/core/theme/app_text_style.dart';
 import 'package:my_template/core/utils/app_locale_key.dart';
 
 class Ifrs16CardWidget extends StatelessWidget {
@@ -31,7 +32,7 @@ class Ifrs16CardWidget extends StatelessWidget {
               children: [
                 Text(
                   AppLocaleKey.ifrs16Asset.tr(),
-                  style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.bold, color: AppColor.emeraldTeal),
+                  style: AppTextStyle.text16SDark(context).copyWith(fontSize: 15.sp, fontWeight: FontWeight.bold, color: AppColor.emeraldTeal),
                 ),
                 Icon(Icons.more_vert_rounded, color: AppColor.whiteColor(context).withValues(alpha: 0.54), size: 20.r),
               ],

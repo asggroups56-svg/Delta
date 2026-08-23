@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:my_template/core/theme/app_colors.dart';
+import 'package:my_template/core/theme/app_text_style.dart';
 import 'package:my_template/core/utils/app_locale_key.dart';
 
 class UploadInvoiceBottomSheetWidget extends StatelessWidget {
@@ -46,7 +47,7 @@ class UploadInvoiceBottomSheetWidget extends StatelessWidget {
           Gap(14.h),
           Text(
             AppLocaleKey.uploadInvoiceDoc.tr(),
-            style: TextStyle(
+            style: AppTextStyle.text16SDark(context).copyWith(
               fontSize: 15.sp,
               fontWeight: FontWeight.bold,
               color: AppColor.whiteColor(context),
@@ -76,7 +77,7 @@ class UploadInvoiceBottomSheetWidget extends StatelessWidget {
                 Gap(10.h),
                 Text(
                   AppLocaleKey.tapToSelectFile.tr(),
-                  style: TextStyle(
+                  style: AppTextStyle.text12SDark(context).copyWith(
                     fontSize: 12.sp,
                     color: AppColor.whiteColor(context).withValues(alpha: 0.7),
                   ),
@@ -84,7 +85,7 @@ class UploadInvoiceBottomSheetWidget extends StatelessWidget {
                 Gap(4.h),
                 Text(
                   AppLocaleKey.maxSize10Mb.tr(),
-                  style: TextStyle(
+                  style: AppTextStyle.text10SDark(context).copyWith(
                     fontSize: 10.sp,
                     color: AppColor.whiteColor(context).withValues(alpha: 0.38),
                   ),
@@ -114,7 +115,7 @@ class UploadInvoiceBottomSheetWidget extends StatelessWidget {
             },
             child: Text(
               AppLocaleKey.scanAndUpload.tr(),
-              style: TextStyle(
+              style: AppTextStyle.bodyMedium( context).copyWith(
                 fontSize: 13.sp,
                 fontWeight: FontWeight.bold,
                 color: AppColor.whiteColor(context),

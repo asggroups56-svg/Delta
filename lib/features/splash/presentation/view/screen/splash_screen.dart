@@ -5,17 +5,15 @@ import 'package:gap/gap.dart';
 import 'package:my_template/core/images/app_images.dart';
 import 'package:my_template/core/routes/routes_name.dart';
 import 'package:my_template/core/theme/app_colors.dart';
+import 'package:my_template/core/theme/app_text_style.dart';
 import 'package:my_template/core/utils/navigator_methods.dart';
 import 'package:my_template/features/splash/presentation/view/widget/bottom_progress_indicator_footer_widget.dart';
 import 'package:my_template/features/splash/presentation/view/widget/chip_badge_widget.dart';
-
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
-
   @override
   State<SplashScreen> createState() => _SplashScreenState();
 }
-
 class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
@@ -122,14 +120,13 @@ class _SplashScreenState extends State<SplashScreen> {
                   ),
                 ),
                 Gap(28.h),
-
                 // Brand Title
                 FadeInUp(
                   duration: const Duration(milliseconds: 600),
                   delay: const Duration(milliseconds: 300),
                   child: Text(
                     'DELTA ERP',
-                    style: TextStyle(
+                    style: AppTextStyle.bodyMedium(context).copyWith(
                       fontSize: 28.sp,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 2.5,
@@ -153,9 +150,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   child: Text(
                     'Integrated Business Management System',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.w400,
+                    style: AppTextStyle.bodySmall(context).copyWith(
                       color: AppColor.whiteColor(context).withValues(alpha: 0.85),
                       letterSpacing: 0.5,
                     ),

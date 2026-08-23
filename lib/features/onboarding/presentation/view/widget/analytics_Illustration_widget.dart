@@ -3,6 +3,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:my_template/core/theme/app_colors.dart';
+import 'package:my_template/core/theme/app_text_style.dart';
 import 'package:my_template/features/onboarding/presentation/view/widget/chart_bar_widget.dart';
 
 class AnalyticsIllustrationWidget extends StatelessWidget {
@@ -16,7 +18,7 @@ class AnalyticsIllustrationWidget extends StatelessWidget {
         padding: EdgeInsets.all(20.r),
         width: 280.w,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColor.whiteColor(context),
           borderRadius: BorderRadius.circular(24.r),
           boxShadow: [
             BoxShadow(
@@ -51,7 +53,7 @@ class AnalyticsIllustrationWidget extends StatelessWidget {
                       children: [
                         Text(
                           'weeklySales'.tr(),
-                          style: TextStyle(
+                          style: AppTextStyle.bodyMedium(context).copyWith(
                             fontSize: 13.sp,
                             fontWeight: FontWeight.bold,
                             color: Colors.black87,
@@ -59,7 +61,7 @@ class AnalyticsIllustrationWidget extends StatelessWidget {
                         ),
                         Text(
                           'updatedNow'.tr(),
-                          style: TextStyle(
+                          style: AppTextStyle.bodySmall(context).copyWith(
                             fontSize: 10.sp,
                             color: Colors.grey,
                           ),
@@ -82,7 +84,7 @@ class AnalyticsIllustrationWidget extends StatelessWidget {
                       Gap(4.w),
                       Text(
                         '+28%',
-                        style: TextStyle(
+                        style: AppTextStyle.bodySmall(context).copyWith(
                           fontSize: 11.sp,
                           fontWeight: FontWeight.bold,
                           color: Colors.green,
@@ -120,9 +122,9 @@ class AnalyticsIllustrationWidget extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text('totalProfit'.tr(),
-                      style: TextStyle(fontSize: 12.sp, color: Colors.grey[700])),
+                      style: AppTextStyle.bodySmall(context).copyWith(color: Colors.grey[700])),
                   Text('\$48,920.00',
-                      style: TextStyle(
+                      style: AppTextStyle.bodySmall(context).copyWith(
                         fontSize: 13.sp,
                         fontWeight: FontWeight.bold,
                         color: color,

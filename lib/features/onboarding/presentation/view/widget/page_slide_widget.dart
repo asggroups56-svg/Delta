@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:my_template/core/theme/app_colors.dart';
+import 'package:my_template/core/theme/app_text_style.dart';
 import 'package:my_template/features/onboarding/data/model/on_boarding_type.dart';
 import 'package:my_template/features/onboarding/presentation/view/widget/allIn_oneIllustration_widget.dart';
 import 'package:my_template/features/onboarding/presentation/view/widget/analytics_Illustration_widget.dart';
@@ -39,7 +40,7 @@ final OnboardingItemModel item;
                   child: Text(
                     item.titleKey.tr(),
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: AppTextStyle.bodyMedium(context).copyWith(
                       fontSize: 22.sp,
                       fontWeight: FontWeight.bold,
                       color: AppColor.titleFormFiledColor(context),
@@ -54,7 +55,7 @@ final OnboardingItemModel item;
                   child: Text(
                     item.subtitleKey.tr(),
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: AppTextStyle.bodyMedium(context).copyWith(
                       fontSize: 13.sp,
                       color: AppColor.darkTextColor(context),
                       height: 1.6,

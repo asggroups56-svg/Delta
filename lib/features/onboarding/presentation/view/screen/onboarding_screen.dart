@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:my_template/core/routes/routes_name.dart';
 import 'package:my_template/core/theme/app_colors.dart';
+import 'package:my_template/core/theme/app_text_style.dart';
 import 'package:my_template/core/utils/app_locale_key.dart';
 import 'package:my_template/core/utils/navigator_methods.dart';
 import 'package:my_template/features/onboarding/data/model/on_boarding_type.dart';
@@ -99,8 +100,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       Gap(8.w),
                       Text(
                         AppLocaleKey.appName.tr(),
-                        style: TextStyle(
-                          fontSize: 14.sp,
+                        style: AppTextStyle.bodyMedium(context).copyWith(
+                          
                           fontWeight: FontWeight.bold,
                           letterSpacing: 1.2,
                           color: AppColor.titleFormFiledColor(context),
@@ -134,8 +135,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               Gap(6.w),
                               Text(
                                 AppLocaleKey.langSwitchLabel.tr(),
-                                style: TextStyle(
-                                  fontSize: 12.sp,
+                                style: AppTextStyle.bodySmall(context).copyWith(
+                                 
                                   fontWeight: FontWeight.bold,
                                   color: currentItem.accentColor,
                                 ),
@@ -159,7 +160,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           ),
                           child: Text(
                             AppLocaleKey.skip.tr(),
-                            style: TextStyle(
+                            style: AppTextStyle.bodySmall(context).copyWith(
                               fontSize: 13.sp,
                               fontWeight: FontWeight.w600,
                               color: currentItem.accentColor,
@@ -238,7 +239,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             _currentIndex == items.length - 1
                                 ? AppLocaleKey.startNow.tr()
                                 : AppLocaleKey.next.tr(),
-                            style: TextStyle(
+                            style: AppTextStyle.bodyMedium(context).copyWith(
                               fontSize: 15.sp,
                               fontWeight: FontWeight.bold,
                               color: AppColor.whiteColor(context),

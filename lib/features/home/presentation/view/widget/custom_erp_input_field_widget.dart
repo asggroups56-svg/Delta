@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:my_template/core/theme/app_colors.dart';
+import 'package:my_template/core/theme/app_text_style.dart';
 
 class CustomErpInputFieldWidget extends StatelessWidget {
   final String label;
@@ -26,8 +27,8 @@ class CustomErpInputFieldWidget extends StatelessWidget {
       children: [
         Text(
           label,
-          style: TextStyle(
-            fontSize: 11.sp,
+          style: AppTextStyle.bodyMedium(context).copyWith(
+            
             fontWeight: FontWeight.w600,
             color: AppColor.whiteColor(context).withValues(alpha: 0.7),
           ),
@@ -38,13 +39,14 @@ class CustomErpInputFieldWidget extends StatelessWidget {
           keyboardType: isNumber ? TextInputType.number : TextInputType.text,
           maxLines: maxLines,
           textAlign: TextAlign.start,
-          style: TextStyle(
+          style: AppTextStyle.bodyMedium(context).copyWith(
+            fontWeight: FontWeight.w500,
             fontSize: 12.sp,
             color: AppColor.whiteColor(context),
           ),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: TextStyle(
+            hintStyle: AppTextStyle.bodySmall(context).copyWith(
               fontSize: 11.sp,
               color: AppColor.whiteColor(context).withValues(alpha: 0.3),
             ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:my_template/core/theme/app_colors.dart';
+import 'package:my_template/core/theme/app_text_style.dart';
 
 class ChipBadgeWidget extends StatelessWidget {
   const ChipBadgeWidget({super.key, required this.icon, required this.label});
@@ -22,8 +23,7 @@ class ChipBadgeWidget extends StatelessWidget {
           Gap(6.w),
           Text(
             label,
-            style: TextStyle(
-              fontSize: 11.sp,
+            style: AppTextStyle.bodySmall(context).copyWith(
               color: AppColor.whiteColor(context),
               fontWeight: FontWeight.w500,
             ),

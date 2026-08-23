@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:my_template/core/theme/app_colors.dart';
+import 'package:my_template/core/theme/app_text_style.dart';
 import 'package:my_template/core/utils/app_locale_key.dart';
 
 class BankCardWidget extends StatelessWidget {
@@ -31,7 +32,7 @@ class BankCardWidget extends StatelessWidget {
               children: [
                 Text(
                   AppLocaleKey.bankCard.tr(),
-                  style: TextStyle(
+                  style: AppTextStyle.bodyMedium(context).copyWith(
                     fontSize: 16.sp,
                     fontWeight: FontWeight.bold,
                     color: AppColor.emeraldTeal,
@@ -47,7 +48,7 @@ class BankCardWidget extends StatelessWidget {
             Gap(6.h),
             Text(
               AppLocaleKey.bankDesc.tr(),
-              style: TextStyle(
+              style: AppTextStyle.bodySmall(context).copyWith(
                 fontSize: 11.sp,
                 color: AppColor.whiteColor(context).withValues(alpha: 0.6),
                 height: 1.4,
@@ -69,7 +70,7 @@ class BankCardWidget extends StatelessWidget {
                     child: Center(
                       child: Text(
                         AppLocaleKey.connectBank.tr(),
-                        style: TextStyle(
+                        style: AppTextStyle.bodySmall(context).copyWith(
                           fontSize: 11.sp,
                           fontWeight: FontWeight.bold,
                           color: AppColor.emeraldTeal,
@@ -92,7 +93,7 @@ class BankCardWidget extends StatelessWidget {
                     child: Center(
                       child: Text(
                         AppLocaleKey.importStatement.tr(),
-                        style: TextStyle(
+                        style: AppTextStyle.bodySmall(context).copyWith(
                           fontSize: 11.sp,
                           color: AppColor.whiteColor(context).withValues(alpha: 0.7),
                         ),

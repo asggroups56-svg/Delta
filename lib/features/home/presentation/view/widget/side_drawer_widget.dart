@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:my_template/core/routes/routes_name.dart';
 import 'package:my_template/core/theme/app_colors.dart';
+import 'package:my_template/core/theme/app_text_style.dart';
 import 'package:my_template/core/utils/navigator_methods.dart';
 import 'package:my_template/features/home/presentation/view/widget/drawer_tile_widget.dart';
 
@@ -37,7 +38,10 @@ class SideDrawerWidget extends StatelessWidget {
                   Expanded(
                     child: Text(
                       'appsAndServices'.tr(),
-                      style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.bold, color: AppColor.whiteColor(context)),
+                      style: AppTextStyle.text16SDark(context).copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: AppColor.whiteColor(context),
+                      ),
                     ),
                   ),
                 ],

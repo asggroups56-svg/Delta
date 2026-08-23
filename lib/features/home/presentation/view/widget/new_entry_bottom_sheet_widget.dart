@@ -62,12 +62,16 @@ class NewEntryBottomSheetWidget extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  '${AppLocaleKey.newRecord.tr()} — $sectionTitle',
-                  style: TextStyle(
-                    fontSize: 15.sp,
-                    fontWeight: FontWeight.bold,
-                    color: AppColor.emeraldTeal,
+                Expanded(
+                  child: Text(
+                    '${AppLocaleKey.newRecord.tr()} — $sectionTitle',
+                    style: TextStyle(
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.bold,
+                      color: AppColor.emeraldTeal,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
                   ),
                 ),
                 IconButton(

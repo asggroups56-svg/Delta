@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:my_template/core/theme/app_colors.dart';
+import 'package:my_template/core/theme/app_text_style.dart';
 import 'package:my_template/core/utils/app_locale_key.dart';
 import 'new_entry_bottom_sheet_widget.dart';
 
@@ -69,8 +70,7 @@ class _SalesCardWidgetState extends State<SalesCardWidget> {
                   children: [
                     Text(
                       AppLocaleKey.salesCard.tr(),
-                      style: TextStyle(
-                        fontSize: 16.sp,
+                      style: AppTextStyle.text16SDark(context).copyWith(
                         fontWeight: FontWeight.bold,
                         color: AppColor.emeraldTeal,
                       ),
@@ -98,7 +98,7 @@ class _SalesCardWidgetState extends State<SalesCardWidget> {
                           Gap(4.w),
                           Text(
                             currentPeriod['title'] as String,
-                            style: TextStyle(
+                            style: AppTextStyle.text10SDark(context).copyWith(
                               fontSize: 9.sp,
                               color: AppColor.whiteColor(context).withValues(alpha: 0.7),
                               fontWeight: FontWeight.w500,
@@ -130,8 +130,7 @@ class _SalesCardWidgetState extends State<SalesCardWidget> {
             Gap(6.h),
             Text(
               AppLocaleKey.salesDesc.tr(),
-              style: TextStyle(
-                fontSize: 11.sp,
+              style: AppTextStyle.text10SDark(context).copyWith(
                 color: AppColor.whiteColor(context).withValues(alpha: 0.6),
                 height: 1.4,
               ),
@@ -158,8 +157,7 @@ class _SalesCardWidgetState extends State<SalesCardWidget> {
                   ),
                   child: Text(
                     AppLocaleKey.newBtn.tr(),
-                    style: TextStyle(
-                      fontSize: 12.sp,
+                    style: AppTextStyle.text12SDark(context).copyWith(
                       fontWeight: FontWeight.bold,
                       color: AppColor.whiteColor(context),
                     ),
@@ -185,14 +183,13 @@ class _SalesCardWidgetState extends State<SalesCardWidget> {
                   children: [
                     Text(
                       '${barData[_selectedBarIndex]['label']}:',
-                      style: TextStyle(
-                        fontSize: 10.sp,
+                      style: AppTextStyle.text10SDark(context).copyWith(
                         color: AppColor.whiteColor(context).withValues(alpha: 0.7),
                       ),
                     ),
                     Text(
                       barData[_selectedBarIndex]['amount'] as String,
-                      style: TextStyle(
+                      style: AppTextStyle.text10SDark(context).copyWith(
                         fontSize: 11.sp,
                         fontWeight: FontWeight.bold,
                         color: AppColor.mintTeal,
@@ -257,7 +254,7 @@ class _SalesCardWidgetState extends State<SalesCardWidget> {
                               textAlign: TextAlign.center,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
+                              style: AppTextStyle.text10SDark(context).copyWith(
                                 fontSize: 8.sp,
                                 color: isSelected
                                     ? AppColor.emeraldTeal

@@ -51,7 +51,7 @@ class _CategoryFiltersWidgetState extends State<CategoryFiltersWidget> {
               child: Text(cat,
                   style: TextStyle(
                       fontSize: 12.sp,
-                      color: isSelected ? Colors.white : AppColor.whiteColor(context).withValues(alpha: 0.6),
+                      color: isSelected ? AppColor.whiteColor(context) : AppColor.whiteColor(context).withValues(alpha: 0.6),
                       fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)),
             ),
           );

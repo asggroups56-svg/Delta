@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:my_template/core/theme/app_colors.dart';
+import 'package:my_template/core/theme/app_text_style.dart';
 import 'package:my_template/core/utils/app_locale_key.dart';
 
 class ZakatCardWidget extends StatelessWidget {
@@ -50,7 +51,7 @@ class ZakatCardWidget extends StatelessWidget {
                   ),
                   child: Text(
                     AppLocaleKey.newBtn.tr(),
-                    style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.bold, color: AppColor.whiteColor(context)),
+                    style: AppTextStyle.text12SDark(context).copyWith(fontWeight: FontWeight.bold, color: AppColor.whiteColor(context)),
                   ),
                 ),
               ),

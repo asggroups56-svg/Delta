@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:my_template/core/theme/app_colors.dart';
+import 'package:my_template/core/theme/app_text_style.dart';
 import 'package:my_template/core/utils/app_locale_key.dart';
 import 'custom_erp_input_field_widget.dart';
 
@@ -68,7 +69,7 @@ class VendorBillBottomSheetWidget extends StatelessWidget {
                     Gap(8.w),
                     Text(
                       AppLocaleKey.createVendorBill.tr(),
-                      style: TextStyle(
+                      style: AppTextStyle.text16SDark(context).copyWith(
                         fontSize: 15.sp,
                         fontWeight: FontWeight.bold,
                         color: AppColor.whiteColor(context),
@@ -146,8 +147,8 @@ class VendorBillBottomSheetWidget extends StatelessWidget {
                     onPressed: () => Navigator.pop(context),
                     child: Text(
                       AppLocaleKey.draft.tr(),
-                      style: TextStyle(
-                        fontSize: 12.sp,
+                      style: AppTextStyle.text12SDark(context).copyWith(
+                        
                         color: AppColor.whiteColor(context).withValues(alpha: 0.7),
                       ),
                     ),
@@ -176,7 +177,7 @@ class VendorBillBottomSheetWidget extends StatelessWidget {
                     },
                     child: Text(
                       AppLocaleKey.postBill.tr(),
-                      style: TextStyle(
+                      style: AppTextStyle.text12SDark(context).copyWith(
                         fontSize: 12.sp,
                         fontWeight: FontWeight.bold,
                         color: AppColor.whiteColor(context),

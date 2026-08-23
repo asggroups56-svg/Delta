@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:my_template/core/theme/app_colors.dart';
+import 'package:my_template/core/theme/app_text_style.dart';
 import 'ai_chat_bottom_sheet_widget.dart';
 
 class AiFabWidget extends StatefulWidget {
@@ -77,7 +78,7 @@ class _AiFabWidgetState extends State<AiFabWidget> with SingleTickerProviderStat
                 Gap(6.w),
                 Text(
                   'AI',
-                  style: TextStyle(
+                  style: AppTextStyle.bodySmall(context).copyWith(
                     fontSize: 13.sp,
                     fontWeight: FontWeight.bold,
                     color: AppColor.whiteColor(context),

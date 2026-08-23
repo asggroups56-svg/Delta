@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:my_template/core/theme/app_colors.dart';
+import 'package:my_template/core/theme/app_text_style.dart';
 import 'package:my_template/core/utils/app_locale_key.dart';
 import 'upload_invoice_bottom_sheet_widget.dart';
 import 'vendor_bill_bottom_sheet_widget.dart';
@@ -33,8 +34,7 @@ class PurchasesCardWidget extends StatelessWidget {
               children: [
                 Text(
                   AppLocaleKey.purchasesCard.tr(),
-                  style: TextStyle(
-                    fontSize: 16.sp,
+                  style: AppTextStyle.text16SDark(context).copyWith(
                     fontWeight: FontWeight.bold,
                     color: AppColor.emeraldTeal,
                   ),
@@ -49,8 +49,7 @@ class PurchasesCardWidget extends StatelessWidget {
             Gap(6.h),
             Text(
               AppLocaleKey.purchasesDesc.tr(),
-              style: TextStyle(
-                fontSize: 11.sp,
+              style: AppTextStyle.text10SDark(context).copyWith(
                 color: AppColor.whiteColor(context).withValues(alpha: 0.6),
                 height: 1.4,
               ),
@@ -84,8 +83,7 @@ class PurchasesCardWidget extends StatelessWidget {
                         Text(
                           AppLocaleKey.createVendorBill.tr(),
                           textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 11.sp,
+                          style: AppTextStyle.text10SDark(context).copyWith(
                             fontWeight: FontWeight.bold,
                             color: AppColor.emeraldTeal,
                           ),
@@ -98,8 +96,7 @@ class PurchasesCardWidget extends StatelessWidget {
                   padding: EdgeInsets.symmetric(horizontal: 12.w),
                   child: Text(
                     AppLocaleKey.orLabel.tr(),
-                    style: TextStyle(
-                      fontSize: 12.sp,
+                    style: AppTextStyle.text12SDark(context).copyWith(
                       color: AppColor.whiteColor(context).withValues(alpha: 0.38),
                     ),
                   ),
@@ -136,7 +133,7 @@ class PurchasesCardWidget extends StatelessWidget {
                           ),
                           child: Text(
                             AppLocaleKey.uploadBtn.tr(),
-                            style: TextStyle(
+                            style: AppTextStyle.text10SDark(context).copyWith(
                               fontSize: 11.sp,
                               fontWeight: FontWeight.bold,
                               color: AppColor.whiteColor(context),

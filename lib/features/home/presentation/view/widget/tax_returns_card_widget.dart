@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:my_template/core/theme/app_colors.dart';
+import 'package:my_template/core/theme/app_text_style.dart';
 import 'package:my_template/core/utils/app_locale_key.dart';
 
 class TaxReturnsCardWidget extends StatelessWidget {
@@ -79,7 +80,10 @@ class TaxReturnsCardWidget extends StatelessWidget {
                       Gap(10.w),
                       Text(
                         step,
-                        style: TextStyle(fontSize: 12.sp, color: AppColor.emeraldTeal, fontWeight: FontWeight.w500),
+                        style: AppTextStyle.text12SDark(context).copyWith(
+                          color: AppColor.emeraldTeal,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ],
                   ),
