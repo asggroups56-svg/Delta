@@ -9,6 +9,7 @@ import 'package:my_template/core/custom_widgets/custom_form_field/custom_form_fi
 import 'package:my_template/core/custom_widgets/custom_toast/custom_toast.dart';
 import 'package:my_template/core/routes/routes_name.dart';
 import 'package:my_template/core/theme/app_colors.dart';
+import 'package:my_template/core/utils/app_locale_key.dart';
 import 'package:my_template/core/utils/common_methods.dart';
 import 'package:my_template/core/utils/navigator_methods.dart';
 import 'package:my_template/features/auth/presentation/view/cubit/auth_cubit.dart';
@@ -23,18 +24,20 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  void _toggleLanguage() {
+  Future<void> _toggleLanguage() async {
     if (context.locale.languageCode == 'ar') {
-      context.setLocale(const Locale('en'));
+      await context.setLocale(const Locale('en'));
     } else {
-      context.setLocale(const Locale('ar'));
+      await context.setLocale(const Locale('ar'));
+    }
+    if (mounted) {
+      setState(() {});
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<AuthCubit>();
-    final isArabic = context.locale.languageCode == 'ar';
 
     return Scaffold(
       backgroundColor: AppColor.scaffoldColor(context),
@@ -115,7 +118,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                                 Gap(6.w),
                                 Text(
-                                  isArabic ? 'English' : 'العربية',
+                                  AppLocaleKey.langSwitchLabel.tr(),
                                   style: TextStyle(
                                     fontSize: 12.sp,
                                     fontWeight: FontWeight.bold,

@@ -8,23 +8,17 @@ import 'core/routes/app_routers_import.dart';
 import 'core/routes/routes_name.dart';
 import 'core/theme/style.dart';
 
-class DeltaApp extends StatefulWidget {
+class DeltaApp extends StatelessWidget {
   const DeltaApp({super.key});
 
-  @override
-  State<DeltaApp> createState() => _DeltaAppState();
-}
-
-class _DeltaAppState extends State<DeltaApp> {
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
       designSize: const Size(360, 690),
       minTextAdapt: true,
       splitScreenMode: true,
-      builder: (_, child) {
+      builder: (context, child) {
         return MaterialApp(
-          
           localizationsDelegates: [
             ...context.localizationDelegates,
             CountryLocalizations.delegate,

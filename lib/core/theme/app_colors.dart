@@ -188,4 +188,15 @@ class AppColor {
       listen: listen,
     );
   }
+
+  // ── Static Constant Colors ────────────────────────────────────────────────
+  static const Color darkBackground     = Color(0xFF0D121B);
+  static const Color darkCardBackground = Color(0xFF131B26);
+  static const Color darkSurface        = Color(0xFF1B2431);
+  static const Color emeraldTeal        = Color(0xFF00B894);
+  static const Color oceanBlue         = Color(0xFF0984E3);
+  static const Color purpleAccent       = Color(0xFF6C5CE7);
+  static const Color mintTeal           = Color(0xFF55E6C1);
+  static const Color skyBlue            = Color(0xFF74B9FF);
+  static const Color warningOrange      = Color(0xFFE17055);
 }

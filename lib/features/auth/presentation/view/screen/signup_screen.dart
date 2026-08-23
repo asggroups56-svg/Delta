@@ -6,6 +6,7 @@ import 'package:gap/gap.dart';
 import 'package:my_template/core/custom_widgets/custom_form_field/custom_form_field.dart';
 import 'package:my_template/core/routes/routes_name.dart';
 import 'package:my_template/core/theme/app_colors.dart';
+import 'package:my_template/core/utils/app_locale_key.dart';
 import 'package:my_template/core/utils/navigator_methods.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -28,11 +29,14 @@ class _SignupScreenState extends State<SignupScreen> {
 
   bool _agreeTerms = true;
 
-  void _toggleLanguage() {
+  Future<void> _toggleLanguage() async {
     if (context.locale.languageCode == 'ar') {
-      context.setLocale(const Locale('en'));
+      await context.setLocale(const Locale('en'));
     } else {
-      context.setLocale(const Locale('ar'));
+      await context.setLocale(const Locale('ar'));
+    }
+    if (mounted) {
+      setState(() {});
     }
   }
 
@@ -55,8 +59,6 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isArabic = context.locale.languageCode == 'ar';
-
     return Scaffold(
       backgroundColor: AppColor.scaffoldColor(context),
       body: SafeArea(
@@ -75,7 +77,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         IconButton(
                           onPressed: () => Navigator.pop(context),
                           icon: Icon(
-                            isArabic
+                            context.locale.languageCode == 'ar'
                                 ? Icons.arrow_forward_ios_rounded
                                 : Icons.arrow_back_ios_rounded,
                             size: 18.r,
@@ -117,7 +119,7 @@ class _SignupScreenState extends State<SignupScreen> {
                             ),
                             Gap(6.w),
                             Text(
-                              isArabic ? 'English' : 'العربية',
+                              AppLocaleKey.langSwitchLabel.tr(),
                               style: TextStyle(
                                 fontSize: 12.sp,
                                 fontWeight: FontWeight.bold,

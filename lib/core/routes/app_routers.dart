@@ -23,6 +23,10 @@ class AppRouters {
         return MaterialPageRoute(
           builder: (_) => const SignupScreen(),
         );
+      case RoutesName.accountingDashboardScreen:
+        return MaterialPageRoute(
+          builder: (_) => const AccountingDashboardScreen(),
+        );
 
       default:
         return null;
