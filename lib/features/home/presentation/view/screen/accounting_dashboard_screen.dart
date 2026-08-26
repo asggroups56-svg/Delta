@@ -61,6 +61,8 @@ class _AccountingDashboardScreenState extends State<AccountingDashboardScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               DashboardTopHeaderWidget(
+                title: AppLocaleKey.moduleAccounting.tr(),
+                subtitle: 'نظام المالي والمحاسبة',
                 onToggleLanguage: _toggleLanguage,
                 onOpenDrawer: () => _scaffoldKey.currentState?.openDrawer(),
               ),

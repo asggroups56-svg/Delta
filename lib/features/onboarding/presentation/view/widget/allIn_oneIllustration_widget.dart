@@ -1,6 +1,7 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:my_template/core/theme/app_colors.dart';
 import 'package:my_template/features/onboarding/presentation/view/widget/module_badge_widget.dart';
 
 class AllinOneillustrationWidget extends StatelessWidget {
@@ -45,7 +46,7 @@ final Color color;
                 )
               ],
             ),
-            child: Icon(Icons.hub_rounded, size: 48.r, color: Colors.white),
+            child: Icon(Icons.hub_rounded, size: 48.r, color: AppColor.whiteColor(context)),
           ),
         ),
 

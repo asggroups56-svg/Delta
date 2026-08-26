@@ -1,128 +1,92 @@
-import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
+/// بيكلم Google Gemini مباشرة من التطبيق (مجاني ضمن حدود سخية).
+/// اعمل مفتاحك من https://aistudio.google.com/apikey
 class GeminiService {
-  GeminiService._();
+  /// المفتاح بيتخزن في الذاكرة بس (بيتصفر لو قفلت التطبيق).
+  /// لو عايز يفضل محفوظ بين الجلسات، خزّنه بـ shared_preferences بدل الـ static.
+  static String apiKey = '';
 
-  // We store the key reversed to completely bypass GitHub Push Protection scanner
-  static String apiKey = 'gnWjebVpYNy7YiDXPGXQujWvFXoPGgv_tNolDq6qKqI6NR8bA.QA'.split('').reversed.join('');
+  static const String _model = 'gemini-3.5-flash-lite';
+  static String get _baseUrl =>
+      'https://generativelanguage.googleapis.com/v1beta/models/$_model:generateContent';
 
-  static final List<String> _models = [
-    'gemini-3.7-flash',
-    'gemini-3.5-flash-lite',
-    'gemini-3.1-pro-preview',
-    'gemini-pro',
-  ];
+  static const String _systemPrompt =
+      'أنت مساعد ذكي داخل تطبيق، جاوب بشكل واضح ومختصر وبنفس لغة السؤال.';
 
-  static final Dio _dio = Dio(
-    BaseOptions(
-      connectTimeout: const Duration(seconds: 15),
-      receiveTimeout: const Duration(seconds: 25),
-      headers: {'Content-Type': 'application/json'},
-    ),
-  );
-
-  /// Generates a response using Google AI Studio (Gemini API)
+  /// [history] ليست بنفس شكل اللي مستخدمها في AiChatBottomSheetWidget:
+  /// كل عنصر فيه {'role': 'user' أو 'ai', 'text': '...'}
   static Future<String> generateResponse({
     required String prompt,
-    List<Map<String, String>> history = const [],
-    String? base64Image,
-    String? mimeType = 'image/jpeg',
+    required List<Map<String, String>> history,
   }) async {
     if (apiKey.trim().isEmpty) {
-      return _getFallbackResponse(prompt);
+      return 'من فضلك أدخل مفتاح Google AI Studio أولاً من الأيقونة 🔑 فوق.';
     }
 
-    // Build conversation contents
-    final List<Map<String, dynamic>> contents = [];
+    final contents = <Map<String, dynamic>>[];
 
+    // بنحوّل الـ history (من غير رسالة الترحيب الأولى) لصيغة Gemini
     for (final msg in history) {
-      final role = msg['role'] == 'user' ? 'user' : 'model';
-      final text = msg['text'] ?? '';
-      if (text.isNotEmpty) {
-        contents.add({
-          'role': role,
-          'parts': [
-            {'text': text}
-          ]
-        });
-      }
-    }
-
-    // Append current user prompt
-    final List<Map<String, dynamic>> finalParts = [];
-    
-    if (base64Image != null && base64Image.isNotEmpty) {
-      finalParts.add({
-        'inlineData': {
-          'mimeType': mimeType ?? 'image/jpeg',
-          'data': base64Image,
-        }
+      if (msg['role'] == null || msg['text'] == null) continue;
+      contents.add({
+        'role': msg['role'] == 'user' ? 'user' : 'model',
+        'parts': [
+          {'text': msg['text']}
+        ],
       });
     }
-    
-    finalParts.add({'text': prompt});
 
-    contents.add({
-      'role': 'user',
-      'parts': finalParts,
-    });
+    // آخر رسالة (السؤال الحالي) لو لسه مش مضافة
+    if (contents.isEmpty || contents.last['parts'][0]['text'] != prompt) {
+      contents.add({
+        'role': 'user',
+        'parts': [
+          {'text': prompt}
+        ],
+      });
+    }
 
-    String lastErrorMessage = '';
+    try {
+      final response = await http.post(
+        Uri.parse('$_baseUrl?key=$apiKey'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'system_instruction': {
+            'parts': [
+              {'text': _systemPrompt}
+            ]
+          },
+          'contents': contents,
+        }),
+      );
 
-    // Loop through all models until one succeeds
-    for (var modelName in _models) {
-      try {
-        final String url =
-            'https://generativelanguage.googleapis.com/v1beta/models/$modelName:generateContent?key=$apiKey';
-
-        final response = await _dio.post(
-          url,
-          data: {'contents': contents},
-        );
-
-        if (response.statusCode == 200 && response.data != null) {
-          final candidates = response.data['candidates'] as List?;
-          if (candidates != null && candidates.isNotEmpty) {
-            final content = candidates[0]['content'];
-            if (content != null) {
-              final parts = content['parts'] as List?;
-              if (parts != null && parts.isNotEmpty) {
-                final String aiText = parts[0]['text'] ?? '';
-                if (aiText.isNotEmpty) {
-                  return aiText; // Success! Return immediately.
-                }
-              }
-            }
-          }
-        }
-      } on DioException catch (e) {
-        debugPrint('Error with model $modelName: ${e.response?.data ?? e.message}');
-        if (e.response != null) {
-          lastErrorMessage = 'Code: ${e.response?.statusCode}\nMessage: ${e.response?.data}';
-        } else {
-          lastErrorMessage = e.message ?? 'Unknown network error';
-        }
-        // Continue to the next model in the list
-        continue;
-      } catch (e) {
-        debugPrint('Error with model $modelName: $e');
-        lastErrorMessage = e.toString();
-        // Continue to the next model in the list
-        continue;
+      if (response.statusCode != 200) {
+        final decodedError = jsonDecode(utf8.decode(response.bodyBytes));
+        final message = decodedError['error']?['message'] ?? 'خطأ غير معروف';
+        throw GeminiException('فشل الاتصال بـ Gemini ($message)');
       }
-    }
 
-    // If all models fail, return the error of the last model
-    return '❌ لم نتمكن من الاتصال بـ Gemini بعد تجربة جميع الموديلات المتاحة. \nالخطأ الأخير:\n$lastErrorMessage';
-  }
+      final decoded = jsonDecode(utf8.decode(response.bodyBytes));
+      final text = decoded['candidates']?[0]?['content']?['parts']?[0]?['text'];
 
-  /// Fallback smart assistant response when offline or before adding an API key
-  static String _getFallbackResponse(String query) {
-    final q = query.trim().toLowerCase();
-    if (q.contains('مرحبا') || q.contains('اهلا') || q.contains('hi') || q.contains('hello')) {
-      return 'أهلاً بك! 👋 أنا مساعد الذكاء الاصطناعي الخاص بك والمربوط بـ Google AI Studio (Gemini). كيف يمكنني مساعدتك اليوم في الحسابات والفواتير أو الاستفسارات العامة؟';
+      if (text == null || text is! String || text.trim().isEmpty) {
+        throw GeminiException('الرد جه فاضي من Gemini');
+      }
+
+      return text.trim();
+    } on GeminiException {
+      rethrow;
+    } catch (e) {
+      throw GeminiException('حصل خطأ أثناء الاتصال: $e');
     }
-    return '🤖 تم استلام سؤالك: "$query"\n\nأنا جاهز للإجابة عبر Google AI Studio Gemini. برجاء التأكد من إضافة مفتاح API الخاص بك (Google AI Studio Key) للحصول على إجابات حيّة ومباشرة لحظياً!';
   }
+}
+
+class GeminiException implements Exception {
+  final String message;
+  GeminiException(this.message);
+  @override
+  String toString() => message;
 }

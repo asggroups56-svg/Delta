@@ -1,5 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -18,6 +20,7 @@ class AiChatBottomSheetWidget extends StatefulWidget {
 class _AiChatBottomSheetWidgetState extends State<AiChatBottomSheetWidget> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  final FocusNode _focusNode = FocusNode();
 
   bool _isThinking = false;
   late final List<Map<String, String>> _messages;
@@ -52,7 +55,7 @@ class _AiChatBottomSheetWidgetState extends State<AiChatBottomSheetWidget> {
             Gap(8.w),
             Text(
               'Google AI Studio Key',
-              style: AppTextStyle.bodyMedium(ctx).copyWith( color: AppColor.whiteColor(ctx), fontWeight: FontWeight.bold),
+              style: AppTextStyle.bodyMedium(ctx).copyWith(color: AppColor.whiteColor(ctx), fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -95,7 +98,7 @@ class _AiChatBottomSheetWidgetState extends State<AiChatBottomSheetWidget> {
                 ),
               );
             },
-            child:  Text('حفظ', style: AppTextStyle.bodyMedium(ctx).copyWith(fontWeight: FontWeight.bold, color: AppColor.whiteColor(ctx))),
+            child: Text('حفظ', style: AppTextStyle.bodyMedium(ctx).copyWith(fontWeight: FontWeight.bold, color: AppColor.whiteColor(ctx))),
           ),
         ],
       ),
@@ -109,6 +112,7 @@ class _AiChatBottomSheetWidgetState extends State<AiChatBottomSheetWidget> {
     if (customText == null) {
       _controller.clear();
     }
+    _focusNode.unfocus();
 
     setState(() {
       _messages.add({'role': 'user', 'text': text});
@@ -117,25 +121,36 @@ class _AiChatBottomSheetWidgetState extends State<AiChatBottomSheetWidget> {
 
     _scrollToBottom();
 
-    final response = await GeminiService.generateResponse(
-      prompt: text,
-      history: _messages,
-    );
+    try {
+      final response = await GeminiService.generateResponse(
+        prompt: text,
+        history: _messages,
+      );
 
-    if (mounted) {
+      if (!mounted) return;
       setState(() {
         _isThinking = false;
         _messages.add({'role': 'ai', 'text': response});
       });
-      _scrollToBottom();
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _isThinking = false;
+        _messages.add({
+          'role': 'ai',
+          'text': 'حصل خطأ أثناء الاتصال بالنموذج، تأكد من الإنترنت أو من مفتاح الـ API وحاول تاني.',
+          'isError': 'true',
+        });
+      });
     }
+    _scrollToBottom();
   }
 
   void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
+          _scrollController.position.maxScrollExtent + 80,
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeOut,
         );
@@ -143,10 +158,24 @@ class _AiChatBottomSheetWidgetState extends State<AiChatBottomSheetWidget> {
     });
   }
 
+  void _copyMessage(String text) {
+    Clipboard.setData(ClipboardData(text: text));
+    HapticFeedback.lightImpact();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text('تم نسخ الرسالة'),
+        backgroundColor: AppColor.emeraldTeal,
+        duration: const Duration(seconds: 1),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
   @override
   void dispose() {
     _controller.dispose();
     _scrollController.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -234,7 +263,7 @@ class _AiChatBottomSheetWidgetState extends State<AiChatBottomSheetWidget> {
               itemBuilder: (context, idx) {
                 final item = suggestions[idx];
                 return GestureDetector(
-                  onTap: () => _sendMessage(item['query']),
+                  onTap: _isThinking ? null : () => _sendMessage(item['query']),
                   child: Container(
                     margin: EdgeInsets.only(right: 8.w),
                     padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
@@ -264,7 +293,14 @@ class _AiChatBottomSheetWidgetState extends State<AiChatBottomSheetWidget> {
                   return _buildThinkingIndicator();
                 }
                 final msg = _messages[index];
-                return _buildChatBubble(msg['text']!, msg['role'] == 'user');
+                return _AnimatedBubble(
+                  key: ValueKey(index),
+                  child: _buildChatBubble(
+                    msg['text']!,
+                    msg['role'] == 'user',
+                    isError: msg['isError'] == 'true',
+                  ),
+                );
               },
             ),
           ),
@@ -279,7 +315,11 @@ class _AiChatBottomSheetWidgetState extends State<AiChatBottomSheetWidget> {
                 Expanded(
                   child: TextField(
                     controller: _controller,
+                    focusNode: _focusNode,
+                    enabled: !_isThinking,
                     textAlign: TextAlign.start,
+                    minLines: 1,
+                    maxLines: 4,
                     style: TextStyle(fontSize: 13.sp, color: AppColor.whiteColor(context)),
                     decoration: InputDecoration(
                       hintText: AppLocaleKey.aiInputHint.tr(),
@@ -294,14 +334,18 @@ class _AiChatBottomSheetWidgetState extends State<AiChatBottomSheetWidget> {
                 ),
                 Gap(8.w),
                 GestureDetector(
-                  onTap: () => _sendMessage(),
-                  child: Container(
-                    padding: EdgeInsets.all(12.r),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(colors: [AppColor.purpleAccent, AppColor.emeraldTeal]),
-                      borderRadius: BorderRadius.circular(14.r),
+                  onTap: _isThinking ? null : () => _sendMessage(),
+                  child: AnimatedOpacity(
+                    opacity: _isThinking ? 0.5 : 1,
+                    duration: const Duration(milliseconds: 200),
+                    child: Container(
+                      padding: EdgeInsets.all(12.r),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(colors: [AppColor.purpleAccent, AppColor.emeraldTeal]),
+                        borderRadius: BorderRadius.circular(14.r),
+                      ),
+                      child: Icon(Icons.send_rounded, color: AppColor.whiteColor(context), size: 18.r),
                     ),
-                    child: Icon(Icons.send_rounded, color: AppColor.whiteColor(context), size: 18.r),
                   ),
                 ),
               ],
@@ -338,29 +382,93 @@ class _AiChatBottomSheetWidgetState extends State<AiChatBottomSheetWidget> {
     );
   }
 
-  Widget _buildChatBubble(String text, bool isUser) {
+  Widget _buildChatBubble(String text, bool isUser, {bool isError = false}) {
     return Align(
       alignment: isUser ? Alignment.centerLeft : Alignment.centerRight,
-      child: Container(
-        margin: EdgeInsets.only(bottom: 10.h, left: isUser ? 0 : 36.w, right: isUser ? 36.w : 0),
-        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
-        decoration: BoxDecoration(
-          gradient: isUser ? LinearGradient(colors: [AppColor.purpleAccent, AppColor.oceanBlue]) : null,
-          color: isUser ? null : AppColor.darkSurface,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(16.r),
-            topRight: Radius.circular(16.r),
-            bottomLeft: isUser ? Radius.circular(4.r) : Radius.circular(16.r),
-            bottomRight: isUser ? Radius.circular(16.r) : Radius.circular(4.r),
+      child: GestureDetector(
+        onLongPress: () => _copyMessage(text),
+        child: Container(
+          margin: EdgeInsets.only(bottom: 10.h, left: isUser ? 0 : 36.w, right: isUser ? 36.w : 0),
+          padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
+          decoration: BoxDecoration(
+            gradient: isUser ? LinearGradient(colors: [AppColor.purpleAccent, AppColor.oceanBlue]) : null,
+            color: isUser ? null : (isError ? Colors.red.withValues(alpha: 0.08) : AppColor.darkSurface),
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(16.r),
+              topRight: Radius.circular(16.r),
+              bottomLeft: isUser ? Radius.circular(4.r) : Radius.circular(16.r),
+              bottomRight: isUser ? Radius.circular(16.r) : Radius.circular(4.r),
+            ),
+            border: isUser
+                ? null
+                : Border.all(color: isError ? Colors.red.withValues(alpha: 0.3) : AppColor.whiteColor(context).withValues(alpha: 0.05)),
           ),
-          border: isUser ? null : Border.all(color: AppColor.whiteColor(context).withValues(alpha: 0.05)),
-        ),
-        child: Text(
-          text,
-          textAlign: TextAlign.start,
-          style: AppTextStyle.bodySmall(context).copyWith(color: AppColor.whiteColor(context).withValues(alpha: 0.95), height: 1.5),
+          child: isUser
+              ? Text(
+                  text,
+                  textAlign: TextAlign.start,
+                  style: AppTextStyle.bodySmall(context).copyWith(color: AppColor.whiteColor(context).withValues(alpha: 0.95), height: 1.5),
+                )
+              : MarkdownBody(
+                  data: text,
+                  selectable: false,
+                  styleSheet: MarkdownStyleSheet(
+                    p: AppTextStyle.bodySmall(context).copyWith(
+                      color: isError ? Colors.red : AppColor.whiteColor(context).withValues(alpha: 0.95),
+                      height: 1.6,
+                    ),
+                    strong: AppTextStyle.bodySmall(context).copyWith(
+                      color: AppColor.whiteColor(context),
+                      fontWeight: FontWeight.bold,
+                    ),
+                    listBullet: AppTextStyle.bodySmall(context).copyWith(color: AppColor.emeraldTeal),
+                    code: AppTextStyle.bodySmall(context).copyWith(
+                      backgroundColor: AppColor.darkBackground,
+                      color: AppColor.skyBlue,
+                    ),
+                  ),
+                ),
         ),
       ),
+    );
+  }
+}
+
+/// أنيميشن دخول بسيط (fade + slide) لكل رسالة جديدة
+class _AnimatedBubble extends StatefulWidget {
+  final Widget child;
+  const _AnimatedBubble({super.key, required this.child});
+
+  @override
+  State<_AnimatedBubble> createState() => _AnimatedBubbleState();
+}
+
+class _AnimatedBubbleState extends State<_AnimatedBubble> with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _fade;
+  late final Animation<Offset> _slide;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 260));
+    _fade = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
+    _slide = Tween<Offset>(begin: const Offset(0, 0.08), end: Offset.zero)
+        .animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: _fade,
+      child: SlideTransition(position: _slide, child: widget.child),
     );
   }
 }

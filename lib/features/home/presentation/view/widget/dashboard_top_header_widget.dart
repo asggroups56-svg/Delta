@@ -10,188 +10,330 @@ import 'ai_chat_bottom_sheet_widget.dart';
 class DashboardTopHeaderWidget extends StatelessWidget {
   final VoidCallback onToggleLanguage;
   final VoidCallback onOpenDrawer;
+  final String? title;
+  final String? subtitle;
 
   const DashboardTopHeaderWidget({
     super.key,
     required this.onToggleLanguage,
     required this.onOpenDrawer,
+    this.title,
+    this.subtitle,
   });
 
   @override
   Widget build(BuildContext context) {
+    final displayTitle = title ?? AppLocaleKey.dashboardLabel.tr();
+    final displaySubtitle = subtitle ?? 'Delta ERP Solutions';
+
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
-      color: AppColor.darkCardBackground,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Color(0xFF16202E),
+            Color(0xFF111722),
+          ],
+        ),
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(20.r)),
+        border: Border(
+          bottom: BorderSide(
+            color: AppColor.whiteColor(context).withValues(alpha: 0.08),
+            width: 1.2,
+          ),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.35),
+            blurRadius: 16.r,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
       child: Row(
         children: [
-          Stack(
-            clipBehavior: Clip.none,
-            children: [
-              CircleAvatar(
-                radius: 16.r,
-                backgroundColor: AppColor.emeraldTeal,
-                child: Text(
-                  'A',
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.bold,
-                    color: AppColor.whiteColor(context),
-                  ),
-                ),
-              ),
-              Positioned(
-                bottom: 0,
-                right: 0,
-                child: Container(
-                  width: 8.w,
-                  height: 8.h,
-                  decoration: BoxDecoration(
-                    color: Colors.greenAccent,
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: AppColor.darkCardBackground,
-                      width: 1.5,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          Gap(6.w),
-          InkWell(
-            onTap: () {},
-            borderRadius: BorderRadius.circular(8.r),
-            child: Padding(
-              padding: EdgeInsets.all(4.r),
-              child: Icon(
-                Icons.access_time_rounded,
-                color: AppColor.whiteColor(context).withValues(alpha: 0.7),
-                size: 18.r,
-              ),
-            ),
-          ),
-          Stack(
-            clipBehavior: Clip.none,
-            children: [
-              InkWell(
-                onTap: () {},
-                borderRadius: BorderRadius.circular(8.r),
-                child: Padding(
-                  padding: EdgeInsets.all(4.r),
-                  child: Icon(
-                    Icons.chat_bubble_outline_rounded,
-                    color: AppColor.whiteColor(context).withValues(alpha: 0.7),
-                    size: 18.r,
-                  ),
-                ),
-              ),
-              Positioned(
-                top: 0,
-                right: 0,
-                child: Container(
-                  width: 12.w,
-                  height: 12.h,
-                  decoration: const BoxDecoration(
-                    color: Colors.redAccent,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: Text(
-                      '1',
-                      style: AppTextStyle.bodySmall(context).copyWith(
-                        fontSize: 7.sp,
-                        color: AppColor.whiteColor(context),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          Gap(4.w),
-          GestureDetector(
-            onTap: () {
-              showModalBottomSheet(
-                context: context,
-                isScrollControlled: true,
-                backgroundColor: Colors.transparent,
-                builder: (ctx) => const AiChatBottomSheetWidget(),
-              );
-            },
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 4.h),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [AppColor.purpleAccent, AppColor.emeraldTeal],
-                ),
-                borderRadius: BorderRadius.circular(8.r),
-              ),
+          // ── Left/RTL Section: User Profile & Title (Expanded to prevent overflow) ──
+          Expanded(
+            child: GestureDetector(
+              onTap: onOpenDrawer,
               child: Row(
-                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
-                    Icons.auto_awesome_rounded,
-                    color: AppColor.whiteColor(context),
-                    size: 11.r,
+                  Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(2.r),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: LinearGradient(
+                            colors: [
+                              AppColor.emeraldTeal,
+                              AppColor.purpleAccent,
+                            ],
+                          ),
+                        ),
+                        child: CircleAvatar(
+                          radius: 16.r,
+                          backgroundColor: AppColor.darkSurface,
+                          child: Text(
+                            'A',
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.bold,
+                              color: AppColor.whiteColor(context),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 1.h,
+                        right: 1.w,
+                        child: Container(
+                          width: 9.w,
+                          height: 9.h,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF00E676),
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: const Color(0xFF16202E),
+                              width: 1.5,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFF00E676).withValues(alpha: 0.5),
+                                blurRadius: 4.r,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  Gap(2.w),
-                  Text(
-                    'AI',
-                    style: AppTextStyle.bodySmall(context).copyWith(
-                      fontSize: 9.sp,
-                      fontWeight: FontWeight.bold,
-                      color: AppColor.whiteColor(context),
+                  Gap(8.w),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          displayTitle,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTextStyle.bodyMedium(context).copyWith(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13.sp,
+                            color: AppColor.whiteColor(context),
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            Container(
+                              width: 4.w,
+                              height: 4.h,
+                              decoration: const BoxDecoration(
+                                color: AppColor.emeraldTeal,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            Gap(4.w),
+                            Expanded(
+                              child: Text(
+                                displaySubtitle,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: AppTextStyle.bodySmall(context).copyWith(
+                                  fontSize: 9.5.sp,
+                                  color: AppColor.whiteColor(context).withValues(alpha: 0.55),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
             ),
           ),
+
           Gap(6.w),
-          Expanded(
-            child: Text(
-              AppLocaleKey.dashboardLabel.tr(),
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: AppTextStyle.bodyMedium(context).copyWith(
-                fontWeight: FontWeight.bold,
-                color: AppColor.whiteColor(context),
-              ),
-            ),
-          ),
-          Gap(6.w),
-          InkWell(
-            onTap: onToggleLanguage,
-            borderRadius: BorderRadius.circular(8.r),
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-              decoration: BoxDecoration(
-                color: AppColor.whiteColor(context).withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8.r),
-              ),
-              child: Text(
-                AppLocaleKey.langSwitchShort.tr(),
-                style: AppTextStyle.bodySmall(context).copyWith(
-                  color: AppColor.whiteColor(context),
-                  fontWeight: FontWeight.bold,
+
+          // ── Right/Actions Section: Glassmorphism Action Bar ──
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // 1) AI Assistant Pill Button
+              GestureDetector(
+                onTap: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (ctx) => const AiChatBottomSheetWidget(),
+                  );
+                },
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 6.h),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        AppColor.purpleAccent,
+                        AppColor.emeraldTeal,
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(10.r),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColor.purpleAccent.withValues(alpha: 0.3),
+                        blurRadius: 6.r,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.auto_awesome_rounded,
+                        color: AppColor.whiteColor(context),
+                        size: 12.r,
+                      ),
+                      Gap(3.w),
+                      Text(
+                        'AI',
+                        style: TextStyle(
+                          fontSize: 10.sp,
+                          fontWeight: FontWeight.bold,
+                          color: AppColor.whiteColor(context),
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ),
-          Gap(4.w),
-          InkWell(
-            onTap: onOpenDrawer,
-            borderRadius: BorderRadius.circular(8.r),
-            child: Padding(
-              padding: EdgeInsets.all(4.r),
-              child: Icon(
-                Icons.menu_rounded,
-                color: AppColor.whiteColor(context),
-                size: 20.r,
+              Gap(5.w),
+
+              // 2) Notification/Chat Badge Button
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  InkWell(
+                    onTap: () {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                        builder: (ctx) => const AiChatBottomSheetWidget(),
+                      );
+                    },
+                    borderRadius: BorderRadius.circular(10.r),
+                    child: Container(
+                      padding: EdgeInsets.all(6.r),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF1F2B3E),
+                        borderRadius: BorderRadius.circular(10.r),
+                        border: Border.all(
+                          color: AppColor.whiteColor(context).withValues(alpha: 0.08),
+                        ),
+                      ),
+                      child: Icon(
+                        Icons.notifications_none_rounded,
+                        color: AppColor.whiteColor(context).withValues(alpha: 0.85),
+                        size: 16.r,
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: -2.h,
+                    right: -2.w,
+                    child: Container(
+                      width: 13.w,
+                      height: 13.h,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFF5252),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: const Color(0xFF16202E),
+                          width: 1.2,
+                        ),
+                      ),
+                      child: Center(
+                        child: Text(
+                          '1',
+                          style: TextStyle(
+                            fontSize: 7.5.sp,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
+              Gap(5.w),
+
+              // 3) Language Switcher Chip
+              InkWell(
+                onTap: onToggleLanguage,
+                borderRadius: BorderRadius.circular(10.r),
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 7.w, vertical: 5.h),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1F2B3E),
+                    borderRadius: BorderRadius.circular(10.r),
+                    border: Border.all(
+                      color: AppColor.whiteColor(context).withValues(alpha: 0.08),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.language_rounded,
+                        color: AppColor.emeraldTeal,
+                        size: 13.r,
+                      ),
+                      Gap(3.w),
+                      Text(
+                        AppLocaleKey.langSwitchShort.tr(),
+                        style: AppTextStyle.bodySmall(context).copyWith(
+                          color: AppColor.whiteColor(context),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 10.sp,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Gap(5.w),
+
+              // 4) Navigation Menu Button
+              InkWell(
+                onTap: onOpenDrawer,
+                borderRadius: BorderRadius.circular(10.r),
+                child: Container(
+                  padding: EdgeInsets.all(6.r),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1F2B3E),
+                    borderRadius: BorderRadius.circular(10.r),
+                    border: Border.all(
+                      color: AppColor.whiteColor(context).withValues(alpha: 0.08),
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.menu_rounded,
+                    color: AppColor.whiteColor(context),
+                    size: 16.r,
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),

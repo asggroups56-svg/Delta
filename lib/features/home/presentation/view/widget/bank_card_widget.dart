@@ -6,6 +6,7 @@ import 'package:gap/gap.dart';
 import 'package:my_template/core/theme/app_colors.dart';
 import 'package:my_template/core/theme/app_text_style.dart';
 import 'package:my_template/core/utils/app_locale_key.dart';
+import 'banks_slider_widget.dart';
 
 class BankCardWidget extends StatelessWidget {
   const BankCardWidget({super.key});
@@ -54,7 +55,9 @@ class BankCardWidget extends StatelessWidget {
                 height: 1.4,
               ),
             ),
-            Gap(16.h),
+            Gap(12.h),
+            const BanksSliderWidget(),
+            Gap(14.h),
             Row(
               children: [
                 Expanded(

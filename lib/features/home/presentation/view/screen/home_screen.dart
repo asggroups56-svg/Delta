@@ -86,6 +86,8 @@ class _HomeScreenState extends State<HomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               DashboardTopHeaderWidget(
+                title: AppLocaleKey.dashboardLabel.tr(),
+                subtitle: 'Delta ERP Solutions',
                 onToggleLanguage: _toggleLanguage,
                 onOpenDrawer: () => _scaffoldKey.currentState?.openDrawer(),
               ),
