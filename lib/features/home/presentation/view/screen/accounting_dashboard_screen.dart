@@ -19,7 +19,6 @@ import 'package:my_template/features/home/presentation/view/widget/side_drawer_a
 import 'package:my_template/features/home/presentation/view/widget/tax_adjustments_card_widget.dart';
 import 'package:my_template/features/home/presentation/view/widget/tax_returns_card_widget.dart';
 import 'package:my_template/features/home/presentation/view/widget/zakat_card_widget.dart';
-
 class AccountingDashboardScreen extends StatefulWidget {
   const AccountingDashboardScreen({super.key});
 
@@ -62,7 +61,7 @@ class _AccountingDashboardScreenState extends State<AccountingDashboardScreen> {
             children: [
               DashboardTopHeaderWidget(
                 title: AppLocaleKey.moduleAccounting.tr(),
-                subtitle: 'نظام المالي والمحاسبة',
+                subtitle: AppLocaleKey.accountingDashboard.tr(),
                 onToggleLanguage: _toggleLanguage,
                 onOpenDrawer: () => _scaffoldKey.currentState?.openDrawer(),
               ),

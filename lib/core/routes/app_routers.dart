@@ -23,6 +23,10 @@ class AppRouters {
         return MaterialPageRoute(
           builder: (_) => const SignupScreen(),
         );
+      case RoutesName.forgotPasswordScreen:
+        return MaterialPageRoute(
+          builder: (_) => const ForgotPasswordScreen(),
+        );
       case RoutesName.accountingDashboardScreen:
         return MaterialPageRoute(
           builder: (_) => const AccountingDashboardScreen(),

@@ -44,6 +44,17 @@
   "accountType": "Account Type",
   "rememberMe": "Remember Me",
   "forgotPassword": "Forgot Password?",
+  "forgotPasswordHeader": "Reset Password",
+  "forgotPasswordHeaderSubtitle": "Enter your email or mobile number to receive a verification code and reset your password",
+  "sendVerificationCode": "Send Verification Code",
+  "verificationCode": "Verification Code (OTP)",
+  "enterVerificationCode": "Enter the 4 to 6 digit code",
+  "newPassword": "New Password",
+  "confirmNewPassword": "Confirm New Password",
+  "resetPasswordBtn": "Reset Password",
+  "passwordResetSuccess": "Password updated successfully. You can now sign in.",
+  "backToLogin": "Back to Sign In",
+  "resendCode": "Resend Code",
   "loginBtn": "Sign In",
   "dontHaveAccount": "Don't have an account?",
   "createNewAccount": "Create New Account",
@@ -169,6 +180,8 @@
   "scanAndUpload": "Scan & Upload",
   "zakatLabel": "Zakat",
   "taxAdjustments": "Tax Adjustments",
-  "ifrs16Asset": "IFRS 16 Asset"
+  "ifrs16Asset": "IFRS 16 Asset",
+  "accountingDashboard": "Accounting & Finance Dashboard",
+  "integratedBusinessManagementSystem": "Integrated Business Management System"
 }
 

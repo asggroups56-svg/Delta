@@ -62,6 +62,17 @@ class AppLocaleKey {
   static const String accountType               = 'accountType';
   static const String rememberMe                = 'rememberMe';
   static const String forgotPassword            = 'forgotPassword';
+  static const String forgotPasswordHeader      = 'forgotPasswordHeader';
+  static const String forgotPasswordHeaderSubtitle = 'forgotPasswordHeaderSubtitle';
+  static const String sendVerificationCode      = 'sendVerificationCode';
+  static const String verificationCode          = 'verificationCode';
+  static const String enterVerificationCode     = 'enterVerificationCode';
+  static const String newPassword               = 'newPassword';
+  static const String confirmNewPassword        = 'confirmNewPassword';
+  static const String resetPasswordBtn          = 'resetPasswordBtn';
+  static const String passwordResetSuccess      = 'passwordResetSuccess';
+  static const String backToLogin               = 'backToLogin';
+  static const String resendCode                = 'resendCode';
   static const String loginBtn                  = 'loginBtn';
   static const String dontHaveAccount           = 'dontHaveAccount';
   static const String createNewAccount          = 'createNewAccount';
@@ -207,4 +218,6 @@ class AppLocaleKey {
   static const String taxAdjustments            = 'taxAdjustments';
   static const String ifrs16Asset               = 'ifrs16Asset';
   static const String zakatLabel                = 'zakatLabel';
+  static const String accountingDashboard       = 'accountingDashboard';
+  static const String integratedBusinessManagementSystem = 'integratedBusinessManagementSystem';
 }

@@ -21,22 +21,24 @@ class AuthCubit extends Cubit<AuthState> {
   set accountType(String accountType) =>
       accountTypeController.text = accountType;
 
-  bool rememberMe = false;
+  bool get rememberMe => state.rememberMe;
 
-  void changeRememberMe() {
-    rememberMe = !rememberMe;
-    emit(state.copyWith());
+  void changeRememberMe([bool? value]) {
+    if (isClosed) return;
+    emit(state.copyWith(rememberMe: value ?? !state.rememberMe));
   }
 
   Future<void> login({BuildContext? context}) async {
+    if (isClosed) return;
     emit(state.copyWith(loginStatus: StatusState.loading()));
 
     final result = await authRepo.login(
       mobile: mobileController.text,
       password: passwordController.text,
-      rememberMe: rememberMe,
+      rememberMe: state.rememberMe,
       accountType: accountTypeController.text,
     );
+    if (isClosed) return;
     result.fold(
       (error) => emit(
         state.copyWith(loginStatus: StatusState.failure(error.errMessage)),
@@ -45,5 +47,13 @@ class AuthCubit extends Cubit<AuthState> {
         emit(state.copyWith(loginStatus: StatusState.success(success)));
       },
     );
+  }
+
+  @override
+  Future<void> close() {
+    mobileController.dispose();
+    passwordController.dispose();
+    accountTypeController.dispose();
+    return super.close();
   }
 }

@@ -4,6 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:my_template/core/theme/app_colors.dart';
 import 'package:my_template/core/theme/app_text_style.dart';
+import 'package:my_template/core/theme/app_decorations.dart';
+import 'package:my_template/core/theme/app_shadows.dart';
 import 'package:my_template/core/utils/app_locale_key.dart';
 import 'ai_chat_bottom_sheet_widget.dart';
 
@@ -28,29 +30,16 @@ class DashboardTopHeaderWidget extends StatelessWidget {
 
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Color(0xFF16202E),
-            Color(0xFF111722),
-          ],
-        ),
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(20.r)),
+      decoration: AppDecorations.headerDecoration(
+        gradient: AppGradients.dashboardHeader,
+        radius: 20,
+        boxShadow: AppShadows.header,
         border: Border(
           bottom: BorderSide(
             color: AppColor.whiteColor(context).withValues(alpha: 0.08),
             width: 1.2,
           ),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.35),
-            blurRadius: 16.r,
-            offset: const Offset(0, 6),
-          ),
-        ],
       ),
       child: Row(
         children: [
@@ -65,21 +54,15 @@ class DashboardTopHeaderWidget extends StatelessWidget {
                     children: [
                       Container(
                         padding: EdgeInsets.all(2.r),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: LinearGradient(
-                            colors: [
-                              AppColor.emeraldTeal,
-                              AppColor.purpleAccent,
-                            ],
-                          ),
+                        decoration: AppDecorations.circularGradient(
+                          gradient: AppGradients.avatarGradient,
                         ),
                         child: CircleAvatar(
                           radius: 16.r,
                           backgroundColor: AppColor.darkSurface,
                           child: Text(
                             'A',
-                            style: TextStyle(
+                            style: AppTextStyle.label(context).copyWith(
                               fontSize: 14.sp,
                               fontWeight: FontWeight.bold,
                               color: AppColor.whiteColor(context),
@@ -93,19 +76,12 @@ class DashboardTopHeaderWidget extends StatelessWidget {
                         child: Container(
                           width: 9.w,
                           height: 9.h,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF00E676),
-                            shape: BoxShape.circle,
+                          decoration: AppDecorations.circularDecoration(
+                            backgroundColor: const Color(0xFF00E676),
                             border: Border.all(
                               color: const Color(0xFF16202E),
                               width: 1.5,
                             ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0xFF00E676).withValues(alpha: 0.5),
-                                blurRadius: 4.r,
-                              ),
-                            ],
                           ),
                         ),
                       ),
@@ -177,14 +153,9 @@ class DashboardTopHeaderWidget extends StatelessWidget {
                 },
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 6.h),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        AppColor.purpleAccent,
-                        AppColor.emeraldTeal,
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(10.r),
+                  decoration: AppDecorations.roundedGradient(
+                    gradient: AppGradients.purpleAccent,
+                    radius: 10,
                     boxShadow: [
                       BoxShadow(
                         color: AppColor.purpleAccent.withValues(alpha: 0.3),
@@ -204,7 +175,7 @@ class DashboardTopHeaderWidget extends StatelessWidget {
                       Gap(3.w),
                       Text(
                         'AI',
-                        style: TextStyle(
+                        style: AppTextStyle.label(context).copyWith(
                           fontSize: 10.sp,
                           fontWeight: FontWeight.bold,
                           color: AppColor.whiteColor(context),
@@ -233,9 +204,9 @@ class DashboardTopHeaderWidget extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10.r),
                     child: Container(
                       padding: EdgeInsets.all(6.r),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF1F2B3E),
-                        borderRadius: BorderRadius.circular(10.r),
+                      decoration: AppDecorations.roundedContainer(
+                        backgroundColor: const Color(0xFF1F2B3E),
+                        radius: 10,
                         border: Border.all(
                           color: AppColor.whiteColor(context).withValues(alpha: 0.08),
                         ),
@@ -253,9 +224,8 @@ class DashboardTopHeaderWidget extends StatelessWidget {
                     child: Container(
                       width: 13.w,
                       height: 13.h,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFF5252),
-                        shape: BoxShape.circle,
+                      decoration: AppDecorations.circularDecoration(
+                        backgroundColor: const Color(0xFFFF5252),
                         border: Border.all(
                           color: const Color(0xFF16202E),
                           width: 1.2,
@@ -264,7 +234,7 @@ class DashboardTopHeaderWidget extends StatelessWidget {
                       child: Center(
                         child: Text(
                           '1',
-                          style: TextStyle(
+                          style: AppTextStyle.caption(context).copyWith(
                             fontSize: 7.5.sp,
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -283,9 +253,9 @@ class DashboardTopHeaderWidget extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10.r),
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 7.w, vertical: 5.h),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF1F2B3E),
-                    borderRadius: BorderRadius.circular(10.r),
+                  decoration: AppDecorations.roundedContainer(
+                    backgroundColor: const Color(0xFF1F2B3E),
+                    radius: 10,
                     border: Border.all(
                       color: AppColor.whiteColor(context).withValues(alpha: 0.08),
                     ),
@@ -319,9 +289,9 @@ class DashboardTopHeaderWidget extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10.r),
                 child: Container(
                   padding: EdgeInsets.all(6.r),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF1F2B3E),
-                    borderRadius: BorderRadius.circular(10.r),
+                  decoration: AppDecorations.roundedContainer(
+                    backgroundColor: const Color(0xFF1F2B3E),
+                    radius: 10,
                     border: Border.all(
                       color: AppColor.whiteColor(context).withValues(alpha: 0.08),
                     ),

@@ -13,7 +13,6 @@ import 'package:my_template/core/utils/app_locale_key.dart';
 import 'package:my_template/core/utils/common_methods.dart';
 import 'package:my_template/core/utils/navigator_methods.dart';
 import 'package:my_template/features/auth/presentation/view/cubit/auth_cubit.dart';
-
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -65,7 +64,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 key: _formKey,
                 child: Column(
                   children: [
-                    // Top Bar with Brand & Language Toggle
+                    
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -210,34 +209,43 @@ class _LoginScreenState extends State<LoginScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Row(
-                                  children: [
-                                    SizedBox(
-                                      width: 24.w,
-                                      height: 24.h,
-                                      child: Checkbox(
-                                        value: cubit.rememberMe,
-                                        activeColor: const Color(0xFF0D9488),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(4.r),
+                                InkWell(
+                                  onTap: () => cubit.changeRememberMe(),
+                                  borderRadius: BorderRadius.circular(4.r),
+                                  child: Row(
+                                    children: [
+                                      SizedBox(
+                                        width: 24.w,
+                                        height: 24.h,
+                                        child: Checkbox(
+                                          value: state.rememberMe,
+                                          activeColor: const Color(0xFF0D9488),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(4.r),
+                                          ),
+                                          onChanged: (value) =>
+                                              cubit.changeRememberMe(value),
                                         ),
-                                        onChanged: (value) =>
-                                            cubit.changeRememberMe(),
                                       ),
-                                    ),
-                                    Gap(8.w),
-                                    Text(
-                                      'rememberMe'.tr(),
-                                      style: TextStyle(
-                                        fontSize: 12.sp,
-                                        color: AppColor.darkTextColor(context),
+                                      Gap(8.w),
+                                      Text(
+                                        'rememberMe'.tr(),
+                                        style: TextStyle(
+                                          fontSize: 12.sp,
+                                          color: AppColor.darkTextColor(context),
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                                 TextButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    NavigatorMethods.pushNamed(
+                                      context,
+                                      RoutesName.forgotPasswordScreen,
+                                    );
+                                  },
                                   child: Text(
                                     'forgotPassword'.tr(),
                                     style: TextStyle(

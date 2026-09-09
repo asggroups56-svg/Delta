@@ -1,4 +1,5 @@
 import 'package:animate_do/animate_do.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
@@ -6,6 +7,7 @@ import 'package:my_template/core/images/app_images.dart';
 import 'package:my_template/core/routes/routes_name.dart';
 import 'package:my_template/core/theme/app_colors.dart';
 import 'package:my_template/core/theme/app_text_style.dart';
+import 'package:my_template/core/utils/app_locale_key.dart';
 import 'package:my_template/core/utils/navigator_methods.dart';
 import 'package:my_template/features/splash/presentation/view/widget/bottom_progress_indicator_footer_widget.dart';
 import 'package:my_template/features/splash/presentation/view/widget/chip_badge_widget.dart';
@@ -148,7 +150,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   duration: const Duration(milliseconds: 600),
                   delay: const Duration(milliseconds: 500),
                   child: Text(
-                    'Integrated Business Management System',
+                    AppLocaleKey.integratedBusinessManagementSystem.tr(),
                     textAlign: TextAlign.center,
                     style: AppTextStyle.bodySmall(context).copyWith(
                       color: AppColor.whiteColor(context).withValues(alpha: 0.85),
@@ -164,11 +166,11 @@ class _SplashScreenState extends State<SplashScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      ChipBadgeWidget(icon:  Icons.shopping_bag_rounded, label: 'المبيعات'),
+                      ChipBadgeWidget(icon:  Icons.shopping_bag_rounded, label: AppLocaleKey.sales.tr()),
                       Gap(8.w),
-                      ChipBadgeWidget(icon: Icons.inventory_rounded, label: 'المخزون'),
+                      ChipBadgeWidget(icon: Icons.inventory_rounded, label: AppLocaleKey.inventory.tr()),
                       Gap(8.w),
-                      ChipBadgeWidget(icon: Icons.calculate_rounded, label: 'المحاسبة'),
+                      ChipBadgeWidget(icon: Icons.calculate_rounded, label: AppLocaleKey.accounting.tr()),
                     ],
                   ),
                 ),

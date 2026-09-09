@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:my_template/core/theme/app_colors.dart';
 import 'package:my_template/core/theme/app_text_style.dart';
-
 class ChipBadgeWidget extends StatelessWidget {
   const ChipBadgeWidget({super.key, required this.icon, required this.label});
  final IconData icon;final String label;

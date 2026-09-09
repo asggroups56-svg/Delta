@@ -44,6 +44,17 @@
   "accountType": "نوع الحساب",
   "rememberMe": "تذكر بياناتي",
   "forgotPassword": "نسيت كلمة المرور؟",
+  "forgotPasswordHeader": "استعادة كلمة المرور",
+  "forgotPasswordHeaderSubtitle": "أدخل بريدك الإلكتروني أو رقم هاتفك لإرسال رمز التحقق وإعادة تعيين كلمة المرور",
+  "sendVerificationCode": "إرسال رمز التحقق",
+  "verificationCode": "رمز التحقق (OTP)",
+  "enterVerificationCode": "أدخل رمز التحقق المكون من 4 إلى 6 أرقام",
+  "newPassword": "كلمة المرور الجديدة",
+  "confirmNewPassword": "تأكيد كلمة المرور الجديدة",
+  "resetPasswordBtn": "تحديث كلمة المرور",
+  "passwordResetSuccess": "تم تحديث كلمة المرور بنجاح، يمكنك تسجيل الدخول الآن",
+  "backToLogin": "العودة لتسجيل الدخول",
+  "resendCode": "إعادة إرسال الرمز",
   "loginBtn": "تسجيل الدخول",
   "dontHaveAccount": "ليس لديك حساب؟",
   "createNewAccount": "إنشاء حساب جديد",
@@ -169,5 +180,7 @@
   "scanAndUpload": "بدء الفحص والرفع",
   "zakatLabel": "الزكاة",
   "taxAdjustments": "التسويات الضريبية",
-  "ifrs16Asset": "أصول المعيار 16 (IFRS)"
+  "ifrs16Asset": "أصول المعيار 16 (IFRS)",
+  "accountingDashboard": "نظام المالي والمحاسبة",
+  "integratedBusinessManagementSystem": "نظام إدارة الأعمال المتكامل"
 }
