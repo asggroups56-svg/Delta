@@ -34,6 +34,8 @@ class GridModulesWidget extends StatelessWidget {
             onTap: () {
               if (mod['id'] == 'accounting') {
                 NavigatorMethods.pushNamed(context, RoutesName.accountingDashboardScreen);
+              } else if (mod['id'] == 'dashboards') {
+                NavigatorMethods.pushNamed(context, RoutesName.reportsScreen);
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                   content: Text(mod['title'] as String),

@@ -5,6 +5,7 @@ import 'package:my_template/features/auth/presentation/view/screen/login_screen.
 import 'package:my_template/features/auth/presentation/view/screen/signup_screen.dart';
 import 'package:my_template/features/auth/presentation/view/screen/forgot_password_screen.dart';
 import 'package:my_template/features/home/presentation/view/screen/accounting_dashboard_screen.dart';
+import 'package:my_template/features/reports/presentation/view/screen/reports_screen.dart';
 import 'package:my_template/features/home/presentation/view/screen/home_screen.dart';
 import 'package:my_template/features/onboarding/presentation/view/screen/onboarding_screen.dart';
 
