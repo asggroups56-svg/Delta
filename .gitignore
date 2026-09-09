@@ -49,3 +49,4 @@ app.*.map.json
 .env.*
 *.env
 key.properties
+lib/core/config/app_secrets.dart

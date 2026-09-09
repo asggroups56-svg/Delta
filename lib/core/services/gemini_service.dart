@@ -1,8 +1,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../config/app_secrets.dart';
 
 class GeminiService {
-  static String apiKey = const String.fromEnvironment('GEMINI_API_KEY', defaultValue: '');
+  static String apiKey = AppSecrets.geminiApiKey;
   static const String _model = 'gemini-3.5-flash-lite';
   static String get _baseUrl =>
       'https://generativelanguage.googleapis.com/v1beta/models/$_model:generateContent';
