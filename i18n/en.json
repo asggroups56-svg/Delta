@@ -230,6 +230,24 @@
   "previewReport": "Preview",
   "downloadingPdf": "Preparing and generating PDF report...",
   "exportingExcel": "Exporting Excel report spreadsheet...",
-  "reportExportSuccess": "Report exported successfully!"
+  "reportExportSuccess": "Report exported successfully!",
+  "knowledgeBaseTitle": "Enterprise Knowledge Base",
+  "knowledgeBaseSubtitle": "Company policies, guidelines, and manuals",
+  "searchKnowledge": "Search articles, policies, guides...",
+  "kbTabAll": "All",
+  "kbTabHR": "HR & Admin",
+  "kbTabIT": "IT Support",
+  "kbTabFinance": "Finance",
+  "kbTabOperations": "Operations",
+  "readTime": "{mins} min read",
+  "updatedAgo": "Updated {days} days ago",
+  "articleHrTitle": "Employee Leave Policy 2026",
+  "articleHrDesc": "Detailed guide on annual leaves, sick leaves, and public holidays entitlement.",
+  "articleItTitle": "IT Security & Best Practices",
+  "articleItDesc": "Mandatory security protocols, password management, and data protection guidelines.",
+  "articleFinanceTitle": "Expense Claim & Reimbursement",
+  "articleFinanceDesc": "How to submit an expense report and the approval workflow for reimbursements.",
+  "articleOpsTitle": "Facility Evacuation Plan",
+  "articleOpsDesc": "Emergency procedures and evacuation maps for the main headquarters."
 }
 

@@ -8,4 +8,5 @@ class RoutesName {
   static const String forgotPasswordScreen = 'forgotPasswordScreen';
   static const String accountingDashboardScreen = 'accountingDashboardScreen';
   static const String reportsScreen = 'reportsScreen';
+  static const String knowledgeScreen = 'knowledgeScreen';
 }

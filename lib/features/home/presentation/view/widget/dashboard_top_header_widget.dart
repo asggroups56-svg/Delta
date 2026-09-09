@@ -14,6 +14,8 @@ class DashboardTopHeaderWidget extends StatelessWidget {
   final VoidCallback onOpenDrawer;
   final String? title;
   final String? subtitle;
+  final bool showBackIcon;
+  final VoidCallback? onBackTap;
 
   const DashboardTopHeaderWidget({
     super.key,
@@ -21,6 +23,8 @@ class DashboardTopHeaderWidget extends StatelessWidget {
     required this.onOpenDrawer,
     this.title,
     this.subtitle,
+    this.showBackIcon = false,
+    this.onBackTap,
   });
 
   @override
@@ -43,13 +47,40 @@ class DashboardTopHeaderWidget extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // ── Left/RTL Section: User Profile & Title (Expanded to prevent overflow) ──
           Expanded(
-            child: GestureDetector(
-              onTap: onOpenDrawer,
-              child: Row(
-                children: [
-                  Stack(
+            child: showBackIcon
+              ? GestureDetector(
+                  onTap: onBackTap ?? () => Navigator.pop(context),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(8.r),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1F2B3E),
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: AppColor.whiteColor(context).withValues(alpha: 0.08),
+                          ),
+                        ),
+                        child: Icon(
+                          context.locale.languageCode == 'ar'
+                              ? Icons.arrow_forward_ios_rounded
+                              : Icons.arrow_back_ios_new_rounded,
+                          color: AppColor.whiteColor(context),
+                          size: 14.r,
+                        ),
+                      ),
+                      Gap(8.w),
+                      // Extract title column
+                      Expanded(child: _buildTitleColumn(context, displayTitle, displaySubtitle)),
+                    ],
+                  ),
+                )
+              : GestureDetector(
+                  onTap: onOpenDrawer,
+                  child: Row(
+                    children: [
+                      Stack(
                     clipBehavior: Clip.none,
                     children: [
                       Container(
@@ -88,48 +119,7 @@ class DashboardTopHeaderWidget extends StatelessWidget {
                     ],
                   ),
                   Gap(8.w),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          displayTitle,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: AppTextStyle.bodyMedium(context).copyWith(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 13.sp,
-                            color: AppColor.whiteColor(context),
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            Container(
-                              width: 4.w,
-                              height: 4.h,
-                              decoration: const BoxDecoration(
-                                color: AppColor.emeraldTeal,
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                            Gap(4.w),
-                            Expanded(
-                              child: Text(
-                                displaySubtitle,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: AppTextStyle.bodySmall(context).copyWith(
-                                  fontSize: 9.5.sp,
-                                  color: AppColor.whiteColor(context).withValues(alpha: 0.55),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
+                  Expanded(child: _buildTitleColumn(context, displayTitle, displaySubtitle)),
                 ],
               ),
             ),
@@ -236,7 +226,7 @@ class DashboardTopHeaderWidget extends StatelessWidget {
                           '1',
                           style: AppTextStyle.caption(context).copyWith(
                             fontSize: 7.5.sp,
-                            color: Colors.white,
+                            color: AppColor.whiteColor(context),
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -307,6 +297,49 @@ class DashboardTopHeaderWidget extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildTitleColumn(BuildContext context, String displayTitle, String displaySubtitle) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          displayTitle,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: AppTextStyle.bodyMedium(context).copyWith(
+            fontWeight: FontWeight.bold,
+            fontSize: 13.sp,
+            color: AppColor.whiteColor(context),
+          ),
+        ),
+        Row(
+          children: [
+            Container(
+              width: 4.w,
+              height: 4.h,
+              decoration: const BoxDecoration(
+                color: AppColor.emeraldTeal,
+                shape: BoxShape.circle,
+              ),
+            ),
+            Gap(4.w),
+            Expanded(
+              child: Text(
+                displaySubtitle,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: AppTextStyle.bodySmall(context).copyWith(
+                  fontSize: 9.5.sp,
+                  color: AppColor.whiteColor(context).withValues(alpha: 0.55),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

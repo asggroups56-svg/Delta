@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:my_template/core/custom_widgets/custom_toast/custom_toast.dart';
 import 'package:my_template/core/theme/app_colors.dart';
+import 'package:my_template/core/theme/app_text_style.dart';
 import 'package:my_template/core/utils/app_locale_key.dart';
 import 'package:my_template/core/utils/common_methods.dart';
 import 'package:my_template/features/home/presentation/view/widget/ai_chat_bottom_sheet_widget.dart';
@@ -12,19 +13,15 @@ import 'package:my_template/features/reports/presentation/view/widget/reports_ch
 import 'package:my_template/features/reports/presentation/view/widget/reports_donut_chart_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/reports_kpi_card_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/reports_table_item_widget.dart';
-
 class ReportsScreen extends StatefulWidget {
   const ReportsScreen({super.key});
-
   @override
   State<ReportsScreen> createState() => _ReportsScreenState();
 }
-
 class _ReportsScreenState extends State<ReportsScreen> {
   int _selectedPeriodIndex = 2; // Default "This Month"
   int _selectedCategoryTab = 0; // 0 = Overview, 1 = Financials, 2 = Sales, 3 = Inventory, 4 = Tax
   final TextEditingController _searchController = TextEditingController();
-
   Future<void> _toggleLanguage() async {
     if (context.locale.languageCode == 'ar') {
       await context.setLocale(const Locale('en'));
@@ -67,7 +64,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 width: 40.w,
                 height: 4.h,
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
+                  color: AppColor.whiteColor(context).withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(4.r),
                 ),
               ),
@@ -454,13 +451,13 @@ class _ReportsScreenState extends State<ReportsScreen> {
                           ),
                           child: Text(
                             periods[index],
-                            style: TextStyle(
+                            style: AppTextStyle.bodySmall(context).copyWith(
                               fontSize: 11.sp,
                               fontWeight: isSelected
                                   ? FontWeight.bold
                                   : FontWeight.normal,
                               color: isSelected
-                                  ? Colors.white
+                                  ? AppColor.whiteColor(context)
                                   : AppColor.whiteColor(context)
                                       .withValues(alpha: 0.7),
                             ),
@@ -511,7 +508,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                   child: Icon(
                                     Icons.auto_awesome_rounded,
                                     size: 15.r,
-                                    color: Colors.white,
+                                    color: AppColor.whiteColor(context),
                                   ),
                                 ),
                                 Gap(8.w),

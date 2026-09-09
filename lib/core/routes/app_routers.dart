@@ -35,6 +35,10 @@ class AppRouters {
         return MaterialPageRoute(
           builder: (_) => const ReportsScreen(),
         );
+      case RoutesName.knowledgeScreen:
+        return MaterialPageRoute(
+          builder: (_) => const KnowledgeScreen(),
+        );
 
       default:
         return null;

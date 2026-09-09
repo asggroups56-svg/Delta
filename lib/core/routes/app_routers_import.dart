@@ -8,6 +8,7 @@ import 'package:my_template/features/home/presentation/view/screen/accounting_da
 import 'package:my_template/features/reports/presentation/view/screen/reports_screen.dart';
 import 'package:my_template/features/home/presentation/view/screen/home_screen.dart';
 import 'package:my_template/features/onboarding/presentation/view/screen/onboarding_screen.dart';
+import 'package:my_template/features/knowledge/presentation/view/screen/knowledge_screen.dart';
 
 import '../../features/auth/presentation/view/cubit/auth_cubit.dart';
 import '../../features/splash/presentation/view/screen/splash_screen.dart' show SplashScreen;

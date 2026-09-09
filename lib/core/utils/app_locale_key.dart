@@ -270,4 +270,25 @@ class AppLocaleKey {
   static const String downloadingPdf            = 'downloadingPdf';
   static const String exportingExcel            = 'exportingExcel';
   static const String reportExportSuccess       = 'reportExportSuccess';
+
+  // ── Knowledge Base ────────────────────────────────────────────────────────
+  static const String knowledgeBaseTitle        = 'knowledgeBaseTitle';
+  static const String knowledgeBaseSubtitle     = 'knowledgeBaseSubtitle';
+  static const String searchKnowledge           = 'searchKnowledge';
+  static const String kbTabAll                  = 'kbTabAll';
+  static const String kbTabHR                   = 'kbTabHR';
+  static const String kbTabIT                   = 'kbTabIT';
+  static const String kbTabFinance              = 'kbTabFinance';
+  static const String kbTabOperations           = 'kbTabOperations';
+  static const String readTime                  = 'readTime';
+  static const String updatedAgo                = 'updatedAgo';
+  
+  static const String articleHrTitle            = 'articleHrTitle';
+  static const String articleHrDesc             = 'articleHrDesc';
+  static const String articleItTitle            = 'articleItTitle';
+  static const String articleItDesc             = 'articleItDesc';
+  static const String articleFinanceTitle       = 'articleFinanceTitle';
+  static const String articleFinanceDesc        = 'articleFinanceDesc';
+  static const String articleOpsTitle           = 'articleOpsTitle';
+  static const String articleOpsDesc            = 'articleOpsDesc';
 }
