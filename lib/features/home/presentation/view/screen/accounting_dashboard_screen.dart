@@ -20,7 +20,14 @@ import 'package:my_template/features/home/presentation/view/widget/tax_adjustmen
 import 'package:my_template/features/home/presentation/view/widget/tax_returns_card_widget.dart';
 import 'package:my_template/features/home/presentation/view/widget/zakat_card_widget.dart';
 class AccountingDashboardScreen extends StatefulWidget {
-  const AccountingDashboardScreen({super.key});
+  final bool embeddedInShell;
+  final VoidCallback? onToggleLanguage;
+
+  const AccountingDashboardScreen({
+    super.key,
+    this.embeddedInShell = false,
+    this.onToggleLanguage,
+  });
 
   @override
   State<AccountingDashboardScreen> createState() => _AccountingDashboardScreenState();
@@ -30,6 +37,10 @@ class _AccountingDashboardScreenState extends State<AccountingDashboardScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   Future<void> _toggleLanguage() async {
+    if (widget.onToggleLanguage != null) {
+      widget.onToggleLanguage!();
+      return;
+    }
     if (context.locale.languageCode == 'ar') {
       await context.setLocale(const Locale('en'));
     } else {
@@ -49,11 +60,13 @@ class _AccountingDashboardScreenState extends State<AccountingDashboardScreen> {
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: AppColor.darkBackground,
-      drawer: SideDrawerAccountingWidget(
-        onTap: _logout,
-        openAiChatTap: () {},
-      ),
-      floatingActionButton: const AiFabWidget(),
+      drawer: widget.embeddedInShell
+          ? null
+          : SideDrawerAccountingWidget(
+              onTap: _logout,
+              openAiChatTap: () {},
+            ),
+      floatingActionButton: widget.embeddedInShell ? null : const AiFabWidget(),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -97,7 +110,7 @@ class _AccountingDashboardScreenState extends State<AccountingDashboardScreen> {
                   ],
                 ),
               ),
-              Gap(80.h),
+              Gap(widget.embeddedInShell ? 110.h : 80.h),
             ],
           ),
         ),

@@ -13,6 +13,7 @@ import 'package:my_template/core/utils/app_locale_key.dart';
 import 'package:my_template/core/utils/common_methods.dart';
 import 'package:my_template/core/utils/navigator_methods.dart';
 import 'package:my_template/features/auth/presentation/view/cubit/auth_cubit.dart';
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -39,19 +40,20 @@ class _LoginScreenState extends State<LoginScreen> {
     final cubit = context.read<AuthCubit>();
 
     return Scaffold(
-      backgroundColor: AppColor.scaffoldColor(context),
+      backgroundColor: AppColor.darkBackground,
       body: SafeArea(
         child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
           padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
           child: BlocConsumer<AuthCubit, AuthState>(
             listener: (context, state) {
               if (state.loginStatus.isSuccess) {
                 CommonMethods.showToast(
                   message: state.loginStatus.data?.message ??
-                      "loginBtn".tr() + " SUCCESS",
+                      "${AppLocaleKey.loginBtn.tr()} SUCCESS",
                 );
                 NavigatorMethods.pushReplacementNamed(
-                    context, RoutesName.homeScreen);
+                    context, RoutesName.mainShellScreen);
               }
               if (state.loginStatus.isFailure) {
                 log(state.loginStatus.error?.toString() ?? "Login failed");
@@ -64,37 +66,52 @@ class _LoginScreenState extends State<LoginScreen> {
                 key: _formKey,
                 child: Column(
                   children: [
-                    
+                    // Top App Bar: Brand & Language Switcher
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          children: [
-                            Container(
-                              padding: EdgeInsets.all(8.r),
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Color(0xFF0D9488),
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: EdgeInsets.all(8.r),
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [Color(0xFF00B894), Color(0xFF0984E3)],
+                                  ),
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: AppColor.emeraldTeal.withValues(alpha: 0.35),
+                                      blurRadius: 8.r,
+                                    ),
+                                  ],
+                                ),
+                                child: Icon(
+                                  Icons.widgets_rounded,
+                                  size: 18.r,
+                                  color: Colors.white,
+                                ),
                               ),
-                              child: Icon(
-                                Icons.widgets_rounded,
-                                size: 20.r,
-                                color: Colors.white,
+                              Gap(10.w),
+                              Expanded(
+                                child: Text(
+                                  AppLocaleKey.appName.tr(),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 16.sp,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 1.2,
+                                    color: Colors.white,
+                                  ),
+                                ),
                               ),
-                            ),
-                            Gap(8.w),
-                            Text(
-                              'appName'.tr(),
-                              style: TextStyle(
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 1.2,
-                                color: AppColor.titleFormFiledColor(context),
-                              ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                        // Language Switcher
+                        Gap(8.w),
+                        // Language Switcher Pill
                         InkWell(
                           onTap: _toggleLanguage,
                           borderRadius: BorderRadius.circular(20.r),
@@ -102,26 +119,27 @@ class _LoginScreenState extends State<LoginScreen> {
                             padding: EdgeInsets.symmetric(
                                 horizontal: 12.w, vertical: 6.h),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF0D9488).withValues(alpha: 0.1),
+                              color: AppColor.emeraldTeal.withValues(alpha: 0.12),
                               borderRadius: BorderRadius.circular(20.r),
                               border: Border.all(
-                                color: const Color(0xFF0D9488).withValues(alpha: 0.25),
+                                color: AppColor.emeraldTeal.withValues(alpha: 0.3),
                               ),
                             ),
                             child: Row(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(
                                   Icons.language_rounded,
-                                  size: 16.r,
-                                  color: const Color(0xFF0D9488),
+                                  size: 15.r,
+                                  color: AppColor.emeraldTeal,
                                 ),
                                 Gap(6.w),
                                 Text(
                                   AppLocaleKey.langSwitchLabel.tr(),
                                   style: TextStyle(
-                                    fontSize: 12.sp,
+                                    fontSize: 11.5.sp,
                                     fontWeight: FontWeight.bold,
-                                    color: const Color(0xFF0D9488),
+                                    color: AppColor.mintTeal,
                                   ),
                                 ),
                               ],
@@ -130,56 +148,86 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ],
                     ),
-                    Gap(32.h),
+                    Gap(28.h),
 
-                    // Enterprise Login Glassmorphic Card
+                    // Enterprise Glassmorphic Login Card
                     FadeInUp(
                       duration: const Duration(milliseconds: 600),
                       child: Container(
-                        padding: EdgeInsets.all(24.r),
+                        padding: EdgeInsets.all(22.r),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: const Color(0xFF141D2B),
                           borderRadius: BorderRadius.circular(24.r),
+                          border: Border.all(
+                            color: AppColor.whiteColor(context).withValues(alpha: 0.08),
+                          ),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFF0D9488).withValues(alpha: 0.08),
-                              blurRadius: 30,
+                              color: Colors.black.withValues(alpha: 0.4),
+                              blurRadius: 24.r,
                               offset: const Offset(0, 10),
                             ),
+                            BoxShadow(
+                              color: AppColor.emeraldTeal.withValues(alpha: 0.04),
+                              blurRadius: 20.r,
+                              spreadRadius: 2,
+                            ),
                           ],
-                          border: Border.all(
-                            color: Colors.grey.withValues(alpha: 0.15),
-                          ),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Header Title
-                            Text(
-                              'loginTitle'.tr(),
-                              style: TextStyle(
-                                fontSize: 20.sp,
-                                fontWeight: FontWeight.bold,
-                                color: AppColor.titleFormFiledColor(context),
-                              ),
+                            // Header Title & Icon
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        AppLocaleKey.loginTitle.tr(),
+                                        style: TextStyle(
+                                          fontSize: 20.sp,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      Gap(4.h),
+                                      Text(
+                                        AppLocaleKey.loginSubtitle.tr(),
+                                        style: TextStyle(
+                                          fontSize: 12.sp,
+                                          color: AppColor.whiteColor(context).withValues(alpha: 0.55),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Gap(12.w),
+                                Container(
+                                  padding: EdgeInsets.all(10.r),
+                                  decoration: BoxDecoration(
+                                    color: AppColor.emeraldTeal.withValues(alpha: 0.12),
+                                    borderRadius: BorderRadius.circular(12.r),
+                                  ),
+                                  child: Icon(
+                                    Icons.lock_person_rounded,
+                                    color: AppColor.emeraldTeal,
+                                    size: 22.r,
+                                  ),
+                                ),
+                              ],
                             ),
-                            Gap(6.h),
-                            Text(
-                              'loginSubtitle'.tr(),
-                              style: TextStyle(
-                                fontSize: 12.sp,
-                                color: AppColor.darkTextColor(context),
-                              ),
-                            ),
-                            Gap(24.h),
+                            Gap(22.h),
 
                             // Mobile / Email Field
                             CustomFormField(
                               controller: cubit.mobileController,
-                              title: 'mobileOrEmail'.tr(),
+                              title: AppLocaleKey.mobileOrEmail.tr(),
                               prefixIcon: const Icon(Icons.phone_android_rounded),
                               validator: (value) => value!.isEmpty
-                                  ? 'mobileOrEmail'.tr()
+                                  ? AppLocaleKey.mobileOrEmail.tr()
                                   : null,
                             ),
                             Gap(16.h),
@@ -187,21 +235,21 @@ class _LoginScreenState extends State<LoginScreen> {
                             // Password Field
                             CustomFormField(
                               controller: cubit.passwordController,
-                              title: 'password'.tr(),
+                              title: AppLocaleKey.password.tr(),
                               prefixIcon: const Icon(Icons.lock_outline_rounded),
                               isPassword: true,
                               validator: (value) =>
-                                  value!.isEmpty ? 'password'.tr() : null,
+                                  value!.isEmpty ? AppLocaleKey.password.tr() : null,
                             ),
                             Gap(16.h),
 
                             // Account Type Field
                             CustomFormField(
                               controller: cubit.accountTypeController,
-                              title: 'accountType'.tr(),
+                              title: AppLocaleKey.accountType.tr(),
                               prefixIcon: const Icon(Icons.badge_outlined),
                               validator: (value) =>
-                                  value!.isEmpty ? 'accountType'.tr() : null,
+                                  value!.isEmpty ? AppLocaleKey.accountType.tr() : null,
                             ),
                             Gap(12.h),
 
@@ -215,11 +263,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                   child: Row(
                                     children: [
                                       SizedBox(
-                                        width: 24.w,
-                                        height: 24.h,
+                                        width: 22.w,
+                                        height: 22.h,
                                         child: Checkbox(
                                           value: state.rememberMe,
-                                          activeColor: const Color(0xFF0D9488),
+                                          activeColor: AppColor.emeraldTeal,
                                           shape: RoundedRectangleBorder(
                                             borderRadius:
                                                 BorderRadius.circular(4.r),
@@ -228,12 +276,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                               cubit.changeRememberMe(value),
                                         ),
                                       ),
-                                      Gap(8.w),
+                                      Gap(6.w),
                                       Text(
-                                        'rememberMe'.tr(),
+                                        AppLocaleKey.rememberMe.tr(),
                                         style: TextStyle(
                                           fontSize: 12.sp,
-                                          color: AppColor.darkTextColor(context),
+                                          color: AppColor.whiteColor(context).withValues(alpha: 0.7),
                                         ),
                                       ),
                                     ],
@@ -247,49 +295,74 @@ class _LoginScreenState extends State<LoginScreen> {
                                     );
                                   },
                                   child: Text(
-                                    'forgotPassword'.tr(),
+                                    AppLocaleKey.forgotPassword.tr(),
                                     style: TextStyle(
                                       fontSize: 12.sp,
                                       fontWeight: FontWeight.w600,
-                                      color: const Color(0xFF0D9488),
+                                      color: AppColor.mintTeal,
                                     ),
                                   ),
                                 ),
                               ],
                             ),
-                            Gap(24.h),
+                            Gap(22.h),
 
-                            // Enterprise Style Submit Button
+                            // Submit Button with Gradient
                             SizedBox(
                               width: double.infinity,
                               height: 48.h,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  if (_formKey.currentState!.validate()) {
-                                    cubit.login(context: context);
-                                  } else {
-                                    // Fallback for direct preview navigation if needed
-                                    NavigatorMethods.pushReplacementNamed(
-                                      context,
-                                      RoutesName.homeScreen,
-                                    );
-                                  }
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF0D9488),
-                                  elevation: 3,
-                                  shadowColor:
-                                      const Color(0xFF0D9488).withValues(alpha: 0.4),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(14.r),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [Color(0xFF00B894), Color(0xFF0984E3)],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
                                   ),
+                                  borderRadius: BorderRadius.circular(14.r),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: AppColor.emeraldTeal.withValues(alpha: 0.35),
+                                      blurRadius: 12.r,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
                                 ),
-                                child: Text(
-                                  'loginBtn'.tr(),
-                                  style: TextStyle(
-                                    fontSize: 15.sp,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    if (_formKey.currentState!.validate()) {
+                                      cubit.login(context: context);
+                                    } else {
+                                      NavigatorMethods.pushReplacementNamed(
+                                        context,
+                                        RoutesName.mainShellScreen,
+                                      );
+                                    }
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.transparent,
+                                    shadowColor: Colors.transparent,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(14.r),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        AppLocaleKey.loginBtn.tr(),
+                                        style: TextStyle(
+                                          fontSize: 15.sp,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      Gap(8.w),
+                                      const Icon(
+                                        Icons.arrow_forward_rounded,
+                                        color: Colors.white,
+                                        size: 18,
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
@@ -305,13 +378,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'dontHaveAccount'.tr(),
+                          AppLocaleKey.dontHaveAccount.tr(),
                           style: TextStyle(
                             fontSize: 13.sp,
-                            color: AppColor.darkTextColor(context),
+                            color: AppColor.whiteColor(context).withValues(alpha: 0.6),
                           ),
                         ),
-                        Gap(4.w),
+                        Gap(6.w),
                         GestureDetector(
                           onTap: () {
                             NavigatorMethods.pushNamed(
@@ -320,24 +393,24 @@ class _LoginScreenState extends State<LoginScreen> {
                             );
                           },
                           child: Text(
-                            'createNewAccount'.tr(),
+                            AppLocaleKey.createNewAccount.tr(),
                             style: TextStyle(
                               fontSize: 13.sp,
                               fontWeight: FontWeight.bold,
-                              color: const Color(0xFF0D9488),
+                              color: AppColor.mintTeal,
                             ),
                           ),
                         ),
                       ],
                     ),
-                    Gap(30.h),
+                    Gap(28.h),
 
                     // Footer
                     Text(
-                      'versionPoweredBy'.tr(),
+                      AppLocaleKey.versionPoweredBy.tr(),
                       style: TextStyle(
                         fontSize: 11.sp,
-                        color: Colors.grey[500],
+                        color: AppColor.whiteColor(context).withValues(alpha: 0.35),
                       ),
                     ),
                   ],

@@ -6,28 +6,47 @@ import 'package:gap/gap.dart';
 import 'package:my_template/core/theme/app_colors.dart';
 import 'package:my_template/core/theme/app_text_style.dart';
 import 'package:my_template/features/onboarding/data/model/on_boarding_type.dart';
-import 'package:my_template/features/onboarding/presentation/view/widget/allIn_oneIllustration_widget.dart';
-import 'package:my_template/features/onboarding/presentation/view/widget/analytics_Illustration_widget.dart';
-import 'package:my_template/features/onboarding/presentation/view/widget/automation_Illustration_widget.dart';
+import 'package:my_template/features/onboarding/presentation/view/widget/all_in_one_illustration_widget.dart';
+import 'package:my_template/features/onboarding/presentation/view/widget/analytics_illustration_widget.dart';
+import 'package:my_template/features/onboarding/presentation/view/widget/automation_illustration_widget.dart';
 
 class PageSlideWidget extends StatelessWidget {
-  const PageSlideWidget({super.key , required this.item});
-final OnboardingItemModel item;
+  const PageSlideWidget({super.key, required this.item});
+
+  final OnboardingItemModel item;
+
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 24.w),
+      padding: EdgeInsets.symmetric(horizontal: 20.w),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Graphic Illustration Card
+          // Graphic Illustration Card with glassmorphic container
           Expanded(
             flex: 6,
             child: Center(
-              child: _buildGraphicIllustration(item),
+              child: Container(
+                padding: EdgeInsets.all(16.r),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF141D2B),
+                  borderRadius: BorderRadius.circular(24.r),
+                  border: Border.all(
+                    color: item.accentColor.withValues(alpha: 0.25),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: item.accentColor.withValues(alpha: 0.15),
+                      blurRadius: 24.r,
+                      spreadRadius: 2,
+                    ),
+                  ],
+                ),
+                child: _buildGraphicIllustration(item),
+              ),
             ),
           ),
-          Gap(20.h),
+          Gap(24.h),
 
           // Title & Description
           Expanded(
@@ -43,7 +62,7 @@ final OnboardingItemModel item;
                     style: AppTextStyle.bodyMedium(context).copyWith(
                       fontSize: 22.sp,
                       fontWeight: FontWeight.bold,
-                      color: AppColor.titleFormFiledColor(context),
+                      color: Colors.white,
                       height: 1.3,
                     ),
                   ),
@@ -57,8 +76,8 @@ final OnboardingItemModel item;
                     textAlign: TextAlign.center,
                     style: AppTextStyle.bodyMedium(context).copyWith(
                       fontSize: 13.sp,
-                      color: AppColor.darkTextColor(context),
-                      height: 1.6,
+                      color: AppColor.whiteColor(context).withValues(alpha: 0.65),
+                      height: 1.5,
                     ),
                   ),
                 ),
@@ -69,14 +88,15 @@ final OnboardingItemModel item;
       ),
     );
   }
-    Widget _buildGraphicIllustration(OnboardingItemModel item) {
+
+  Widget _buildGraphicIllustration(OnboardingItemModel item) {
     switch (item.type) {
       case OnboardingType.allInOne:
         return AllinOneillustrationWidget(color: item.accentColor);
       case OnboardingType.analytics:
         return AnalyticsIllustrationWidget(color: item.accentColor);
       case OnboardingType.automation:
-        return AutomationIllustrationWidget( color: item.accentColor);
+        return AutomationIllustrationWidget(color: item.accentColor);
     }
   }
 }

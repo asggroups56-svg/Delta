@@ -17,7 +17,7 @@ class OfflineWidget extends StatelessWidget {
         return Container(
           padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
           decoration: BoxDecoration(
-            color: AppColor.primaryColor(context).withOpacity(0.2),
+            color: AppColor.primaryColor(context).withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(7),
           ),
           child: IntrinsicHeight(
@@ -83,7 +83,7 @@ class OfflineWidget extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
           decoration: BoxDecoration(
-            color: AppColor.primaryColor(context).withOpacity(0.2),
+            color: AppColor.primaryColor(context).withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(7),
           ),
           child: Column(

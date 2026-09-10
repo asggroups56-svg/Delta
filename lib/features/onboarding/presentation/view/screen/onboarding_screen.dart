@@ -1,4 +1,3 @@
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -10,7 +9,6 @@ import 'package:my_template/core/utils/app_locale_key.dart';
 import 'package:my_template/core/utils/navigator_methods.dart';
 import 'package:my_template/features/onboarding/data/model/on_boarding_type.dart';
 import 'package:my_template/features/onboarding/presentation/view/widget/page_slide_widget.dart';
-
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -27,19 +25,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         OnboardingItemModel(
           titleKey: AppLocaleKey.onboardingTitle1,
           subtitleKey: AppLocaleKey.onboardingSubtitle1,
-          accentColor: const Color(0xFF0D9488), // Emerald Teal Accent
+          accentColor: const Color(0xFF00B894),
           type: OnboardingType.allInOne,
         ),
         OnboardingItemModel(
           titleKey: AppLocaleKey.onboardingTitle2,
           subtitleKey: AppLocaleKey.onboardingSubtitle2,
-          accentColor: const Color(0xFF0284C7), // Ocean Blue Accent
+          accentColor: const Color(0xFF0984E3),
           type: OnboardingType.analytics,
         ),
         OnboardingItemModel(
           titleKey: AppLocaleKey.onboardingTitle3,
           subtitleKey: AppLocaleKey.onboardingSubtitle3,
-          accentColor: const Color(0xFF059669), // Emerald Green Accent
+          accentColor: const Color(0xFF6C5CE7),
           type: OnboardingType.automation,
         ),
       ];
@@ -77,7 +75,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final currentItem = items[_currentIndex];
 
     return Scaffold(
-      backgroundColor: AppColor.scaffoldColor(context),
+      backgroundColor: AppColor.darkBackground,
       body: SafeArea(
         child: Column(
           children: [
@@ -95,16 +93,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: currentItem.accentColor,
+                          boxShadow: [
+                            BoxShadow(
+                              color: currentItem.accentColor.withValues(alpha: 0.5),
+                              blurRadius: 6,
+                            ),
+                          ],
                         ),
                       ),
                       Gap(8.w),
                       Text(
                         AppLocaleKey.appName.tr(),
                         style: AppTextStyle.bodyMedium(context).copyWith(
-                          
                           fontWeight: FontWeight.bold,
                           letterSpacing: 1.2,
-                          color: AppColor.titleFormFiledColor(context),
+                          color: Colors.white,
                         ),
                       ),
                     ],
@@ -119,24 +122,24 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           padding: EdgeInsets.symmetric(
                               horizontal: 12.w, vertical: 6.h),
                           decoration: BoxDecoration(
-                            color: currentItem.accentColor.withValues(alpha: 0.1),
+                            color: currentItem.accentColor.withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(20.r),
                             border: Border.all(
-                              color: currentItem.accentColor.withValues(alpha: 0.25),
+                              color: currentItem.accentColor.withValues(alpha: 0.3),
                             ),
                           ),
                           child: Row(
                             children: [
                               Icon(
                                 Icons.language_rounded,
-                                size: 16.r,
+                                size: 15.r,
                                 color: currentItem.accentColor,
                               ),
                               Gap(6.w),
                               Text(
                                 AppLocaleKey.langSwitchLabel.tr(),
-                                style: AppTextStyle.bodySmall(context).copyWith(
-                                 
+                                style: TextStyle(
+                                  fontSize: 11.5.sp,
                                   fontWeight: FontWeight.bold,
                                   color: currentItem.accentColor,
                                 ),
@@ -153,7 +156,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             padding: EdgeInsets.symmetric(
                                 horizontal: 14.w, vertical: 6.h),
                             backgroundColor:
-                                currentItem.accentColor.withValues(alpha: 0.08),
+                                AppColor.whiteColor(context).withValues(alpha: 0.06),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20.r),
                             ),
@@ -163,7 +166,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             style: AppTextStyle.bodySmall(context).copyWith(
                               fontSize: 13.sp,
                               fontWeight: FontWeight.w600,
-                              color: currentItem.accentColor,
+                              color: AppColor.whiteColor(context).withValues(alpha: 0.7),
                             ),
                           ),
                         ),
@@ -195,7 +198,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Animated Page Indicators
+                  // Animated Page Indicators with glow
                   Row(
                     children: List.generate(
                       items.length,
@@ -209,6 +212,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               ? currentItem.accentColor
                               : currentItem.accentColor.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(4.r),
+                          boxShadow: _currentIndex == index
+                              ? [
+                                  BoxShadow(
+                                    color: currentItem.accentColor.withValues(alpha: 0.5),
+                                    blurRadius: 6,
+                                  ),
+                                ]
+                              : null,
                         ),
                       ),
                     ),
@@ -217,45 +228,62 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   // Next / Get Started Button
                   AnimatedContainer(
                     duration: const Duration(milliseconds: 300),
-                    child: ElevatedButton(
-                      onPressed: _onNext,
-                      style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(
-                          horizontal:
-                              _currentIndex == items.length - 1 ? 28.w : 22.w,
-                          vertical: 14.h,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            currentItem.accentColor,
+                            currentItem.accentColor.withValues(alpha: 0.8),
+                          ],
                         ),
-                        backgroundColor: currentItem.accentColor,
-                        elevation: 4,
-                        shadowColor: currentItem.accentColor.withValues(alpha: 0.4),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30.r),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            _currentIndex == items.length - 1
-                                ? AppLocaleKey.startNow.tr()
-                                : AppLocaleKey.next.tr(),
-                            style: AppTextStyle.bodyMedium(context).copyWith(
-                              fontSize: 15.sp,
-                              fontWeight: FontWeight.bold,
-                              color: AppColor.whiteColor(context),
-                            ),
-                          ),
-                          Gap(8.w),
-                          Icon(
-                            _currentIndex == items.length - 1
-                                ? Icons.rocket_launch_rounded
-                                : (context.locale.languageCode == 'ar'
-                                    ? Icons.arrow_back_rounded
-                                    : Icons.arrow_forward_rounded),
-                            size: 18.r,
-                            color: AppColor.whiteColor(context),
+                        borderRadius: BorderRadius.circular(30.r),
+                        boxShadow: [
+                          BoxShadow(
+                            color: currentItem.accentColor.withValues(alpha: 0.4),
+                            blurRadius: 12.r,
+                            offset: const Offset(0, 4),
                           ),
                         ],
+                      ),
+                      child: ElevatedButton(
+                        onPressed: _onNext,
+                        style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.symmetric(
+                            horizontal:
+                                _currentIndex == items.length - 1 ? 28.w : 22.w,
+                            vertical: 14.h,
+                          ),
+                          backgroundColor: Colors.transparent,
+                          shadowColor: Colors.transparent,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30.r),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              _currentIndex == items.length - 1
+                                  ? AppLocaleKey.startNow.tr()
+                                  : AppLocaleKey.next.tr(),
+                              style: AppTextStyle.bodyMedium(context).copyWith(
+                                fontSize: 15.sp,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                            Gap(8.w),
+                            Icon(
+                              _currentIndex == items.length - 1
+                                  ? Icons.rocket_launch_rounded
+                                  : (context.locale.languageCode == 'ar'
+                                      ? Icons.arrow_back_rounded
+                                      : Icons.arrow_forward_rounded),
+                              size: 18.r,
+                              color: Colors.white,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -268,4 +296,3 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 }
-

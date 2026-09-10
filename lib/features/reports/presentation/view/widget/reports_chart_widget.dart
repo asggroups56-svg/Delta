@@ -52,17 +52,21 @@ class _ReportsChartWidgetState extends State<ReportsChartWidget> {
                   children: [
                     Text(
                       AppLocaleKey.revenueExpensesTrend.tr(),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         color: AppColor.whiteColor(context),
-                        fontSize: 14.sp,
+                        fontSize: 13.5.sp,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     Gap(3.h),
                     Text(
                       'SAR (${_revenues[_selectedMonthIndex].toInt()}K Rev / ${_expenses[_selectedMonthIndex].toInt()}K Exp)',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        fontSize: 11.sp,
+                        fontSize: 10.5.sp,
                         color: AppColor.mintTeal,
                         fontWeight: FontWeight.w600,
                       ),
@@ -70,15 +74,17 @@ class _ReportsChartWidgetState extends State<ReportsChartWidget> {
                   ],
                 ),
               ),
+              Gap(8.w),
               Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   _buildLegendDot(
-                    color: AppColor.emeraldTeal,
+                    color: AppColor.royalIndigo,
                     label: AppLocaleKey.revenueLegend.tr(),
                   ),
-                  Gap(12.w),
+                  Gap(8.w),
                   _buildLegendDot(
-                    color: const Color(0xFFFF7675),
+                    color: AppColor.roseDanger,
                     label: AppLocaleKey.expensesLegend.tr(),
                   ),
                 ],
@@ -107,18 +113,32 @@ class _ReportsChartWidgetState extends State<ReportsChartWidget> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      // Selected Value Tooltip Indicator
+                      // Active Tooltip Bubble
                       if (isSelected)
                         Container(
                           padding: EdgeInsets.symmetric(
-                              horizontal: 6.w, vertical: 2.h),
+                            horizontal: 6.w,
+                            vertical: 2.h,
+                          ),
                           margin: EdgeInsets.only(bottom: 4.h),
                           decoration: BoxDecoration(
-                            color: AppColor.emeraldTeal,
+                            gradient: const LinearGradient(
+                              colors: [
+                                Color(0xFF4F46E5),
+                                Color(0xFF06B6D4),
+                              ],
+                            ),
                             borderRadius: BorderRadius.circular(6.r),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColor.royalIndigo
+                                    .withValues(alpha: 0.4),
+                                blurRadius: 6,
+                              ),
+                            ],
                           ),
                           child: Text(
-                            '+${(_revenues[index] - _expenses[index]).toInt()}K',
+                            '${_revenues[index].toInt()}k',
                             style: TextStyle(
                               fontSize: 9.sp,
                               fontWeight: FontWeight.bold,
@@ -141,11 +161,12 @@ class _ReportsChartWidgetState extends State<ReportsChartWidget> {
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
                                 colors: isSelected
-                                    ? [AppColor.emeraldTeal, AppColor.mintTeal]
+                                    ? [AppColor.royalIndigo, AppColor.electricCyan]
                                     : [
-                                        AppColor.emeraldTeal
+                                        AppColor.royalIndigo
                                             .withValues(alpha: 0.4),
-                                        AppColor.mintTeal.withValues(alpha: 0.4)
+                                        AppColor.electricCyan
+                                            .withValues(alpha: 0.4)
                                       ],
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
@@ -154,7 +175,7 @@ class _ReportsChartWidgetState extends State<ReportsChartWidget> {
                               boxShadow: isSelected
                                   ? [
                                       BoxShadow(
-                                        color: AppColor.emeraldTeal
+                                        color: AppColor.royalIndigo
                                             .withValues(alpha: 0.4),
                                         blurRadius: 8,
                                         offset: const Offset(0, 2),
@@ -173,13 +194,13 @@ class _ReportsChartWidgetState extends State<ReportsChartWidget> {
                               gradient: LinearGradient(
                                 colors: isSelected
                                     ? [
-                                        const Color(0xFFFF7675),
-                                        const Color(0xFFE84393)
+                                        AppColor.roseDanger,
+                                        const Color(0xFFFB7185),
                                       ]
                                     : [
-                                        const Color(0xFFFF7675)
+                                        AppColor.roseDanger
                                             .withValues(alpha: 0.4),
-                                        const Color(0xFFE84393)
+                                        const Color(0xFFFB7185)
                                             .withValues(alpha: 0.4)
                                       ],
                                 begin: Alignment.topCenter,

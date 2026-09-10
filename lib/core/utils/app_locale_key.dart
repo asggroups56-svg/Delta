@@ -280,9 +280,19 @@ class AppLocaleKey {
   static const String kbTabIT                   = 'kbTabIT';
   static const String kbTabFinance              = 'kbTabFinance';
   static const String kbTabOperations           = 'kbTabOperations';
+  static const String kbTabLegal                = 'kbTabLegal';
   static const String readTime                  = 'readTime';
   static const String updatedAgo                = 'updatedAgo';
-  
+  static const String kbStatsArticles           = 'kbStatsArticles';
+  static const String kbStatsCategories         = 'kbStatsCategories';
+  static const String kbStatsAuthors            = 'kbStatsAuthors';
+  static const String kbStatsUpdated            = 'kbStatsUpdated';
+  static const String kbFeaturedTag             = 'kbFeaturedTag';
+  static const String kbFeaturedTitle           = 'kbFeaturedTitle';
+  static const String kbFeaturedDesc            = 'kbFeaturedDesc';
+  static const String kbFeaturedReadTime        = 'kbFeaturedReadTime';
+  static const String kbReadMore                = 'kbReadMore';
+
   static const String articleHrTitle            = 'articleHrTitle';
   static const String articleHrDesc             = 'articleHrDesc';
   static const String articleItTitle            = 'articleItTitle';
@@ -291,4 +301,17 @@ class AppLocaleKey {
   static const String articleFinanceDesc        = 'articleFinanceDesc';
   static const String articleOpsTitle           = 'articleOpsTitle';
   static const String articleOpsDesc            = 'articleOpsDesc';
+  static const String articleLegalTitle         = 'articleLegalTitle';
+  static const String articleLegalDesc          = 'articleLegalDesc';
+  static const String articleErpTitle           = 'articleErpTitle';
+  static const String articleErpDesc            = 'articleErpDesc';
+  static const String articleHrOnboardTitle     = 'articleHrOnboardTitle';
+  static const String articleHrOnboardDesc      = 'articleHrOnboardDesc';
+  static const String articleComplianceTitle    = 'articleComplianceTitle';
+  static const String articleComplianceDesc     = 'articleComplianceDesc';
+  static const String kbViewCount               = 'kbViewCount';
+  static const String kbBookmarkCount           = 'kbBookmarkCount';
+  static const String kbPopular                 = 'kbPopular';
+  static const String kbNew                     = 'kbNew';
+  static const String kbRecentlyUpdated         = 'kbRecentlyUpdated';
 }

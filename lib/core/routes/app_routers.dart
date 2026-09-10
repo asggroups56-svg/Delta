@@ -3,15 +3,15 @@ part of 'app_routers_import.dart';
 class AppRouters {
   static GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
   static Route<dynamic>? onGenerateRoute(RouteSettings settings) {
-    dynamic args;
-    if (settings.arguments != null) args = settings.arguments;
     switch (settings.name) {
       case RoutesName.splashScreen:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
       case RoutesName.onboardingScreen:
         return MaterialPageRoute(builder: (_) => const OnboardingScreen());
+      case RoutesName.mainShellScreen:
+        return MaterialPageRoute(builder: (_) => const MainShellScreen());
       case RoutesName.homeScreen:
-        return MaterialPageRoute(builder: (_) => HomeScreen());
+        return MaterialPageRoute(builder: (_) => const HomeScreen());
       case RoutesName.loginScreen:
         return MaterialPageRoute(
           builder: (_) => BlocProvider(
@@ -38,6 +38,22 @@ class AppRouters {
       case RoutesName.knowledgeScreen:
         return MaterialPageRoute(
           builder: (_) => const KnowledgeScreen(),
+        );
+      case RoutesName.createInvoiceScreen:
+        return MaterialPageRoute(
+          builder: (_) => const CreateInvoiceScreen(),
+        );
+      case RoutesName.addLeadScreen:
+        return MaterialPageRoute(
+          builder: (_) => const AddLeadScreen(),
+        );
+      case RoutesName.scanUploadScreen:
+        return MaterialPageRoute(
+          builder: (_) => const ScanUploadScreen(),
+        );
+      case RoutesName.aiCopilotScreen:
+        return MaterialPageRoute(
+          builder: (_) => const AiCopilotScreen(),
         );
 
       default:

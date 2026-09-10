@@ -104,38 +104,45 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      IconButton(
-                        onPressed: () {
-                          if (_currentStep == 2) {
-                            setState(() {
-                              _currentStep = 1;
-                            });
-                          } else {
-                            Navigator.pop(context);
-                          }
-                        },
-                        icon: Icon(
-                          context.locale.languageCode == 'ar'
-                              ? Icons.arrow_forward_ios_rounded
-                              : Icons.arrow_back_ios_rounded,
-                          size: 18.r,
-                          color: AppColor.titleFormFiledColor(context),
-                        ),
+                    Expanded(
+                      child: Row(
+                        children: [
+                          IconButton(
+                            onPressed: () {
+                              if (_currentStep == 2) {
+                                setState(() {
+                                  _currentStep = 1;
+                                });
+                              } else {
+                                Navigator.pop(context);
+                              }
+                            },
+                            icon: Icon(
+                              context.locale.languageCode == 'ar'
+                                  ? Icons.arrow_forward_ios_rounded
+                                  : Icons.arrow_back_ios_rounded,
+                              size: 18.r,
+                              color: AppColor.titleFormFiledColor(context),
+                            ),
+                          ),
+                          Gap(4.w),
+                          Expanded(
+                            child: Text(
+                              'appName'.tr(),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1.2,
+                                color: AppColor.titleFormFiledColor(context),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                      Gap(4.w),
-                      Text(
-                        'appName'.tr(),
-                        style: TextStyle(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.2,
-                          color: AppColor.titleFormFiledColor(context),
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                    Gap(8.w),
                   // Language Switcher
                   InkWell(
                     onTap: _toggleLanguage,

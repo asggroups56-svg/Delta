@@ -140,35 +140,37 @@ class ReportsTableItemWidget extends StatelessWidget {
                   children: [
                     Icon(
                       Icons.calendar_today_outlined,
-                      size: 13.r,
+                      size: 12.r,
                       color: AppColor.whiteColor(context).withValues(alpha: 0.5),
                     ),
                     Gap(4.w),
-                    Expanded(
+                    Flexible(
                       child: Text(
                         date,
+                        maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          fontSize: 11.sp,
+                          fontSize: 10.5.sp,
                           color:
                               AppColor.whiteColor(context).withValues(alpha: 0.5),
                         ),
                       ),
                     ),
-                    Gap(8.w),
+                    Gap(6.w),
                     Text(
                       amount,
                       style: TextStyle(
-                        fontSize: 12.sp,
+                        fontSize: 11.sp,
                         fontWeight: FontWeight.bold,
                         color: AppColor.mintTeal,
                       ),
                     ),
-                    Gap(8.w),
+                    Gap(6.w),
                   ],
                 ),
               ),
               Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   // PDF Export button
                   InkWell(

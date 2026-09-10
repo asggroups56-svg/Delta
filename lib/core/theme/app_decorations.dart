@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'app_colors.dart';
 
 /// Centralized decoration utilities to avoid repeating BoxDecoration patterns
 class AppDecorations {
@@ -152,7 +151,7 @@ class AppDecorations {
       ],
       border: Border(
         bottom: BorderSide(
-          color: AppColor.whiteColor(null as BuildContext).withValues(alpha: 0.08),
+          color: Colors.white.withValues(alpha: 0.08),
           width: 1.2,
         ),
       ),
@@ -173,64 +172,64 @@ class AppDecorations {
 
 // Constant app colors for dark theme
 class AppColors {
-  static const Color darkBackground = Color(0xFF0D121B);
-  static const Color darkCardBackground = Color(0xFF131B26);
-  static const Color darkSurface = Color(0xFF1B2431);
+  static const Color darkBackground = Color(0xFF090D16);
+  static const Color darkCardBackground = Color(0xFF111827);
+  static const Color darkSurface = Color(0xFF1E293B);
 }
 
 /// Centralized gradient definitions to avoid repetition
 class AppGradients {
-  /// Dashboard header gradient (dark blue)
+  /// Dashboard header gradient (Modern Deep Navy)
   static const LinearGradient dashboardHeader = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
     colors: [
-      Color(0xFF16202E),
-      Color(0xFF111722),
+      Color(0xFF0F172A),
+      Color(0xFF090D16),
     ],
   );
 
-  /// Primary gradient (emerald to teal)
+  /// Primary gradient (Royal Indigo to Electric Cyan)
   static const LinearGradient primary = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
     colors: [
-      Color(0xFF0D9488),
-      Color(0xFF14B8A6),
+      Color(0xFF4F46E5),
+      Color(0xFF06B6D4),
     ],
   );
 
-  /// Accent gradient (blue to purple)
+  /// Accent gradient (Indigo to Sky)
   static const LinearGradient accent = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
     colors: [
-      Color(0xFF00B894),
-      Color(0xFF0984E3),
+      Color(0xFF6366F1),
+      Color(0xFF38BDF8),
     ],
   );
 
-  /// Purple accent gradient
+  /// Purple accent gradient (Violet to Indigo)
   static const LinearGradient purpleAccent = LinearGradient(
     colors: [
-      Color(0xFF00B894),
-      Color(0xFF0984E3),
+      Color(0xFF7C3AED),
+      Color(0xFF4F46E5),
     ],
   );
 
-  /// Emerald to purple gradient
+  /// Emerald to Cyan gradient
   static const LinearGradient emeraldPurple = LinearGradient(
     colors: [
-      Color(0xFF00B894),
-      Color(0xFF6C5CE7),
+      Color(0xFF10B981),
+      Color(0xFF06B6D4),
     ],
   );
 
   /// Profile avatar gradient
   static const LinearGradient avatarGradient = LinearGradient(
     colors: [
-      Color(0xFF00B894),
-      Color(0xFF0984E3),
+      Color(0xFF4F46E5),
+      Color(0xFF06B6D4),
     ],
   );
 

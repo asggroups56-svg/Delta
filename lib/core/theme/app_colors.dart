@@ -3,22 +3,22 @@ import 'package:flutter/material.dart';
 import 'app_theme.dart';
 
 class AppColor {
-  // Primary App Color: Emerald Teal
+  // Primary App Color: Royal Indigo
   static Color primaryColor(BuildContext context, {bool listen = true}) {
     return AppTheme.getByTheme(
       context,
-      light: const Color(0xFF0D9488),
-      dark: const Color(0xFF0D9488),
+      light: const Color(0xFF4F46E5),
+      dark: const Color(0xFF6366F1),
       listen: listen,
     );
   }
 
-  // Secondary App Color: Ocean Blue
+  // Secondary App Color: Electric Cyan / Sky
   static Color secondAppColor(BuildContext context, {bool listen = true}) {
     return AppTheme.getByTheme(
       context,
-      light: const Color(0xFF0284C7),
-      dark: const Color(0xFF0284C7),
+      light: const Color(0xFF06B6D4),
+      dark: const Color(0xFF0EA5E9),
       listen: listen,
     );
   }
@@ -26,8 +26,8 @@ class AppColor {
   static Color borderColor(BuildContext context, {bool listen = true}) {
     return AppTheme.getByTheme(
       context,
-      light: const Color(0xffA6A6A6),
-      dark: const Color(0xffA6A6A6),
+      light: const Color(0xFFE2E8F0),
+      dark: const Color(0xFF334155),
       listen: listen,
     );
   }
@@ -36,7 +36,7 @@ class AppColor {
     return AppTheme.getByTheme(
       context,
       light: const Color(0xFFF8FAFC),
-      dark: const Color(0xFFF8FAFC),
+      dark: const Color(0xFF090D16),
       listen: listen,
     );
   }
@@ -44,8 +44,8 @@ class AppColor {
   static Color textFormFillColor(BuildContext context, {bool listen = true}) {
     return AppTheme.getByTheme(
       context,
-      light: const Color(0xFFF8FAFC),
-      dark: const Color(0xFFF8FAFC),
+      light: const Color(0xFFF1F5F9),
+      dark: const Color(0xFF111827),
       listen: listen,
     );
   }
@@ -53,13 +53,13 @@ class AppColor {
   static Color hintColor(BuildContext context, {bool listen = true}) {
     return AppTheme.getByTheme(
       context,
-      light: const Color(0xffA6A6A6),
-      dark: const Color(0xffA6A6A6),
+      light: const Color(0xFF94A3B8),
+      dark: const Color(0xFF64748B),
       listen: listen,
     );
   }
 
-  static Color BackColor(BuildContext context, {bool listen = true}) {
+  static Color backColor(BuildContext context, {bool listen = true}) {
     return AppTheme.getByTheme(
       context,
       light: Colors.black,
@@ -68,42 +68,42 @@ class AppColor {
     );
   }
 
-  // Dark Background Base: Rich Deep Emerald
-  static Color DeepColor(BuildContext context, {bool listen = true}) {
+  // Dark Background Base: Deep Midnight Obsidian
+  static Color deepColor(BuildContext context, {bool listen = true}) {
     return AppTheme.getByTheme(
       context,
-      light: const Color(0xFF042F2C),
-      dark: const Color(0xFF042F2C),
+      light: const Color(0xFF0B1120),
+      dark: const Color(0xFF090D16),
       listen: listen,
     );
   }
 
-  // Primary Gradient Indigo/Teal
-  static Color DeepIndigoColor(BuildContext context, {bool listen = true}) {
+  // Primary Gradient Indigo
+  static Color deepIndigoColor(BuildContext context, {bool listen = true}) {
     return AppTheme.getByTheme(
       context,
-      light: const Color(0xFF0D9488),
-      dark: const Color(0xFF0D9488),
+      light: const Color(0xFF4F46E5),
+      dark: const Color(0xFF4F46E5),
       listen: listen,
     );
   }
 
-  // Accent Color 1: Ocean Blue
-  static Color AccentPurpleColor(BuildContext context, {bool listen = true}) {
+  // Accent Color 1: Royal Indigo / Violet
+  static Color accentPurpleColor(BuildContext context, {bool listen = true}) {
     return AppTheme.getByTheme(
       context,
-      light: const Color(0xFF0284C7),
-      dark: const Color(0xFF0284C7),
+      light: const Color(0xFF6366F1),
+      dark: const Color(0xFF6366F1),
       listen: listen,
     );
   }
 
-  // Accent Color 2: Bright Mint Teal
-  static Color AccentIndigoColor(BuildContext context, {bool listen = true}) {
+  // Accent Color 2: Electric Cyan
+  static Color accentIndigoColor(BuildContext context, {bool listen = true}) {
     return AppTheme.getByTheme(
       context,
-      light: const Color(0xFF14B8A6),
-      dark: const Color(0xFF14B8A6),
+      light: const Color(0xFF06B6D4),
+      dark: const Color(0xFF06B6D4),
       listen: listen,
     );
   }
@@ -112,7 +112,7 @@ class AppColor {
     return AppTheme.getByTheme(
       context,
       light: const Color(0xFF64748B),
-      dark: const Color(0xFF64748B),
+      dark: const Color(0xFF94A3B8),
       listen: listen,
     );
   }
@@ -120,8 +120,8 @@ class AppColor {
   static Color greyColor(BuildContext context, {bool listen = true}) {
     return AppTheme.getByTheme(
       context,
-      light: const Color(0xFFA5A5A5),
-      dark: const Color(0xFFA5A5A5),
+      light: const Color(0xFF94A3B8),
+      dark: const Color(0xFF64748B),
       listen: listen,
     );
   }
@@ -130,7 +130,7 @@ class AppColor {
     return AppTheme.getByTheme(
       context,
       light: const Color(0xFF0F172A),
-      dark: const Color(0xFF0F172A),
+      dark: const Color(0xFFF8FAFC),
       listen: listen,
     );
   }
@@ -138,8 +138,8 @@ class AppColor {
   static Color whiteColor(BuildContext context, {bool listen = true}) {
     return AppTheme.getByTheme(
       context,
-      light: const Color(0xffffffff),
-      dark: const Color(0xffffffff),
+      light: const Color(0xFFFFFFFF),
+      dark: const Color(0xFFFFFFFF),
       listen: listen,
     );
   }
@@ -148,7 +148,7 @@ class AppColor {
     return AppTheme.getByTheme(
       context,
       light: const Color(0xFFE2E8F0),
-      dark: const Color(0xFFE2E8F0),
+      dark: const Color(0xFF1E293B),
       listen: listen,
     );
   }
@@ -156,8 +156,8 @@ class AppColor {
   static Color textFormColor(BuildContext context, {bool listen = true}) {
     return AppTheme.getByTheme(
       context,
-      light: const Color(0xff000000),
-      dark: const Color(0xff000000),
+      light: const Color(0xFF0F172A),
+      dark: const Color(0xFFF8FAFC),
       listen: listen,
     );
   }
@@ -166,7 +166,7 @@ class AppColor {
     return AppTheme.getByTheme(
       context,
       light: const Color(0xFF0F172A),
-      dark: const Color(0xFF0F172A),
+      dark: const Color(0xFFF8FAFC),
       listen: listen,
     );
   }
@@ -174,8 +174,8 @@ class AppColor {
   static Color appBarColor(BuildContext context, {bool listen = true}) {
     return AppTheme.getByTheme(
       context,
-      light: const Color(0xffFAFAFA),
-      dark: const Color(0xffFAFAFA),
+      light: const Color(0xFFFFFFFF),
+      dark: const Color(0xFF0F172A),
       listen: listen,
     );
   }
@@ -183,20 +183,27 @@ class AppColor {
   static Color buttonTextColor(BuildContext context, {bool listen = true}) {
     return AppTheme.getByTheme(
       context,
-      light: const Color(0xffffffff),
-      dark: const Color(0xffffffff),
+      light: const Color(0xFFFFFFFF),
+      dark: const Color(0xFFFFFFFF),
       listen: listen,
     );
   }
 
-  // ── Static Constant Colors ────────────────────────────────────────────────
-  static const Color darkBackground     = Color(0xFF0D121B);
-  static const Color darkCardBackground = Color(0xFF131B26);
-  static const Color darkSurface        = Color(0xFF1B2431);
-  static const Color emeraldTeal        = Color(0xFF00B894);
-  static const Color oceanBlue         = Color(0xFF0984E3);
-  static const Color purpleAccent       = Color(0xFF6C5CE7);
-  static const Color mintTeal           = Color(0xFF55E6C1);
-  static const Color skyBlue            = Color(0xFF74B9FF);
-  static const Color warningOrange      = Color(0xFFE17055);
+  // ── Static Constant Colors (Modern Enterprise Dark) ────────────────────────
+  static const Color darkBackground     = Color(0xFF090D16); // Midnight Obsidian
+  static const Color darkCardBackground = Color(0xFF111827); // Deep Slate Card
+  static const Color darkSurface        = Color(0xFF1E293B); // Elevated Slate
+  static const Color royalIndigo        = Color(0xFF4F46E5); // Primary Royal Indigo
+  static const Color indigoLight        = Color(0xFF6366F1); // Vivid Indigo
+  static const Color electricCyan       = Color(0xFF06B6D4); // Electric Cyan Accent
+  static const Color cyanLight          = Color(0xFF38BDF8); // Sky Cyan
+  static const Color emeraldTeal        = Color(0xFF10B981); // Emerald (Success/Profit)
+  static const Color mintTeal           = Color(0xFF34D399); // Mint
+  static const Color oceanBlue          = Color(0xFF0284C7); // Sapphire
+  static const Color skyBlue            = Color(0xFF38BDF8); // Soft Sky
+  static const Color purpleAccent       = Color(0xFF7C3AED); // Royal Violet
+  static const Color warningOrange      = Color(0xFFF59E0B); // Enterprise Amber
+  static const Color roseDanger         = Color(0xFFF43F5E); // Crisp Rose
+  static const Color slateMuted         = Color(0xFF94A3B8); // Muted Text
+  static const Color slateSubtle        = Color(0xFF64748B); // Border/Subtle
 }

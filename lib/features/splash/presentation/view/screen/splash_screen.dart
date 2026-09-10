@@ -47,9 +47,9 @@ class _SplashScreenState extends State<SplashScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              AppColor.DeepColor(context), // Deep Dark Emerald
-              AppColor.DeepIndigoColor(context), // Delta Primary Emerald
-              AppColor.AccentPurpleColor(context), // Ocean Blue Accent
+              AppColor.deepColor(context), // Deep Dark Emerald
+              AppColor.deepIndigoColor(context), // Delta Primary Emerald
+              AppColor.accentPurpleColor(context), // Ocean Blue Accent
             ],
             stops: [0.0, 0.6, 1.0],
           ),
@@ -116,7 +116,7 @@ class _SplashScreenState extends State<SplashScreen> {
                       errorBuilder: (context, error, stackTrace) => Icon(
                         Icons.widgets_rounded,
                         size: 64.r,
-                        color: AppColor.AccentIndigoColor(context),
+                        color: AppColor.accentIndigoColor(context),
                       ),
                     ),
                   ),
@@ -135,7 +135,7 @@ class _SplashScreenState extends State<SplashScreen> {
                       color: AppColor.whiteColor(context),
                       shadows: [
                         Shadow(
-                           color: AppColor.BackColor(context).withValues(alpha: 0.3),
+                           color: AppColor.backColor(context).withValues(alpha: 0.3),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         )

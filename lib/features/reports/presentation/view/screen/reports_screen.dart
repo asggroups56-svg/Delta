@@ -497,31 +497,38 @@ class _ReportsScreenState extends State<ReportsScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Row(
-                              children: [
-                                Container(
-                                  padding: EdgeInsets.all(6.r),
-                                  decoration: const BoxDecoration(
-                                    color: Color(0xFF0D9488),
-                                    shape: BoxShape.circle,
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.all(6.r),
+                                    decoration: const BoxDecoration(
+                                      color: Color(0xFF0D9488),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(
+                                      Icons.auto_awesome_rounded,
+                                      size: 15.r,
+                                      color: AppColor.whiteColor(context),
+                                    ),
                                   ),
-                                  child: Icon(
-                                    Icons.auto_awesome_rounded,
-                                    size: 15.r,
-                                    color: AppColor.whiteColor(context),
+                                  Gap(8.w),
+                                  Expanded(
+                                    child: Text(
+                                      AppLocaleKey.aiExecutiveInsightTitle.tr(),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontSize: 12.sp,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColor.mintTeal,
+                                      ),
+                                    ),
                                   ),
-                                ),
-                                Gap(8.w),
-                                Text(
-                                  AppLocaleKey.aiExecutiveInsightTitle.tr(),
-                                  style: TextStyle(
-                                    fontSize: 12.sp,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColor.mintTeal,
-                                  ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
+                            Gap(8.w),
                             InkWell(
                               onTap: _openAiChat,
                               child: Container(
@@ -763,7 +770,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   },
                 ),
               ),
-              Gap(40.h),
+              Gap(100.h),
             ],
           ),
         ),
