@@ -11,6 +11,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:my_template/core/custom_widgets/custom_toast/custom_toast.dart';
 import 'package:my_template/core/theme/app_colors.dart';
 import 'package:my_template/core/utils/common_methods.dart';
+import 'package:my_template/features/home/presentation/view/widget/ocr_item_row_widget.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdfx/pdfx.dart';
 
@@ -1151,6 +1152,7 @@ class _PurchaseOcrScreenState extends State<PurchaseOcrScreen>
     opacity: _resultFade,
     child: Column(
       children: [
+        
         _buildItemsSection(),
         Gap(20.h),
         _buildAccountingSection(),
@@ -1168,6 +1170,22 @@ class _PurchaseOcrScreenState extends State<PurchaseOcrScreen>
       ),
     );
   }
+  List<OcrItemRow> _toItemRows(List<OcrItem> items) {
+  return items
+      .map(
+        (item) => OcrItemRow(
+          itemCode: item.itemCode,
+          description: item.description,
+          quantity: item.quantity,
+          price: item.price,
+          total: item.total,
+          vat: item.vat,
+          net: item.net,
+          discount: item.discount,
+        ),
+      )
+      .toList();
+}
 Widget _buildItemsSection() {
   if (_items.isEmpty) {
     return Container(
@@ -1203,82 +1221,7 @@ Widget _buildItemsSection() {
     );
   }
 
-  return Directionality(
-    textDirection: TextDirection.rtl,
-    child: Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(14.r),
-      decoration: BoxDecoration(
-        color: const Color(0xFF0A0F1E),
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-          color: AppColor.emeraldTeal.withValues(alpha: 0.25),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: EdgeInsets.all(9.r),
-                decoration: BoxDecoration(
-                  color: AppColor.emeraldTeal.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(10.r),
-                ),
-                child: Icon(
-                  Icons.inventory_2_rounded,
-                  color: AppColor.emeraldTeal,
-                  size: 19.r,
-                ),
-              ),
-              Gap(10.w),
-              Expanded(
-                child: Text(
-                  'أصناف الفاتورة',
-                  style: TextStyle(
-                    fontSize: 13.sp,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    fontFamily: 'Tajawal',
-                  ),
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 9.w,
-                  vertical: 5.h,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColor.emeraldTeal.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(8.r),
-                ),
-                child: Text(
-                  '${_items.length} صنف',
-                  style: TextStyle(
-                    fontSize: 9.sp,
-                    fontWeight: FontWeight.bold,
-                    color: AppColor.emeraldTeal,
-                    fontFamily: 'Tajawal',
-                  ),
-                ),
-              ),
-            ],
-          ),
-
-          Gap(12.h),
-
-          ...List.generate(
-            _items.length,
-            (index) => _buildDynamicItemCard(
-              _items[index],
-              index,
-            ),
-          ),
-        ],
-      ),
-    ),
-  );
+   return OcrItemsTable(items: _toItemRows(_items));
 }
   // ───────────────────────────────────────────────────────────────────────────
   // AppBar
