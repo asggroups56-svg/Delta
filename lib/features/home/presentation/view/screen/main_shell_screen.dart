@@ -26,7 +26,6 @@ class _MainShellScreenState extends State<MainShellScreen>
   int _currentIndex = 0;
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
-
   Future<void> _toggleLanguage() async {
     if (context.locale.languageCode == 'ar') {
       await context.setLocale(const Locale('en'));
@@ -35,7 +34,6 @@ class _MainShellScreenState extends State<MainShellScreen>
     }
     if (mounted) setState(() {});
   }
-
   void _logout() {
     NavigatorMethods.pushReplacementNamed(context, RoutesName.loginScreen);
   }

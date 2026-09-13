@@ -55,6 +55,10 @@ class AppRouters {
         return MaterialPageRoute(
           builder: (_) => const AiCopilotScreen(),
         );
+      case RoutesName.purchaseOcrScreen:
+        return MaterialPageRoute(
+          builder: (_) => const PurchaseOcrScreen(),
+        );
 
       default:
         return null;

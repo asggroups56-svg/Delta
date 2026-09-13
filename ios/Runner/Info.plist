@@ -66,5 +66,11 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>يحتاج التطبيق إلى الكاميرا لالتقاط صور فواتير المشتريات واستخراج بياناتها تلقائياً بتقنية OCR</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>يحتاج التطبيق إلى معرض الصور لاختيار صورة فاتورة ومعالجتها بتقنية OCR</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>يحتاج التطبيق إلى حفظ الصور في معرض الصور</string>
 </dict>
 </plist>

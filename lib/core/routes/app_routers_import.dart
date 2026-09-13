@@ -14,6 +14,7 @@ import 'package:my_template/features/quick_actions/presentation/view/screen/crea
 import 'package:my_template/features/quick_actions/presentation/view/screen/add_lead_screen.dart';
 import 'package:my_template/features/quick_actions/presentation/view/screen/scan_upload_screen.dart';
 import 'package:my_template/features/quick_actions/presentation/view/screen/ai_copilot_screen.dart';
+import 'package:my_template/features/home/presentation/view/screen/purchase_ocr_screen.dart';
 
 import '../../features/auth/presentation/view/cubit/auth_cubit.dart';
 import '../../features/splash/presentation/view/screen/splash_screen.dart' show SplashScreen;
