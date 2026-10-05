@@ -14,11 +14,9 @@ class ReportsChartWidget extends StatefulWidget {
 
 class _ReportsChartWidgetState extends State<ReportsChartWidget> {
   int _selectedMonthIndex = 5; // Default selected to current month (Jun)
-
   final List<String> _months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
   final List<double> _revenues = [120, 145, 130, 180, 165, 215]; // in k SAR
   final List<double> _expenses = [80, 95, 88, 110, 105, 125];
-
   @override
   Widget build(BuildContext context) {
     final maxVal = 250.0;

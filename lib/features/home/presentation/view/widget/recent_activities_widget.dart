@@ -3,7 +3,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
-import 'package:my_template/core/theme/app_colors.dart';
 import 'package:my_template/core/utils/app_locale_key.dart';
 
 class RecentActivitiesWidget extends StatelessWidget {
@@ -14,24 +13,24 @@ class RecentActivitiesWidget extends StatelessWidget {
     final activities = [
       {
         'title': AppLocaleKey.newInvoiceIssued.tr(),
-        'desc': 'INV-2026-089 • \$12,450.00',
-        'time': '10 min ago',
+        'desc': 'INV-2026-089 • 12,450.00 ر.س',
+        'time': 'منذ 10 دقائق',
         'icon': Icons.receipt_rounded,
-        'color': AppColor.emeraldTeal,
+        'color': const Color(0xFF2563EB),
       },
       {
         'title': AppLocaleKey.stockUpdated.tr(),
-        'desc': 'Warehouse A • 45 Items replenished',
-        'time': '1 hr ago',
+        'desc': 'المستودع الرئيسي • توريد 45 صنف',
+        'time': 'منذ ساعة',
         'icon': Icons.inventory_2_rounded,
-        'color': AppColor.oceanBlue,
+        'color': const Color(0xFF059669),
       },
       {
         'title': AppLocaleKey.newLeadAdded.tr(),
-        'desc': 'Acme Corp • Enterprise Tier',
-        'time': '3 hrs ago',
+        'desc': 'مجموعة دلتا الدولية • فئة المؤسسات',
+        'time': 'منذ 3 ساعات',
         'icon': Icons.hub_rounded,
-        'color': AppColor.purpleAccent,
+        'color': const Color(0xFF7C3AED),
       },
     ];
 
@@ -40,11 +39,19 @@ class RecentActivitiesWidget extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.all(16.r),
         decoration: BoxDecoration(
-          color: const Color(0xFF141D2B),
+          color: Colors.white,
           borderRadius: BorderRadius.circular(18.r),
           border: Border.all(
-            color: AppColor.whiteColor(context).withValues(alpha: 0.07),
+            color: const Color(0xFFE2E8F0),
+            width: 1.2,
           ),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF0F172A).withValues(alpha: 0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -54,18 +61,18 @@ class RecentActivitiesWidget extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.history_rounded,
-                      size: 18.r,
-                      color: AppColor.emeraldTeal,
+                      size: 18,
+                      color: Color(0xFF2563EB),
                     ),
                     Gap(6.w),
                     Text(
                       AppLocaleKey.recentActivities.tr(),
                       style: TextStyle(
-                        fontSize: 13.sp,
-                        fontWeight: FontWeight.w700,
-                        color: AppColor.whiteColor(context),
+                        fontSize: 13.5.sp,
+                        fontWeight: FontWeight.w800,
+                        color: const Color(0xFF0F172A),
                       ),
                     ),
                   ],
@@ -74,13 +81,13 @@ class RecentActivitiesWidget extends StatelessWidget {
                   'Live Feed',
                   style: TextStyle(
                     fontSize: 11.sp,
-                    fontWeight: FontWeight.w600,
-                    color: AppColor.mintTeal,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFF2563EB),
                   ),
                 ),
               ],
             ),
-            Gap(12.h),
+            Gap(14.h),
             ...activities.asMap().entries.map((entry) {
               final idx = entry.key;
               final item = entry.value;
@@ -95,7 +102,7 @@ class RecentActivitiesWidget extends StatelessWidget {
                       Container(
                         padding: EdgeInsets.all(8.r),
                         decoration: BoxDecoration(
-                          color: color.withValues(alpha: 0.15),
+                          color: color.withValues(alpha: 0.12),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
@@ -113,8 +120,8 @@ class RecentActivitiesWidget extends StatelessWidget {
                               item['title'] as String,
                               style: TextStyle(
                                 fontSize: 12.sp,
-                                fontWeight: FontWeight.w600,
-                                color: AppColor.whiteColor(context),
+                                fontWeight: FontWeight.w700,
+                                color: const Color(0xFF0F172A),
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -124,7 +131,7 @@ class RecentActivitiesWidget extends StatelessWidget {
                               item['desc'] as String,
                               style: TextStyle(
                                 fontSize: 11.sp,
-                                color: AppColor.whiteColor(context).withValues(alpha: 0.5),
+                                color: const Color(0xFF64748B),
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -137,7 +144,7 @@ class RecentActivitiesWidget extends StatelessWidget {
                         item['time'] as String,
                         style: TextStyle(
                           fontSize: 10.sp,
-                          color: AppColor.whiteColor(context).withValues(alpha: 0.4),
+                          color: const Color(0xFF94A3B8),
                         ),
                       ),
                     ],
@@ -145,8 +152,8 @@ class RecentActivitiesWidget extends StatelessWidget {
                   if (!isLast)
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: 8.h),
-                      child: Divider(
-                        color: AppColor.whiteColor(context).withValues(alpha: 0.05),
+                      child: const Divider(
+                        color: Color(0xFFF1F5F9),
                         height: 1,
                       ),
                     ),

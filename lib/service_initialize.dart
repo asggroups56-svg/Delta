@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import 'core/cache/shared_pref/shared_pref.dart';
 import 'core/services/services_locator.dart';
 import 'core/theme/theme_enum.dart';
 
@@ -16,6 +17,7 @@ class ServiceInitialize {
     await Hive.openBox('app');
     await ScreenUtil.ensureScreenSize();
     await EasyLocalization.ensureInitialized();
+    await CacheHelper().init();
     await initDependencies();
   }
 }

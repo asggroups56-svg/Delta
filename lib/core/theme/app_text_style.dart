@@ -132,9 +132,9 @@ class AppTextStyle {
     Color? color,
   }) {
     return _buildStyle(
-      fontSize: 16.sp,
+      fontSize: 14.sp,
       fontWeight: _medium,
-      color: color ?? AppColor.greyColor(context, listen: listen),
+      color: color ?? AppColor.textFormColor(context, listen: listen),
     );
   }
 
@@ -144,9 +144,9 @@ class AppTextStyle {
     Color? color,
   }) {
     return _buildStyle(
-      fontSize: 16.sp,
-      fontWeight: _medium,
-      color: color ?? AppColor.greyColor(context, listen: listen),
+      fontSize: 13.sp,
+      fontWeight: _semibold,
+      color: color ?? AppColor.titleFormFiledColor(context, listen: listen),
     );
   }
 

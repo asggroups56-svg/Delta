@@ -10,7 +10,6 @@ import 'core/theme/style.dart';
 
 class DeltaApp extends StatelessWidget {
   const DeltaApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
@@ -18,10 +17,10 @@ class DeltaApp extends StatelessWidget {
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) {
-        return MaterialApp(
-          localizationsDelegates: [
-            ...context.localizationDelegates,
-            CountryLocalizations.delegate,
+      return MaterialApp(
+      localizationsDelegates: [
+      ...context.localizationDelegates,
+      CountryLocalizations.delegate,
           ],
           supportedLocales: context.supportedLocales,
           locale: context.locale,

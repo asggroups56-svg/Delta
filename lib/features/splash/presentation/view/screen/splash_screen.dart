@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:my_template/core/images/app_images.dart';
+import 'package:my_template/core/cache/shared_pref/shared_pref.dart';
 import 'package:my_template/core/routes/routes_name.dart';
 import 'package:my_template/core/theme/app_colors.dart';
 import 'package:my_template/core/theme/app_text_style.dart';
@@ -11,11 +12,13 @@ import 'package:my_template/core/utils/app_locale_key.dart';
 import 'package:my_template/core/utils/navigator_methods.dart';
 import 'package:my_template/features/splash/presentation/view/widget/bottom_progress_indicator_footer_widget.dart';
 import 'package:my_template/features/splash/presentation/view/widget/chip_badge_widget.dart';
+
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
   @override
   State<SplashScreen> createState() => _SplashScreenState();
 }
+
 class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
@@ -24,16 +27,19 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void _navigateToNext() {
-    Future.delayed(const Duration(milliseconds: 3200)).then(
-      (value) {
-        if (mounted) {
-          NavigatorMethods.pushReplacementNamed(
-            context,
-            RoutesName.onboardingScreen,
-          );
-        }
-      },
-    );
+    Future.delayed(const Duration(milliseconds: 3200)).then((value) {
+      if (mounted) {
+        NavigatorMethods.pushReplacementNamed(
+          context,
+          CacheHelper.sharedPreferences
+                      .getString(CacheHelper.authTokenKey)
+                      ?.isNotEmpty ==
+                  true
+              ? RoutesName.mainShellScreen
+              : RoutesName.onboardingScreen,
+        );
+      }
+    });
   }
 
   @override
@@ -42,7 +48,7 @@ class _SplashScreenState extends State<SplashScreen> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration:  BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -93,7 +99,9 @@ class _SplashScreenState extends State<SplashScreen> {
                   child: Container(
                     padding: EdgeInsets.all(22.r),
                     decoration: BoxDecoration(
-                      color: AppColor.whiteColor(context).withValues(alpha: 0.12),
+                      color: AppColor.whiteColor(
+                        context,
+                      ).withValues(alpha: 0.12),
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
@@ -135,10 +143,12 @@ class _SplashScreenState extends State<SplashScreen> {
                       color: AppColor.whiteColor(context),
                       shadows: [
                         Shadow(
-                           color: AppColor.backColor(context).withValues(alpha: 0.3),
+                          color: AppColor.backColor(
+                            context,
+                          ).withValues(alpha: 0.3),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
-                        )
+                        ),
                       ],
                     ),
                   ),
@@ -153,7 +163,9 @@ class _SplashScreenState extends State<SplashScreen> {
                     AppLocaleKey.integratedBusinessManagementSystem.tr(),
                     textAlign: TextAlign.center,
                     style: AppTextStyle.bodySmall(context).copyWith(
-                      color: AppColor.whiteColor(context).withValues(alpha: 0.85),
+                      color: AppColor.whiteColor(
+                        context,
+                      ).withValues(alpha: 0.85),
                       letterSpacing: 0.5,
                     ),
                   ),
@@ -166,11 +178,20 @@ class _SplashScreenState extends State<SplashScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      ChipBadgeWidget(icon:  Icons.shopping_bag_rounded, label: AppLocaleKey.sales.tr()),
+                      ChipBadgeWidget(
+                        icon: Icons.shopping_bag_rounded,
+                        label: AppLocaleKey.sales.tr(),
+                      ),
                       Gap(8.w),
-                      ChipBadgeWidget(icon: Icons.inventory_rounded, label: AppLocaleKey.inventory.tr()),
+                      ChipBadgeWidget(
+                        icon: Icons.inventory_rounded,
+                        label: AppLocaleKey.inventory.tr(),
+                      ),
                       Gap(8.w),
-                      ChipBadgeWidget(icon: Icons.calculate_rounded, label: AppLocaleKey.accounting.tr()),
+                      ChipBadgeWidget(
+                        icon: Icons.calculate_rounded,
+                        label: AppLocaleKey.accounting.tr(),
+                      ),
                     ],
                   ),
                 ),
@@ -183,4 +204,3 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 }
-

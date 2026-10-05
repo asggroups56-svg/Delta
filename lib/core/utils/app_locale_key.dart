@@ -60,7 +60,6 @@ class AppLocaleKey {
   static const String fullName                  = 'fullName';
   static const String companyName               = 'companyName';
   static const String accountType               = 'accountType';
-  static const String rememberMe                = 'rememberMe';
   static const String forgotPassword            = 'forgotPassword';
   static const String forgotPasswordHeader      = 'forgotPasswordHeader';
   static const String forgotPasswordHeaderSubtitle = 'forgotPasswordHeaderSubtitle';
@@ -74,13 +73,6 @@ class AppLocaleKey {
   static const String backToLogin               = 'backToLogin';
   static const String resendCode                = 'resendCode';
   static const String loginBtn                  = 'loginBtn';
-  static const String dontHaveAccount           = 'dontHaveAccount';
-  static const String createNewAccount          = 'createNewAccount';
-  static const String signupTitle               = 'signupTitle';
-  static const String signupSubtitle            = 'signupSubtitle';
-  static const String agreeTerms                = 'agreeTerms';
-  static const String signupBtn                 = 'signupBtn';
-  static const String alreadyHaveAccount        = 'alreadyHaveAccount';
 
   // ── Home ──────────────────────────────────────────────────────────────────
   static const String welcomeUser               = 'welcomeUser';

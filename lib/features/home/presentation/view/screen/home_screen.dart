@@ -2,21 +2,23 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:my_template/core/cache/shared_pref/shared_pref.dart';
 import 'package:my_template/core/routes/routes_name.dart';
 import 'package:my_template/core/theme/app_colors.dart';
 import 'package:my_template/core/utils/app_locale_key.dart';
 import 'package:my_template/core/utils/navigator_methods.dart';
 import 'package:my_template/features/home/presentation/view/widget/ai_chat_bottom_sheet_widget.dart';
 import 'package:my_template/features/home/presentation/view/widget/ai_fab_widget.dart';
+import 'package:my_template/features/home/presentation/view/widget/annual_financial_overview_widget.dart';
 import 'package:my_template/features/home/presentation/view/widget/category_filters_widget.dart';
 import 'package:my_template/features/home/presentation/view/widget/dashboard_top_header_widget.dart';
+import 'package:my_template/features/home/presentation/view/widget/delta_welcome_banner_widget.dart';
 import 'package:my_template/features/home/presentation/view/widget/documents_header_widget.dart';
 import 'package:my_template/features/home/presentation/view/widget/folder_list_widget.dart';
 import 'package:my_template/features/home/presentation/view/widget/grid_modules_widget.dart';
-import 'package:my_template/features/home/presentation/view/widget/quick_actions_widget.dart';
+import 'package:my_template/features/home/presentation/view/widget/quick_shortcuts_widget.dart';
 import 'package:my_template/features/home/presentation/view/widget/recent_activities_widget.dart';
 import 'package:my_template/features/home/presentation/view/widget/side_drawer_widget.dart';
-import 'package:my_template/features/home/presentation/view/widget/welcome_banner_widget.dart';
 
 class HomeScreen extends StatefulWidget {
   final bool embeddedInShell;
@@ -52,7 +54,9 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void _logout() {
+  Future<void> _logout() async {
+    await CacheHelper().clearAuthData();
+    if (!mounted) return;
     NavigatorMethods.pushReplacementNamed(context, RoutesName.loginScreen);
   }
 
@@ -119,15 +123,35 @@ class _HomeScreenState extends State<HomeScreen> {
     ];
 
     final List<Map<String, dynamic>> documentFolders = [
-      {'name': AppLocaleKey.folderInsurance.tr(),      'count': AppLocaleKey.folderInsuranceCount.tr(),     'icon': Icons.security_rounded,                   'color': AppColor.emeraldTeal},
-      {'name': AppLocaleKey.folderLoans.tr(),          'count': AppLocaleKey.folderLoansCount.tr(),         'icon': Icons.account_balance_wallet_outlined,    'color': AppColor.royalIndigo},
-      {'name': AppLocaleKey.folderRegistrations.tr(),  'count': AppLocaleKey.folderRegistrationsCount.tr(), 'icon': Icons.assignment_outlined,                 'color': AppColor.purpleAccent},
-      {'name': AppLocaleKey.folderContracts.tr(),      'count': AppLocaleKey.folderContractsCount.tr(),     'icon': Icons.description_outlined,               'color': AppColor.warningOrange},
+      {
+        'name': AppLocaleKey.folderInsurance.tr(),
+        'count': AppLocaleKey.folderInsuranceCount.tr(),
+        'icon': Icons.security_rounded,
+        'color': AppColor.emeraldTeal,
+      },
+      {
+        'name': AppLocaleKey.folderLoans.tr(),
+        'count': AppLocaleKey.folderLoansCount.tr(),
+        'icon': Icons.account_balance_wallet_outlined,
+        'color': AppColor.royalIndigo,
+      },
+      {
+        'name': AppLocaleKey.folderRegistrations.tr(),
+        'count': AppLocaleKey.folderRegistrationsCount.tr(),
+        'icon': Icons.assignment_outlined,
+        'color': AppColor.purpleAccent,
+      },
+      {
+        'name': AppLocaleKey.folderContracts.tr(),
+        'count': AppLocaleKey.folderContractsCount.tr(),
+        'icon': Icons.description_outlined,
+        'color': AppColor.warningOrange,
+      },
     ];
 
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: AppColor.darkBackground,
+      backgroundColor: AppColor.scaffoldColor(context),
       drawer: widget.embeddedInShell
           ? null
           : SideDrawerWidget(
@@ -154,23 +178,31 @@ class _HomeScreenState extends State<HomeScreen> {
 
               Gap(16.h),
 
-              // 2. Welcome Banner
+              // 2. Delta ASG Welcome Banner
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.w),
-                child: const WelcomeBannerWidget(),
-              ),
-
-              Gap(18.h),
-
-              // 3. Quick Actions Row
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
-                child: QuickActionsWidget(onAiTap: _openAiChat),
+                child: const DeltaWelcomeBannerWidget(),
               ),
 
               Gap(22.h),
 
-              // 4. Main Modules Section
+              // 3. Annual Financial Overview (Net Sales & Cash Flow Charts)
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                child: const AnnualFinancialOverviewWidget(),
+              ),
+
+              Gap(24.h),
+
+              // 4. Quick Shortcuts (اختصارات العمل - الوصول السريع)
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                child: QuickShortcutsWidget(onAiTap: _openAiChat),
+              ),
+
+              Gap(22.h),
+
+              // 5. Main Modules Section
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.w),
                 child: Row(
@@ -179,24 +211,29 @@ class _HomeScreenState extends State<HomeScreen> {
                     Text(
                       AppLocaleKey.mainModules.tr(),
                       style: TextStyle(
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.bold,
-                        color: AppColor.whiteColor(context).withValues(alpha: 0.85),
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.w800,
+                        color: AppColor.titleFormFiledColor(context),
                         letterSpacing: -0.2,
                       ),
                     ),
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 8.w,
+                        vertical: 3.h,
+                      ),
                       decoration: BoxDecoration(
-                        color: AppColor.whiteColor(context).withValues(alpha: 0.05),
+                        color: AppColor.primaryColor(
+                          context,
+                        ).withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12.r),
                       ),
                       child: Text(
                         '${gridModules.length} Modules',
                         style: TextStyle(
                           fontSize: 10.sp,
-                          color: AppColor.emeraldTeal,
-                          fontWeight: FontWeight.w600,
+                          color: AppColor.primaryColor(context),
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ),

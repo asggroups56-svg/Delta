@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:my_template/core/cache/shared_pref/shared_pref.dart';
 import 'package:my_template/core/routes/routes_name.dart';
 import 'package:my_template/core/theme/app_colors.dart';
 import 'package:my_template/core/utils/app_locale_key.dart';
@@ -19,6 +20,7 @@ import 'package:my_template/features/home/presentation/view/widget/side_drawer_a
 import 'package:my_template/features/home/presentation/view/widget/tax_adjustments_card_widget.dart';
 import 'package:my_template/features/home/presentation/view/widget/tax_returns_card_widget.dart';
 import 'package:my_template/features/home/presentation/view/widget/zakat_card_widget.dart';
+
 class AccountingDashboardScreen extends StatefulWidget {
   final bool embeddedInShell;
   final VoidCallback? onToggleLanguage;
@@ -30,7 +32,8 @@ class AccountingDashboardScreen extends StatefulWidget {
   });
 
   @override
-  State<AccountingDashboardScreen> createState() => _AccountingDashboardScreenState();
+  State<AccountingDashboardScreen> createState() =>
+      _AccountingDashboardScreenState();
 }
 
 class _AccountingDashboardScreenState extends State<AccountingDashboardScreen> {
@@ -51,7 +54,9 @@ class _AccountingDashboardScreenState extends State<AccountingDashboardScreen> {
     }
   }
 
-  void _logout() {
+  Future<void> _logout() async {
+    await CacheHelper().clearAuthData();
+    if (!mounted) return;
     NavigatorMethods.pushReplacementNamed(context, RoutesName.loginScreen);
   }
 
@@ -62,10 +67,7 @@ class _AccountingDashboardScreenState extends State<AccountingDashboardScreen> {
       backgroundColor: AppColor.darkBackground,
       drawer: widget.embeddedInShell
           ? null
-          : SideDrawerAccountingWidget(
-              onTap: _logout,
-              openAiChatTap: () {},
-            ),
+          : SideDrawerAccountingWidget(onTap: _logout, openAiChatTap: () {}),
       floatingActionButton: widget.embeddedInShell ? null : const AiFabWidget(),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -92,21 +94,41 @@ class _AccountingDashboardScreenState extends State<AccountingDashboardScreen> {
                     Gap(16.h),
                     const CashCardWidget(),
                     Gap(16.h),
-                    TaxAdjustmentsCardWidget(onTap: () {
-                      NewEntryBottomSheetWidget.show(context, AppLocaleKey.taxAdjustments.tr());
-                    }),
+                    TaxAdjustmentsCardWidget(
+                      onTap: () {
+                        NewEntryBottomSheetWidget.show(
+                          context,
+                          AppLocaleKey.taxAdjustments.tr(),
+                        );
+                      },
+                    ),
                     Gap(16.h),
-                    TaxReturnsCardWidget(onTap: () {
-                      NewEntryBottomSheetWidget.show(context, AppLocaleKey.taxReturnsCard.tr());
-                    }),
+                    TaxReturnsCardWidget(
+                      onTap: () {
+                        NewEntryBottomSheetWidget.show(
+                          context,
+                          AppLocaleKey.taxReturnsCard.tr(),
+                        );
+                      },
+                    ),
                     Gap(16.h),
-                    Ifrs16CardWidget(onTap: () {
-                      NewEntryBottomSheetWidget.show(context, AppLocaleKey.ifrs16Asset.tr());
-                    }),
+                    Ifrs16CardWidget(
+                      onTap: () {
+                        NewEntryBottomSheetWidget.show(
+                          context,
+                          AppLocaleKey.ifrs16Asset.tr(),
+                        );
+                      },
+                    ),
                     Gap(16.h),
-                    ZakatCardWidget(onTap: () {
-                      NewEntryBottomSheetWidget.show(context, AppLocaleKey.zakatLabel.tr());
-                    }),
+                    ZakatCardWidget(
+                      onTap: () {
+                        NewEntryBottomSheetWidget.show(
+                          context,
+                          AppLocaleKey.zakatLabel.tr(),
+                        );
+                      },
+                    ),
                   ],
                 ),
               ),

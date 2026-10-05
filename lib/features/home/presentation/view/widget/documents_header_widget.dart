@@ -40,7 +40,7 @@ class DocumentsHeaderWidget extends StatelessWidget {
             ),
             child: Icon(
               Icons.folder_special_rounded,
-              color: Colors.white,
+              color: AppColor.whiteColor(context),
               size: 18.r,
             ),
           ),
@@ -117,7 +117,7 @@ class DocumentsHeaderWidget extends StatelessWidget {
                     Icon(
                       Icons.cloud_upload_outlined,
                       size: 14.r,
-                      color: Colors.white,
+                      color: AppColor.whiteColor(context),
                     ),
                     Gap(4.w),
                     Text(
@@ -125,7 +125,7 @@ class DocumentsHeaderWidget extends StatelessWidget {
                       style: AppTextStyle.text10SDark(context).copyWith(
                         fontWeight: FontWeight.bold,
                         fontSize: 10.5.sp,
-                        color: Colors.white,
+                        color: AppColor.whiteColor(context),
                       ),
                     ),
                   ],

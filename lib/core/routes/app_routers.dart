@@ -19,46 +19,26 @@ class AppRouters {
             child: const LoginScreen(),
           ),
         );
-      case RoutesName.signupScreen:
-        return MaterialPageRoute(
-          builder: (_) => const SignupScreen(),
-        );
       case RoutesName.forgotPasswordScreen:
-        return MaterialPageRoute(
-          builder: (_) => const ForgotPasswordScreen(),
-        );
+        return MaterialPageRoute(builder: (_) => const ForgotPasswordScreen());
       case RoutesName.accountingDashboardScreen:
         return MaterialPageRoute(
           builder: (_) => const AccountingDashboardScreen(),
         );
       case RoutesName.reportsScreen:
-        return MaterialPageRoute(
-          builder: (_) => const ReportsScreen(),
-        );
+        return MaterialPageRoute(builder: (_) => const ReportsScreen());
       case RoutesName.knowledgeScreen:
-        return MaterialPageRoute(
-          builder: (_) => const KnowledgeScreen(),
-        );
+        return MaterialPageRoute(builder: (_) => const KnowledgeScreen());
       case RoutesName.createInvoiceScreen:
-        return MaterialPageRoute(
-          builder: (_) => const CreateInvoiceScreen(),
-        );
+        return MaterialPageRoute(builder: (_) => const CreateInvoiceScreen());
       case RoutesName.addLeadScreen:
-        return MaterialPageRoute(
-          builder: (_) => const AddLeadScreen(),
-        );
+        return MaterialPageRoute(builder: (_) => const AddLeadScreen());
       case RoutesName.scanUploadScreen:
-        return MaterialPageRoute(
-          builder: (_) => const ScanUploadScreen(),
-        );
+        return MaterialPageRoute(builder: (_) => const ScanUploadScreen());
       case RoutesName.aiCopilotScreen:
-        return MaterialPageRoute(
-          builder: (_) => const AiCopilotScreen(),
-        );
+        return MaterialPageRoute(builder: (_) => const AiCopilotScreen());
       case RoutesName.purchaseOcrScreen:
-        return MaterialPageRoute(
-          builder: (_) => const PurchaseOcrScreen(),
-        );
+        return MaterialPageRoute(builder: (_) => const PurchaseOcrScreen());
 
       default:
         return null;

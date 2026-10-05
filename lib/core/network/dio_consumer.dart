@@ -21,7 +21,7 @@ class DioConsumer implements ApiConsumer {
         kDebugMode
             ? [
                 PrettyDioLogger(
-                  requestHeader: true,
+                  requestHeader: false,
                   requestBody: true,
                   responseBody: true,
                   responseHeader: false,

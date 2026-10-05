@@ -72,41 +72,37 @@ class User extends Equatable {
 }
 
 class AuthResponseModel extends Equatable {
-  final User user;
   final String token;
+  final String refreshToken;
+  final bool isSuccess;
+  final String userId;
   final String message;
-  final bool isExpired;
 
   const AuthResponseModel({
-    required this.user,
     required this.token,
-    required this.isExpired,
+    required this.refreshToken,
+    required this.isSuccess,
+    required this.userId,
     required this.message,
   });
 
-  factory AuthResponseModel.fromJson(Map<String, dynamic> json) {
-    // The API wraps payload under "data"
-    final data = json['data'] as Map<String, dynamic>?;
-    if (data == null) {
-      throw Exception('Missing "data" field in AuthResponse');
-    }
-    return AuthResponseModel(
-      user: User.fromJson(data['user'] as Map<String, dynamic>),
-      token: data['token'] as String,
-      isExpired: data['isExpired'] as bool,
-      message: json['message'] as String,
-    );
-  }
+  factory AuthResponseModel.fromJson(Map<String, dynamic> json) =>
+      AuthResponseModel(
+        token: json['token'] as String? ?? '',
+        refreshToken: json['refreshToken'] as String? ?? '',
+        isSuccess: json['isSuccess'] as bool? ?? false,
+        userId: json['userId'] as String? ?? '',
+        message: json['message'] as String? ?? '',
+      );
 
   Map<String, dynamic> toJson() => {
-    'data': {
-      'user': user.toJson(),
-      'token': token,
-      'isExpired': isExpired,
-      'message': message,
-    },
+    'token': token,
+    'refreshToken': refreshToken,
+    'isSuccess': isSuccess,
+    'userId': userId,
+    'message': message,
   };
 
   @override
-  List<Object?> get props => [user, token, isExpired, message];
+  List<Object?> get props => [token, refreshToken, isSuccess, userId, message];
 }

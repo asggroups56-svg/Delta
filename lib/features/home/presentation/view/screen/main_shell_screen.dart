@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:my_template/core/cache/shared_pref/shared_pref.dart';
 import 'package:my_template/core/routes/routes_name.dart';
 import 'package:my_template/core/theme/app_colors.dart';
 import 'package:my_template/core/utils/navigator_methods.dart';
@@ -34,7 +35,10 @@ class _MainShellScreenState extends State<MainShellScreen>
     }
     if (mounted) setState(() {});
   }
-  void _logout() {
+
+  Future<void> _logout() async {
+    await CacheHelper().clearAuthData();
+    if (!mounted) return;
     NavigatorMethods.pushReplacementNamed(context, RoutesName.loginScreen);
   }
 
@@ -76,19 +80,16 @@ class _MainShellScreenState extends State<MainShellScreen>
   }
 
   List<Widget> get _pages => [
-        HomeScreen(
-          embeddedInShell: true,
-          onAiTap: _openAiChat,
-          onToggleLanguage: _toggleLanguage,
-        ),
-        const AccountingDashboardShell(),
-        const ReportsScreen(),
-        const KnowledgeScreen(),
-        ProfileScreen(
-          onLogout: _logout,
-          onToggleLanguage: _toggleLanguage,
-        ),
-      ];
+    HomeScreen(
+      embeddedInShell: true,
+      onAiTap: _openAiChat,
+      onToggleLanguage: _toggleLanguage,
+    ),
+    const AccountingDashboardShell(),
+    const ReportsScreen(),
+    const KnowledgeScreen(),
+    ProfileScreen(onLogout: _logout, onToggleLanguage: _toggleLanguage),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -99,18 +100,11 @@ class _MainShellScreenState extends State<MainShellScreen>
           // ── Main Content with fade transition ────────────────────
           FadeTransition(
             opacity: _fadeAnimation,
-            child: IndexedStack(
-              index: _currentIndex,
-              children: _pages,
-            ),
+            child: IndexedStack(index: _currentIndex, children: _pages),
           ),
 
           // ── Floating AI Pill FAB ─────────────────────────────────
-          Positioned(
-            bottom: 20.h,
-            right: 20.w,
-            child: _buildAiFab(),
-          ),
+          Positioned(bottom: 20.h, right: 20.w, child: _buildAiFab()),
         ],
       ),
       bottomNavigationBar: BottomNavBarWidget(
@@ -177,9 +171,10 @@ class _AiPulsingFabState extends State<_AiPulsingFab>
       vsync: this,
       duration: const Duration(seconds: 2),
     )..repeat(reverse: true);
-    _pulseAnim = Tween<double>(begin: 0.88, end: 1.0).animate(
-      CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut),
-    );
+    _pulseAnim = Tween<double>(
+      begin: 0.88,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut));
   }
 
   @override

@@ -136,8 +136,6 @@ class AppDecorations {
     );
   }
 
-  // Common reusable decorations for specific widgets
-  
   /// Dashboard header with dark gradient
   static BoxDecoration dashboardHeaderDecoration() {
     return headerDecoration(
@@ -170,10 +168,10 @@ class AppDecorations {
   }
 }
 
-// Constant app colors for dark theme
+// Constant app colors for Ocean Sapphire & Deep Slate dark theme
 class AppColors {
-  static const Color darkBackground = Color(0xFF090D16);
-  static const Color darkCardBackground = Color(0xFF111827);
+  static const Color darkBackground = Color(0xFF0A0F1D);
+  static const Color darkCardBackground = Color(0xFF131C2E);
   static const Color darkSurface = Color(0xFF1E293B);
 }
 
@@ -185,51 +183,51 @@ class AppGradients {
     end: Alignment.bottomCenter,
     colors: [
       Color(0xFF0F172A),
-      Color(0xFF090D16),
+      Color(0xFF0A0F1D),
     ],
   );
 
-  /// Primary gradient (Royal Indigo to Electric Cyan)
+  /// Primary gradient (Ocean Sapphire to Vibrant Sky)
   static const LinearGradient primary = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
     colors: [
-      Color(0xFF4F46E5),
-      Color(0xFF06B6D4),
-    ],
-  );
-
-  /// Accent gradient (Indigo to Sky)
-  static const LinearGradient accent = LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: [
-      Color(0xFF6366F1),
+      Color(0xFF0284C7),
       Color(0xFF38BDF8),
     ],
   );
 
-  /// Purple accent gradient (Violet to Indigo)
+  /// Accent gradient (Deep Sapphire to Ice Cyan)
+  static const LinearGradient accent = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [
+      Color(0xFF0369A1),
+      Color(0xFF38BDF8),
+    ],
+  );
+
+  /// Purple/Blue accent gradient
   static const LinearGradient purpleAccent = LinearGradient(
     colors: [
-      Color(0xFF7C3AED),
-      Color(0xFF4F46E5),
+      Color(0xFF0284C7),
+      Color(0xFF0EA5E9),
     ],
   );
 
   /// Emerald to Cyan gradient
   static const LinearGradient emeraldPurple = LinearGradient(
     colors: [
-      Color(0xFF10B981),
-      Color(0xFF06B6D4),
+      Color(0xFF0EA5E9),
+      Color(0xFF38BDF8),
     ],
   );
 
   /// Profile avatar gradient
   static const LinearGradient avatarGradient = LinearGradient(
     colors: [
-      Color(0xFF4F46E5),
-      Color(0xFF06B6D4),
+      Color(0xFF0284C7),
+      Color(0xFF38BDF8),
     ],
   );
 

@@ -1,10 +1,15 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import '../cache/shared_pref/shared_pref.dart';
 import '../utils/common_methods.dart';
+import 'end_points.dart';
 
 class AppInterceptors extends Interceptor {
+  static const String _authorizationScheme = 'Bearer';
+
   AppInterceptors();
   static bool isInternet = true;
+
   @override
   Future<void> onRequest(
     RequestOptions options,
@@ -15,9 +20,18 @@ class AppInterceptors extends Interceptor {
 
     options.headers['Content-Type'] = 'application/json';
     options.headers['Accept'] = 'application/json';
-    options.headers['x-api-key'] = 'reqres-free-v1';
+    if (!options.path.endsWith(EndPoints.login)) {
+      final token = CacheHelper.sharedPreferences.getString(
+        CacheHelper.authTokenKey,
+      );
+      if (token != null && token.isNotEmpty) {
+        options.headers['Authorization'] = token.startsWith('Bearer ')
+            ? token
+            : '$_authorizationScheme $token';
+      }
+    }
 
-    // Check internet connectivity before sending request
+    // Check internet connectivity before sending request.
     if (!await CommonMethods.hasConnection()) {
       isInternet = false;
       return handler.reject(

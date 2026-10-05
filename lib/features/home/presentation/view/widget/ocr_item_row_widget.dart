@@ -44,7 +44,7 @@ class OcrItemsTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (items.isEmpty) return _buildEmpty();
+    if (items.isEmpty) return _buildEmpty(context);
 
     return Directionality(
       textDirection: TextDirection.rtl,
@@ -59,7 +59,7 @@ class OcrItemsTable extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildHeader(),
+            _buildHeader(context),
             Divider(
               height: 1,
               color: AppColor.emeraldTeal.withValues(alpha: 0.2),
@@ -71,14 +71,14 @@ class OcrItemsTable extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildColumnHeaders(),
+                  _buildColumnHeaders(context),
                   Divider(
                     height: 1,
-                    color: Colors.white.withValues(alpha: 0.08),
+                    color: AppColor.whiteColor(context).withValues(alpha: 0.08),
                   ),
                   ...List.generate(
                     items.length,
-                    (i) => _buildRow(i, items[i]),
+                    (i) => _buildRow(i, items[i], context),
                   ),
                 ],
               ),
@@ -88,9 +88,8 @@ class OcrItemsTable extends StatelessWidget {
       ),
     );
   }
-
   // ── رأس القسم (أيقونة + عنوان + عدد) ─────────────────────────────────────
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
     return Padding(
       padding: EdgeInsets.all(14.r),
       child: Row(
@@ -114,7 +113,7 @@ class OcrItemsTable extends StatelessWidget {
               style: TextStyle(
                 fontSize: 13.sp,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: AppColor.whiteColor(context),
                 fontFamily: 'Tajawal',
               ),
             ),
@@ -141,9 +140,11 @@ class OcrItemsTable extends StatelessWidget {
   }
 
   // ── صف العناوين (Header) ─────────────────────────────────────────────────
-  Widget _buildColumnHeaders() {
+  Widget _buildColumnHeaders(
+    BuildContext context
+    ) {
     return Container(
-      color: Colors.white.withValues(alpha: 0.03),
+      color: AppColor.whiteColor(context).withValues(alpha: 0.03),
       padding: EdgeInsets.symmetric(vertical: 10.h),
       child: Row(
         children: [
@@ -186,13 +187,14 @@ class OcrItemsTable extends StatelessWidget {
   }
 
   // ── صف بيانات ────────────────────────────────────────────────────────────
-  Widget _buildRow(int index, OcrItemRow item) {
+  Widget _buildRow(int index, OcrItemRow item,BuildContext context) {
     final isEven = index.isEven;
+
 
     return Container(
       color: isEven
-          ? Colors.transparent
-          : Colors.white.withValues(alpha: 0.02),
+                ? Colors.transparent
+                : AppColor.whiteColor(context).withValues(alpha: 0.02),
       padding: EdgeInsets.symmetric(vertical: 11.h),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -223,7 +225,7 @@ class OcrItemsTable extends StatelessWidget {
             width: _colDiscount,
             color: item.discount != '—'
                 ? const Color(0xFFFF7675)
-                : Colors.white.withValues(alpha: 0.35),
+                : AppColor.whiteColor(context).withValues(alpha: 0.35),
           ),
           _bodyCell(
             item.net,
@@ -265,14 +267,14 @@ class OcrItemsTable extends StatelessWidget {
   }
 
   // ── حالة عدم وجود أصناف ──────────────────────────────────────────────────
-  Widget _buildEmpty() {
+  Widget _buildEmpty( BuildContext context) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(18.r),
       decoration: BoxDecoration(
         color: const Color(0xFF111827),
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+        border: Border.all(color: AppColor.whiteColor(context).withValues(alpha: 0.08)),
       ),
       child: Row(
         children: [
@@ -284,7 +286,7 @@ class OcrItemsTable extends StatelessWidget {
               'لم يتم التعرف على أصناف الفاتورة بشكل واضح.',
               style: TextStyle(
                 fontSize: 11.sp,
-                color: Colors.white.withValues(alpha: 0.7),
+                color: AppColor.whiteColor(context).withValues(alpha: 0.7),
                 fontFamily: 'Tajawal',
               ),
             ),
