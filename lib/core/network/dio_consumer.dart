@@ -36,8 +36,16 @@ class DioConsumer implements ApiConsumer {
   }
 
   @override
-  Future get(String path, {Map<String, dynamic>? queryParameters}) async {
-    final response = await client.get(path, queryParameters: queryParameters);
+  Future get(
+    String path, {
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+  }) async {
+    final response = await client.get(
+      path,
+      queryParameters: queryParameters,
+      options: options,
+    );
     return response.data;
   }
 
@@ -47,11 +55,13 @@ class DioConsumer implements ApiConsumer {
     Map<String, dynamic>? body,
     Map<String, dynamic>? queryParameters,
     bool? isFormData,
+    Options? options,
   }) async {
     var response = await client.post(
       path,
       data: isFormData == true ? FormData.fromMap(body!) : body,
       queryParameters: queryParameters,
+      options: options,
     );
     return response.data;
   }
@@ -62,11 +72,13 @@ class DioConsumer implements ApiConsumer {
     Map<String, dynamic>? body,
     Map<String, dynamic>? queryParameters,
     bool? isFormData,
+    Options? options,
   }) async {
     final response = await client.put(
       path,
       data: isFormData == true ? FormData.fromMap(body!) : body,
       queryParameters: queryParameters,
+      options: options,
     );
     return response.data;
   }
@@ -77,11 +89,13 @@ class DioConsumer implements ApiConsumer {
     Map<String, dynamic>? body,
     Map<String, dynamic>? queryParameters,
     bool? isFormData,
+    Options? options,
   }) async {
-    final response = await client.get(
+    final response = await client.delete(
       path,
       data: isFormData == true ? FormData.fromMap(body!) : body,
       queryParameters: queryParameters,
+      options: options,
     );
     return response.data;
   }

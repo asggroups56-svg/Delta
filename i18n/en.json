@@ -204,6 +204,8 @@
   "salesByCategoryTitle": "Sales Breakdown by Department",
   "topReportsListTitle": "Audited Financial Statements & Reports",
   "searchReports": "Search reports & statements...",
+  "statementChartOfAccount": "Chart of Accounts (AGL001)",
+  "statementChartOfAccountDesc": "Financial account hierarchy, tree structure, and ledger accounts",
   "statementIncome": "Income Statement (P&L)",
   "statementIncomeDesc": "Comprehensive profit and loss statement for current fiscal period",
   "statementBalanceSheet": "Balance Sheet Statement",

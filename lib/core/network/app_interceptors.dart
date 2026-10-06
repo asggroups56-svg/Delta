@@ -18,8 +18,8 @@ class AppInterceptors extends Interceptor {
     isInternet = true;
     debugPrint('REQUEST[${options.method}] => PATH: ${options.path}');
 
-    options.headers['Content-Type'] = 'application/json';
-    options.headers['Accept'] = 'application/json';
+    options.headers['Content-Type'] ??= 'application/json';
+    options.headers['Accept'] ??= 'application/json';
     if (!options.path.endsWith(EndPoints.login)) {
       final token = CacheHelper.sharedPreferences.getString(
         CacheHelper.authTokenKey,

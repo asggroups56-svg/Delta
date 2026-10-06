@@ -204,6 +204,8 @@
   "salesByCategoryTitle": "توزيع المبيعات حسب الأقسام",
   "topReportsListTitle": "القوائم والتقارير المالية المعتمدة",
   "searchReports": "ابحث في التقارير والقوائم...",
+  "statementChartOfAccount": "دليل الحسابات (Chart of Accounts)",
+  "statementChartOfAccountDesc": "شجرة الحسابات المالية، المستويات، وتفاصيل الحسابات (AGL001)",
   "statementIncome": "قائمة الدخل والأرباح (P&L)",
   "statementIncomeDesc": "بيان الأرباح والخسائر الشامل للفترة الحالية",
   "statementBalanceSheet": "الميزانية العمومية (Balance Sheet)",

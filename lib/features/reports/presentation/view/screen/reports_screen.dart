@@ -6,13 +6,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:my_template/core/custom_widgets/custom_toast/custom_toast.dart';
+import 'package:my_template/core/services/services_locator.dart';
 import 'package:my_template/core/theme/app_colors.dart';
 import 'package:my_template/core/theme/app_text_style.dart';
 import 'package:my_template/core/utils/app_locale_key.dart';
 import 'package:my_template/core/utils/common_methods.dart';
 import 'package:my_template/features/home/presentation/view/widget/ai_chat_bottom_sheet_widget.dart';
+import 'package:my_template/features/reports/data/repository/reports_repo.dart';
 import 'package:my_template/features/reports/presentation/view/widget/excel_export_service.dart';
 import 'package:my_template/features/reports/presentation/view/widget/excel_preview_panel.dart';
+import 'package:my_template/features/reports/presentation/view/widget/file_download_service.dart';
+import 'package:my_template/features/reports/presentation/view/widget/fullscreen_pdf_viewer_screen.dart';
 import 'package:my_template/features/reports/presentation/view/widget/pdf_export_service.dart';
 import 'package:my_template/features/reports/presentation/view/widget/pdf_preview_panel.dart';
 import 'package:my_template/features/reports/presentation/view/widget/reports_chart_widget.dart';
@@ -104,6 +108,25 @@ class _ReportsScreenState extends State<ReportsScreen> {
             ),
             Gap(16.h),
             _buildExportOption(
+              icon: Icons.account_tree_rounded,
+              color: AppColor.oceanBlue,
+              title: '${AppLocaleKey.statementChartOfAccount.tr()} (PDF)',
+              subtitle: 'Report/ChartOfAccountReport (AGL001 - Live API)',
+              onTap: () {
+                Navigator.pop(ctx);
+                _handleExportPdf(
+                  title: AppLocaleKey.statementChartOfAccount.tr(),
+                  description: AppLocaleKey.statementChartOfAccountDesc.tr(),
+                  amount: 'AGL001',
+                  date: 'Live API',
+                  status: AppLocaleKey.statusAudited.tr(),
+                  reportName: 'AGL001',
+                  isApiReport: true,
+                );
+              },
+            ),
+            Gap(10.h),
+            _buildExportOption(
               icon: Icons.picture_as_pdf_rounded,
               color: const Color(0xFFFF7675),
               title: AppLocaleKey.exportPdf.tr(),
@@ -139,7 +162,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
             Gap(10.h),
             _buildExportOption(
               icon: Icons.share_rounded,
-              color: AppColor.oceanBlue,
+              color: AppColor.purpleAccent,
               title: AppLocaleKey.shareReport.tr(),
               subtitle: 'Direct Link & Board Presentation Format',
               onTap: () {
@@ -225,19 +248,44 @@ class _ReportsScreenState extends State<ReportsScreen> {
     required String amount,
     required String date,
     required String status,
+    String? reportName,
+    bool isApiReport = false,
   }) async {
     setState(() => _isGenerating = true);
 
     try {
-      final file = await PdfExportService.generate(
-        title: title,
-        description: description,
-        amount: amount,
-        date: date,
-        status: status,
-      );
+      final File file;
+      if (isApiReport || reportName != null) {
+        final result = await sl<ReportsRepo>().getChartOfAccountReport(
+          reportName: reportName ?? 'AGL001',
+          exportType: 'pdf',
+        );
+
+        file = result.fold(
+          (failure) => throw Exception(failure.errMessage),
+          (savedFile) => savedFile,
+        );
+      } else {
+        file = await PdfExportService.generate(
+          title: title,
+          description: description,
+          amount: amount,
+          date: date,
+          status: status,
+        );
+      }
 
       if (!mounted) return;
+
+      // ── حفظ وتنزيل الملف تلقائياً في مجلد التنزيلات بالجهاز ──
+      final baseName =
+          reportName != null && reportName.isNotEmpty ? reportName : title;
+      final fileName =
+          '${baseName.replaceAll(RegExp(r'\s+'), '_')}_${DateTime.now().millisecondsSinceEpoch}.pdf';
+      await FileDownloadService.saveFileToDevice(
+        sourceFile: file,
+        defaultFileName: fileName,
+      );
 
       setState(() {
         _pdfFile = file;
@@ -247,18 +295,35 @@ class _ReportsScreenState extends State<ReportsScreen> {
         _isGenerating = false;
       });
 
-      // نمرّر للأعلى لعرض المعاينة.
+      // نمرّر للأعلى لعرض المعاينة داخل الصفحة كخيار إضافي.
       _scrollToPreview();
 
       CommonMethods.showToast(
-        message: '${AppLocaleKey.downloadingPdf.tr()} ($title)',
+        message: 'تم جلب وتنزيل التقرير بنجاح ($title)',
         type: ToastType.success,
       );
+
+      // ── فتح التقرير فوراً بملء الشاشة بجودة فائقة ووضوح كامل ──
+      if (mounted) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => FullscreenPdfViewerScreen(
+              file: file,
+              title: title,
+              reportName: reportName,
+              autoDownloaded: true,
+            ),
+          ),
+        );
+      }
     } catch (e) {
       if (!mounted) return;
       setState(() => _isGenerating = false);
       CommonMethods.showToast(
-        message: 'حدث خطأ أثناء إنشاء ملف PDF',
+        message: e is Exception
+            ? e.toString().replaceFirst('Exception: ', '')
+            : 'حدث خطأ أثناء تحميل ملف PDF',
         type: ToastType.error,
       );
     }
@@ -363,6 +428,19 @@ class _ReportsScreenState extends State<ReportsScreen> {
     ];
 
     final List<Map<String, dynamic>> statements = [
+      {
+        'id': 'chart_of_account',
+        'reportName': 'AGL001',
+        'isApiReport': true,
+        'title': AppLocaleKey.statementChartOfAccount.tr(),
+        'desc': AppLocaleKey.statementChartOfAccountDesc.tr(),
+        'amount': 'AGL001',
+        'date': 'Live API',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.account_tree_rounded,
+        'iconColor': AppColor.oceanBlue,
+        'category': 1,
+      },
       {
         'title': AppLocaleKey.statementIncome.tr(),
         'desc': AppLocaleKey.statementIncomeDesc.tr(),
@@ -521,16 +599,16 @@ class _ReportsScreenState extends State<ReportsScreen> {
           Expanded(
             child: Row(
               children: [
-                IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: Icon(
-                    context.locale.languageCode == 'ar'
-                        ? Icons.arrow_forward_ios_rounded
-                        : Icons.arrow_back_ios_rounded,
-                    size: 18.r,
-                    color: AppColor.whiteColor(context),
-                  ),
-                ),
+                // IconButton(
+                //   onPressed: () => Navigator.pop(context),
+                //   icon: Icon(
+                //     context.locale.languageCode == 'ar'
+                //         ? Icons.arrow_forward_ios_rounded
+                //         : Icons.arrow_back_ios_rounded,
+                //     size: 18.r,
+                //     color: AppColor.whiteColor(context),
+                //   ),
+                // ),
                 Gap(4.w),
                 Expanded(
                   child: Column(
@@ -636,7 +714,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
       child: Padding(
         padding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 16.h),
         child: SizedBox(
-          height: 400.h,
+          height: 500.h,
           child: _buildPreviewContent(),
         ),
       ),
@@ -647,23 +725,54 @@ class _ReportsScreenState extends State<ReportsScreen> {
     if (_isGenerating) {
       return Container(
         decoration: BoxDecoration(
-          color: AppColor.darkCardBackground,
-          borderRadius: BorderRadius.circular(16.r),
+          color: const Color(0xFF0F172A),
+          borderRadius: BorderRadius.circular(20.r),
           border: Border.all(
-            color: AppColor.whiteColor(context).withValues(alpha: 0.08),
+            color: AppColor.emeraldTeal.withValues(alpha: 0.3),
+            width: 1.5,
           ),
+          boxShadow: [
+            BoxShadow(
+              color: AppColor.emeraldTeal.withValues(alpha: 0.1),
+              blurRadius: 20,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const CircularProgressIndicator(color: Color(0xFF06B6D4)),
-              Gap(14.h),
+              Container(
+                padding: EdgeInsets.all(16.r),
+                decoration: BoxDecoration(
+                  color: AppColor.emeraldTeal.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: SizedBox(
+                  width: 32.r,
+                  height: 32.r,
+                  child: const CircularProgressIndicator(
+                    strokeWidth: 3,
+                    color: AppColor.emeraldTeal,
+                  ),
+                ),
+              ),
+              Gap(16.h),
               Text(
-                'جاري إنشاء المعاينة...',
+                'جاري جلب وإنشاء التقرير المالي...',
                 style: TextStyle(
-                  color: AppColor.whiteColor(context).withValues(alpha: 0.7),
-                  fontSize: 12.sp,
+                  color: AppColor.whiteColor(context),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13.sp,
+                ),
+              ),
+              Gap(6.h),
+              Text(
+                'Report/ChartOfAccountReport (ASG Delta)',
+                style: TextStyle(
+                  color: AppColor.mintTeal.withValues(alpha: 0.8),
+                  fontSize: 11.sp,
                 ),
               ),
             ],
@@ -1039,6 +1148,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 amount: amount,
                 date: date,
                 status: status,
+                reportName: st['reportName'] as String?,
+                isApiReport: st['isApiReport'] == true,
               ),
               onExportExcel: () => _handleExportExcel(
                 title: title,

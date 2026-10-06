@@ -243,6 +243,8 @@ class AppLocaleKey {
   static const String salesByCategoryTitle      = 'salesByCategoryTitle';
   static const String topReportsListTitle       = 'topReportsListTitle';
   static const String searchReports             = 'searchReports';
+  static const String statementChartOfAccount   = 'statementChartOfAccount';
+  static const String statementChartOfAccountDesc = 'statementChartOfAccountDesc';
   static const String statementIncome           = 'statementIncome';
   static const String statementIncomeDesc       = 'statementIncomeDesc';
   static const String statementBalanceSheet     = 'statementBalanceSheet';
