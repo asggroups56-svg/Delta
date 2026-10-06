@@ -10,13 +10,13 @@ class DashboardSubActionBarWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
-      color: AppColor.darkBackground,
+      color: AppColor.cardColor(context),
       child: Row(
         children: [
           Container(
             padding: EdgeInsets.all(10.r),
             decoration: BoxDecoration(
-              color: const Color(0xFF171F2B),
+              color: AppColor.cardSurfaceColor(context),
               borderRadius: BorderRadius.circular(10.r),
               border: Border.all(
                 color: AppColor.whiteColor(context).withValues(alpha: 0.08),
@@ -24,7 +24,7 @@ class DashboardSubActionBarWidget extends StatelessWidget {
             ),
             child: Icon(
               Icons.search_rounded,
-              color: AppColor.whiteColor(context).withValues(alpha: 0.7),
+              color: AppColor.darkTextColor(context),
               size: 18.r,
             ),
           ),
@@ -32,7 +32,7 @@ class DashboardSubActionBarWidget extends StatelessWidget {
           Container(
             padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 4.h),
             decoration: BoxDecoration(
-              color: const Color(0xFF171F2B),
+              color: AppColor.cardSurfaceColor(context),
               borderRadius: BorderRadius.circular(10.r),
               border: Border.all(
                 color: AppColor.whiteColor(context).withValues(alpha: 0.08),
@@ -45,7 +45,7 @@ class DashboardSubActionBarWidget extends StatelessWidget {
                   constraints: const BoxConstraints(),
                   icon: Icon(
                     Icons.chevron_left_rounded,
-                    color: AppColor.whiteColor(context).withValues(alpha: 0.7),
+                    color: AppColor.darkTextColor(context),
                     size: 22.r,
                   ),
                   onPressed: () => Navigator.pop(context),
@@ -56,7 +56,7 @@ class DashboardSubActionBarWidget extends StatelessWidget {
                   constraints: const BoxConstraints(),
                   icon: Icon(
                     Icons.chevron_right_rounded,
-                    color: AppColor.whiteColor(context).withValues(alpha: 0.7),
+                    color: AppColor.darkTextColor(context),
                     size: 22.r,
                   ),
                   onPressed: () {},
@@ -68,7 +68,7 @@ class DashboardSubActionBarWidget extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(10.r),
             decoration: BoxDecoration(
-              color: const Color(0xFF171F2B),
+              color: AppColor.cardSurfaceColor(context),
               borderRadius: BorderRadius.circular(10.r),
               border: Border.all(
                 color: AppColor.whiteColor(context).withValues(alpha: 0.08),
@@ -76,7 +76,7 @@ class DashboardSubActionBarWidget extends StatelessWidget {
             ),
             child: Icon(
               Icons.settings_outlined,
-              color: AppColor.whiteColor(context).withValues(alpha: 0.7),
+              color: AppColor.darkTextColor(context),
               size: 18.r,
             ),
           ),

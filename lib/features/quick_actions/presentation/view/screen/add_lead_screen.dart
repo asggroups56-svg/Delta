@@ -27,7 +27,9 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
   final TextEditingController _companyController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _expectedValueController = TextEditingController(text: '75,000');
+  final TextEditingController _expectedValueController = TextEditingController(
+    text: '75,000',
+  );
   final TextEditingController _notesController = TextEditingController();
 
   DateTime _followUpDate = DateTime.now().add(const Duration(days: 2));
@@ -55,9 +57,9 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColor.darkBackground,
+      backgroundColor: AppColor.scaffoldColor(context),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0F172A),
+        backgroundColor: AppColor.appBarColor(context),
         elevation: 0,
         centerTitle: true,
         title: Text(
@@ -65,11 +67,14 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
           style: AppTextStyle.appBarStyle(context).copyWith(
             fontSize: 16.sp,
             fontWeight: FontWeight.w700,
-            color: Colors.white,
+            color: AppColor.appBarTextColor(context),
           ),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
+          icon: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: AppColor.appBarTextColor(context),
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
@@ -79,7 +84,9 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
             decoration: BoxDecoration(
               color: AppColor.royalIndigo.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(8.r),
-              border: Border.all(color: AppColor.royalIndigo.withValues(alpha: 0.4)),
+              border: Border.all(
+                color: AppColor.royalIndigo.withValues(alpha: 0.4),
+              ),
             ),
             alignment: Alignment.center,
             child: Text(
@@ -130,9 +137,9 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
     return Container(
       padding: EdgeInsets.all(4.r),
       decoration: BoxDecoration(
-        color: const Color(0xFF111827),
+        color: AppColor.cardColor(context),
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+        border: Border.all(color: AppColor.borderColor(context)),
       ),
       child: Row(
         children: [
@@ -175,7 +182,7 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
                   BoxShadow(
                     color: AppColor.royalIndigo.withValues(alpha: 0.4),
                     blurRadius: 10,
-                  )
+                  ),
                 ]
               : null,
         ),
@@ -186,7 +193,9 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
             Icon(
               icon,
               size: 16.r,
-              color: isSelected ? Colors.white : const Color(0xFF94A3B8),
+              color: isSelected
+                  ? Colors.white
+                  : AppColor.darkTextColor(context),
             ),
             Gap(6.w),
             Text(
@@ -194,7 +203,9 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
               style: TextStyle(
                 fontSize: 11.sp,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                color: isSelected ? Colors.white : const Color(0xFF94A3B8),
+                color: isSelected
+                    ? Colors.white
+                    : AppColor.darkTextColor(context),
                 fontFamily: 'Tajawal',
               ),
             ),
@@ -208,9 +219,9 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
     return Container(
       padding: EdgeInsets.all(16.r),
       decoration: BoxDecoration(
-        color: const Color(0xFF111827),
+        color: AppColor.cardColor(context),
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+        border: Border.all(color: AppColor.borderColor(context)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -220,7 +231,7 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
             style: TextStyle(
               fontSize: 13.sp,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: AppColor.titleFormFiledColor(context),
               fontFamily: 'Tajawal',
             ),
           ),
@@ -228,7 +239,10 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
           if (_entityType == 'corporate') ...[
             TextFormField(
               controller: _companyController,
-              style: const TextStyle(color: Colors.white, fontFamily: 'Tajawal'),
+              style: TextStyle(
+                color: AppColor.textFormColor(context),
+                fontFamily: 'Tajawal',
+              ),
               decoration: _inputDecoration(
                 label: 'اسم الشركة / المؤسسة *',
                 prefixIcon: Icons.apartment_rounded,
@@ -238,7 +252,10 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
           ],
           TextFormField(
             controller: _nameController,
-            style: const TextStyle(color: Colors.white, fontFamily: 'Tajawal'),
+            style: TextStyle(
+              color: AppColor.textFormColor(context),
+              fontFamily: 'Tajawal',
+            ),
             decoration: _inputDecoration(
               label: 'اسم الشخص المسؤول / العميل *',
               prefixIcon: Icons.badge_outlined,
@@ -251,7 +268,10 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
                 child: TextFormField(
                   controller: _phoneController,
                   keyboardType: TextInputType.phone,
-                  style: const TextStyle(color: Colors.white, fontFamily: 'Tajawal'),
+                  style: TextStyle(
+                    color: AppColor.textFormColor(context),
+                    fontFamily: 'Tajawal',
+                  ),
                   decoration: _inputDecoration(
                     label: 'رقم الجوال *',
                     prefixIcon: Icons.phone_android_rounded,
@@ -263,7 +283,10 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
                 child: TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
-                  style: const TextStyle(color: Colors.white, fontFamily: 'Tajawal'),
+                  style: TextStyle(
+                    color: AppColor.textFormColor(context),
+                    fontFamily: 'Tajawal',
+                  ),
                   decoration: _inputDecoration(
                     label: 'البريد الإلكتروني',
                     prefixIcon: Icons.alternate_email_rounded,
@@ -281,9 +304,9 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
     return Container(
       padding: EdgeInsets.all(16.r),
       decoration: BoxDecoration(
-        color: const Color(0xFF111827),
+        color: AppColor.cardColor(context),
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+        border: Border.all(color: AppColor.borderColor(context)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -293,7 +316,7 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
             style: TextStyle(
               fontSize: 13.sp,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: AppColor.titleFormFiledColor(context),
               fontFamily: 'Tajawal',
             ),
           ),
@@ -304,24 +327,30 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
                 child: DropdownButtonFormField<String>(
                   value: _leadSource,
                   isExpanded: true,
-                  dropdownColor: const Color(0xFF1E293B),
-                  style: const TextStyle(color: Colors.white, fontFamily: 'Tajawal'),
+                  dropdownColor: AppColor.cardColor(context),
+                  style: TextStyle(
+                    color: AppColor.textFormColor(context),
+                    fontFamily: 'Tajawal',
+                  ),
                   decoration: _inputDecoration(
                     label: 'مصدر العميل',
                     prefixIcon: Icons.campaign_rounded,
                   ),
-                  items: [
-                    'موقع إلكتروني',
-                    'توصية / إحالة',
-                    'لينكد إن (LinkedIn)',
-                    'اتصال تسويقي',
-                    'معرض / مؤتمر',
-                  ]
-                      .map((src) => DropdownMenuItem(
-                            value: src,
-                            child: Text(src, overflow: TextOverflow.ellipsis),
-                          ))
-                      .toList(),
+                  items:
+                      [
+                            'موقع إلكتروني',
+                            'توصية / إحالة',
+                            'لينكد إن (LinkedIn)',
+                            'اتصال تسويقي',
+                            'معرض / مؤتمر',
+                          ]
+                          .map(
+                            (src) => DropdownMenuItem(
+                              value: src,
+                              child: Text(src, overflow: TextOverflow.ellipsis),
+                            ),
+                          )
+                          .toList(),
                   onChanged: (val) {
                     if (val != null) setState(() => _leadSource = val);
                   },
@@ -332,7 +361,10 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
                 child: TextFormField(
                   controller: _expectedValueController,
                   keyboardType: TextInputType.number,
-                  style: const TextStyle(color: Colors.white, fontFamily: 'Tajawal'),
+                  style: TextStyle(
+                    color: AppColor.textFormColor(context),
+                    fontFamily: 'Tajawal',
+                  ),
                   decoration: _inputDecoration(
                     label: 'القيمة المتوقعة (SAR)',
                     prefixIcon: Icons.monetization_on_outlined,
@@ -348,22 +380,24 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
                 child: DropdownButtonFormField<String>(
                   value: _priority,
                   isExpanded: true,
-                  dropdownColor: const Color(0xFF1E293B),
-                  style: const TextStyle(color: Colors.white, fontFamily: 'Tajawal'),
+                  dropdownColor: AppColor.cardColor(context),
+                  style: TextStyle(
+                    color: AppColor.textFormColor(context),
+                    fontFamily: 'Tajawal',
+                  ),
                   decoration: _inputDecoration(
                     label: 'أولوية العميل',
                     prefixIcon: Icons.local_fire_department_rounded,
                   ),
-                  items: [
-                    'Hot (عالية الأهمية)',
-                    'Warm (متوسطة)',
-                    'Cold (منخفضة)',
-                  ]
-                      .map((p) => DropdownMenuItem(
-                            value: p,
-                            child: Text(p, overflow: TextOverflow.ellipsis),
-                          ))
-                      .toList(),
+                  items:
+                      ['Hot (عالية الأهمية)', 'Warm (متوسطة)', 'Cold (منخفضة)']
+                          .map(
+                            (p) => DropdownMenuItem(
+                              value: p,
+                              child: Text(p, overflow: TextOverflow.ellipsis),
+                            ),
+                          )
+                          .toList(),
                   onChanged: (val) {
                     if (val != null) setState(() => _priority = val);
                   },
@@ -374,23 +408,29 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
                 child: DropdownButtonFormField<String>(
                   value: _stage,
                   isExpanded: true,
-                  dropdownColor: const Color(0xFF1E293B),
-                  style: const TextStyle(color: Colors.white, fontFamily: 'Tajawal'),
+                  dropdownColor: AppColor.cardColor(context),
+                  style: TextStyle(
+                    color: AppColor.textFormColor(context),
+                    fontFamily: 'Tajawal',
+                  ),
                   decoration: _inputDecoration(
                     label: 'مرحلة البيع',
                     prefixIcon: Icons.timeline_rounded,
                   ),
-                  items: [
-                    'تأهيل العميل (Qualification)',
-                    'عرض أولي (Demo)',
-                    'إرسال عرض سعر (Quote)',
-                    'مفاوضات (Negotiation)',
-                  ]
-                      .map((s) => DropdownMenuItem(
-                            value: s,
-                            child: Text(s, overflow: TextOverflow.ellipsis),
-                          ))
-                      .toList(),
+                  items:
+                      [
+                            'تأهيل العميل (Qualification)',
+                            'عرض أولي (Demo)',
+                            'إرسال عرض سعر (Quote)',
+                            'مفاوضات (Negotiation)',
+                          ]
+                          .map(
+                            (s) => DropdownMenuItem(
+                              value: s,
+                              child: Text(s, overflow: TextOverflow.ellipsis),
+                            ),
+                          )
+                          .toList(),
                   onChanged: (val) {
                     if (val != null) setState(() => _stage = val);
                   },
@@ -402,22 +442,28 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
           DropdownButtonFormField<String>(
             value: _assignedAgent,
             isExpanded: true,
-            dropdownColor: const Color(0xFF1E293B),
-            style: const TextStyle(color: Colors.white, fontFamily: 'Tajawal'),
+            dropdownColor: AppColor.cardColor(context),
+            style: TextStyle(
+              color: AppColor.textFormColor(context),
+              fontFamily: 'Tajawal',
+            ),
             decoration: _inputDecoration(
               label: 'المسؤول المعين للمتابعة',
               prefixIcon: Icons.support_agent_rounded,
             ),
-            items: [
-              'م. أحمد خالد (مدير مبيعات الشركات)',
-              'سارة المنصور (استشاري حلول ERP)',
-              'فهد السبيعي (أخصائي حسابات عملاء)',
-            ]
-                .map((a) => DropdownMenuItem(
-                      value: a,
-                      child: Text(a, overflow: TextOverflow.ellipsis),
-                    ))
-                .toList(),
+            items:
+                [
+                      'م. أحمد خالد (مدير مبيعات الشركات)',
+                      'سارة المنصور (استشاري حلول ERP)',
+                      'فهد السبيعي (أخصائي حسابات عملاء)',
+                    ]
+                    .map(
+                      (a) => DropdownMenuItem(
+                        value: a,
+                        child: Text(a, overflow: TextOverflow.ellipsis),
+                      ),
+                    )
+                    .toList(),
             onChanged: (val) {
               if (val != null) setState(() => _assignedAgent = val);
             },
@@ -431,9 +477,9 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
     return Container(
       padding: EdgeInsets.all(16.r),
       decoration: BoxDecoration(
-        color: const Color(0xFF111827),
+        color: AppColor.cardColor(context),
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+        border: Border.all(color: AppColor.borderColor(context)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -443,7 +489,7 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
             style: TextStyle(
               fontSize: 13.sp,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: AppColor.titleFormFiledColor(context),
               fontFamily: 'Tajawal',
             ),
           ),
@@ -461,13 +507,17 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
             child: Container(
               padding: EdgeInsets.all(12.r),
               decoration: BoxDecoration(
-                color: const Color(0xFF1E293B),
+                color: AppColor.cardSurfaceColor(context),
                 borderRadius: BorderRadius.circular(12.r),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+                border: Border.all(color: AppColor.borderColor(context)),
               ),
               child: Row(
                 children: [
-                  Icon(Icons.calendar_month_rounded, color: AppColor.cyanLight, size: 20.r),
+                  Icon(
+                    Icons.calendar_month_rounded,
+                    color: AppColor.cyanLight,
+                    size: 20.r,
+                  ),
                   Gap(10.w),
                   Expanded(
                     child: Column(
@@ -477,7 +527,7 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
                           'موعد المتابعة القادمة (Next Follow-up)',
                           style: TextStyle(
                             fontSize: 10.sp,
-                            color: Colors.white.withValues(alpha: 0.5),
+                            color: AppColor.darkTextColor(context),
                             fontFamily: 'Tajawal',
                           ),
                         ),
@@ -487,13 +537,17 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
                           style: TextStyle(
                             fontSize: 12.sp,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: AppColor.titleFormFiledColor(context),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  Icon(Icons.edit_calendar_rounded, color: AppColor.cyanLight, size: 18.r),
+                  Icon(
+                    Icons.edit_calendar_rounded,
+                    color: AppColor.cyanLight,
+                    size: 18.r,
+                  ),
                 ],
               ),
             ),
@@ -502,7 +556,10 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
           TextFormField(
             controller: _notesController,
             maxLines: 3,
-            style: const TextStyle(color: Colors.white, fontFamily: 'Tajawal'),
+            style: TextStyle(
+              color: AppColor.textFormColor(context),
+              fontFamily: 'Tajawal',
+            ),
             decoration: _inputDecoration(
               label: 'ملاحظات ومتطلبات العميل المبدئية...',
               prefixIcon: Icons.notes_rounded,
@@ -540,17 +597,15 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
     );
   }
 
-  InputDecoration _inputDecoration({required String label, required IconData prefixIcon}) {
+  InputDecoration _inputDecoration({
+    required String label,
+    required IconData prefixIcon,
+  }) {
     return InputDecoration(
       labelText: label,
-      labelStyle: TextStyle(
-        fontSize: 11.sp,
-        color: Colors.white.withValues(alpha: 0.5),
-        fontFamily: 'Tajawal',
-      ),
+      labelStyle: TextStyle(fontSize: 11.sp, fontFamily: 'Tajawal'),
       prefixIcon: Icon(prefixIcon, color: AppColor.cyanLight, size: 18.r),
       filled: true,
-      fillColor: const Color(0xFF1E293B),
       contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12.r),
@@ -558,7 +613,7 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12.r),
-        borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
+        borderSide: BorderSide.none,
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12.r),

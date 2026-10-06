@@ -18,7 +18,7 @@ class AnalyticsIllustrationWidget extends StatelessWidget {
         padding: EdgeInsets.all(20.r),
         width: 280.w,
         decoration: BoxDecoration(
-          color: AppColor.whiteColor(context),
+          color: AppColor.buttonTextColor(context),
           borderRadius: BorderRadius.circular(24.r),
           boxShadow: [
             BoxShadow(

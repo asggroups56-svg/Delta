@@ -22,14 +22,12 @@ class UploadInvoiceBottomSheetWidget extends StatelessWidget {
     return Container(
       padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 30.h),
       decoration: BoxDecoration(
-        color: const Color(0xFF0F172A),
+        color: AppColor.cardColor(context),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(24.r),
           topRight: Radius.circular(24.r),
         ),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.08),
-        ),
+        border: Border.all(color: AppColor.borderColor(context)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -40,7 +38,7 @@ class UploadInvoiceBottomSheetWidget extends StatelessWidget {
               width: 40.w,
               height: 4.h,
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.20),
+                color: AppColor.hintColor(context),
                 borderRadius: BorderRadius.circular(4.r),
               ),
             ),
@@ -58,8 +56,11 @@ class UploadInvoiceBottomSheetWidget extends StatelessWidget {
                   ),
                   borderRadius: BorderRadius.circular(12.r),
                 ),
-                child: Icon(Icons.document_scanner_rounded,
-                    color: Colors.white, size: 20.r),
+                child: Icon(
+                  Icons.document_scanner_rounded,
+                  color: Colors.white,
+                  size: 20.r,
+                ),
               ),
               Gap(12.w),
               Expanded(
@@ -71,14 +72,14 @@ class UploadInvoiceBottomSheetWidget extends StatelessWidget {
                       style: AppTextStyle.text16SDark(context).copyWith(
                         fontSize: 15.sp,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: AppColor.titleFormFiledColor(context),
                       ),
                     ),
                     Text(
                       'استخراج البيانات تلقائياً بتقنية OCR AI',
                       style: TextStyle(
                         fontSize: 10.5.sp,
-                        color: Colors.white.withValues(alpha: 0.5),
+                        color: AppColor.darkTextColor(context),
                         fontFamily: 'Tajawal',
                       ),
                     ),
@@ -98,7 +99,7 @@ class UploadInvoiceBottomSheetWidget extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 9.sp,
                     fontWeight: FontWeight.w800,
-                    color: Colors.white,
+                    color: AppColor.buttonTextColor(context),
                     fontFamily: 'Tajawal',
                   ),
                 ),
@@ -111,10 +112,11 @@ class UploadInvoiceBottomSheetWidget extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(14.r),
             decoration: BoxDecoration(
-              color: const Color(0xFF1E293B),
+              color: AppColor.cardSurfaceColor(context),
               borderRadius: BorderRadius.circular(14.r),
               border: Border.all(
-                  color: const Color(0xFF4F46E5).withValues(alpha: 0.25)),
+                color: const Color(0xFF4F46E5).withValues(alpha: 0.25),
+              ),
             ),
             child: Column(
               children: [
@@ -180,8 +182,11 @@ class UploadInvoiceBottomSheetWidget extends StatelessWidget {
                 Navigator.pop(context);
                 Navigator.pushNamed(context, RoutesName.purchaseOcrScreen);
               },
-              icon: Icon(Icons.photo_library_rounded,
-                  size: 18.r, color: const Color(0xFF4F46E5)),
+              icon: Icon(
+                Icons.photo_library_rounded,
+                size: 18.r,
+                color: const Color(0xFF4F46E5),
+              ),
               label: Text(
                 'اختيار صورة من المعرض',
                 style: TextStyle(
@@ -193,7 +198,8 @@ class UploadInvoiceBottomSheetWidget extends StatelessWidget {
               ),
               style: OutlinedButton.styleFrom(
                 side: BorderSide(
-                    color: const Color(0xFF4F46E5).withValues(alpha: 0.5)),
+                  color: const Color(0xFF4F46E5).withValues(alpha: 0.5),
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14.r),
                 ),

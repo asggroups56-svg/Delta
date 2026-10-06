@@ -14,9 +14,18 @@ class AppThemeCubit extends Cubit<AppThemeState> {
 
   ThemeEnum _theme = ThemeEnum.light;
   set theme(ThemeEnum value) {
+    setTheme(value);
+  }
+
+  void setTheme(ThemeEnum value) {
+    if (_theme == value) return;
     _theme = value;
     HiveMethods.updateThem(_theme);
     emit(AppThemeUpdate());
+  }
+
+  void toggleTheme() {
+    setTheme(_theme == ThemeEnum.dark ? ThemeEnum.light : ThemeEnum.dark);
   }
 
   ThemeEnum get theme => _theme;

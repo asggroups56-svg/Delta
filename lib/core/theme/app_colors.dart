@@ -8,7 +8,7 @@ class AppColor {
     return AppTheme.getByTheme(
       context,
       light: const Color(0xFF1E40AF), // Crisp Royal Navy Blue
-      dark: const Color(0xFF3B82F6),  // Bright Royal Blue
+      dark: const Color(0xFF3B82F6), // Bright Royal Blue
       listen: listen,
     );
   }
@@ -18,7 +18,7 @@ class AppColor {
     return AppTheme.getByTheme(
       context,
       light: const Color(0xFF0284C7), // Sapphire Blue
-      dark: const Color(0xFF38BDF8),  // Sky Cyan
+      dark: const Color(0xFF38BDF8), // Sky Cyan
       listen: listen,
     );
   }
@@ -38,7 +38,7 @@ class AppColor {
     return AppTheme.getByTheme(
       context,
       light: const Color(0xFFF1F5F9), // Modern Crisp Slate Background
-      dark: const Color(0xFF0F172A),  // Deep Obsidian Navy
+      dark: const Color(0xFF0F172A), // Deep Obsidian Navy
       listen: listen,
     );
   }
@@ -48,7 +48,16 @@ class AppColor {
     return AppTheme.getByTheme(
       context,
       light: const Color(0xFFFFFFFF), // Pure White Card
-      dark: const Color(0xFF1E293B),  // Elevated Navy Card
+      dark: const Color(0xFF1E293B), // Elevated Navy Card
+      listen: listen,
+    );
+  }
+
+  static Color cardSurfaceColor(BuildContext context, {bool listen = true}) {
+    return AppTheme.getByTheme(
+      context,
+      light: const Color(0xFFF8FAFC),
+      dark: const Color(0xFF263449),
       listen: listen,
     );
   }
@@ -150,7 +159,7 @@ class AppColor {
   static Color whiteColor(BuildContext context, {bool listen = true}) {
     return AppTheme.getByTheme(
       context,
-      light: const Color(0xFFFFFFFF),
+      light: const Color(0xFF0F172A),
       dark: const Color(0xFFFFFFFF),
       listen: listen,
     );
@@ -204,26 +213,30 @@ class AppColor {
   }
 
   // ── Static Palette Constants ──────────────────────────────────────────────
-  static const Color royalNavy          = Color(0xFF1E40AF); // Primary Brand Navy
-  static const Color deltaBlue          = Color(0xFF2563EB); // Vibrant Delta Blue
-  static const Color oceanBlue          = Color(0xFF0284C7); // Sapphire
-  static const Color skyBlue            = Color(0xFF0EA5E9); // Sky Accent
-  static const Color lightBg            = Color(0xFFF1F5F9); // Light Slate Background
-  static const Color lightCard          = Color(0xFFFFFFFF); // Clean White Card
-  static const Color darkBackground     = Color(0xFF0F172A); // Midnight Navy (Dark mode)
-  static const Color darkCardBackground = Color(0xFF1E293B); // Slate Card (Dark mode)
-  static const Color textMain           = Color(0xFF0F172A); // Main Heading Dark Text
-  static const Color textMuted          = Color(0xFF64748B); // Subtitle Slate Text
-  static const Color emeraldTeal        = Color(0xFF10B981); // Emerald Success
-  static const Color mintTeal           = Color(0xFF059669); // Deep Mint
-  static const Color warningOrange      = Color(0xFFD97706); // Amber Alert
-  static const Color roseDanger         = Color(0xFFDC2626); // Crimson Red
-  
+  static const Color royalNavy = Color(0xFF1E40AF); // Primary Brand Navy
+  static const Color deltaBlue = Color(0xFF2563EB); // Vibrant Delta Blue
+  static const Color oceanBlue = Color(0xFF0284C7); // Sapphire
+  static const Color skyBlue = Color(0xFF0EA5E9); // Sky Accent
+  static const Color lightBg = Color(0xFFF1F5F9); // Light Slate Background
+  static const Color lightCard = Color(0xFFFFFFFF); // Clean White Card
+  static const Color darkBackground = Color(
+    0xFF0F172A,
+  ); // Midnight Navy (Dark mode)
+  static const Color darkCardBackground = Color(
+    0xFF1E293B,
+  ); // Slate Card (Dark mode)
+  static const Color textMain = Color(0xFF0F172A); // Main Heading Dark Text
+  static const Color textMuted = Color(0xFF64748B); // Subtitle Slate Text
+  static const Color emeraldTeal = Color(0xFF10B981); // Emerald Success
+  static const Color mintTeal = Color(0xFF059669); // Deep Mint
+  static const Color warningOrange = Color(0xFFD97706); // Amber Alert
+  static const Color roseDanger = Color(0xFFDC2626); // Crimson Red
+
   // ── Restored Aliases for Backward Compatibility ────────────────────────────
-  static const Color royalIndigo    = royalNavy;
-  static const Color cyanLight      = skyBlue;
-  static const Color purpleAccent   = deltaBlue;
-  static const Color electricCyan   = oceanBlue;
-  static const Color indigoLight    = Color(0xFF3B82F6);
-  static const Color darkSurface    = darkCardBackground;
+  static const Color royalIndigo = royalNavy;
+  static const Color cyanLight = skyBlue;
+  static const Color purpleAccent = deltaBlue;
+  static const Color electricCyan = oceanBlue;
+  static const Color indigoLight = Color(0xFF3B82F6);
+  static const Color darkSurface = darkCardBackground;
 }

@@ -9,10 +9,7 @@ import 'custom_erp_input_field_widget.dart';
 class NewEntryBottomSheetWidget extends StatelessWidget {
   final String sectionTitle;
 
-  const NewEntryBottomSheetWidget({
-    super.key,
-    required this.sectionTitle,
-  });
+  const NewEntryBottomSheetWidget({super.key, required this.sectionTitle});
 
   static void show(BuildContext context, String sectionTitle) {
     showModalBottomSheet(
@@ -31,9 +28,11 @@ class NewEntryBottomSheetWidget extends StatelessWidget {
     final notesController = TextEditingController();
 
     return Container(
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
       decoration: BoxDecoration(
-        color: AppColor.darkCardBackground,
+        color: AppColor.cardColor(context),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(24.r),
           topRight: Radius.circular(24.r),
@@ -128,7 +127,9 @@ class NewEntryBottomSheetWidget extends StatelessWidget {
                   child: OutlinedButton(
                     style: OutlinedButton.styleFrom(
                       side: BorderSide(
-                        color: AppColor.whiteColor(context).withValues(alpha: 0.24),
+                        color: AppColor.whiteColor(
+                          context,
+                        ).withValues(alpha: 0.24),
                       ),
                       padding: EdgeInsets.symmetric(vertical: 12.h),
                       shape: RoundedRectangleBorder(
@@ -140,7 +141,9 @@ class NewEntryBottomSheetWidget extends StatelessWidget {
                       AppLocaleKey.saveDraft.tr(),
                       style: TextStyle(
                         fontSize: 12.sp,
-                        color: AppColor.whiteColor(context).withValues(alpha: 0.7),
+                        color: AppColor.whiteColor(
+                          context,
+                        ).withValues(alpha: 0.7),
                       ),
                     ),
                   ),
@@ -157,21 +160,23 @@ class NewEntryBottomSheetWidget extends StatelessWidget {
                     ),
                     onPressed: () {
                       Navigator.pop(context);
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text(AppLocaleKey.recordAddedSuccess.tr()),
-                        backgroundColor: AppColor.emeraldTeal,
-                        behavior: SnackBarBehavior.floating,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12.r),
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(AppLocaleKey.recordAddedSuccess.tr()),
+                          backgroundColor: AppColor.emeraldTeal,
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.r),
+                          ),
                         ),
-                      ));
+                      );
                     },
                     child: Text(
                       AppLocaleKey.confirmAndSave.tr(),
                       style: TextStyle(
                         fontSize: 12.sp,
                         fontWeight: FontWeight.bold,
-                        color: AppColor.whiteColor(context),
+                        color: AppColor.buttonTextColor(context),
                       ),
                     ),
                   ),

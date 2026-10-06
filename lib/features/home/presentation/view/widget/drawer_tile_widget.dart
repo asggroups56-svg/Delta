@@ -24,7 +24,11 @@ class DrawerTileWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveColor = color ?? (isActive ? AppColor.emeraldTeal : AppColor.whiteColor(context).withValues(alpha: 0.85));
+    final effectiveColor =
+        color ??
+        (isActive
+            ? AppColor.emeraldTeal
+            : AppColor.titleFormFiledColor(context));
 
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 2.h),
@@ -36,10 +40,15 @@ class DrawerTileWidget extends StatelessWidget {
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
             decoration: BoxDecoration(
-              color: isActive ? AppColor.emeraldTeal.withValues(alpha: 0.12) : Colors.transparent,
+              color: isActive
+                  ? AppColor.emeraldTeal.withValues(alpha: 0.12)
+                  : Colors.transparent,
               borderRadius: BorderRadius.circular(12.r),
               border: isActive
-                  ? Border.all(color: AppColor.emeraldTeal.withValues(alpha: 0.3), width: 1)
+                  ? Border.all(
+                      color: AppColor.emeraldTeal.withValues(alpha: 0.3),
+                      width: 1,
+                    )
                   : null,
             ),
             child: Row(
@@ -50,8 +59,8 @@ class DrawerTileWidget extends StatelessWidget {
                     color: isActive
                         ? AppColor.emeraldTeal.withValues(alpha: 0.2)
                         : (color != null
-                            ? color!.withValues(alpha: 0.12)
-                            : AppColor.whiteColor(context).withValues(alpha: 0.05)),
+                              ? color!.withValues(alpha: 0.12)
+                              : AppColor.cardSurfaceColor(context)),
                     borderRadius: BorderRadius.circular(8.r),
                   ),
                   child: Icon(icons, color: effectiveColor, size: 18.r),
@@ -69,7 +78,10 @@ class DrawerTileWidget extends StatelessWidget {
                 ),
                 if (badge != null)
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 6.w,
+                      vertical: 2.h,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColor.purpleAccent.withValues(alpha: 0.25),
                       borderRadius: BorderRadius.circular(10.r),

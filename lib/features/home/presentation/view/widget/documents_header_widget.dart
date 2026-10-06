@@ -14,7 +14,7 @@ class DocumentsHeaderWidget extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
       decoration: BoxDecoration(
-        color: const Color(0xFF141D2B),
+        color: AppColor.cardColor(context),
         borderRadius: BorderRadius.circular(18.r),
         border: Border.all(
           color: AppColor.whiteColor(context).withValues(alpha: 0.08),
@@ -40,7 +40,7 @@ class DocumentsHeaderWidget extends StatelessWidget {
             ),
             child: Icon(
               Icons.folder_special_rounded,
-              color: AppColor.whiteColor(context),
+              color: AppColor.buttonTextColor(context),
               size: 18.r,
             ),
           ),
@@ -55,7 +55,7 @@ class DocumentsHeaderWidget extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 13.5.sp,
                     fontWeight: FontWeight.w700,
-                    color: AppColor.whiteColor(context),
+                    color: AppColor.titleFormFiledColor(context),
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -117,7 +117,7 @@ class DocumentsHeaderWidget extends StatelessWidget {
                     Icon(
                       Icons.cloud_upload_outlined,
                       size: 14.r,
-                      color: AppColor.whiteColor(context),
+                      color: AppColor.buttonTextColor(context),
                     ),
                     Gap(4.w),
                     Text(
@@ -125,7 +125,7 @@ class DocumentsHeaderWidget extends StatelessWidget {
                       style: AppTextStyle.text10SDark(context).copyWith(
                         fontWeight: FontWeight.bold,
                         fontSize: 10.5.sp,
-                        color: AppColor.whiteColor(context),
+                        color: AppColor.buttonTextColor(context),
                       ),
                     ),
                   ],

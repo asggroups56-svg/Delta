@@ -14,28 +14,38 @@ class SideDrawerAccountingWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: const Color(0xFF0D121B),
+      backgroundColor: AppColor.cardColor(context),
       child: SafeArea(
         child: Column(
           children: [
             Container(
               padding: EdgeInsets.all(20.r),
-              color: const Color(0xFF131B26),
+              color: AppColor.cardSurfaceColor(context),
               child: Row(
                 children: [
                   Container(
                     padding: EdgeInsets.all(10.r),
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(colors: [Color(0xFF00B894), Color(0xFF0984E3)]),
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF00B894), Color(0xFF0984E3)],
+                      ),
                       borderRadius: BorderRadius.circular(14.r),
                     ),
-                    child: Icon(Icons.account_balance_outlined, color: AppColor.whiteColor(context), size: 22.r),
+                    child: Icon(
+                      Icons.account_balance_outlined,
+                      color: AppColor.buttonTextColor(context),
+                      size: 22.r,
+                    ),
                   ),
                   Gap(12.w),
                   Expanded(
                     child: Text(
                       'accountingAndFinance'.tr(),
-                      style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.bold, color: AppColor.whiteColor(context)),
+                      style: TextStyle(
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.bold,
+                        color: AppColor.titleFormFiledColor(context),
+                      ),
                     ),
                   ),
                 ],
@@ -45,25 +55,47 @@ class SideDrawerAccountingWidget extends StatelessWidget {
               child: ListView(
                 padding: EdgeInsets.all(16.r),
                 children: [
-                  DrawerTileWidget(icons: Icons.dashboard_outlined, title: 'dashboardDrawer'.tr(), onTap: () => Navigator.pop(context)),
-                  DrawerTileWidget(icons: Icons.shopping_cart_outlined, title: 'salesAndInvoices'.tr()),
-                  DrawerTileWidget(icons: Icons.shopping_bag_outlined, title: 'purchasesLabel'.tr()),
-                  DrawerTileWidget(icons: Icons.receipt_long_rounded, title: 'taxAndReturns'.tr()),
-                  DrawerTileWidget(icons: Icons.account_balance_rounded, title: 'bankAndCash'.tr()),
                   DrawerTileWidget(
-                      icons: Icons.auto_awesome_rounded,
-                      title: 'aiAssistant'.tr(),
-                      onTap: openAiChatTap ?? () {}),
-                  Divider(color: AppColor.whiteColor(context).withValues(alpha: 0.1), height: 24.h),
+                    icons: Icons.dashboard_outlined,
+                    title: 'dashboardDrawer'.tr(),
+                    onTap: () => Navigator.pop(context),
+                  ),
                   DrawerTileWidget(
-                      icons: Icons.arrow_back_rounded,
-                      title: 'backToHome'.tr(),
-                      onTap: () => Navigator.pop(context)),
+                    icons: Icons.shopping_cart_outlined,
+                    title: 'salesAndInvoices'.tr(),
+                  ),
                   DrawerTileWidget(
-                      icons: Icons.logout_rounded,
-                      title: 'logoutLabel'.tr(),
-                      onTap: onTap ?? () {},
-                      color: Colors.redAccent),
+                    icons: Icons.shopping_bag_outlined,
+                    title: 'purchasesLabel'.tr(),
+                  ),
+                  DrawerTileWidget(
+                    icons: Icons.receipt_long_rounded,
+                    title: 'taxAndReturns'.tr(),
+                  ),
+                  DrawerTileWidget(
+                    icons: Icons.account_balance_rounded,
+                    title: 'bankAndCash'.tr(),
+                  ),
+                  DrawerTileWidget(
+                    icons: Icons.auto_awesome_rounded,
+                    title: 'aiAssistant'.tr(),
+                    onTap: openAiChatTap ?? () {},
+                  ),
+                  Divider(
+                    color: AppColor.whiteColor(context).withValues(alpha: 0.1),
+                    height: 24.h,
+                  ),
+                  DrawerTileWidget(
+                    icons: Icons.arrow_back_rounded,
+                    title: 'backToHome'.tr(),
+                    onTap: () => Navigator.pop(context),
+                  ),
+                  DrawerTileWidget(
+                    icons: Icons.logout_rounded,
+                    title: 'logoutLabel'.tr(),
+                    onTap: onTap ?? () {},
+                    color: Colors.redAccent,
+                  ),
                 ],
               ),
             ),

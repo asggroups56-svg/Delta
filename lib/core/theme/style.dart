@@ -6,33 +6,64 @@ import 'app_text_style.dart';
 import 'app_theme.dart';
 
 ThemeData appThemeData(BuildContext context) {
+  final brightness = AppTheme.getByTheme(
+    context,
+    light: Brightness.light,
+    dark: Brightness.dark,
+  );
+  final primaryTextColor = AppColor.titleFormFiledColor(context);
+  final secondaryTextColor = AppColor.darkTextColor(context);
+
   return ThemeData(
     primaryColor: AppColor.primaryColor(context),
     visualDensity: VisualDensity.adaptivePlatformDensity,
     useMaterial3: false,
     hintColor: AppColor.hintColor(context),
-    brightness: AppTheme.getByTheme(
-      context,
-      light: Brightness.light,
-      dark: Brightness.dark,
+    brightness: brightness,
+    textTheme: ThemeData(brightness: brightness).textTheme.apply(
+      bodyColor: primaryTextColor,
+      displayColor: primaryTextColor,
+      fontFamily: context.fontFamily(),
     ),
+    primaryTextTheme: ThemeData(brightness: brightness).primaryTextTheme.apply(
+      bodyColor: primaryTextColor,
+      displayColor: primaryTextColor,
+      fontFamily: context.fontFamily(),
+    ),
+    iconTheme: IconThemeData(color: secondaryTextColor),
+    dividerColor: AppColor.borderColor(context),
     buttonTheme: ButtonThemeData(
       buttonColor: AppColor.primaryColor(context),
       alignedDropdown: true,
     ),
-    bottomSheetTheme: const BottomSheetThemeData(backgroundColor: Colors.white),
+    inputDecorationTheme: InputDecorationTheme(
+      filled: true,
+      fillColor: AppColor.textFormFillColor(context),
+      hintStyle: TextStyle(color: AppColor.hintColor(context)),
+      labelStyle: TextStyle(color: secondaryTextColor),
+      enabledBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: AppColor.textFormBorderColor(context)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: AppColor.primaryColor(context)),
+      ),
+    ),
+    bottomSheetTheme: BottomSheetThemeData(
+      backgroundColor: AppColor.cardColor(context),
+    ),
+    dialogTheme: DialogThemeData(
+      backgroundColor: AppColor.cardColor(context),
+      surfaceTintColor: Colors.transparent,
+    ),
     colorScheme: ColorScheme.fromSwatch().copyWith(
       primary: AppColor.primaryColor(context),
       secondary: AppColor.secondAppColor(context),
-      surface: AppColor.whiteColor(context),
-      brightness: AppTheme.getByTheme(
-        context,
-        light: Brightness.light,
-        dark: Brightness.dark,
-      ),
+      surface: AppColor.cardColor(context),
+      onSurface: primaryTextColor,
+      brightness: brightness,
     ),
     appBarTheme: AppBarTheme(
-      backgroundColor: AppColor.secondAppColor(context),
+      backgroundColor: AppColor.appBarColor(context),
       elevation: 0,
       centerTitle: true,
       titleTextStyle: AppTextStyle.appBarStyle(context),
@@ -42,6 +73,16 @@ ThemeData appThemeData(BuildContext context) {
     fontFamily: context.fontFamily(),
     textSelectionTheme: TextSelectionThemeData(
       cursorColor: AppColor.primaryColor(context),
+      selectionColor: AppColor.primaryColor(context).withValues(alpha: 0.25),
+      selectionHandleColor: AppColor.primaryColor(context),
+    ),
+    popupMenuTheme: PopupMenuThemeData(
+      color: AppColor.cardColor(context),
+      textStyle: TextStyle(color: primaryTextColor),
+    ),
+    listTileTheme: ListTileThemeData(
+      textColor: primaryTextColor,
+      iconColor: secondaryTextColor,
     ),
     platform: TargetPlatform.iOS,
   );

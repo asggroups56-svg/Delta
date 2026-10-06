@@ -50,8 +50,14 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
       {'label': AppLocaleKey.kbTabAll.tr(), 'icon': Icons.apps_rounded},
       {'label': AppLocaleKey.kbTabHR.tr(), 'icon': Icons.people_alt_outlined},
       {'label': AppLocaleKey.kbTabIT.tr(), 'icon': Icons.security_rounded},
-      {'label': AppLocaleKey.kbTabFinance.tr(), 'icon': Icons.account_balance_outlined},
-      {'label': AppLocaleKey.kbTabOperations.tr(), 'icon': Icons.engineering_outlined},
+      {
+        'label': AppLocaleKey.kbTabFinance.tr(),
+        'icon': Icons.account_balance_outlined,
+      },
+      {
+        'label': AppLocaleKey.kbTabOperations.tr(),
+        'icon': Icons.engineering_outlined,
+      },
       {'label': AppLocaleKey.kbTabLegal.tr(), 'icon': Icons.gavel_rounded},
     ];
 
@@ -148,7 +154,8 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
 
     // Filter articles
     final filteredArticles = articles.where((a) {
-      if (_selectedCategoryIndex != 0 && a['category'] != _selectedCategoryIndex) {
+      if (_selectedCategoryIndex != 0 &&
+          a['category'] != _selectedCategoryIndex) {
         return false;
       }
       if (_searchController.text.trim().isNotEmpty) {
@@ -161,14 +168,12 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
     }).toList();
 
     return Scaffold(
-      backgroundColor: AppColor.darkBackground,
+      backgroundColor: AppColor.scaffoldColor(context),
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
             // ── Top Bar ───────────────────────────────────────────────
-            SliverToBoxAdapter(
-              child: _buildTopBar(context),
-            ),
+            SliverToBoxAdapter(child: _buildTopBar(context)),
 
             // ── Search Bar ────────────────────────────────────────────
             SliverToBoxAdapter(
@@ -179,11 +184,9 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
                   child: Container(
                     height: 48.h,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF151D2B),
+                      color: AppColor.cardColor(context),
                       borderRadius: BorderRadius.circular(14.r),
-                      border: Border.all(
-                        color: AppColor.whiteColor(context).withValues(alpha: 0.06),
-                      ),
+                      border: Border.all(color: AppColor.borderColor(context)),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withValues(alpha: 0.12),
@@ -197,7 +200,7 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
                         Gap(14.w),
                         Icon(
                           Icons.search_rounded,
-                          color: AppColor.whiteColor(context).withValues(alpha: 0.35),
+                          color: AppColor.darkTextColor(context),
                           size: 20.sp,
                         ),
                         Gap(10.w),
@@ -206,14 +209,14 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
                             controller: _searchController,
                             onChanged: (_) => setState(() {}),
                             style: TextStyle(
-                              color: AppColor.whiteColor(context),
+                              color: AppColor.titleFormFiledColor(context),
                               fontSize: 13.sp,
                             ),
                             decoration: InputDecoration(
                               border: InputBorder.none,
                               hintText: AppLocaleKey.searchKnowledge.tr(),
                               hintStyle: TextStyle(
-                                color: AppColor.whiteColor(context).withValues(alpha: 0.25),
+                                color: AppColor.hintColor(context),
                                 fontSize: 13.sp,
                               ),
                             ),
@@ -222,7 +225,9 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
                         Container(
                           height: 32.h,
                           width: 1,
-                          color: AppColor.whiteColor(context).withValues(alpha: 0.06),
+                          color: AppColor.whiteColor(
+                            context,
+                          ).withValues(alpha: 0.06),
                         ),
                         IconButton(
                           onPressed: _openAiChat,
@@ -253,10 +258,30 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
                   padding: EdgeInsets.fromLTRB(16.w, 20.h, 16.w, 0),
                   child: Row(
                     children: [
-                      _buildStatItem(context, '48', AppLocaleKey.kbStatsArticles.tr(), AppColor.mintTeal),
-                      _buildStatItem(context, '6', AppLocaleKey.kbStatsCategories.tr(), AppColor.oceanBlue),
-                      _buildStatItem(context, '12', AppLocaleKey.kbStatsAuthors.tr(), AppColor.purpleAccent),
-                      _buildStatItem(context, '24h', AppLocaleKey.kbStatsUpdated.tr(), AppColor.emeraldTeal),
+                      _buildStatItem(
+                        context,
+                        '48',
+                        AppLocaleKey.kbStatsArticles.tr(),
+                        AppColor.mintTeal,
+                      ),
+                      _buildStatItem(
+                        context,
+                        '6',
+                        AppLocaleKey.kbStatsCategories.tr(),
+                        AppColor.oceanBlue,
+                      ),
+                      _buildStatItem(
+                        context,
+                        '12',
+                        AppLocaleKey.kbStatsAuthors.tr(),
+                        AppColor.purpleAccent,
+                      ),
+                      _buildStatItem(
+                        context,
+                        '24h',
+                        AppLocaleKey.kbStatsUpdated.tr(),
+                        AppColor.emeraldTeal,
+                      ),
                     ],
                   ),
                 ),
@@ -314,7 +339,9 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
                       style: TextStyle(
                         fontSize: 13.sp,
                         fontWeight: FontWeight.w600,
-                        color: AppColor.whiteColor(context).withValues(alpha: 0.5),
+                        color: AppColor.whiteColor(
+                          context,
+                        ).withValues(alpha: 0.5),
                       ),
                     ),
                     Row(
@@ -322,7 +349,9 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
                         Icon(
                           Icons.sort_rounded,
                           size: 16.sp,
-                          color: AppColor.whiteColor(context).withValues(alpha: 0.4),
+                          color: AppColor.whiteColor(
+                            context,
+                          ).withValues(alpha: 0.4),
                         ),
                         Gap(4.w),
                         Text(
@@ -344,26 +373,23 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
             SliverPadding(
               padding: EdgeInsets.symmetric(horizontal: 16.w),
               sliver: SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    final article = filteredArticles[index];
-                    return FadeInUp(
-                      delay: Duration(milliseconds: 80 * index),
-                      duration: const Duration(milliseconds: 400),
-                      child: KnowledgeArticleItemWidget(
-                        title: article['title'] as String,
-                        description: article['desc'] as String,
-                        icon: article['icon'] as IconData,
-                        iconColor: article['color'] as Color,
-                        readTimeMins: article['readTime'] as int,
-                        updatedDaysAgo: article['updatedAgo'] as int,
-                        views: article['views'] as int,
-                        badge: article['badge'] as String?,
-                      ),
-                    );
-                  },
-                  childCount: filteredArticles.length,
-                ),
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  final article = filteredArticles[index];
+                  return FadeInUp(
+                    delay: Duration(milliseconds: 80 * index),
+                    duration: const Duration(milliseconds: 400),
+                    child: KnowledgeArticleItemWidget(
+                      title: article['title'] as String,
+                      description: article['desc'] as String,
+                      icon: article['icon'] as IconData,
+                      iconColor: article['color'] as Color,
+                      readTimeMins: article['readTime'] as int,
+                      updatedDaysAgo: article['updatedAgo'] as int,
+                      views: article['views'] as int,
+                      badge: article['badge'] as String?,
+                    ),
+                  );
+                }, childCount: filteredArticles.length),
               ),
             ),
 
@@ -380,16 +406,10 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color(0xFF16202E), Color(0xFF111722)],
-        ),
+        color: AppColor.cardColor(context),
         borderRadius: BorderRadius.vertical(bottom: Radius.circular(20.r)),
         border: Border(
-          bottom: BorderSide(
-            color: AppColor.whiteColor(context).withValues(alpha: 0.06),
-          ),
+          bottom: BorderSide(color: AppColor.borderColor(context)),
         ),
         boxShadow: [
           BoxShadow(
@@ -407,17 +427,15 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
             child: Container(
               padding: EdgeInsets.all(8.r),
               decoration: BoxDecoration(
-                color: const Color(0xFF1F2B3E),
+                color: AppColor.cardSurfaceColor(context),
                 shape: BoxShape.circle,
-                border: Border.all(
-                  color: AppColor.whiteColor(context).withValues(alpha: 0.08),
-                ),
+                border: Border.all(color: AppColor.borderColor(context)),
               ),
               child: Icon(
                 context.locale.languageCode == 'ar'
                     ? Icons.arrow_forward_ios_rounded
                     : Icons.arrow_back_ios_new_rounded,
-                color: AppColor.whiteColor(context),
+                color: AppColor.titleFormFiledColor(context),
                 size: 14.r,
               ),
             ),
@@ -434,7 +452,7 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
                   style: AppTextStyle.bodyMedium(context).copyWith(
                     fontWeight: FontWeight.bold,
                     fontSize: 14.sp,
-                    color: AppColor.whiteColor(context),
+                    color: AppColor.titleFormFiledColor(context),
                     letterSpacing: -0.3,
                   ),
                 ),
@@ -456,7 +474,7 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
                         overflow: TextOverflow.ellipsis,
                         style: AppTextStyle.bodySmall(context).copyWith(
                           fontSize: 10.sp,
-                          color: AppColor.whiteColor(context).withValues(alpha: 0.5),
+                          color: AppColor.darkTextColor(context),
                         ),
                       ),
                     ),
@@ -472,21 +490,23 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 6.h),
               decoration: BoxDecoration(
-                color: const Color(0xFF1F2B3E),
+                color: AppColor.cardSurfaceColor(context),
                 borderRadius: BorderRadius.circular(10.r),
-                border: Border.all(
-                  color: AppColor.whiteColor(context).withValues(alpha: 0.08),
-                ),
+                border: Border.all(color: AppColor.borderColor(context)),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.language_rounded, color: AppColor.emeraldTeal, size: 13.r),
+                  Icon(
+                    Icons.language_rounded,
+                    color: AppColor.emeraldTeal,
+                    size: 13.r,
+                  ),
                   Gap(3.w),
                   Text(
                     AppLocaleKey.langSwitchShort.tr(),
                     style: AppTextStyle.bodySmall(context).copyWith(
-                      color: AppColor.whiteColor(context),
+                      color: AppColor.titleFormFiledColor(context),
                       fontWeight: FontWeight.bold,
                       fontSize: 10.sp,
                     ),
@@ -501,7 +521,12 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
   }
 
   // ── Stats Bar ────────────────────────────────────────────────────────────
-  Widget _buildStatItem(BuildContext context, String value, String label, Color color) {
+  Widget _buildStatItem(
+    BuildContext context,
+    String value,
+    String label,
+    Color color,
+  ) {
     return Expanded(
       child: Container(
         margin: EdgeInsets.symmetric(horizontal: 4.w),
@@ -527,7 +552,7 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
               label,
               style: TextStyle(
                 fontSize: 9.5.sp,
-                color: AppColor.whiteColor(context).withValues(alpha: 0.45),
+                color: AppColor.darkTextColor(context),
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -542,19 +567,9 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
     return Container(
       padding: EdgeInsets.all(18.r),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            const Color(0xFF0D9488).withValues(alpha: 0.25),
-            const Color(0xFF6C5CE7).withValues(alpha: 0.15),
-            const Color(0xFF0284C7).withValues(alpha: 0.10),
-          ],
-        ),
+        color: AppColor.cardColor(context),
         borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(
-          color: AppColor.mintTeal.withValues(alpha: 0.2),
-        ),
+        border: Border.all(color: AppColor.mintTeal.withValues(alpha: 0.2)),
         boxShadow: [
           BoxShadow(
             color: const Color(0xFF0D9488).withValues(alpha: 0.15),
@@ -580,7 +595,11 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.star_rounded, size: 12.sp, color: AppColor.darkBackground),
+                    Icon(
+                      Icons.star_rounded,
+                      size: 12.sp,
+                      color: AppColor.darkBackground,
+                    ),
                     Gap(4.w),
                     Text(
                       AppLocaleKey.kbFeaturedTag.tr(),
@@ -598,13 +617,17 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
                 decoration: BoxDecoration(
-                  color: AppColor.whiteColor(context).withValues(alpha: 0.08),
+                  color: AppColor.cardSurfaceColor(context),
                   borderRadius: BorderRadius.circular(8.r),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.schedule_rounded, size: 11.sp, color: AppColor.mintTeal),
+                    Icon(
+                      Icons.schedule_rounded,
+                      size: 11.sp,
+                      color: AppColor.mintTeal,
+                    ),
                     Gap(4.w),
                     Text(
                       AppLocaleKey.kbFeaturedReadTime.tr(),
@@ -626,7 +649,7 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
             style: TextStyle(
               fontSize: 16.sp,
               fontWeight: FontWeight.w800,
-              color: AppColor.whiteColor(context),
+              color: AppColor.titleFormFiledColor(context),
               height: 1.3,
               letterSpacing: -0.3,
             ),
@@ -639,7 +662,7 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 12.sp,
-              color: AppColor.whiteColor(context).withValues(alpha: 0.65),
+              color: AppColor.darkTextColor(context),
               height: 1.5,
             ),
           ),
@@ -687,24 +710,32 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
               const Spacer(),
               Row(
                 children: [
-                  Icon(Icons.visibility_outlined, size: 14.sp, color: AppColor.whiteColor(context).withValues(alpha: 0.35)),
+                  Icon(
+                    Icons.visibility_outlined,
+                    size: 14.sp,
+                    color: AppColor.darkTextColor(context),
+                  ),
                   Gap(4.w),
                   Text(
                     '2.4K',
                     style: TextStyle(
                       fontSize: 11.sp,
-                      color: AppColor.whiteColor(context).withValues(alpha: 0.4),
+                      color: AppColor.darkTextColor(context),
                       fontWeight: FontWeight.w500,
                     ),
                   ),
                   Gap(12.w),
-                  Icon(Icons.bookmark_border_rounded, size: 14.sp, color: AppColor.whiteColor(context).withValues(alpha: 0.35)),
+                  Icon(
+                    Icons.bookmark_border_rounded,
+                    size: 14.sp,
+                    color: AppColor.darkTextColor(context),
+                  ),
                   Gap(4.w),
                   Text(
                     '186',
                     style: TextStyle(
                       fontSize: 11.sp,
-                      color: AppColor.whiteColor(context).withValues(alpha: 0.4),
+                      color: AppColor.darkTextColor(context),
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -718,7 +749,12 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
   }
 
   // ── Category Chip ────────────────────────────────────────────────────────
-  Widget _buildCategoryChip(BuildContext context, String label, IconData icon, int index) {
+  Widget _buildCategoryChip(
+    BuildContext context,
+    String label,
+    IconData icon,
+    int index,
+  ) {
     final isSelected = _selectedCategoryIndex == index;
     return GestureDetector(
       onTap: () {
@@ -733,14 +769,16 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
         decoration: BoxDecoration(
           gradient: isSelected
-              ? const LinearGradient(colors: [AppColor.emeraldTeal, AppColor.mintTeal])
+              ? const LinearGradient(
+                  colors: [AppColor.emeraldTeal, AppColor.mintTeal],
+                )
               : null,
-          color: isSelected ? null : const Color(0xFF151D2B),
+          color: isSelected ? null : AppColor.cardColor(context),
           borderRadius: BorderRadius.circular(12.r),
           border: Border.all(
             color: isSelected
                 ? Colors.transparent
-                : AppColor.whiteColor(context).withValues(alpha: 0.06),
+                : AppColor.borderColor(context),
           ),
           boxShadow: isSelected
               ? [
@@ -760,7 +798,7 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
               size: 14.sp,
               color: isSelected
                   ? AppColor.darkBackground
-                  : AppColor.whiteColor(context).withValues(alpha: 0.5),
+                  : AppColor.darkTextColor(context),
             ),
             Gap(6.w),
             Text(
@@ -768,7 +806,7 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
               style: TextStyle(
                 color: isSelected
                     ? AppColor.darkBackground
-                    : AppColor.whiteColor(context).withValues(alpha: 0.7),
+                    : AppColor.titleFormFiledColor(context),
                 fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                 fontSize: 12.sp,
               ),

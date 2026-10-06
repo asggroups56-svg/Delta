@@ -36,19 +36,29 @@ class GridModulesWidget extends StatelessWidget {
             child: InkWell(
               onTap: () {
                 if (mod['id'] == 'accounting') {
-                  NavigatorMethods.pushNamed(context, RoutesName.accountingDashboardScreen);
+                  NavigatorMethods.pushNamed(
+                    context,
+                    RoutesName.accountingDashboardScreen,
+                  );
                 } else if (mod['id'] == 'dashboards') {
                   NavigatorMethods.pushNamed(context, RoutesName.reportsScreen);
                 } else if (mod['id'] == 'knowledge') {
-                  NavigatorMethods.pushNamed(context, RoutesName.knowledgeScreen);
+                  NavigatorMethods.pushNamed(
+                    context,
+                    RoutesName.knowledgeScreen,
+                  );
                 } else {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text(mod['title'] as String),
-                    backgroundColor: gradient.first,
-                    duration: const Duration(seconds: 1),
-                    behavior: SnackBarBehavior.floating,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-                  ));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(mod['title'] as String),
+                      backgroundColor: gradient.first,
+                      duration: const Duration(seconds: 1),
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                    ),
+                  );
                 }
               },
               borderRadius: BorderRadius.circular(16.r),
@@ -64,15 +74,17 @@ class GridModulesWidget extends StatelessWidget {
                           width: 58.w,
                           height: 58.h,
                           decoration: BoxDecoration(
-                            color: AppColor.whiteColor(context).withValues(alpha: 0.1),
+                            color: AppColor.cardColor(context),
                             borderRadius: BorderRadius.circular(16.r),
                             border: Border.all(
-                              color: const Color(0xFFE2E8F0),
+                              color: AppColor.borderColor(context),
                               width: 1.2,
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(0xFF0F172A).withValues(alpha: 0.04),
+                                color: const Color(
+                                  0xFF0F172A,
+                                ).withValues(alpha: 0.04),
                                 blurRadius: 10.r,
                                 offset: const Offset(0, 4),
                               ),
@@ -105,10 +117,16 @@ class GridModulesWidget extends StatelessWidget {
                             top: -4.h,
                             right: -4.w,
                             child: Container(
-                              padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 6.w,
+                                vertical: 2.h,
+                              ),
                               decoration: BoxDecoration(
                                 gradient: const LinearGradient(
-                                  colors: [Color(0xFFDC2626), Color(0xFFEA580C)],
+                                  colors: [
+                                    Color(0xFFDC2626),
+                                    Color(0xFFEA580C),
+                                  ],
                                 ),
                                 borderRadius: BorderRadius.circular(10.r),
                                 border: Border.all(
@@ -117,7 +135,9 @@ class GridModulesWidget extends StatelessWidget {
                                 ),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: const Color(0xFFDC2626).withValues(alpha: 0.35),
+                                    color: const Color(
+                                      0xFFDC2626,
+                                    ).withValues(alpha: 0.35),
                                     blurRadius: 4.r,
                                   ),
                                 ],
@@ -144,7 +164,7 @@ class GridModulesWidget extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 11.5.sp,
                           fontWeight: FontWeight.w700,
-                          color: const Color(0xFF0F172A),
+                          color: AppColor.titleFormFiledColor(context),
                           letterSpacing: -0.2,
                         ),
                       ),

@@ -39,9 +39,10 @@ class _ScanUploadScreenState extends State<ScanUploadScreen>
       duration: const Duration(seconds: 2),
     )..repeat(reverse: true);
 
-    _scanLaserAnim = Tween<double>(begin: 0.05, end: 0.95).animate(
-      CurvedAnimation(parent: _scanLaserCtrl, curve: Curves.easeInOut),
-    );
+    _scanLaserAnim = Tween<double>(
+      begin: 0.05,
+      end: 0.95,
+    ).animate(CurvedAnimation(parent: _scanLaserCtrl, curve: Curves.easeInOut));
   }
 
   @override
@@ -82,9 +83,9 @@ class _ScanUploadScreenState extends State<ScanUploadScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColor.darkBackground,
+      backgroundColor: AppColor.scaffoldColor(context),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0F172A),
+        backgroundColor: AppColor.appBarColor(context),
         elevation: 0,
         centerTitle: true,
         title: Text(
@@ -92,11 +93,14 @@ class _ScanUploadScreenState extends State<ScanUploadScreen>
           style: AppTextStyle.appBarStyle(context).copyWith(
             fontSize: 16.sp,
             fontWeight: FontWeight.w700,
-            color: Colors.white,
+            color: AppColor.appBarTextColor(context),
           ),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
+          icon: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: AppColor.appBarTextColor(context),
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
@@ -106,13 +110,19 @@ class _ScanUploadScreenState extends State<ScanUploadScreen>
             decoration: BoxDecoration(
               color: AppColor.emeraldTeal.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(8.r),
-              border: Border.all(color: AppColor.emeraldTeal.withValues(alpha: 0.4)),
+              border: Border.all(
+                color: AppColor.emeraldTeal.withValues(alpha: 0.4),
+              ),
             ),
             alignment: Alignment.center,
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.auto_awesome_rounded, color: AppColor.emeraldTeal, size: 12.r),
+                Icon(
+                  Icons.auto_awesome_rounded,
+                  color: AppColor.emeraldTeal,
+                  size: 12.r,
+                ),
                 Gap(4.w),
                 Text(
                   'OCR Active',
@@ -163,25 +173,29 @@ class _ScanUploadScreenState extends State<ScanUploadScreen>
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 4.h),
       decoration: BoxDecoration(
-        color: const Color(0xFF111827),
+        color: AppColor.cardColor(context),
         borderRadius: BorderRadius.circular(14.r),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+        border: Border.all(color: AppColor.borderColor(context)),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: _docCategory,
           isExpanded: true,
-          dropdownColor: const Color(0xFF1E293B),
-          icon: Icon(Icons.keyboard_arrow_down_rounded, color: AppColor.cyanLight),
-          style: const TextStyle(color: Colors.white, fontFamily: 'Tajawal'),
+          dropdownColor: AppColor.cardColor(context),
+          icon: Icon(
+            Icons.keyboard_arrow_down_rounded,
+            color: AppColor.cyanLight,
+          ),
+          style: TextStyle(
+            color: AppColor.textFormColor(context),
+            fontFamily: 'Tajawal',
+          ),
           items: [
             'فاتورة مشتريات (Purchase Bill)',
             'إيصال مصروفات نقدية (Expense Receipt)',
             'عقد اتفاقية (Contract)',
             'كشف حساب بنكي (Bank Statement)',
-          ]
-              .map((c) => DropdownMenuItem(value: c, child: Text(c)))
-              .toList(),
+          ].map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
           onChanged: (val) {
             if (val != null) setState(() => _docCategory = val);
           },
@@ -195,10 +209,12 @@ class _ScanUploadScreenState extends State<ScanUploadScreen>
       height: 240.h,
       width: double.infinity,
       decoration: BoxDecoration(
-        color: const Color(0xFF111827),
+        color: AppColor.cardColor(context),
         borderRadius: BorderRadius.circular(20.r),
         border: Border.all(
-          color: _isScanned ? AppColor.emeraldTeal : AppColor.royalIndigo.withValues(alpha: 0.4),
+          color: _isScanned
+              ? AppColor.emeraldTeal
+              : AppColor.royalIndigo.withValues(alpha: 0.4),
           width: 1.5,
         ),
         boxShadow: [
@@ -232,7 +248,11 @@ class _ScanUploadScreenState extends State<ScanUploadScreen>
                       ? Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.check_circle_rounded, color: AppColor.emeraldTeal, size: 54.r),
+                            Icon(
+                              Icons.check_circle_rounded,
+                              color: AppColor.emeraldTeal,
+                              size: 54.r,
+                            ),
                             Gap(8.h),
                             Text(
                               'تم استخراج وقراءة المستند بنجاح',
@@ -256,7 +276,11 @@ class _ScanUploadScreenState extends State<ScanUploadScreen>
                       : Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.document_scanner_outlined, color: AppColor.cyanLight, size: 48.r),
+                            Icon(
+                              Icons.document_scanner_outlined,
+                              color: AppColor.cyanLight,
+                              size: 48.r,
+                            ),
                             Gap(10.h),
                             Text(
                               'ضع الفاتورة أو المستند داخل الإطار',
@@ -283,10 +307,26 @@ class _ScanUploadScreenState extends State<ScanUploadScreen>
             ),
 
             // Corner Frame Guides
-            Positioned(top: 16.r, left: 16.r, child: _buildCornerGuide(Alignment.topLeft)),
-            Positioned(top: 16.r, right: 16.r, child: _buildCornerGuide(Alignment.topRight)),
-            Positioned(bottom: 16.r, left: 16.r, child: _buildCornerGuide(Alignment.bottomLeft)),
-            Positioned(bottom: 16.r, right: 16.r, child: _buildCornerGuide(Alignment.bottomRight)),
+            Positioned(
+              top: 16.r,
+              left: 16.r,
+              child: _buildCornerGuide(Alignment.topLeft),
+            ),
+            Positioned(
+              top: 16.r,
+              right: 16.r,
+              child: _buildCornerGuide(Alignment.topRight),
+            ),
+            Positioned(
+              bottom: 16.r,
+              left: 16.r,
+              child: _buildCornerGuide(Alignment.bottomLeft),
+            ),
+            Positioned(
+              bottom: 16.r,
+              right: 16.r,
+              child: _buildCornerGuide(Alignment.bottomRight),
+            ),
 
             // Scanning Laser Line (Animated when scanning)
             if (!_isScanned || _isProcessing)
@@ -311,7 +351,9 @@ class _ScanUploadScreenState extends State<ScanUploadScreen>
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0xFF06B6D4).withValues(alpha: 0.8),
+                            color: const Color(
+                              0xFF06B6D4,
+                            ).withValues(alpha: 0.8),
                             blurRadius: 12,
                             spreadRadius: 2,
                           ),
@@ -359,10 +401,18 @@ class _ScanUploadScreenState extends State<ScanUploadScreen>
       height: 22.r,
       decoration: BoxDecoration(
         border: Border(
-          top: isTop ? BorderSide(color: AppColor.cyanLight, width: 2.5) : BorderSide.none,
-          bottom: !isTop ? BorderSide(color: AppColor.cyanLight, width: 2.5) : BorderSide.none,
-          left: isLeft ? BorderSide(color: AppColor.cyanLight, width: 2.5) : BorderSide.none,
-          right: !isLeft ? BorderSide(color: AppColor.cyanLight, width: 2.5) : BorderSide.none,
+          top: isTop
+              ? BorderSide(color: AppColor.cyanLight, width: 2.5)
+              : BorderSide.none,
+          bottom: !isTop
+              ? BorderSide(color: AppColor.cyanLight, width: 2.5)
+              : BorderSide.none,
+          left: isLeft
+              ? BorderSide(color: AppColor.cyanLight, width: 2.5)
+              : BorderSide.none,
+          right: !isLeft
+              ? BorderSide(color: AppColor.cyanLight, width: 2.5)
+              : BorderSide.none,
         ),
       ),
     );
@@ -440,31 +490,39 @@ class _ScanUploadScreenState extends State<ScanUploadScreen>
     return Container(
       padding: EdgeInsets.all(16.r),
       decoration: BoxDecoration(
-        color: const Color(0xFF111827),
+        color: AppColor.cardColor(context),
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+        border: Border.all(color: AppColor.borderColor(context)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.tips_and_updates_rounded, color: AppColor.warningOrange, size: 20.r),
+              Icon(
+                Icons.tips_and_updates_rounded,
+                color: AppColor.warningOrange,
+                size: 20.r,
+              ),
               Gap(8.w),
               Text(
                 'مزايا الماسح الذكي في Delta ERP',
                 style: TextStyle(
                   fontSize: 13.sp,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: AppColor.titleFormFiledColor(context),
                   fontFamily: 'Tajawal',
                 ),
               ),
             ],
           ),
           Gap(12.h),
-          _buildFeatureBullet('استخراج تلقائي لرمز الاستجابة السريعة (ZATCA QR Code)'),
-          _buildFeatureBullet('التعرف على الرقم الضريبي للمورد ومطابقته بقاعدة البيانات'),
+          _buildFeatureBullet(
+            'استخراج تلقائي لرمز الاستجابة السريعة (ZATCA QR Code)',
+          ),
+          _buildFeatureBullet(
+            'التعرف على الرقم الضريبي للمورد ومطابقته بقاعدة البيانات',
+          ),
           _buildFeatureBullet('الربط الفوري مع شجرة الحسابات ومركز التكلفة'),
           _buildFeatureBullet('حفظ نسخة رقمية مؤرشفة مشفرة سحابياً'),
         ],
@@ -478,14 +536,18 @@ class _ScanUploadScreenState extends State<ScanUploadScreen>
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.check_circle_outline_rounded, color: AppColor.cyanLight, size: 14.r),
+          Icon(
+            Icons.check_circle_outline_rounded,
+            color: AppColor.cyanLight,
+            size: 14.r,
+          ),
           Gap(8.w),
           Expanded(
             child: Text(
               text,
               style: TextStyle(
                 fontSize: 11.sp,
-                color: Colors.white.withValues(alpha: 0.7),
+                color: AppColor.darkTextColor(context),
                 fontFamily: 'Tajawal',
               ),
             ),
@@ -499,7 +561,7 @@ class _ScanUploadScreenState extends State<ScanUploadScreen>
     return Container(
       padding: EdgeInsets.all(16.r),
       decoration: BoxDecoration(
-        color: const Color(0xFF111827),
+        color: AppColor.cardColor(context),
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(color: AppColor.emeraldTeal.withValues(alpha: 0.4)),
       ),
@@ -514,7 +576,7 @@ class _ScanUploadScreenState extends State<ScanUploadScreen>
                 style: TextStyle(
                   fontSize: 13.sp,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: AppColor.titleFormFiledColor(context),
                   fontFamily: 'Tajawal',
                 ),
               ),
@@ -540,7 +602,10 @@ class _ScanUploadScreenState extends State<ScanUploadScreen>
           TextFormField(
             initialValue: _supplierName,
             onChanged: (val) => _supplierName = val,
-            style: const TextStyle(color: Colors.white, fontFamily: 'Tajawal'),
+            style: TextStyle(
+              color: AppColor.textFormColor(context),
+              fontFamily: 'Tajawal',
+            ),
             decoration: _inputDecoration(
               label: 'اسم المورد / الشركة',
               prefixIcon: Icons.store_rounded,
@@ -553,7 +618,10 @@ class _ScanUploadScreenState extends State<ScanUploadScreen>
                 child: TextFormField(
                   initialValue: _vatNumber,
                   onChanged: (val) => _vatNumber = val,
-                  style: const TextStyle(color: Colors.white, fontFamily: 'Tajawal'),
+                  style: TextStyle(
+                    color: AppColor.textFormColor(context),
+                    fontFamily: 'Tajawal',
+                  ),
                   decoration: _inputDecoration(
                     label: 'الرقم الضريبي للمورد',
                     prefixIcon: Icons.pin_rounded,
@@ -565,7 +633,10 @@ class _ScanUploadScreenState extends State<ScanUploadScreen>
                 child: TextFormField(
                   initialValue: _invoiceDate,
                   onChanged: (val) => _invoiceDate = val,
-                  style: const TextStyle(color: Colors.white, fontFamily: 'Tajawal'),
+                  style: TextStyle(
+                    color: AppColor.textFormColor(context),
+                    fontFamily: 'Tajawal',
+                  ),
                   decoration: _inputDecoration(
                     label: 'تاريخ الفاتورة',
                     prefixIcon: Icons.calendar_today_rounded,
@@ -597,7 +668,10 @@ class _ScanUploadScreenState extends State<ScanUploadScreen>
                 child: TextFormField(
                   initialValue: _vatAmount,
                   onChanged: (val) => _vatAmount = val,
-                  style: const TextStyle(color: Colors.white, fontFamily: 'Tajawal'),
+                  style: TextStyle(
+                    color: AppColor.textFormColor(context),
+                    fontFamily: 'Tajawal',
+                  ),
                   decoration: _inputDecoration(
                     label: 'مبلغ الضريبة (15%)',
                     prefixIcon: Icons.receipt_rounded,
@@ -609,20 +683,26 @@ class _ScanUploadScreenState extends State<ScanUploadScreen>
           Gap(10.h),
           DropdownButtonFormField<String>(
             initialValue: _destinationAccount,
-            dropdownColor: const Color(0xFF1E293B),
-            style: const TextStyle(color: Colors.white, fontFamily: 'Tajawal'),
+            dropdownColor: AppColor.cardColor(context),
+            style: TextStyle(
+              color: AppColor.textFormColor(context),
+              fontFamily: 'Tajawal',
+            ),
             decoration: _inputDecoration(
               label: 'حساب المصروف / التوجيه المحاسبي',
               prefixIcon: Icons.account_balance_rounded,
             ),
-            items: [
-              '5010 - مشتريات ومصروفات تشغيلية',
-              '5020 - مصروفات عمومية وإدارية',
-              '1030 - مخزون البضائع والمستودعات',
-              '1020 - أصول ثابتة ومعدات تقنية',
-            ]
-                .map((acc) => DropdownMenuItem(value: acc, child: Text(acc)))
-                .toList(),
+            items:
+                [
+                      '5010 - مشتريات ومصروفات تشغيلية',
+                      '5020 - مصروفات عمومية وإدارية',
+                      '1030 - مخزون البضائع والمستودعات',
+                      '1020 - أصول ثابتة ومعدات تقنية',
+                    ]
+                    .map(
+                      (acc) => DropdownMenuItem(value: acc, child: Text(acc)),
+                    )
+                    .toList(),
             onChanged: (val) {
               if (val != null) setState(() => _destinationAccount = val);
             },
@@ -659,17 +739,20 @@ class _ScanUploadScreenState extends State<ScanUploadScreen>
     );
   }
 
-  InputDecoration _inputDecoration({required String label, required IconData prefixIcon}) {
+  InputDecoration _inputDecoration({
+    required String label,
+    required IconData prefixIcon,
+  }) {
     return InputDecoration(
       labelText: label,
       labelStyle: TextStyle(
         fontSize: 11.sp,
-        color: Colors.white.withValues(alpha: 0.5),
+        color: AppColor.hintColor(context),
         fontFamily: 'Tajawal',
       ),
       prefixIcon: Icon(prefixIcon, color: AppColor.cyanLight, size: 18.r),
       filled: true,
-      fillColor: const Color(0xFF1E293B),
+      fillColor: AppColor.textFormFillColor(context),
       contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12.r),
@@ -677,7 +760,7 @@ class _ScanUploadScreenState extends State<ScanUploadScreen>
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12.r),
-        borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
+        borderSide: BorderSide(color: AppColor.textFormBorderColor(context)),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12.r),

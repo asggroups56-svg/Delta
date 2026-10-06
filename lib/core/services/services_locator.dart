@@ -4,6 +4,7 @@ import 'package:internet_connection_checker_plus/internet_connection_checker_plu
 import 'package:my_template/features/auth/data/repository/auth_repo.dart';
 import 'package:my_template/features/auth/presentation/view/cubit/auth_cubit.dart';
 import 'package:my_template/features/home/data/repository/home_repo.dart';
+import 'package:my_template/features/lookup/data/repository/lookup_repo.dart';
 import 'package:my_template/features/reports/data/repository/reports_repo.dart';
 import 'package:my_template/features/reports/presentation/view/cubit/reports_cubit.dart';
 

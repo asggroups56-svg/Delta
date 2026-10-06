@@ -28,7 +28,6 @@ class CustomErpInputFieldWidget extends StatelessWidget {
         Text(
           label,
           style: AppTextStyle.bodyMedium(context).copyWith(
-            
             fontWeight: FontWeight.w600,
             color: AppColor.whiteColor(context).withValues(alpha: 0.7),
           ),
@@ -51,8 +50,11 @@ class CustomErpInputFieldWidget extends StatelessWidget {
               color: AppColor.whiteColor(context).withValues(alpha: 0.3),
             ),
             filled: true,
-            fillColor: AppColor.darkSurface,
-            contentPadding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
+            fillColor: AppColor.textFormFillColor(context),
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: 14.w,
+              vertical: 10.h,
+            ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.r),
               borderSide: BorderSide.none,

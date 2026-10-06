@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:my_template/core/routes/routes_name.dart';
+import 'package:my_template/core/theme/app_colors.dart';
 import 'package:my_template/core/utils/app_locale_key.dart';
 import 'package:my_template/core/utils/navigator_methods.dart';
 
@@ -22,42 +23,50 @@ class QuickShortcutsWidget extends StatelessWidget {
         'subtitle': isArabic ? 'فاتورة بيع إلكترونية' : 'E-Invoice',
         'icon': Icons.receipt_long_rounded,
         'gradient': [const Color(0xFF1E40AF), const Color(0xFF2563EB)],
-        'onTap': () => NavigatorMethods.pushNamed(context, RoutesName.createInvoiceScreen),
+        'onTap': () =>
+            NavigatorMethods.pushNamed(context, RoutesName.createInvoiceScreen),
       },
       {
         'title': isArabic ? 'مسح الفواتير OCR' : 'OCR Scan Bill',
         'subtitle': isArabic ? 'استخراج ذكي للبيانات' : 'Smart Extraction',
         'icon': Icons.document_scanner_rounded,
         'gradient': [const Color(0xFF047857), const Color(0xFF10B981)],
-        'onTap': () => NavigatorMethods.pushNamed(context, RoutesName.purchaseOcrScreen),
+        'onTap': () =>
+            NavigatorMethods.pushNamed(context, RoutesName.purchaseOcrScreen),
       },
       {
         'title': isArabic ? 'عميل جديد' : 'New Customer',
         'subtitle': isArabic ? 'إضافة شريك عمل' : 'Add Partner',
         'icon': Icons.person_add_alt_1_rounded,
         'gradient': [const Color(0xFF0369A1), const Color(0xFF0EA5E9)],
-        'onTap': () => NavigatorMethods.pushNamed(context, RoutesName.addLeadScreen),
+        'onTap': () =>
+            NavigatorMethods.pushNamed(context, RoutesName.addLeadScreen),
       },
       {
         'title': isArabic ? 'التقارير والقوائم' : 'Financial Reports',
         'subtitle': isArabic ? 'تحليلات لحظية' : 'Live Analytics',
         'icon': Icons.analytics_outlined,
         'gradient': [const Color(0xFF6D28D9), const Color(0xFF8B5CF6)],
-        'onTap': () => NavigatorMethods.pushNamed(context, RoutesName.reportsScreen),
+        'onTap': () =>
+            NavigatorMethods.pushNamed(context, RoutesName.reportsScreen),
       },
       {
         'title': isArabic ? 'لوحة المحاسبة' : 'Accounting Dashboard',
         'subtitle': isArabic ? 'إدارة القيود والضرائب' : 'Tax & Ledger',
         'icon': Icons.account_balance_outlined,
         'gradient': [const Color(0xFFB45309), const Color(0xFFF59E0B)],
-        'onTap': () => NavigatorMethods.pushNamed(context, RoutesName.accountingDashboardScreen),
+        'onTap': () => NavigatorMethods.pushNamed(
+          context,
+          RoutesName.accountingDashboardScreen,
+        ),
       },
       {
         'title': 'AI Copilot',
         'subtitle': isArabic ? 'مساعد دلتا الذكي' : 'Delta Assistant',
         'icon': Icons.auto_awesome_rounded,
         'gradient': [const Color(0xFFBE123C), const Color(0xFFF43F5E)],
-        'onTap': () => NavigatorMethods.pushNamed(context, RoutesName.aiCopilotScreen),
+        'onTap': () =>
+            NavigatorMethods.pushNamed(context, RoutesName.aiCopilotScreen),
       },
     ];
 
@@ -98,7 +107,7 @@ class QuickShortcutsWidget extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 17.sp,
                   fontWeight: FontWeight.w900,
-                  color: const Color(0xFF0F172A),
+                  color: AppColor.titleFormFiledColor(context),
                   letterSpacing: -0.2,
                 ),
               ),
@@ -132,17 +141,22 @@ class QuickShortcutsWidget extends StatelessWidget {
                   onTap: item['onTap'] as VoidCallback,
                   borderRadius: BorderRadius.circular(16.r),
                   child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 10.w,
+                      vertical: 8.h,
+                    ),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColor.cardColor(context),
                       borderRadius: BorderRadius.circular(16.r),
                       border: Border.all(
-                        color: const Color(0xFFE2E8F0),
+                        color: AppColor.borderColor(context),
                         width: 1.2,
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFF0F172A).withValues(alpha: 0.03),
+                          color: const Color(
+                            0xFF0F172A,
+                          ).withValues(alpha: 0.03),
                           blurRadius: 10,
                           offset: const Offset(0, 3),
                         ),
@@ -162,7 +176,9 @@ class QuickShortcutsWidget extends StatelessWidget {
                             borderRadius: BorderRadius.circular(12.r),
                             boxShadow: [
                               BoxShadow(
-                                color: gradientColors.first.withValues(alpha: 0.25),
+                                color: gradientColors.first.withValues(
+                                  alpha: 0.25,
+                                ),
                                 blurRadius: 6,
                               ),
                             ],
@@ -187,7 +203,7 @@ class QuickShortcutsWidget extends StatelessWidget {
                                 style: TextStyle(
                                   fontSize: 11.5.sp,
                                   fontWeight: FontWeight.w800,
-                                  color: const Color(0xFF0F172A),
+                                  color: AppColor.titleFormFiledColor(context),
                                 ),
                               ),
                               Gap(2.h),
@@ -198,7 +214,7 @@ class QuickShortcutsWidget extends StatelessWidget {
                                 style: TextStyle(
                                   fontSize: 9.5.sp,
                                   fontWeight: FontWeight.w500,
-                                  color: const Color(0xFF64748B),
+                                  color: AppColor.darkTextColor(context),
                                 ),
                               ),
                             ],

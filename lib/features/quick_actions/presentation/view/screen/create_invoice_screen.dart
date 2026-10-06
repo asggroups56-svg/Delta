@@ -42,7 +42,10 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
   ];
 
   double get _subtotal {
-    return _items.fold(0.0, (sum, item) => sum + (item.quantity * item.unitPrice - item.discount));
+    return _items.fold(
+      0.0,
+      (sum, item) => sum + (item.quantity * item.unitPrice - item.discount),
+    );
   }
 
   double get _totalVat {
@@ -90,7 +93,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF111827),
+        backgroundColor: AppColor.cardColor(context),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20.r),
           side: BorderSide(
@@ -119,7 +122,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
               style: TextStyle(
                 fontSize: 15.sp,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: AppColor.titleFormFiledColor(context),
                 fontFamily: 'Tajawal',
               ),
             ),
@@ -133,7 +136,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
               'رقم الفاتورة: INV-2026-0842\nإجمالي المبلغ: ${_grandTotal.toStringAsFixed(2)} ر.س\nمطابقة لاشتراطات هيئة الزكاة والضريبة والجمارك (ZATCA Phase 2)',
               style: TextStyle(
                 fontSize: 12.sp,
-                color: Colors.white.withValues(alpha: 0.75),
+                color: AppColor.darkTextColor(context),
                 height: 1.5,
                 fontFamily: 'Tajawal',
               ),
@@ -142,15 +145,17 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
             Container(
               padding: EdgeInsets.all(12.r),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.05),
+                color: AppColor.cardSurfaceColor(context),
                 borderRadius: BorderRadius.circular(12.r),
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.1),
-                ),
+                border: Border.all(color: AppColor.borderColor(context)),
               ),
               child: Row(
                 children: [
-                  Icon(Icons.qr_code_2_rounded, color: Colors.white, size: 36.r),
+                  Icon(
+                    Icons.qr_code_2_rounded,
+                    color: AppColor.titleFormFiledColor(context),
+                    size: 36.r,
+                  ),
                   Gap(10.w),
                   Expanded(
                     child: Text(
@@ -191,9 +196,9 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColor.darkBackground,
+      backgroundColor: AppColor.scaffoldColor(context),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0F172A),
+        backgroundColor: AppColor.appBarColor(context),
         elevation: 0,
         centerTitle: true,
         title: Text(
@@ -201,11 +206,14 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
           style: AppTextStyle.appBarStyle(context).copyWith(
             fontSize: 16.sp,
             fontWeight: FontWeight.w700,
-            color: Colors.white,
+            color: AppColor.appBarTextColor(context),
           ),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
+          icon: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: AppColor.appBarTextColor(context),
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
@@ -215,7 +223,9 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
             decoration: BoxDecoration(
               color: AppColor.royalIndigo.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(8.r),
-              border: Border.all(color: AppColor.royalIndigo.withValues(alpha: 0.4)),
+              border: Border.all(
+                color: AppColor.royalIndigo.withValues(alpha: 0.4),
+              ),
             ),
             alignment: Alignment.center,
             child: Text(
@@ -276,10 +286,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
       padding: EdgeInsets.all(18.r),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [
-            Color(0xFF1E293B),
-            Color(0xFF0F172A),
-          ],
+          colors: [Color(0xFF1E293B), Color(0xFF0F172A)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -351,7 +358,11 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.verified_rounded, color: AppColor.emeraldTeal, size: 14.r),
+                Icon(
+                  Icons.verified_rounded,
+                  color: AppColor.emeraldTeal,
+                  size: 14.r,
+                ),
                 Gap(4.w),
                 Text(
                   'متوافقة مع ZATCA',
@@ -374,9 +385,9 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
     return Container(
       padding: EdgeInsets.all(4.r),
       decoration: BoxDecoration(
-        color: const Color(0xFF111827),
+        color: AppColor.cardColor(context),
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+        border: Border.all(color: AppColor.borderColor(context)),
       ),
       child: Row(
         children: [
@@ -416,7 +427,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                   BoxShadow(
                     color: AppColor.royalIndigo.withValues(alpha: 0.4),
                     blurRadius: 10,
-                  )
+                  ),
                 ]
               : null,
         ),
@@ -426,7 +437,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
           style: TextStyle(
             fontSize: 11.sp,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-            color: isSelected ? Colors.white : const Color(0xFF94A3B8),
+            color: isSelected ? Colors.white : AppColor.darkTextColor(context),
             fontFamily: 'Tajawal',
           ),
         ),
@@ -438,9 +449,9 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
     return Container(
       padding: EdgeInsets.all(16.r),
       decoration: BoxDecoration(
-        color: const Color(0xFF111827),
+        color: AppColor.cardColor(context),
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+        border: Border.all(color: AppColor.borderColor(context)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -453,20 +464,25 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                 style: TextStyle(
                   fontSize: 13.sp,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: AppColor.titleFormFiledColor(context),
                   fontFamily: 'Tajawal',
                 ),
               ),
               GestureDetector(
                 onTap: () {
                   CommonMethods.showToast(
-                    message: 'يمكنك اختيار العميل من القائمة أو إضافة عميل جديد',
+                    message:
+                        'يمكنك اختيار العميل من القائمة أو إضافة عميل جديد',
                     type: ToastType.help,
                   );
                 },
                 child: Row(
                   children: [
-                    Icon(Icons.person_search_rounded, color: AppColor.cyanLight, size: 16.r),
+                    Icon(
+                      Icons.person_search_rounded,
+                      color: AppColor.cyanLight,
+                      size: 16.r,
+                    ),
                     Gap(4.w),
                     Text(
                       'اختيار عميل',
@@ -486,7 +502,10 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
           TextFormField(
             initialValue: _customerName,
             onChanged: (val) => _customerName = val,
-            style: const TextStyle(color: Colors.white, fontFamily: 'Tajawal'),
+            style: TextStyle(
+              color: AppColor.textFormColor(context),
+              fontFamily: 'Tajawal',
+            ),
             decoration: _inputDecoration(
               label: 'اسم المنشأة / العميل',
               prefixIcon: Icons.business_rounded,
@@ -497,7 +516,10 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
             initialValue: _customerVat,
             onChanged: (val) => _customerVat = val,
             keyboardType: TextInputType.number,
-            style: const TextStyle(color: Colors.white, fontFamily: 'Tajawal'),
+            style: TextStyle(
+              color: AppColor.textFormColor(context),
+              fontFamily: 'Tajawal',
+            ),
             decoration: _inputDecoration(
               label: 'الرقم الضريبي للعميل (15 رقماً)',
               prefixIcon: Icons.pin_rounded,
@@ -512,9 +534,9 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
     return Container(
       padding: EdgeInsets.all(16.r),
       decoration: BoxDecoration(
-        color: const Color(0xFF111827),
+        color: AppColor.cardColor(context),
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+        border: Border.all(color: AppColor.borderColor(context)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -524,7 +546,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
             style: TextStyle(
               fontSize: 13.sp,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: AppColor.titleFormFiledColor(context),
               fontFamily: 'Tajawal',
             ),
           ),
@@ -534,7 +556,8 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
               Expanded(
                 child: _buildDateTile(
                   title: 'تاريخ الإصدار',
-                  date: '${_issueDate.year}-${_issueDate.month.toString().padLeft(2, '0')}-${_issueDate.day.toString().padLeft(2, '0')}',
+                  date:
+                      '${_issueDate.year}-${_issueDate.month.toString().padLeft(2, '0')}-${_issueDate.day.toString().padLeft(2, '0')}',
                   icon: Icons.calendar_today_rounded,
                   onTap: () async {
                     final picked = await showDatePicker(
@@ -551,7 +574,8 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
               Expanded(
                 child: _buildDateTile(
                   title: 'تاريخ الاستحقاق',
-                  date: '${_dueDate.year}-${_dueDate.month.toString().padLeft(2, '0')}-${_dueDate.day.toString().padLeft(2, '0')}',
+                  date:
+                      '${_dueDate.year}-${_dueDate.month.toString().padLeft(2, '0')}-${_dueDate.day.toString().padLeft(2, '0')}',
                   icon: Icons.event_available_rounded,
                   onTap: () async {
                     final picked = await showDatePicker(
@@ -569,18 +593,22 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
           Gap(10.h),
           DropdownButtonFormField<String>(
             initialValue: _paymentTerms,
-            dropdownColor: const Color(0xFF1E293B),
-            style: const TextStyle(color: Colors.white, fontFamily: 'Tajawal'),
+            dropdownColor: AppColor.cardColor(context),
+            style: TextStyle(
+              color: AppColor.textFormColor(context),
+              fontFamily: 'Tajawal',
+            ),
             decoration: _inputDecoration(
               label: 'شروط السداد',
               prefixIcon: Icons.credit_card_rounded,
             ),
-            items: ['Immediate (فوري)', '15 Days', '30 Days', '60 Days', '90 Days']
-                .map((term) => DropdownMenuItem(
-                      value: term,
-                      child: Text(term),
-                    ))
-                .toList(),
+            items:
+                ['Immediate (فوري)', '15 Days', '30 Days', '60 Days', '90 Days']
+                    .map(
+                      (term) =>
+                          DropdownMenuItem(value: term, child: Text(term)),
+                    )
+                    .toList(),
             onChanged: (val) {
               if (val != null) setState(() => _paymentTerms = val);
             },
@@ -601,9 +629,9 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
         decoration: BoxDecoration(
-          color: const Color(0xFF1E293B),
+          color: AppColor.cardSurfaceColor(context),
           borderRadius: BorderRadius.circular(10.r),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+          border: Border.all(color: AppColor.borderColor(context)),
         ),
         child: Row(
           children: [
@@ -617,7 +645,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                     title,
                     style: TextStyle(
                       fontSize: 9.sp,
-                      color: Colors.white.withValues(alpha: 0.5),
+                      color: AppColor.darkTextColor(context),
                       fontFamily: 'Tajawal',
                     ),
                   ),
@@ -627,7 +655,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                     style: TextStyle(
                       fontSize: 11.sp,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: AppColor.titleFormFiledColor(context),
                     ),
                   ),
                 ],
@@ -643,9 +671,9 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
     return Container(
       padding: EdgeInsets.all(16.r),
       decoration: BoxDecoration(
-        color: const Color(0xFF111827),
+        color: AppColor.cardColor(context),
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+        border: Border.all(color: AppColor.borderColor(context)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -658,7 +686,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                 style: TextStyle(
                   fontSize: 13.sp,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: AppColor.titleFormFiledColor(context),
                   fontFamily: 'Tajawal',
                 ),
               ),
@@ -672,7 +700,10 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColor.royalIndigo,
                   foregroundColor: Colors.white,
-                  padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 10.w,
+                    vertical: 6.h,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10.r),
                   ),
@@ -691,9 +722,9 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
               margin: EdgeInsets.only(bottom: 10.h),
               padding: EdgeInsets.all(12.r),
               decoration: BoxDecoration(
-                color: const Color(0xFF1E293B).withValues(alpha: 0.7),
+                color: AppColor.cardSurfaceColor(context),
                 borderRadius: BorderRadius.circular(12.r),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+                border: Border.all(color: AppColor.borderColor(context)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -719,19 +750,30 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                       Expanded(
                         child: TextFormField(
                           initialValue: item.description,
-                          onChanged: (val) => setState(() => item.description = val),
-                          style: const TextStyle(color: Colors.white, fontFamily: 'Tajawal', fontSize: 12),
-                          decoration: const InputDecoration(
+                          onChanged: (val) =>
+                              setState(() => item.description = val),
+                          style: TextStyle(
+                            color: AppColor.textFormColor(context),
+                            fontFamily: 'Tajawal',
+                            fontSize: 12,
+                          ),
+                          decoration: InputDecoration(
                             isDense: true,
                             hintText: 'وصف البند / الخدمة',
-                            hintStyle: TextStyle(color: Colors.white30),
+                            hintStyle: TextStyle(
+                              color: AppColor.hintColor(context),
+                            ),
                             border: InputBorder.none,
                           ),
                         ),
                       ),
                       IconButton(
                         onPressed: () => _removeLineItem(idx),
-                        icon: const Icon(Icons.delete_outline_rounded, color: Color(0xFFF43F5E), size: 20),
+                        icon: const Icon(
+                          Icons.delete_outline_rounded,
+                          color: Color(0xFFF43F5E),
+                          size: 20,
+                        ),
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
                       ),
@@ -746,7 +788,8 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                           value: '${item.quantity}',
                           onChanged: (val) {
                             final q = int.tryParse(val);
-                            if (q != null && q > 0) setState(() => item.quantity = q);
+                            if (q != null && q > 0)
+                              setState(() => item.quantity = q);
                           },
                         ),
                       ),
@@ -800,7 +843,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                           style: TextStyle(
                             fontSize: 11.sp,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: AppColor.titleFormFiledColor(context),
                             fontFamily: 'Tajawal',
                           ),
                         ),
@@ -824,9 +867,9 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
       decoration: BoxDecoration(
-        color: const Color(0xFF0F172A),
+        color: AppColor.cardSurfaceColor(context),
         borderRadius: BorderRadius.circular(8.r),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+        border: Border.all(color: AppColor.borderColor(context)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -835,7 +878,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
             label,
             style: TextStyle(
               fontSize: 8.5.sp,
-              color: Colors.white.withValues(alpha: 0.5),
+              color: AppColor.darkTextColor(context),
               fontFamily: 'Tajawal',
             ),
           ),
@@ -843,7 +886,11 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
             initialValue: value,
             keyboardType: TextInputType.number,
             onChanged: onChanged,
-            style: TextStyle(fontSize: 11.sp, fontWeight: FontWeight.bold, color: Colors.white),
+            style: TextStyle(
+              fontSize: 11.sp,
+              fontWeight: FontWeight.bold,
+              color: AppColor.textFormColor(context),
+            ),
             decoration: const InputDecoration(
               isDense: true,
               contentPadding: EdgeInsets.zero,
@@ -859,16 +906,26 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
     return Container(
       padding: EdgeInsets.all(16.r),
       decoration: BoxDecoration(
-        color: const Color(0xFF111827),
+        color: AppColor.cardColor(context),
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+        border: Border.all(color: AppColor.borderColor(context)),
       ),
       child: Column(
         children: [
-          _buildSummaryRow(label: 'المجموع الفرعي الخاضع للضريبة', value: '${_subtotal.toStringAsFixed(2)} ر.س'),
-          _buildSummaryRow(label: 'إجمالي الخصومات', value: '- ${_totalDiscount.toStringAsFixed(2)} ر.س', isDiscount: true),
-          _buildSummaryRow(label: 'ضريبة القيمة المضافة (15%)', value: '${_totalVat.toStringAsFixed(2)} ر.س'),
-          const Divider(color: Colors.white12, height: 20),
+          _buildSummaryRow(
+            label: 'المجموع الفرعي الخاضع للضريبة',
+            value: '${_subtotal.toStringAsFixed(2)} ر.س',
+          ),
+          _buildSummaryRow(
+            label: 'إجمالي الخصومات',
+            value: '- ${_totalDiscount.toStringAsFixed(2)} ر.س',
+            isDiscount: true,
+          ),
+          _buildSummaryRow(
+            label: 'ضريبة القيمة المضافة (15%)',
+            value: '${_totalVat.toStringAsFixed(2)} ر.س',
+          ),
+          Divider(color: AppColor.borderColor(context), height: 20.h),
           _buildSummaryRow(
             label: 'المجموع الكلي النهائي',
             value: '${_grandTotal.toStringAsFixed(2)} ر.س',
@@ -895,7 +952,9 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
             style: TextStyle(
               fontSize: isGrandTotal ? 13.sp : 11.sp,
               fontWeight: isGrandTotal ? FontWeight.bold : FontWeight.w500,
-              color: isGrandTotal ? Colors.white : Colors.white.withValues(alpha: 0.7),
+              color: isGrandTotal
+                  ? AppColor.titleFormFiledColor(context)
+                  : AppColor.darkTextColor(context),
               fontFamily: 'Tajawal',
             ),
           ),
@@ -906,7 +965,9 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
               fontWeight: isGrandTotal ? FontWeight.w900 : FontWeight.bold,
               color: isGrandTotal
                   ? AppColor.cyanLight
-                  : (isDiscount ? const Color(0xFFF43F5E) : Colors.white),
+                  : (isDiscount
+                        ? const Color(0xFFF43F5E)
+                        : AppColor.titleFormFiledColor(context)),
               fontFamily: 'Tajawal',
             ),
           ),
@@ -924,13 +985,19 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
             icon: const Icon(Icons.save_outlined),
             label: Text(
               'حفظ كمسودة',
-              style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.bold, fontFamily: 'Tajawal'),
+              style: TextStyle(
+                fontSize: 12.sp,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Tajawal',
+              ),
             ),
             style: OutlinedButton.styleFrom(
-              foregroundColor: Colors.white,
-              side: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
+              foregroundColor: AppColor.titleFormFiledColor(context),
+              side: BorderSide(color: AppColor.borderColor(context)),
               padding: EdgeInsets.symmetric(vertical: 12.h),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14.r),
+              ),
             ),
           ),
         ),
@@ -942,13 +1009,19 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
             icon: const Icon(Icons.send_rounded),
             label: Text(
               'إصدار واعتماد الفاتورة',
-              style: TextStyle(fontSize: 12.5.sp, fontWeight: FontWeight.bold, fontFamily: 'Tajawal'),
+              style: TextStyle(
+                fontSize: 12.5.sp,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Tajawal',
+              ),
             ),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColor.royalIndigo,
               foregroundColor: Colors.white,
               padding: EdgeInsets.symmetric(vertical: 12.h),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14.r),
+              ),
               elevation: 4,
             ),
           ),
@@ -957,17 +1030,15 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
     );
   }
 
-  InputDecoration _inputDecoration({required String label, required IconData prefixIcon}) {
+  InputDecoration _inputDecoration({
+    required String label,
+    required IconData prefixIcon,
+  }) {
     return InputDecoration(
       labelText: label,
-      labelStyle: TextStyle(
-        fontSize: 11.sp,
-        color: Colors.white.withValues(alpha: 0.5),
-        fontFamily: 'Tajawal',
-      ),
+      labelStyle: TextStyle(fontSize: 11.sp, fontFamily: 'Tajawal'),
       prefixIcon: Icon(prefixIcon, color: AppColor.cyanLight, size: 18.r),
       filled: true,
-      fillColor: const Color(0xFF1E293B),
       contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12.r),
@@ -975,7 +1046,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12.r),
-        borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
+        borderSide: BorderSide.none,
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12.r),

@@ -32,11 +32,9 @@ class KnowledgeArticleItemWidget extends StatelessWidget {
     return Container(
       margin: EdgeInsets.only(bottom: 14.h),
       decoration: BoxDecoration(
-        color: const Color(0xFF151D2B),
+        color: AppColor.cardColor(context),
         borderRadius: BorderRadius.circular(18.r),
-        border: Border.all(
-          color: AppColor.whiteColor(context).withValues(alpha: 0.04),
-        ),
+        border: Border.all(color: AppColor.borderColor(context)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.15),
@@ -75,11 +73,7 @@ class KnowledgeArticleItemWidget extends StatelessWidget {
                       color: iconColor.withValues(alpha: 0.15),
                     ),
                   ),
-                  child: Icon(
-                    icon,
-                    color: iconColor,
-                    size: 22.sp,
-                  ),
+                  child: Icon(icon, color: iconColor, size: 22.sp),
                 ),
                 Gap(14.w),
                 Expanded(
@@ -97,7 +91,7 @@ class KnowledgeArticleItemWidget extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 13.5.sp,
                                 fontWeight: FontWeight.w700,
-                                color: AppColor.whiteColor(context),
+                                color: AppColor.titleFormFiledColor(context),
                                 letterSpacing: -0.2,
                               ),
                             ),
@@ -105,16 +99,27 @@ class KnowledgeArticleItemWidget extends StatelessWidget {
                           if (badge != null) ...[
                             Gap(8.w),
                             Container(
-                              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 8.w,
+                                vertical: 3.h,
+                              ),
                               decoration: BoxDecoration(
                                 color: badge == AppLocaleKey.kbNew.tr()
-                                    ? AppColor.emeraldTeal.withValues(alpha: 0.15)
-                                    : AppColor.warningOrange.withValues(alpha: 0.15),
+                                    ? AppColor.emeraldTeal.withValues(
+                                        alpha: 0.15,
+                                      )
+                                    : AppColor.warningOrange.withValues(
+                                        alpha: 0.15,
+                                      ),
                                 borderRadius: BorderRadius.circular(6.r),
                                 border: Border.all(
                                   color: badge == AppLocaleKey.kbNew.tr()
-                                      ? AppColor.emeraldTeal.withValues(alpha: 0.3)
-                                      : AppColor.warningOrange.withValues(alpha: 0.3),
+                                      ? AppColor.emeraldTeal.withValues(
+                                          alpha: 0.3,
+                                        )
+                                      : AppColor.warningOrange.withValues(
+                                          alpha: 0.3,
+                                        ),
                                 ),
                               ),
                               child: Text(
@@ -139,7 +144,7 @@ class KnowledgeArticleItemWidget extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 11.5.sp,
-                          color: AppColor.whiteColor(context).withValues(alpha: 0.5),
+                          color: AppColor.darkTextColor(context),
                           height: 1.45,
                         ),
                       ),
@@ -154,7 +159,11 @@ class KnowledgeArticleItemWidget extends StatelessWidget {
                                   child: _buildMetaChip(
                                     context,
                                     Icons.schedule_rounded,
-                                    AppLocaleKey.readTime.tr(namedArgs: {'mins': readTimeMins.toString()}),
+                                    AppLocaleKey.readTime.tr(
+                                      namedArgs: {
+                                        'mins': readTimeMins.toString(),
+                                      },
+                                    ),
                                     AppColor.mintTeal,
                                   ),
                                 ),
@@ -163,8 +172,12 @@ class KnowledgeArticleItemWidget extends StatelessWidget {
                                   child: _buildMetaChip(
                                     context,
                                     Icons.update_rounded,
-                                    AppLocaleKey.updatedAgo.tr(namedArgs: {'days': updatedDaysAgo.toString()}),
-                                    AppColor.whiteColor(context).withValues(alpha: 0.35),
+                                    AppLocaleKey.updatedAgo.tr(
+                                      namedArgs: {
+                                        'days': updatedDaysAgo.toString(),
+                                      },
+                                    ),
+                                    AppColor.darkTextColor(context),
                                   ),
                                 ),
                               ],
@@ -175,7 +188,7 @@ class KnowledgeArticleItemWidget extends StatelessWidget {
                             context.locale.languageCode == 'ar'
                                 ? Icons.chevron_left_rounded
                                 : Icons.chevron_right_rounded,
-                            color: AppColor.whiteColor(context).withValues(alpha: 0.25),
+                            color: AppColor.darkTextColor(context),
                             size: 16.sp,
                           ),
                         ],
@@ -191,7 +204,12 @@ class KnowledgeArticleItemWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildMetaChip(BuildContext context, IconData icon, String text, Color color) {
+  Widget _buildMetaChip(
+    BuildContext context,
+    IconData icon,
+    String text,
+    Color color,
+  ) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [

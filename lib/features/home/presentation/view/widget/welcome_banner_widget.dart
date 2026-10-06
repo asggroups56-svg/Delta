@@ -135,7 +135,7 @@ class WelcomeBannerWidget extends StatelessWidget {
                         Container(
                           padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
                           decoration: BoxDecoration(
-                            color: AppColor.whiteColor(context).withValues(alpha: 0.06),
+                            color: AppColor.buttonTextColor(context).withValues(alpha: 0.06),
                             borderRadius: BorderRadius.circular(8.r),
                           ),
                           child: Row(
@@ -144,14 +144,14 @@ class WelcomeBannerWidget extends StatelessWidget {
                               Icon(
                                 Icons.verified_user_outlined,
                                 size: 12.r,
-                                color: AppColor.whiteColor(context).withValues(alpha: 0.6),
+                                color: AppColor.buttonTextColor(context).withValues(alpha: 0.6),
                               ),
                               Gap(4.w),
                               Text(
                                 'Admin',
                                 style: AppTextStyle.caption(context).copyWith(
                                   fontSize: 10.sp,
-                                  color: AppColor.whiteColor(context).withValues(alpha: 0.7),
+                                  color: AppColor.buttonTextColor(context).withValues(alpha: 0.7),
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -175,7 +175,7 @@ class WelcomeBannerWidget extends StatelessWidget {
                                 style: AppTextStyle.text16SDark(context).copyWith(
                                   fontSize: 18.sp,
                                   fontWeight: FontWeight.w800,
-                                  color: AppColor.whiteColor(context),
+                                  color: AppColor.buttonTextColor(context),
                                   letterSpacing: -0.3,
                                 ),
                               ),
@@ -184,7 +184,7 @@ class WelcomeBannerWidget extends StatelessWidget {
                                 AppLocaleKey.dashboardTitle.tr(),
                                 style: AppTextStyle.text12SDark(context).copyWith(
                                   fontSize: 12.sp,
-                                  color: AppColor.whiteColor(context).withValues(alpha: 0.6),
+                                  color: AppColor.buttonTextColor(context).withValues(alpha: 0.6),
                                 ),
                               ),
                             ],
@@ -224,7 +224,7 @@ class WelcomeBannerWidget extends StatelessWidget {
                     // Divider
                     Container(
                       height: 1,
-                      color: AppColor.whiteColor(context).withValues(alpha: 0.08),
+                      color: AppColor.buttonTextColor(context).withValues(alpha: 0.08),
                     ),
 
                     Gap(12.h),
@@ -271,7 +271,7 @@ class WelcomeBannerWidget extends StatelessWidget {
     return Container(
       width: 1,
       height: 24.h,
-      color: AppColor.whiteColor(context).withValues(alpha: 0.08),
+      color: AppColor.buttonTextColor(context).withValues(alpha: 0.08),
     );
   }
 
@@ -300,7 +300,7 @@ class WelcomeBannerWidget extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 11.5.sp,
                     fontWeight: FontWeight.bold,
-                    color: AppColor.whiteColor(context),
+                    color: AppColor.buttonTextColor(context),
                   ),
                 ),
               ),
@@ -313,7 +313,7 @@ class WelcomeBannerWidget extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 9.sp,
-              color: AppColor.whiteColor(context).withValues(alpha: 0.45),
+              color: AppColor.buttonTextColor(context).withValues(alpha: 0.45),
             ),
           ),
         ],

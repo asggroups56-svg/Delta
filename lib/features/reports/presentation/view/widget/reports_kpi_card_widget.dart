@@ -28,11 +28,9 @@ class ReportsKpiCardWidget extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(14.r),
       decoration: BoxDecoration(
-        color: AppColor.darkCardBackground,
+        color: AppColor.cardColor(context),
         borderRadius: BorderRadius.circular(18.r),
-        border: Border.all(
-          color: AppColor.whiteColor(context).withValues(alpha: 0.08),
-        ),
+        border: Border.all(color: AppColor.borderColor(context)),
         boxShadow: [
           BoxShadow(
             color: gradient.first.withValues(alpha: 0.12),
@@ -120,14 +118,14 @@ class ReportsKpiCardWidget extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 11.sp,
-              color: AppColor.whiteColor(context).withValues(alpha: 0.65),
+              color: AppColor.darkTextColor(context),
             ),
           ),
           Gap(4.h),
           Text(
             value,
             style: TextStyle(
-              color: AppColor.whiteColor(context),
+              color: AppColor.titleFormFiledColor(context),
               fontWeight: FontWeight.bold,
               fontSize: 17.sp,
             ),

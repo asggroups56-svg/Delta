@@ -20,11 +20,9 @@ class PurchasesCardWidget extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.all(16.r),
         decoration: BoxDecoration(
-          color: AppColor.darkCardBackground,
+          color: AppColor.cardColor(context),
           borderRadius: BorderRadius.circular(16.r),
-          border: Border.all(
-            color: AppColor.whiteColor(context).withValues(alpha: 0.08),
-          ),
+          border: Border.all(color: AppColor.borderColor(context)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -41,7 +39,7 @@ class PurchasesCardWidget extends StatelessWidget {
                 ),
                 Icon(
                   Icons.more_vert_rounded,
-                  color: AppColor.whiteColor(context).withValues(alpha: 0.54),
+                  color: AppColor.darkTextColor(context),
                   size: 20.r,
                 ),
               ],
@@ -49,10 +47,9 @@ class PurchasesCardWidget extends StatelessWidget {
             Gap(6.h),
             Text(
               AppLocaleKey.purchasesDesc.tr(),
-              style: AppTextStyle.text10SDark(context).copyWith(
-                color: AppColor.whiteColor(context).withValues(alpha: 0.6),
-                height: 1.4,
-              ),
+              style: AppTextStyle.text10SDark(
+                context,
+              ).copyWith(color: AppColor.darkTextColor(context), height: 1.4),
             ),
             Gap(20.h),
             Row(
@@ -67,7 +64,7 @@ class PurchasesCardWidget extends StatelessWidget {
                         Container(
                           padding: EdgeInsets.all(12.r),
                           decoration: BoxDecoration(
-                            color: AppColor.darkSurface,
+                            color: AppColor.cardSurfaceColor(context),
                             borderRadius: BorderRadius.circular(12.r),
                             border: Border.all(
                               color: AppColor.skyBlue.withValues(alpha: 0.3),
@@ -96,9 +93,9 @@ class PurchasesCardWidget extends StatelessWidget {
                   padding: EdgeInsets.symmetric(horizontal: 12.w),
                   child: Text(
                     AppLocaleKey.orLabel.tr(),
-                    style: AppTextStyle.text12SDark(context).copyWith(
-                      color: AppColor.whiteColor(context).withValues(alpha: 0.38),
-                    ),
+                    style: AppTextStyle.text12SDark(
+                      context,
+                    ).copyWith(color: AppColor.darkTextColor(context)),
                   ),
                 ),
                 // Upload File Option
@@ -110,10 +107,12 @@ class PurchasesCardWidget extends StatelessWidget {
                         Container(
                           padding: EdgeInsets.all(12.r),
                           decoration: BoxDecoration(
-                            color: AppColor.darkSurface,
+                            color: AppColor.cardSurfaceColor(context),
                             borderRadius: BorderRadius.circular(12.r),
                             border: Border.all(
-                              color: const Color(0xFFFDCB6E).withValues(alpha: 0.3),
+                              color: const Color(
+                                0xFFFDCB6E,
+                              ).withValues(alpha: 0.3),
                             ),
                           ),
                           child: Icon(
@@ -124,10 +123,16 @@ class PurchasesCardWidget extends StatelessWidget {
                         ),
                         Gap(8.h),
                         Container(
-                          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 6.h),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 20.w,
+                            vertical: 6.h,
+                          ),
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
-                              colors: [const Color(0xFF8E44AD), AppColor.purpleAccent],
+                              colors: [
+                                const Color(0xFF8E44AD),
+                                AppColor.purpleAccent,
+                              ],
                             ),
                             borderRadius: BorderRadius.circular(10.r),
                           ),
@@ -136,7 +141,7 @@ class PurchasesCardWidget extends StatelessWidget {
                             style: AppTextStyle.text10SDark(context).copyWith(
                               fontSize: 11.sp,
                               fontWeight: FontWeight.bold,
-                              color: AppColor.whiteColor(context),
+                              color: AppColor.buttonTextColor(context),
                             ),
                           ),
                         ),

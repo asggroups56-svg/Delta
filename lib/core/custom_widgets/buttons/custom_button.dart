@@ -70,7 +70,7 @@ class CustomButton extends StatelessWidget {
             child: Center(
               child: cubitState?.isLoading == true
                   ? CupertinoActivityIndicator(
-                      color: AppColor.whiteColor(context),
+                      color: AppColor.buttonTextColor(context),
                     )
                   : Row(
                       mainAxisAlignment: MainAxisAlignment.center,

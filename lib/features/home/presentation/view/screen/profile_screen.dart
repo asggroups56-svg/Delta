@@ -1,9 +1,12 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:my_template/core/theme/app_colors.dart';
+import 'package:my_template/core/theme/cubit/app_theme_cubit.dart';
+import 'package:my_template/core/theme/theme_enum.dart';
 import 'package:my_template/core/utils/app_locale_key.dart';
 import 'package:my_template/features/home/presentation/view/widget/ai_chat_bottom_sheet_widget.dart';
 
@@ -11,11 +14,7 @@ class ProfileScreen extends StatefulWidget {
   final VoidCallback? onLogout;
   final VoidCallback? onToggleLanguage;
 
-  const ProfileScreen({
-    super.key,
-    this.onLogout,
-    this.onToggleLanguage,
-  });
+  const ProfileScreen({super.key, this.onLogout, this.onToggleLanguage});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -24,7 +23,6 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   bool _notificationsEnabled = true;
   bool _biometricEnabled = false;
-  bool _darkModeEnabled = true;
 
   void _openAiChat() {
     showModalBottomSheet(
@@ -37,8 +35,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = context.watch<AppThemeCubit>().theme == ThemeEnum.dark;
+
     return Scaffold(
-      backgroundColor: AppColor.darkBackground,
+      backgroundColor: AppColor.scaffoldColor(context),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Column(
@@ -66,7 +66,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               duration: const Duration(milliseconds: 400),
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20.w),
-                child: _buildSectionTitle(context, 'Account Settings', Icons.manage_accounts_outlined),
+                child: _buildSectionTitle(
+                  context,
+                  'Account Settings',
+                  Icons.manage_accounts_outlined,
+                ),
               ),
             ),
             Gap(10.h),
@@ -82,7 +86,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     iconColor: AppColor.emeraldTeal,
                     title: 'Ahmed Al-Rashidi',
                     subtitle: 'System Administrator',
-                    trailing: _buildChip(context, 'Admin', AppColor.emeraldTeal),
+                    trailing: _buildChip(
+                      context,
+                      'Admin',
+                      AppColor.emeraldTeal,
+                    ),
                   ),
                   _buildDivider(context),
                   _buildProfileTile(
@@ -100,7 +108,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     iconColor: AppColor.purpleAccent,
                     title: 'admin@delta-erp.sa',
                     subtitle: 'Primary Email · Verified',
-                    trailing: Icon(Icons.verified_rounded, color: AppColor.emeraldTeal, size: 16.r),
+                    trailing: Icon(
+                      Icons.verified_rounded,
+                      color: AppColor.emeraldTeal,
+                      size: 16.r,
+                    ),
                   ),
                 ]),
               ),
@@ -114,7 +126,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               duration: const Duration(milliseconds: 400),
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20.w),
-                child: _buildSectionTitle(context, 'Preferences', Icons.tune_rounded),
+                child: _buildSectionTitle(
+                  context,
+                  'Preferences',
+                  Icons.tune_rounded,
+                ),
               ),
             ),
             Gap(10.h),
@@ -146,12 +162,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   _buildDivider(context),
                   _buildToggleTile(
                     context,
-                    icon: Icons.dark_mode_outlined,
+                    icon: isDarkMode
+                        ? Icons.dark_mode_outlined
+                        : Icons.light_mode_outlined,
                     iconColor: AppColor.purpleAccent,
-                    title: 'Dark Mode',
-                    subtitle: 'Always-on dark interface',
-                    value: _darkModeEnabled,
-                    onChanged: (v) => setState(() => _darkModeEnabled = v),
+                    title: AppLocaleKey.appTheme.tr(),
+                    subtitle:
+                        '${AppLocaleKey.themeModeSubtitle.tr()} · ${isDarkMode ? AppLocaleKey.darkMode.tr() : AppLocaleKey.lightMode.tr()}',
+                    value: isDarkMode,
+                    onChanged: (isDark) {
+                      context.read<AppThemeCubit>().setTheme(
+                        isDark ? ThemeEnum.dark : ThemeEnum.light,
+                      );
+                    },
                   ),
                   _buildDivider(context),
                   _buildActionTile(
@@ -159,7 +182,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     icon: Icons.language_rounded,
                     iconColor: AppColor.skyBlue,
                     title: 'Language / اللغة',
-                    subtitle: context.locale.languageCode == 'ar' ? 'العربية' : 'English',
+                    subtitle: context.locale.languageCode == 'ar'
+                        ? 'العربية'
+                        : 'English',
                     onTap: widget.onToggleLanguage,
                   ),
                 ]),
@@ -186,7 +211,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               duration: const Duration(milliseconds: 400),
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20.w),
-                child: _buildSectionTitle(context, 'System', Icons.settings_outlined),
+                child: _buildSectionTitle(
+                  context,
+                  'System',
+                  Icons.settings_outlined,
+                ),
               ),
             ),
             Gap(10.h),
@@ -251,17 +280,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       width: double.infinity,
       padding: EdgeInsets.fromLTRB(20.w, 56.h, 20.w, 28.h),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF16202E), Color(0xFF0D121B)],
-        ),
+        color: AppColor.cardColor(context),
         borderRadius: BorderRadius.vertical(bottom: Radius.circular(28.r)),
         border: Border(
-          bottom: BorderSide(
-            color: Colors.white.withValues(alpha: 0.06),
-            width: 1,
-          ),
+          bottom: BorderSide(color: AppColor.borderColor(context), width: 1),
         ),
       ),
       child: Column(
@@ -289,13 +311,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   child: CircleAvatar(
                     radius: 36.r,
-                    backgroundColor: const Color(0xFF1B2431),
+                    backgroundColor: AppColor.cardSurfaceColor(context),
                     child: Text(
                       'A',
                       style: TextStyle(
                         fontSize: 28.sp,
                         fontWeight: FontWeight.w800,
-                        color: Colors.white,
+                        color: AppColor.titleFormFiledColor(context),
                         fontFamily: 'Tajawal',
                       ),
                     ),
@@ -311,7 +333,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       color: const Color(0xFF00E676),
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: const Color(0xFF16202E),
+                        color: AppColor.cardColor(context),
                         width: 2,
                       ),
                     ),
@@ -329,7 +351,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               style: TextStyle(
                 fontSize: 18.sp,
                 fontWeight: FontWeight.w800,
-                color: Colors.white,
+                color: AppColor.titleFormFiledColor(context),
                 fontFamily: 'Tajawal',
                 letterSpacing: -0.3,
               ),
@@ -355,7 +377,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   'System Administrator · Delta Enterprise',
                   style: TextStyle(
                     fontSize: 11.sp,
-                    color: Colors.white.withValues(alpha: 0.55),
+                    color: AppColor.darkTextColor(context),
                     fontFamily: 'Tajawal',
                   ),
                 ),
@@ -378,7 +400,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.workspace_premium_rounded, color: AppColor.emeraldTeal, size: 13.r),
+                  Icon(
+                    Icons.workspace_premium_rounded,
+                    color: AppColor.emeraldTeal,
+                    size: 13.r,
+                  ),
                   Gap(5.w),
                   Text(
                     'Enterprise License · Active',
@@ -411,7 +437,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildStatCard(BuildContext context, String value, String label, Color color) {
+  Widget _buildStatCard(
+    BuildContext context,
+    String value,
+    String label,
+    Color color,
+  ) {
     return Expanded(
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 14.h),
@@ -437,7 +468,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               label,
               style: TextStyle(
                 fontSize: 10.sp,
-                color: Colors.white.withValues(alpha: 0.45),
+                color: AppColor.darkTextColor(context),
                 fontFamily: 'Tajawal',
               ),
             ),
@@ -451,14 +482,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildSectionTitle(BuildContext context, String title, IconData icon) {
     return Row(
       children: [
-        Icon(icon, color: Colors.white.withValues(alpha: 0.4), size: 16.r),
+        Icon(icon, color: AppColor.darkTextColor(context), size: 16.r),
         Gap(6.w),
         Text(
           title,
           style: TextStyle(
             fontSize: 12.sp,
             fontWeight: FontWeight.w700,
-            color: Colors.white.withValues(alpha: 0.55),
+            color: AppColor.darkTextColor(context),
             fontFamily: 'Tajawal',
             letterSpacing: 0.5,
           ),
@@ -471,11 +502,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildSettingsCard(BuildContext context, List<Widget> children) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF131B26),
+        color: AppColor.cardColor(context),
         borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.06),
-        ),
+        border: Border.all(color: AppColor.borderColor(context)),
       ),
       child: Column(children: children),
     );
@@ -484,7 +513,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildDivider(BuildContext context) {
     return Divider(
       height: 1,
-      color: Colors.white.withValues(alpha: 0.05),
+      color: AppColor.borderColor(context),
       indent: 54.w,
       endIndent: 0,
     );
@@ -520,7 +549,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   style: TextStyle(
                     fontSize: 13.sp,
                     fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                    color: AppColor.titleFormFiledColor(context),
                     fontFamily: 'Tajawal',
                   ),
                 ),
@@ -528,7 +557,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   subtitle,
                   style: TextStyle(
                     fontSize: 10.5.sp,
-                    color: Colors.white.withValues(alpha: 0.45),
+                    color: AppColor.darkTextColor(context),
                     fontFamily: 'Tajawal',
                   ),
                 ),
@@ -572,7 +601,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   style: TextStyle(
                     fontSize: 13.sp,
                     fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                    color: AppColor.titleFormFiledColor(context),
                     fontFamily: 'Tajawal',
                   ),
                 ),
@@ -580,7 +609,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   subtitle,
                   style: TextStyle(
                     fontSize: 10.5.sp,
-                    color: Colors.white.withValues(alpha: 0.45),
+                    color: AppColor.darkTextColor(context),
                     fontFamily: 'Tajawal',
                   ),
                 ),
@@ -594,8 +623,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               onChanged: onChanged,
               activeThumbColor: iconColor,
               activeTrackColor: iconColor.withValues(alpha: 0.3),
-              inactiveThumbColor: Colors.white.withValues(alpha: 0.3),
-              inactiveTrackColor: Colors.white.withValues(alpha: 0.08),
+              inactiveThumbColor: AppColor.darkTextColor(context),
+              inactiveTrackColor: AppColor.borderColor(context),
             ),
           ),
         ],
@@ -636,7 +665,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     style: TextStyle(
                       fontSize: 13.sp,
                       fontWeight: FontWeight.w600,
-                      color: Colors.white,
+                      color: AppColor.titleFormFiledColor(context),
                       fontFamily: 'Tajawal',
                     ),
                   ),
@@ -644,7 +673,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     subtitle,
                     style: TextStyle(
                       fontSize: 10.5.sp,
-                      color: Colors.white.withValues(alpha: 0.45),
+                      color: AppColor.darkTextColor(context),
                       fontFamily: 'Tajawal',
                     ),
                   ),
@@ -653,7 +682,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             Icon(
               Icons.chevron_right_rounded,
-              color: Colors.white.withValues(alpha: 0.2),
+              color: AppColor.darkTextColor(context).withValues(alpha: 0.4),
               size: 18.r,
             ),
           ],
@@ -719,7 +748,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ],
               ),
-              child: Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 22.r),
+              child: Icon(
+                Icons.auto_awesome_rounded,
+                color: Colors.white,
+                size: 22.r,
+              ),
             ),
             Gap(14.w),
             Expanded(
@@ -731,7 +764,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     style: TextStyle(
                       fontSize: 13.sp,
                       fontWeight: FontWeight.w700,
-                      color: Colors.white,
+                      color: AppColor.titleFormFiledColor(context),
                       fontFamily: 'Tajawal',
                     ),
                   ),
@@ -739,7 +772,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     'Ask anything about your business data',
                     style: TextStyle(
                       fontSize: 10.5.sp,
-                      color: Colors.white.withValues(alpha: 0.55),
+                      color: AppColor.darkTextColor(context),
                       fontFamily: 'Tajawal',
                     ),
                   ),
@@ -751,7 +784,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
               decoration: BoxDecoration(
                 color: AppColor.purpleAccent.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(10.r),
-                border: Border.all(color: AppColor.purpleAccent.withValues(alpha: 0.4)),
+                border: Border.all(
+                  color: AppColor.purpleAccent.withValues(alpha: 0.4),
+                ),
               ),
               child: Text(
                 'Open',
@@ -786,7 +821,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.logout_rounded, color: const Color(0xFFFF7675), size: 18.r),
+            Icon(
+              Icons.logout_rounded,
+              color: const Color(0xFFFF7675),
+              size: 18.r,
+            ),
             Gap(8.w),
             Text(
               AppLocaleKey.logout.tr(),

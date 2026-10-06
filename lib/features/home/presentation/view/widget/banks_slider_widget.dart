@@ -10,10 +10,7 @@ import 'package:my_template/features/home/data/models/banks_data_model.dart';
 class BanksSliderWidget extends StatefulWidget {
   final List<BANKSDATAModel>? banks;
 
-  const BanksSliderWidget({
-    super.key,
-    this.banks,
-  });
+  const BanksSliderWidget({super.key, this.banks});
 
   @override
   State<BanksSliderWidget> createState() => _BanksSliderWidgetState();
@@ -38,7 +35,9 @@ class _BanksSliderWidgetState extends State<BanksSliderWidget> {
   @override
   void didUpdateWidget(covariant BanksSliderWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.banks != oldWidget.banks && widget.banks != null && widget.banks!.isNotEmpty) {
+    if (widget.banks != oldWidget.banks &&
+        widget.banks != null &&
+        widget.banks!.isNotEmpty) {
       setState(() {
         _bankList = widget.banks!;
       });
@@ -99,11 +98,9 @@ class _BanksSliderWidgetState extends State<BanksSliderWidget> {
     return Container(
       height: 48.h,
       decoration: BoxDecoration(
-        color: AppColor.darkSurface.withValues(alpha: 0.5),
+        color: AppColor.cardSurfaceColor(context),
         borderRadius: BorderRadius.circular(14.r),
-        border: Border.all(
-          color: AppColor.whiteColor(context).withValues(alpha: 0.05),
-        ),
+        border: Border.all(color: AppColor.borderColor(context)),
       ),
       child: ListView.builder(
         controller: _scrollController,
@@ -141,7 +138,7 @@ class _BanksSliderWidgetState extends State<BanksSliderWidget> {
                   child: Text(
                     logoText,
                     style: TextStyle(
-                      color: AppColor.whiteColor(context),
+                      color: AppColor.buttonTextColor(context),
                       fontSize: 12.sp,
                       fontWeight: FontWeight.w900,
                     ),
@@ -155,7 +152,7 @@ class _BanksSliderWidgetState extends State<BanksSliderWidget> {
                     Text(
                       displayName,
                       style: AppTextStyle.bodySmall(context).copyWith(
-                        color: AppColor.whiteColor(context).withValues(alpha: 0.9),
+                        color: AppColor.titleFormFiledColor(context),
                         fontWeight: FontWeight.bold,
                         fontSize: 12.sp,
                       ),

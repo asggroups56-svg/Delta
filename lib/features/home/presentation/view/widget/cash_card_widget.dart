@@ -17,9 +17,9 @@ class CashCardWidget extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.all(16.r),
         decoration: BoxDecoration(
-          color: const Color(0xFF131B26),
+          color: AppColor.cardColor(context),
           borderRadius: BorderRadius.circular(16.r),
-          border: Border.all(color: AppColor.whiteColor(context).withValues(alpha: 0.08)),
+          border: Border.all(color: AppColor.borderColor(context)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -29,15 +29,27 @@ class CashCardWidget extends StatelessWidget {
               children: [
                 Text(
                   'cashCard'.tr(),
-                  style: AppTextStyle.bodyMedium(context).copyWith(fontSize: 16.sp, fontWeight: FontWeight.bold, color: const Color(0xFF00B894)),
+                  style: AppTextStyle.bodyMedium(context).copyWith(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF00B894),
+                  ),
                 ),
-                Icon(Icons.more_vert_rounded, color: AppColor.whiteColor(context).withValues(alpha: 0.54), size: 20.r),
+                Icon(
+                  Icons.more_vert_rounded,
+                  color: AppColor.darkTextColor(context),
+                  size: 20.r,
+                ),
               ],
             ),
             Gap(6.h),
             Text(
               'cashDesc'.tr(),
-              style: AppTextStyle.bodySmall(context).copyWith(fontSize: 11.sp, color: AppColor.whiteColor(context).withValues(alpha: 0.6), height: 1.4),
+              style: AppTextStyle.bodySmall(context).copyWith(
+                fontSize: 11.sp,
+                color: AppColor.darkTextColor(context),
+                height: 1.4,
+              ),
             ),
           ],
         ),

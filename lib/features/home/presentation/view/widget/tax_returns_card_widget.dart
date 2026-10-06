@@ -25,9 +25,9 @@ class TaxReturnsCardWidget extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.all(16.r),
         decoration: BoxDecoration(
-          color: AppColor.darkCardBackground,
+          color: AppColor.cardColor(context),
           borderRadius: BorderRadius.circular(16.r),
-          border: Border.all(color: AppColor.whiteColor(context).withValues(alpha: 0.08)),
+          border: Border.all(color: AppColor.borderColor(context)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -37,9 +37,17 @@ class TaxReturnsCardWidget extends StatelessWidget {
               children: [
                 Text(
                   AppLocaleKey.taxReturnsCard.tr(),
-                  style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold, color: AppColor.emeraldTeal),
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.bold,
+                    color: AppColor.emeraldTeal,
+                  ),
                 ),
-                Icon(Icons.more_vert_rounded, color: AppColor.whiteColor(context).withValues(alpha: 0.54), size: 20.r),
+                Icon(
+                  Icons.more_vert_rounded,
+                  color: AppColor.darkTextColor(context),
+                  size: 20.r,
+                ),
               ],
             ),
             Gap(14.h),
@@ -48,15 +56,30 @@ class TaxReturnsCardWidget extends StatelessWidget {
               child: GestureDetector(
                 onTap: onTap,
                 child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 20.w,
+                    vertical: 10.h,
+                  ),
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(colors: [const Color(0xFF8E44AD), AppColor.purpleAccent]),
+                    gradient: LinearGradient(
+                      colors: [const Color(0xFF8E44AD), AppColor.purpleAccent],
+                    ),
                     borderRadius: BorderRadius.circular(10.r),
-                    boxShadow: [BoxShadow(color: AppColor.purpleAccent.withValues(alpha: 0.4), blurRadius: 10, offset: const Offset(0, 3))],
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColor.purpleAccent.withValues(alpha: 0.4),
+                        blurRadius: 10,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
                   ),
                   child: Text(
                     AppLocaleKey.newBtn.tr(),
-                    style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.bold, color: AppColor.whiteColor(context)),
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.bold,
+                      color: AppColor.buttonTextColor(context),
+                    ),
                   ),
                 ),
               ),
@@ -74,7 +97,10 @@ class TaxReturnsCardWidget extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: const Color(0xFF2C3E50),
                           shape: BoxShape.circle,
-                          border: Border.all(color: AppColor.emeraldTeal, width: 2),
+                          border: Border.all(
+                            color: AppColor.emeraldTeal,
+                            width: 2,
+                          ),
                         ),
                       ),
                       Gap(10.w),

@@ -12,20 +12,38 @@ class ReportsDonutChartWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<Map<String, dynamic>> segments = [
-      {'name': 'Cloud ERP & Licenses', 'pct': 42, 'color': AppColor.emeraldTeal, 'amount': '584,200'},
-      {'name': 'POS & Hardware Systems', 'pct': 28, 'color': AppColor.oceanBlue, 'amount': '389,500'},
-      {'name': 'Support & Maintenance', 'pct': 18, 'color': AppColor.purpleAccent, 'amount': '250,400'},
-      {'name': 'Consulting & Setup', 'pct': 12, 'color': AppColor.warningOrange, 'amount': '166,900'},
+      {
+        'name': 'Cloud ERP & Licenses',
+        'pct': 42,
+        'color': AppColor.emeraldTeal,
+        'amount': '584,200',
+      },
+      {
+        'name': 'POS & Hardware Systems',
+        'pct': 28,
+        'color': AppColor.oceanBlue,
+        'amount': '389,500',
+      },
+      {
+        'name': 'Support & Maintenance',
+        'pct': 18,
+        'color': AppColor.purpleAccent,
+        'amount': '250,400',
+      },
+      {
+        'name': 'Consulting & Setup',
+        'pct': 12,
+        'color': AppColor.warningOrange,
+        'amount': '166,900',
+      },
     ];
 
     return Container(
       padding: EdgeInsets.all(18.r),
       decoration: BoxDecoration(
-        color: AppColor.darkCardBackground,
+        color: AppColor.cardColor(context),
         borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(
-          color: AppColor.whiteColor(context).withValues(alpha: 0.08),
-        ),
+        border: Border.all(color: AppColor.borderColor(context)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.25),
@@ -40,7 +58,7 @@ class ReportsDonutChartWidget extends StatelessWidget {
           Text(
             AppLocaleKey.salesByCategoryTitle.tr(),
             style: TextStyle(
-              color: AppColor.whiteColor(context),
+              color: AppColor.titleFormFiledColor(context),
               fontSize: 14.sp,
               fontWeight: FontWeight.bold,
             ),
@@ -67,7 +85,7 @@ class ReportsDonutChartWidget extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 14.sp,
                             fontWeight: FontWeight.bold,
-                            color: AppColor.whiteColor(context),
+                            color: AppColor.titleFormFiledColor(context),
                           ),
                         ),
                         Text(
@@ -114,8 +132,7 @@ class ReportsDonutChartWidget extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 fontSize: 11.sp,
-                                color: AppColor.whiteColor(context)
-                                    .withValues(alpha: 0.8),
+                                color: AppColor.darkTextColor(context),
                               ),
                             ),
                           ),

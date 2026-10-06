@@ -19,7 +19,7 @@ final Color color;
             width: 270.w,
             padding: EdgeInsets.all(20.r),
             decoration: BoxDecoration(
-              color: AppColor.whiteColor(context),
+              color: AppColor.buttonTextColor(context),
               borderRadius: BorderRadius.circular(24.r),
               boxShadow: [
                 BoxShadow(

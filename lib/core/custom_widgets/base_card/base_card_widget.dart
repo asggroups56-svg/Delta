@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:my_template/core/theme/app_colors.dart';
 import 'package:my_template/core/theme/app_decorations.dart';
 import 'package:my_template/core/theme/app_padding.dart';
 import 'package:my_template/core/theme/app_shadows.dart';
-
 
 /// Base widget for dashboard-style cards
 /// Eliminates duplication across similar card widgets (SalesCard, TaxCard, etc.)
@@ -42,7 +42,7 @@ class BaseCard extends StatelessWidget {
                 boxShadow: shadows,
               )
             : AppDecorations.cardDecoration(
-                backgroundColor: backgroundColor ?? AppColors.darkCardBackground,
+                backgroundColor: backgroundColor ?? AppColor.cardColor(context),
                 radius: radius ?? 16,
                 boxShadow: shadows ?? AppShadows.card,
               ),
@@ -82,15 +82,9 @@ class StructuredCard extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (header != null) ...[
-            header!,
-            SizedBox(height: AppSpacing.md.h),
-          ],
+          if (header != null) ...[header!, SizedBox(height: AppSpacing.md.h)],
           body,
-          if (footer != null) ...[
-            SizedBox(height: AppSpacing.md.h),
-            footer!,
-          ],
+          if (footer != null) ...[SizedBox(height: AppSpacing.md.h), footer!],
         ],
       ),
     );
@@ -132,10 +126,7 @@ class SectionHeader extends StatelessWidget {
             ],
           ),
         ),
-        if (action != null) ...[
-          SizedBox(width: AppSpacing.md.w),
-          action!,
-        ],
+        if (action != null) ...[SizedBox(width: AppSpacing.md.w), action!],
       ],
     );
   }
@@ -215,11 +206,6 @@ class StatusBadge extends StatelessWidget {
       ),
     );
   }
-}
-
-/// Constant colors for card components
-class AppColors {
-  static const Color darkCardBackground = Color(0xFF131B26);
 }
 
 /// Spacing helper for cards

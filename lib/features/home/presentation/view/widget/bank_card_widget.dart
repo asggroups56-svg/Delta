@@ -19,11 +19,9 @@ class BankCardWidget extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.all(16.r),
         decoration: BoxDecoration(
-          color: AppColor.darkCardBackground,
+          color: AppColor.cardColor(context),
           borderRadius: BorderRadius.circular(16.r),
-          border: Border.all(
-            color: AppColor.whiteColor(context).withValues(alpha: 0.08),
-          ),
+          border: Border.all(color: AppColor.borderColor(context)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -41,7 +39,7 @@ class BankCardWidget extends StatelessWidget {
                 ),
                 Icon(
                   Icons.more_vert_rounded,
-                  color: AppColor.whiteColor(context).withValues(alpha: 0.54),
+                  color: AppColor.darkTextColor(context),
                   size: 20.r,
                 ),
               ],
@@ -51,7 +49,7 @@ class BankCardWidget extends StatelessWidget {
               AppLocaleKey.bankDesc.tr(),
               style: AppTextStyle.bodySmall(context).copyWith(
                 fontSize: 11.sp,
-                color: AppColor.whiteColor(context).withValues(alpha: 0.6),
+                color: AppColor.darkTextColor(context),
                 height: 1.4,
               ),
             ),
@@ -87,18 +85,16 @@ class BankCardWidget extends StatelessWidget {
                   child: Container(
                     padding: EdgeInsets.symmetric(vertical: 8.h),
                     decoration: BoxDecoration(
-                      color: AppColor.darkSurface,
+                      color: AppColor.cardSurfaceColor(context),
                       borderRadius: BorderRadius.circular(10.r),
-                      border: Border.all(
-                        color: AppColor.whiteColor(context).withValues(alpha: 0.12),
-                      ),
+                      border: Border.all(color: AppColor.borderColor(context)),
                     ),
                     child: Center(
                       child: Text(
                         AppLocaleKey.importStatement.tr(),
                         style: AppTextStyle.bodySmall(context).copyWith(
                           fontSize: 11.sp,
-                          color: AppColor.whiteColor(context).withValues(alpha: 0.7),
+                          color: AppColor.darkTextColor(context),
                         ),
                       ),
                     ),

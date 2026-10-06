@@ -14,7 +14,8 @@ class AiChatBottomSheetWidget extends StatefulWidget {
   const AiChatBottomSheetWidget({super.key});
 
   @override
-  State<AiChatBottomSheetWidget> createState() => _AiChatBottomSheetWidgetState();
+  State<AiChatBottomSheetWidget> createState() =>
+      _AiChatBottomSheetWidgetState();
 }
 
 class _AiChatBottomSheetWidgetState extends State<AiChatBottomSheetWidget> {
@@ -35,10 +36,7 @@ class _AiChatBottomSheetWidgetState extends State<AiChatBottomSheetWidget> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (_messages.isEmpty) {
-      _messages.add({
-        'role': 'ai',
-        'text': AppLocaleKey.aiWelcomeMessage.tr(),
-      });
+      _messages.add({'role': 'ai', 'text': AppLocaleKey.aiWelcomeMessage.tr()});
     }
   }
 
@@ -47,15 +45,20 @@ class _AiChatBottomSheetWidgetState extends State<AiChatBottomSheetWidget> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppColor.darkCardBackground,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+        backgroundColor: AppColor.cardColor(ctx),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16.r),
+        ),
         title: Row(
           children: [
             Icon(Icons.key_rounded, color: AppColor.emeraldTeal, size: 22.r),
             Gap(8.w),
             Text(
               'Google AI Studio Key',
-              style: AppTextStyle.bodyMedium(ctx).copyWith(color: AppColor.whiteColor(ctx), fontWeight: FontWeight.bold),
+              style: AppTextStyle.bodyMedium(ctx).copyWith(
+                color: AppColor.whiteColor(ctx),
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ],
         ),
@@ -65,18 +68,27 @@ class _AiChatBottomSheetWidgetState extends State<AiChatBottomSheetWidget> {
           children: [
             Text(
               'أدخل مفتاح API الخاص بك من Google AI Studio لتفعيل نموذج Gemini المباشر:',
-              style: AppTextStyle.bodySmall(ctx).copyWith(color: AppColor.whiteColor(ctx).withValues(alpha: 0.7)),
+              style: AppTextStyle.bodySmall(ctx).copyWith(
+                color: AppColor.whiteColor(ctx).withValues(alpha: 0.7),
+              ),
             ),
             Gap(12.h),
             TextField(
               controller: keyController,
-              style: AppTextStyle.bodySmall(ctx).copyWith(color: AppColor.whiteColor(ctx)),
+              style: AppTextStyle.bodySmall(
+                ctx,
+              ).copyWith(color: AppColor.whiteColor(ctx)),
               decoration: InputDecoration(
                 hintText: 'AIzaSy...',
-                hintStyle: AppTextStyle.bodySmall(ctx).copyWith(color: AppColor.whiteColor(ctx).withValues(alpha: 0.3)),
+                hintStyle: AppTextStyle.bodySmall(ctx).copyWith(
+                  color: AppColor.whiteColor(ctx).withValues(alpha: 0.3),
+                ),
                 filled: true,
-                fillColor: AppColor.darkSurface,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10.r), borderSide: BorderSide.none),
+                fillColor: AppColor.cardSurfaceColor(ctx),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.r),
+                  borderSide: BorderSide.none,
+                ),
               ),
             ),
           ],
@@ -84,10 +96,17 @@ class _AiChatBottomSheetWidgetState extends State<AiChatBottomSheetWidget> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('إلغاء', style: AppTextStyle.bodySmall(ctx).copyWith(color: AppColor.whiteColor(ctx).withValues(alpha: 0.6))),
+            child: Text(
+              'إلغاء',
+              style: AppTextStyle.bodySmall(ctx).copyWith(
+                color: AppColor.whiteColor(ctx).withValues(alpha: 0.6),
+              ),
+            ),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: AppColor.emeraldTeal),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColor.emeraldTeal,
+            ),
             onPressed: () {
               GeminiService.apiKey = keyController.text.trim();
               Navigator.pop(ctx);
@@ -98,7 +117,13 @@ class _AiChatBottomSheetWidgetState extends State<AiChatBottomSheetWidget> {
                 ),
               );
             },
-            child: Text('حفظ', style: AppTextStyle.bodyMedium(ctx).copyWith(fontWeight: FontWeight.bold, color: AppColor.whiteColor(ctx))),
+            child: Text(
+              'حفظ',
+              style: AppTextStyle.bodyMedium(ctx).copyWith(
+                fontWeight: FontWeight.bold,
+                color: AppColor.whiteColor(ctx),
+              ),
+            ),
           ),
         ],
       ),
@@ -138,7 +163,8 @@ class _AiChatBottomSheetWidgetState extends State<AiChatBottomSheetWidget> {
         _isThinking = false;
         _messages.add({
           'role': 'ai',
-          'text': 'حصل خطأ أثناء الاتصال بالنموذج، تأكد من الإنترنت أو من مفتاح الـ API وحاول تاني.',
+          'text':
+              'حصل خطأ أثناء الاتصال بالنموذج، تأكد من الإنترنت أو من مفتاح الـ API وحاول تاني.',
           'isError': 'true',
         });
       });
@@ -181,7 +207,8 @@ class _AiChatBottomSheetWidgetState extends State<AiChatBottomSheetWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final List<Map<String, String>> suggestions = context.locale.languageCode == 'ar'
+    final List<Map<String, String>> suggestions =
+        context.locale.languageCode == 'ar'
         ? [
             {'label': 'ما هي عاصمة اليمن؟', 'query': 'ما هي عاصمة اليمن؟'},
             {'label': 'ماهي عاصمة مصر؟', 'query': 'ماهي عاصمة مصر؟'},
@@ -189,18 +216,33 @@ class _AiChatBottomSheetWidgetState extends State<AiChatBottomSheetWidget> {
             {'label': 'ما هي عاصمة فلسطين؟', 'query': 'ما هي عاصمة فلسطين؟'},
           ]
         : [
-            {'label': 'What is capital of Yemen?', 'query': 'What is capital of Yemen?'},
-            {'label': 'What is capital of Egypt?', 'query': 'What is capital of Egypt?'},
-            {'label': 'Calculate VAT for 2000 SAR', 'query': 'Calculate VAT for 2000 SAR'},
-            {'label': 'What is capital of Palestine?', 'query': 'What is capital of Palestine?'},
+            {
+              'label': 'What is capital of Yemen?',
+              'query': 'What is capital of Yemen?',
+            },
+            {
+              'label': 'What is capital of Egypt?',
+              'query': 'What is capital of Egypt?',
+            },
+            {
+              'label': 'Calculate VAT for 2000 SAR',
+              'query': 'Calculate VAT for 2000 SAR',
+            },
+            {
+              'label': 'What is capital of Palestine?',
+              'query': 'What is capital of Palestine?',
+            },
           ];
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.75,
       decoration: BoxDecoration(
-        color: AppColor.darkCardBackground,
-        borderRadius: BorderRadius.only(topLeft: Radius.circular(24.r), topRight: Radius.circular(24.r)),
-        border: Border.all(color: AppColor.whiteColor(context).withValues(alpha: 0.08)),
+        color: AppColor.cardColor(context),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(24.r),
+          topRight: Radius.circular(24.r),
+        ),
+        border: Border.all(color: AppColor.borderColor(context)),
       ),
       child: Column(
         children: [
@@ -209,45 +251,75 @@ class _AiChatBottomSheetWidgetState extends State<AiChatBottomSheetWidget> {
               margin: EdgeInsets.only(top: 10.h, bottom: 4.h),
               width: 40.w,
               height: 4.h,
-              decoration: BoxDecoration(color: AppColor.whiteColor(context).withValues(alpha: 0.24), borderRadius: BorderRadius.circular(4.r)),
+              decoration: BoxDecoration(
+                color: AppColor.whiteColor(context).withValues(alpha: 0.24),
+                borderRadius: BorderRadius.circular(4.r),
+              ),
             ),
           ),
           Container(
             padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
             decoration: BoxDecoration(
-              color: const Color(0xFF171F2B),
-              borderRadius: BorderRadius.only(topLeft: Radius.circular(24.r), topRight: Radius.circular(24.r)),
+              color: AppColor.cardSurfaceColor(context),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(24.r),
+                topRight: Radius.circular(24.r),
+              ),
             ),
             child: Row(
               children: [
                 Container(
                   padding: EdgeInsets.all(8.r),
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(colors: [AppColor.purpleAccent, AppColor.emeraldTeal]),
+                    gradient: LinearGradient(
+                      colors: [AppColor.purpleAccent, AppColor.emeraldTeal],
+                    ),
                     borderRadius: BorderRadius.circular(10.r),
                   ),
-                  child: Icon(Icons.auto_awesome_rounded, color: AppColor.whiteColor(context), size: 18.r),
+                  child: Icon(
+                    Icons.auto_awesome_rounded,
+                    color: AppColor.buttonTextColor(context),
+                    size: 18.r,
+                  ),
                 ),
                 Gap(10.w),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(AppLocaleKey.aiAssistantTitle.tr(),
-                          style: AppTextStyle.bodyMedium(context).copyWith(fontWeight: FontWeight.bold, color: AppColor.whiteColor(context))),
-                      Text('Google AI Studio • Gemini',
-                          style: AppTextStyle.bodySmall(context).copyWith(color: AppColor.emeraldTeal, fontWeight: FontWeight.bold)),
+                      Text(
+                        AppLocaleKey.aiAssistantTitle.tr(),
+                        style: AppTextStyle.bodyMedium(context).copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: AppColor.titleFormFiledColor(context),
+                        ),
+                      ),
+                      Text(
+                        'Google AI Studio • Gemini',
+                        style: AppTextStyle.bodySmall(context).copyWith(
+                          color: AppColor.emeraldTeal,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ],
                   ),
                 ),
                 IconButton(
                   onPressed: _showApiKeyDialog,
-                  icon: Icon(Icons.key_rounded, color: AppColor.emeraldTeal, size: 20.r),
+                  icon: Icon(
+                    Icons.key_rounded,
+                    color: AppColor.emeraldTeal,
+                    size: 20.r,
+                  ),
                   tooltip: 'Google AI Studio Key',
                 ),
                 IconButton(
                   onPressed: () => Navigator.pop(context),
-                  icon: Icon(Icons.keyboard_arrow_down_rounded, color: AppColor.whiteColor(context).withValues(alpha: 0.7), size: 24.r),
+                  icon: Icon(
+                    Icons.keyboard_arrow_down_rounded,
+                    color: AppColor.whiteColor(context).withValues(alpha: 0.7),
+                    size: 24.r,
+                  ),
                 ),
               ],
             ),
@@ -255,7 +327,7 @@ class _AiChatBottomSheetWidgetState extends State<AiChatBottomSheetWidget> {
           Container(
             height: 38.h,
             padding: EdgeInsets.symmetric(vertical: 4.h),
-            color: AppColor.darkBackground,
+            color: AppColor.cardSurfaceColor(context),
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               padding: EdgeInsets.symmetric(horizontal: 12.w),
@@ -266,16 +338,23 @@ class _AiChatBottomSheetWidgetState extends State<AiChatBottomSheetWidget> {
                   onTap: _isThinking ? null : () => _sendMessage(item['query']),
                   child: Container(
                     margin: EdgeInsets.only(right: 8.w),
-                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 12.w,
+                      vertical: 4.h,
+                    ),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF171F2B),
+                      color: AppColor.cardColor(context),
                       borderRadius: BorderRadius.circular(16.r),
-                      border: Border.all(color: AppColor.purpleAccent.withValues(alpha: 0.3)),
+                      border: Border.all(
+                        color: AppColor.purpleAccent.withValues(alpha: 0.3),
+                      ),
                     ),
                     child: Center(
                       child: Text(
                         item['label']!,
-                        style: AppTextStyle.bodySmall(context).copyWith(color: AppColor.skyBlue),
+                        style: AppTextStyle.bodySmall(
+                          context,
+                        ).copyWith(color: AppColor.skyBlue),
                       ),
                     ),
                   ),
@@ -307,8 +386,10 @@ class _AiChatBottomSheetWidgetState extends State<AiChatBottomSheetWidget> {
           Container(
             padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
             decoration: BoxDecoration(
-              color: const Color(0xFF171F2B),
-              border: Border(top: BorderSide(color: AppColor.whiteColor(context).withValues(alpha: 0.06))),
+              color: AppColor.cardSurfaceColor(context),
+              border: Border(
+                top: BorderSide(color: AppColor.borderColor(context)),
+              ),
             ),
             child: Row(
               children: [
@@ -320,14 +401,26 @@ class _AiChatBottomSheetWidgetState extends State<AiChatBottomSheetWidget> {
                     textAlign: TextAlign.start,
                     minLines: 1,
                     maxLines: 4,
-                    style: TextStyle(fontSize: 13.sp, color: AppColor.whiteColor(context)),
+                    style: TextStyle(
+                      fontSize: 13.sp,
+                      color: AppColor.titleFormFiledColor(context),
+                    ),
                     decoration: InputDecoration(
                       hintText: AppLocaleKey.aiInputHint.tr(),
-                      hintStyle: TextStyle(fontSize: 12.sp, color: AppColor.whiteColor(context).withValues(alpha: 0.38)),
+                      hintStyle: TextStyle(
+                        fontSize: 12.sp,
+                        color: AppColor.hintColor(context),
+                      ),
                       filled: true,
-                      fillColor: AppColor.darkBackground,
-                      contentPadding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(16.r), borderSide: BorderSide.none),
+                      fillColor: AppColor.cardColor(context),
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 14.w,
+                        vertical: 10.h,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16.r),
+                        borderSide: BorderSide.none,
+                      ),
                     ),
                     onSubmitted: (_) => _sendMessage(),
                   ),
@@ -341,10 +434,16 @@ class _AiChatBottomSheetWidgetState extends State<AiChatBottomSheetWidget> {
                     child: Container(
                       padding: EdgeInsets.all(12.r),
                       decoration: BoxDecoration(
-                        gradient: LinearGradient(colors: [AppColor.purpleAccent, AppColor.emeraldTeal]),
+                        gradient: LinearGradient(
+                          colors: [AppColor.purpleAccent, AppColor.emeraldTeal],
+                        ),
                         borderRadius: BorderRadius.circular(14.r),
                       ),
-                      child: Icon(Icons.send_rounded, color: AppColor.whiteColor(context), size: 18.r),
+                      child: Icon(
+                        Icons.send_rounded,
+                        color: AppColor.buttonTextColor(context),
+                        size: 18.r,
+                      ),
                     ),
                   ),
                 ),
@@ -363,18 +462,26 @@ class _AiChatBottomSheetWidgetState extends State<AiChatBottomSheetWidget> {
         margin: EdgeInsets.only(bottom: 12.h, right: 0, left: 40.w),
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
         decoration: BoxDecoration(
-          color: AppColor.darkSurface,
+          color: AppColor.cardSurfaceColor(context),
           borderRadius: BorderRadius.circular(16.r),
-          border: Border.all(color: AppColor.emeraldTeal.withValues(alpha: 0.2)),
+          border: Border.all(
+            color: AppColor.emeraldTeal.withValues(alpha: 0.2),
+          ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            LoadingAnimationWidget.threeArchedCircle(color: AppColor.emeraldTeal, size: 18.r),
+            LoadingAnimationWidget.threeArchedCircle(
+              color: AppColor.emeraldTeal,
+              size: 18.r,
+            ),
             Gap(10.w),
             Text(
               AppLocaleKey.aiThinking.tr(),
-              style: TextStyle(fontSize: 11.sp, color: AppColor.whiteColor(context).withValues(alpha: 0.7)),
+              style: TextStyle(
+                fontSize: 11.sp,
+                color: AppColor.titleFormFiledColor(context),
+              ),
             ),
           ],
         ),
@@ -388,42 +495,69 @@ class _AiChatBottomSheetWidgetState extends State<AiChatBottomSheetWidget> {
       child: GestureDetector(
         onLongPress: () => _copyMessage(text),
         child: Container(
-          margin: EdgeInsets.only(bottom: 10.h, left: isUser ? 0 : 36.w, right: isUser ? 36.w : 0),
+          margin: EdgeInsets.only(
+            bottom: 10.h,
+            left: isUser ? 0 : 36.w,
+            right: isUser ? 36.w : 0,
+          ),
           padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
           decoration: BoxDecoration(
-            gradient: isUser ? LinearGradient(colors: [AppColor.purpleAccent, AppColor.oceanBlue]) : null,
-            color: isUser ? null : (isError ? Colors.red.withValues(alpha: 0.08) : AppColor.darkSurface),
+            gradient: isUser
+                ? LinearGradient(
+                    colors: [AppColor.purpleAccent, AppColor.oceanBlue],
+                  )
+                : null,
+            color: isUser
+                ? null
+                : (isError
+                      ? Colors.red.withValues(alpha: 0.08)
+                      : AppColor.cardSurfaceColor(context)),
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(16.r),
               topRight: Radius.circular(16.r),
               bottomLeft: isUser ? Radius.circular(4.r) : Radius.circular(16.r),
-              bottomRight: isUser ? Radius.circular(16.r) : Radius.circular(4.r),
+              bottomRight: isUser
+                  ? Radius.circular(16.r)
+                  : Radius.circular(4.r),
             ),
             border: isUser
                 ? null
-                : Border.all(color: isError ? Colors.red.withValues(alpha: 0.3) : AppColor.whiteColor(context).withValues(alpha: 0.05)),
+                : Border.all(
+                    color: isError
+                        ? Colors.red.withValues(alpha: 0.3)
+                        : AppColor.borderColor(context),
+                  ),
           ),
           child: isUser
               ? Text(
                   text,
                   textAlign: TextAlign.start,
-                  style: AppTextStyle.bodySmall(context).copyWith(color: AppColor.whiteColor(context).withValues(alpha: 0.95), height: 1.5),
+                  style: AppTextStyle.bodySmall(context).copyWith(
+                    color: AppColor.buttonTextColor(context),
+                    height: 1.5,
+                  ),
                 )
               : MarkdownBody(
                   data: text,
                   selectable: false,
                   styleSheet: MarkdownStyleSheet(
                     p: AppTextStyle.bodySmall(context).copyWith(
-                      color: isError ? Colors.red : AppColor.whiteColor(context).withValues(alpha: 0.95),
+                      color: isError
+                          ? Colors.red
+                          : AppColor.whiteColor(
+                              context,
+                            ).withValues(alpha: 0.95),
                       height: 1.6,
                     ),
                     strong: AppTextStyle.bodySmall(context).copyWith(
-                      color: AppColor.whiteColor(context),
+                      color: AppColor.buttonTextColor(context),
                       fontWeight: FontWeight.bold,
                     ),
-                    listBullet: AppTextStyle.bodySmall(context).copyWith(color: AppColor.emeraldTeal),
+                    listBullet: AppTextStyle.bodySmall(
+                      context,
+                    ).copyWith(color: AppColor.emeraldTeal),
                     code: AppTextStyle.bodySmall(context).copyWith(
-                      backgroundColor: AppColor.darkBackground,
+                      backgroundColor: AppColor.cardColor(context),
                       color: AppColor.skyBlue,
                     ),
                   ),
@@ -443,7 +577,8 @@ class _AnimatedBubble extends StatefulWidget {
   State<_AnimatedBubble> createState() => _AnimatedBubbleState();
 }
 
-class _AnimatedBubbleState extends State<_AnimatedBubble> with SingleTickerProviderStateMixin {
+class _AnimatedBubbleState extends State<_AnimatedBubble>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _fade;
   late final Animation<Offset> _slide;
@@ -451,10 +586,15 @@ class _AnimatedBubbleState extends State<_AnimatedBubble> with SingleTickerProvi
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 260));
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 260),
+    );
     _fade = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
-    _slide = Tween<Offset>(begin: const Offset(0, 0.08), end: Offset.zero)
-        .animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
+    _slide = Tween<Offset>(
+      begin: const Offset(0, 0.08),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
     _controller.forward();
   }
 

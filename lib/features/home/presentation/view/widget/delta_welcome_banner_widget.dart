@@ -124,10 +124,10 @@ class _DeltaWelcomeBannerWidgetState extends State<DeltaWelcomeBannerWidget>
                     Container(
                       padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
                       decoration: BoxDecoration(
-                        color: AppColor.whiteColor(context).withValues(alpha: 0.15),
+                        color: AppColor.buttonTextColor(context).withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(20.r),
                         border: Border.all(
-                          color: AppColor.whiteColor(context).withValues(alpha: 0.25),
+                          color: AppColor.buttonTextColor(context).withValues(alpha: 0.25),
                           width: 1,
                         ),
                       ),
@@ -137,7 +137,7 @@ class _DeltaWelcomeBannerWidgetState extends State<DeltaWelcomeBannerWidget>
                           Icon(
                             Icons.dashboard_outlined,
                             size: 13.r,
-                            color: AppColor.whiteColor(context),
+                            color: AppColor.buttonTextColor(context),
                           ),
                           Gap(5.w),
                           Text(
@@ -145,7 +145,7 @@ class _DeltaWelcomeBannerWidgetState extends State<DeltaWelcomeBannerWidget>
                             style: AppTextStyle.caption(context).copyWith(
                               fontSize: 10.5.sp,
                               fontWeight: FontWeight.w700,
-                              color: AppColor.whiteColor(context),
+                              color: AppColor.buttonTextColor(context),
                             ),
                           ),
                         ],
@@ -177,7 +177,7 @@ class _DeltaWelcomeBannerWidgetState extends State<DeltaWelcomeBannerWidget>
                                     : 'A unified workspace for managing accounts, daily transactions, organization, and cost centers with high efficiency and clarity.',
                                 style: AppTextStyle.bodySmall(context).copyWith(
                                   fontSize: 11.sp,
-                                  color: AppColor.whiteColor(context).withValues(alpha: 0.85),
+                                  color: AppColor.buttonTextColor(context).withValues(alpha: 0.85),
                                   height: 1.4,
                                 ),
                               ),
@@ -203,7 +203,7 @@ class _DeltaWelcomeBannerWidgetState extends State<DeltaWelcomeBannerWidget>
                             color: const Color(0xFF0F172A).withValues(alpha: 0.3),
                             borderRadius: BorderRadius.circular(10.r),
                             border: Border.all(
-                              color: AppColor.whiteColor(context).withValues(alpha: 0.15),
+                              color: AppColor.buttonTextColor(context).withValues(alpha: 0.15),
                               width: 1,
                             ),
                           ),
@@ -221,7 +221,7 @@ class _DeltaWelcomeBannerWidgetState extends State<DeltaWelcomeBannerWidget>
                                 style: TextStyle(
                                   fontSize: 10.sp,
                                   fontWeight: FontWeight.w600,
-                                  color: AppColor.whiteColor(context).withValues(alpha: 0.95),
+                                  color: AppColor.buttonTextColor(context).withValues(alpha: 0.95),
                                 ),
                               ),
                             ],
@@ -289,9 +289,9 @@ class _DeltaWelcomeBannerWidgetState extends State<DeltaWelcomeBannerWidget>
         height: 78.r,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: AppColor.whiteColor(context).withValues(alpha: 0.1),
+          color: AppColor.buttonTextColor(context).withValues(alpha: 0.1),
           border: Border.all(
-            color: AppColor.whiteColor(context).withValues(alpha: 0.25),
+            color: AppColor.buttonTextColor(context).withValues(alpha: 0.25),
             width: 1.5,
           ),
           boxShadow: [
@@ -337,7 +337,7 @@ class _DeltaWelcomeBannerWidgetState extends State<DeltaWelcomeBannerWidget>
               ),
               child: Icon(
                 Icons.account_balance_rounded,
-                color: AppColor.whiteColor(context),
+                color: AppColor.buttonTextColor(context),
                 size: 22.r,
               ),
             ),

@@ -19,7 +19,8 @@ class _AiCopilotScreenState extends State<AiCopilotScreen> {
   final List<_ChatMessage> _messages = [
     _ChatMessage(
       isUser: false,
-      text: 'مرحباً بك! أنا Delta AI Copilot، مساعدك الذكي لإدارة الأعمال وتخطيط الموارد (ERP).\n\nيمكنني مساعدتك في تحليل المبيعات، كشف الفواتير المعلقة، التنبؤ بالسيولة النقدية، أو إنشاء قيود محاسبية فورية. كيف يمكنني خدمتك اليوم؟',
+      text:
+          'مرحباً بك! أنا Delta AI Copilot، مساعدك الذكي لإدارة الأعمال وتخطيط الموارد (ERP).\n\nيمكنني مساعدتك في تحليل المبيعات، كشف الفواتير المعلقة، التنبؤ بالسيولة النقدية، أو إنشاء قيود محاسبية فورية. كيف يمكنني خدمتك اليوم؟',
       timestamp: 'الآن',
       suggestions: [
         '📊 حلل أداء المبيعات لشهر سبتمبر',
@@ -43,13 +44,7 @@ class _AiCopilotScreenState extends State<AiCopilotScreen> {
 
     HapticFeedback.lightImpact();
     setState(() {
-      _messages.add(
-        _ChatMessage(
-          isUser: true,
-          text: text,
-          timestamp: 'الآن',
-        ),
-      );
+      _messages.add(_ChatMessage(isUser: true, text: text, timestamp: 'الآن'));
       _isTyping = true;
     });
 
@@ -75,17 +70,23 @@ class _AiCopilotScreenState extends State<AiCopilotScreen> {
     if (query.contains('مبيعات') || query.contains('سبتمبر')) {
       return _ChatMessage(
         isUser: false,
-        text: '📈 **ملخص أداء مبيعات شهر سبتمبر 2026:**\n\n• إجمالي المبيعات المحققة: **215,400 ر.س** (بنمو **+18.4%** مقارنة بالشهر السابق).\n• أعلى قطاع نمواً: **الخدمات السحابية واستشارات ERP**.\n• عدد الفواتير المصدرة: **42 فاتورة**.\n• نسبة التحصيل النقدي الفوري: **76%**.',
+        text:
+            '📈 **ملخص أداء مبيعات شهر سبتمبر 2026:**\n\n• إجمالي المبيعات المحققة: **215,400 ر.س** (بنمو **+18.4%** مقارنة بالشهر السابق).\n• أعلى قطاع نمواً: **الخدمات السحابية واستشارات ERP**.\n• عدد الفواتير المصدرة: **42 فاتورة**.\n• نسبة التحصيل النقدي الفوري: **76%**.',
         timestamp: 'الآن',
         metricCards: [
-          {'title': 'إجمالي المبيعات', 'value': '215.4K ر.س', 'trend': '+18.4%'},
+          {
+            'title': 'إجمالي المبيعات',
+            'value': '215.4K ر.س',
+            'trend': '+18.4%',
+          },
           {'title': 'الفواتير المصدرة', 'value': '42', 'trend': '+6'},
         ],
       );
     } else if (query.contains('متأخرة') || query.contains('فواتير')) {
       return _ChatMessage(
         isUser: false,
-        text: '⚠️ **تقرير الفواتير متأخرة السداد:**\n\nيوجد حالياً **3 فواتير** تجاوزت موعد الاستحقاق بإجمالي **38,500 ر.س**:\n\n1. شركة البناء الحديث (#INV-0782) - **18,000 ر.س** (متأخرة 12 يوماً)\n2. مؤسسة النخبة التجارية (#INV-0811) - **12,500 ر.س** (متأخرة 5 أيام)\n3. تكنو الخليج (#INV-0830) - **8,000 ر.س** (متأخرة 3 أيام)\n\nهل ترغب في إرسال إشعار تذكير آلي عبر الواتساب والبريد للعملاء؟',
+        text:
+            '⚠️ **تقرير الفواتير متأخرة السداد:**\n\nيوجد حالياً **3 فواتير** تجاوزت موعد الاستحقاق بإجمالي **38,500 ر.س**:\n\n1. شركة البناء الحديث (#INV-0782) - **18,000 ر.س** (متأخرة 12 يوماً)\n2. مؤسسة النخبة التجارية (#INV-0811) - **12,500 ر.س** (متأخرة 5 أيام)\n3. تكنو الخليج (#INV-0830) - **8,000 ر.س** (متأخرة 3 أيام)\n\nهل ترغب في إرسال إشعار تذكير آلي عبر الواتساب والبريد للعملاء؟',
         timestamp: 'الآن',
         suggestions: [
           '📲 إرسال تذكير فوري لجميع المتأخرين',
@@ -95,13 +96,15 @@ class _AiCopilotScreenState extends State<AiCopilotScreen> {
     } else if (query.contains('التدفق') || query.contains('السيولة')) {
       return _ChatMessage(
         isUser: false,
-        text: '💰 **توقع التدفق النقدي الذكي (Cash Flow Forecast):**\n\n• التدفقات النقدية المتوقعة للداخل (Inflow): **142,000 ر.س**\n• الالتزامات والرواتب القادمة (Outflow): **86,500 ر.س**\n• صافي الفائض النقدي المتوقع: **+55,500 ر.س**\n\nمستوى الأمان المالي للشركة: **ممتاز (مغطى لمدة 4.2 أشهر)**.',
+        text:
+            '💰 **توقع التدفق النقدي الذكي (Cash Flow Forecast):**\n\n• التدفقات النقدية المتوقعة للداخل (Inflow): **142,000 ر.س**\n• الالتزامات والرواتب القادمة (Outflow): **86,500 ر.س**\n• صافي الفائض النقدي المتوقع: **+55,500 ر.س**\n\nمستوى الأمان المالي للشركة: **ممتاز (مغطى لمدة 4.2 أشهر)**.',
         timestamp: 'الآن',
       );
     } else {
       return _ChatMessage(
         isUser: false,
-        text: 'تم تحليل طلبك بنجاح! وفقاً لقاعدة بيانات Delta ERP، جميع المؤشرات والعمليات التشغيلية تعمل بأعلى كفاءة ومطابقة لاشتراطات النظام المحاسبي المعتمد.',
+        text:
+            'تم تحليل طلبك بنجاح! وفقاً لقاعدة بيانات Delta ERP، جميع المؤشرات والعمليات التشغيلية تعمل بأعلى كفاءة ومطابقة لاشتراطات النظام المحاسبي المعتمد.',
         timestamp: 'الآن',
       );
     }
@@ -122,13 +125,16 @@ class _AiCopilotScreenState extends State<AiCopilotScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColor.darkBackground,
+      backgroundColor: AppColor.scaffoldColor(context),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0F172A),
+        backgroundColor: AppColor.appBarColor(context),
         elevation: 0,
         centerTitle: false,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
+          icon: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: AppColor.appBarTextColor(context),
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         title: Row(
@@ -147,7 +153,11 @@ class _AiCopilotScreenState extends State<AiCopilotScreen> {
                   ),
                 ],
               ),
-              child: Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 16.r),
+              child: Icon(
+                Icons.auto_awesome_rounded,
+                color: AppColor.appBarTextColor(context),
+                size: 16.r,
+              ),
             ),
             Gap(10.w),
             Column(
@@ -158,7 +168,7 @@ class _AiCopilotScreenState extends State<AiCopilotScreen> {
                   style: TextStyle(
                     fontSize: 14.sp,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: AppColor.darkTextColor(context),
                     fontFamily: 'Tajawal',
                   ),
                 ),
@@ -189,7 +199,10 @@ class _AiCopilotScreenState extends State<AiCopilotScreen> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh_rounded, color: Colors.white70),
+            icon: Icon(
+              Icons.refresh_rounded,
+              color: AppColor.darkTextColor(context),
+            ),
             onPressed: () {
               setState(() {
                 _messages.clear();
@@ -227,9 +240,12 @@ class _AiCopilotScreenState extends State<AiCopilotScreen> {
               child: Row(
                 children: [
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 12.w,
+                      vertical: 8.h,
+                    ),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF1E293B),
+                      color: AppColor.cardSurfaceColor(context),
                       borderRadius: BorderRadius.circular(16.r),
                     ),
                     child: Row(
@@ -248,7 +264,7 @@ class _AiCopilotScreenState extends State<AiCopilotScreen> {
                           'المساعد الذكي يقوم بالتحليل...',
                           style: TextStyle(
                             fontSize: 10.5.sp,
-                            color: Colors.white70,
+                            color: AppColor.darkTextColor(context),
                             fontFamily: 'Tajawal',
                           ),
                         ),
@@ -273,8 +289,9 @@ class _AiCopilotScreenState extends State<AiCopilotScreen> {
         margin: EdgeInsets.only(bottom: 14.h),
         constraints: BoxConstraints(maxWidth: 0.85.sw),
         child: Column(
-          crossAxisAlignment:
-              msg.isUser ? CrossAxisAlignment.start : CrossAxisAlignment.end,
+          crossAxisAlignment: msg.isUser
+              ? CrossAxisAlignment.start
+              : CrossAxisAlignment.end,
           children: [
             Container(
               padding: EdgeInsets.all(14.r),
@@ -286,12 +303,12 @@ class _AiCopilotScreenState extends State<AiCopilotScreen> {
                         end: Alignment.bottomRight,
                       )
                     : null,
-                color: msg.isUser ? null : const Color(0xFF1E293B),
+                color: msg.isUser ? null : AppColor.cardColor(context),
                 borderRadius: BorderRadius.circular(16.r),
                 border: Border.all(
                   color: msg.isUser
                       ? Colors.transparent
-                      : Colors.white.withValues(alpha: 0.08),
+                      : AppColor.borderColor(context),
                 ),
                 boxShadow: [
                   BoxShadow(
@@ -308,7 +325,9 @@ class _AiCopilotScreenState extends State<AiCopilotScreen> {
                     msg.text,
                     style: TextStyle(
                       fontSize: 12.sp,
-                      color: Colors.white,
+                      color: msg.isUser
+                          ? AppColor.whiteColor(context)
+                          : AppColor.titleFormFiledColor(context),
                       height: 1.5,
                       fontFamily: 'Tajawal',
                     ),
@@ -324,10 +343,12 @@ class _AiCopilotScreenState extends State<AiCopilotScreen> {
                             margin: EdgeInsets.only(right: 6.w),
                             padding: EdgeInsets.all(8.r),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF0F172A),
+                              color: AppColor.cardSurfaceColor(context),
                               borderRadius: BorderRadius.circular(10.r),
                               border: Border.all(
-                                color: AppColor.royalIndigo.withValues(alpha: 0.3),
+                                color: AppColor.royalIndigo.withValues(
+                                  alpha: 0.3,
+                                ),
                               ),
                             ),
                             child: Column(
@@ -337,7 +358,7 @@ class _AiCopilotScreenState extends State<AiCopilotScreen> {
                                   card['title']!,
                                   style: TextStyle(
                                     fontSize: 9.sp,
-                                    color: Colors.white54,
+                                    color: AppColor.darkTextColor(context),
                                     fontFamily: 'Tajawal',
                                   ),
                                 ),
@@ -371,10 +392,12 @@ class _AiCopilotScreenState extends State<AiCopilotScreen> {
                   return GestureDetector(
                     onTap: () => _sendMessage(suggestion),
                     child: Container(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 10.w,
+                        vertical: 6.h,
+                      ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF111827),
+                        color: AppColor.cardColor(context),
                         borderRadius: BorderRadius.circular(20.r),
                         border: Border.all(
                           color: AppColor.royalIndigo.withValues(alpha: 0.4),
@@ -404,12 +427,9 @@ class _AiCopilotScreenState extends State<AiCopilotScreen> {
     return Container(
       padding: EdgeInsets.fromLTRB(12.w, 10.h, 12.w, 20.h),
       decoration: BoxDecoration(
-        color: const Color(0xFF0F172A),
+        color: AppColor.cardColor(context),
         border: Border(
-          top: BorderSide(
-            color: Colors.white.withValues(alpha: 0.08),
-            width: 1,
-          ),
+          top: BorderSide(color: AppColor.borderColor(context), width: 1),
         ),
       ),
       child: SafeArea(
@@ -418,15 +438,21 @@ class _AiCopilotScreenState extends State<AiCopilotScreen> {
           children: [
             Container(
               decoration: BoxDecoration(
-                color: const Color(0xFF1E293B),
+                color: AppColor.cardSurfaceColor(context),
                 shape: BoxShape.circle,
               ),
               child: IconButton(
-                icon: Icon(Icons.attach_file_rounded, color: AppColor.cyanLight, size: 20.r),
+                icon: Icon(
+                  Icons.attach_file_rounded,
+                  color: AppColor.cyanLight,
+                  size: 20.r,
+                ),
                 onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('يمكنك إرفاق صور الفواتير أو ملفات Excel للتحليل'),
+                      content: Text(
+                        'يمكنك إرفاق صور الفواتير أو ملفات Excel للتحليل',
+                      ),
                       behavior: SnackBarBehavior.floating,
                     ),
                   );
@@ -438,18 +464,22 @@ class _AiCopilotScreenState extends State<AiCopilotScreen> {
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 14.w),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1E293B),
+                  color: AppColor.cardSurfaceColor(context),
                   borderRadius: BorderRadius.circular(24.r),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.08),
-                  ),
+                  border: Border.all(color: AppColor.borderColor(context)),
                 ),
                 child: TextField(
                   controller: _messageController,
-                  style: const TextStyle(color: Colors.white, fontFamily: 'Tajawal'),
-                  decoration: const InputDecoration(
+                  style: TextStyle(
+                    color: AppColor.textFormColor(context),
+                    fontFamily: 'Tajawal',
+                  ),
+                  decoration: InputDecoration(
                     hintText: 'اسأل المساعد الذكي عن أي بيان في النظام...',
-                    hintStyle: TextStyle(color: Colors.white38, fontSize: 12),
+                    hintStyle: TextStyle(
+                      color: AppColor.hintColor(context),
+                      fontSize: 12,
+                    ),
                     border: InputBorder.none,
                   ),
                   onSubmitted: (_) => _sendMessage(),
@@ -471,7 +501,11 @@ class _AiCopilotScreenState extends State<AiCopilotScreen> {
                 ],
               ),
               child: IconButton(
-                icon: const Icon(Icons.send_rounded, color: Colors.white, size: 18),
+                icon: const Icon(
+                  Icons.send_rounded,
+                  color: Colors.white,
+                  size: 18,
+                ),
                 onPressed: () => _sendMessage(),
               ),
             ),

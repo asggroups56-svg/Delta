@@ -16,7 +16,7 @@ class ModuleBadgeWidget extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
       decoration: BoxDecoration(
-        color: AppColor.whiteColor(context),
+        color: AppColor.buttonTextColor(context),
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(

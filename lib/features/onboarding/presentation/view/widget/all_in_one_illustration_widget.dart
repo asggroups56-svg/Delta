@@ -46,7 +46,7 @@ final Color color;
                 )
               ],
             ),
-            child: Icon(Icons.hub_rounded, size: 48.r, color: AppColor.whiteColor(context)),
+            child: Icon(Icons.hub_rounded, size: 48.r, color: AppColor.buttonTextColor(context)),
           ),
         ),
 

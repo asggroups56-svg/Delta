@@ -8,6 +8,7 @@ import 'package:gap/gap.dart';
 import 'package:my_template/core/custom_widgets/custom_form_field/custom_form_field.dart';
 import 'package:my_template/core/custom_widgets/custom_toast/custom_toast.dart';
 import 'package:my_template/core/routes/routes_name.dart';
+import 'package:my_template/core/theme/app_colors.dart';
 import 'package:my_template/core/utils/app_locale_key.dart';
 import 'package:my_template/core/utils/common_methods.dart';
 import 'package:my_template/core/utils/navigator_methods.dart';
@@ -38,7 +39,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final isArabic = context.locale.languageCode == 'ar';
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF1F5F9),
+      backgroundColor: AppColor.scaffoldColor(context),
       body: LayoutBuilder(
         builder: (context, constraints) {
           return BlocConsumer<AuthCubit, AuthState>(
@@ -57,25 +58,20 @@ class _LoginScreenState extends State<LoginScreen> {
               if (state.loginStatus.isFailure) {
                 log(state.loginStatus.error?.toString() ?? "Login failed");
                 final error = state.loginStatus.error ?? "Login failed";
-                CommonMethods.showToast(
-                  message: error,
-                  type: ToastType.error,
-                );
+                CommonMethods.showToast(message: error, type: ToastType.error);
               }
             },
             builder: (context, state) {
               final isLoading = state.loginStatus.isLoading;
-      
+
               return SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: constraints.maxHeight,
-                  ),
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
                   child: IntrinsicHeight(
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
-                     
+
                       children: [
                         // ═══════════════════════════════════════════════
                         //  LEFT SIDE - Branding Panel (Enterprise ERP Look)
@@ -85,7 +81,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             flex: 5,
                             child: _BrandingPanel(isArabic: isArabic),
                           ),
-      
+
                         // ═══════════════════════════════════════════════
                         //  RIGHT SIDE - Login Form
                         // ═══════════════════════════════════════════════
@@ -105,8 +101,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 child: Form(
                                   key: _formKey,
                                   child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     crossAxisAlignment:
                                         CrossAxisAlignment.stretch,
                                     children: [
@@ -173,22 +168,18 @@ class _LoginScreenState extends State<LoginScreen> {
                                           ),
                                           InkWell(
                                             onTap: _toggleLanguage,
-                                            borderRadius:
-                                                BorderRadius.circular(20.r),
+                                            borderRadius: BorderRadius.circular(
+                                              20.r,
+                                            ),
                                             child: Container(
-                                              padding:
-                                                  EdgeInsets.symmetric(
-                                                    horizontal: 12.w,
-                                                    vertical: 6.h,
-                                                  ),
+                                              padding: EdgeInsets.symmetric(
+                                                horizontal: 12.w,
+                                                vertical: 6.h,
+                                              ),
                                               decoration: BoxDecoration(
-                                                color: const Color(
-                                                  0xFFF1F5F9,
-                                                ),
+                                                color: const Color(0xFFF1F5F9),
                                                 borderRadius:
-                                                    BorderRadius.circular(
-                                                      20.r,
-                                                    ),
+                                                    BorderRadius.circular(20.r),
                                                 border: Border.all(
                                                   color: const Color(
                                                     0xFFE2E8F0,
@@ -196,8 +187,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                                 ),
                                               ),
                                               child: Row(
-                                                mainAxisSize:
-                                                    MainAxisSize.min,
+                                                mainAxisSize: MainAxisSize.min,
                                                 children: [
                                                   Icon(
                                                     Icons.language_rounded,
@@ -224,9 +214,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                           ),
                                         ],
                                       ),
-      
+
                                       Gap(48.h),
-      
+
                                       // Welcome Title
                                       FadeInUp(
                                         duration: const Duration(
@@ -242,13 +232,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                                 vertical: 4.h,
                                               ),
                                               decoration: BoxDecoration(
-                                                color: const Color(
-                                                  0xFFDBEAFE,
-                                                ),
+                                                color: const Color(0xFFDBEAFE),
                                                 borderRadius:
-                                                    BorderRadius.circular(
-                                                      6.r,
-                                                    ),
+                                                    BorderRadius.circular(6.r),
                                               ),
                                               child: Text(
                                                 isArabic
@@ -272,9 +258,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                               style: TextStyle(
                                                 fontSize: 26.sp,
                                                 fontWeight: FontWeight.w900,
-                                                color: const Color(
-                                                  0xFF0F172A,
-                                                ),
+                                                color: const Color(0xFF0F172A),
                                                 letterSpacing: -0.5,
                                                 height: 1.1,
                                               ),
@@ -286,92 +270,92 @@ class _LoginScreenState extends State<LoginScreen> {
                                                   : 'Sign in to access your enterprise dashboard and manage business resources',
                                               style: TextStyle(
                                                 fontSize: 12.5.sp,
-                                                color: const Color(
-                                                  0xFF64748B,
-                                                ),
+                                                color: const Color(0xFF64748B),
                                                 height: 1.5,
                                               ),
                                             ),
                                           ],
                                         ),
                                       ),
-      
+
                                       Gap(32.h),
-      
+
                                       // Username
                                       _buildLabel(
-                                        isArabic
-                                            ? 'اسم المستخدم'
-                                            : 'Username',
+                                        isArabic ? 'اسم المستخدم' : 'Username',
                                       ),
                                       Gap(8.h),
                                       CustomFormField(
-                                        controller:
-                                            cubit.usernameController,
+                                        controller: cubit.usernameController,
                                         hintText: isArabic
                                             ? 'أدخل اسم المستخدم'
                                             : 'Enter your username',
                                         textStyle: TextStyle(
                                           fontSize: 13.5.sp,
                                           fontWeight: FontWeight.w600,
-                                          color: const Color(0xFF0F172A),
+                                          color: AppColor.textFormColor(
+                                            context,
+                                          ),
                                         ),
                                         prefixIcon: const Icon(
                                           Icons.person_outline_rounded,
                                           color: Color(0xFF3B82F6),
                                         ),
                                         radius: 12.r,
-                                        fillColor: const Color(0xFFF8FAFC),
+                                        fillColor: AppColor.textFormFillColor(
+                                          context,
+                                        ),
                                         unFocusColor:
-                                            const Color(0xFFE2E8F0),
+                                            AppColor.textFormBorderColor(
+                                              context,
+                                            ),
                                         focusColor: const Color(0xFF3B82F6),
-                                        validator: (value) =>
-                                            value!.isEmpty
+                                        validator: (value) => value!.isEmpty
                                             ? (isArabic
                                                   ? 'اسم المستخدم مطلوب'
                                                   : 'Username is required')
                                             : null,
                                       ),
                                       Gap(18.h),
-      
+
                                       // Password
-                                      _buildLabel(
-                                        AppLocaleKey.password.tr(),
-                                      ),
+                                      _buildLabel(AppLocaleKey.password.tr()),
                                       Gap(8.h),
                                       CustomFormField(
-                                        controller:
-                                            cubit.passwordController,
+                                        controller: cubit.passwordController,
                                         hintText: isArabic
                                             ? 'أدخل كلمة المرور'
                                             : 'Enter your password',
                                         textStyle: TextStyle(
                                           fontSize: 13.5.sp,
                                           fontWeight: FontWeight.w600,
-                                          color: const Color(0xFF0F172A),
+                                          color: AppColor.textFormColor(
+                                            context,
+                                          ),
                                         ),
                                         prefixIcon: const Icon(
                                           Icons.lock_outline_rounded,
                                           color: Color(0xFF3B82F6),
                                         ),
                                         isPassword: true,
-                                        passwordColor: const Color(
-                                          0xFF64748B,
-                                        ),
+                                        passwordColor: const Color(0xFF64748B),
                                         radius: 12.r,
-                                        fillColor: const Color(0xFFF8FAFC),
+                                        fillColor: AppColor.textFormFillColor(
+                                          context,
+                                        ),
                                         unFocusColor:
-                                            const Color(0xFFE2E8F0),
+                                            AppColor.textFormBorderColor(
+                                              context,
+                                            ),
                                         focusColor: const Color(0xFF3B82F6),
-                                        validator: (value) =>
-                                            value!.isEmpty
+                                        validator: (value) => value!.isEmpty
                                             ? (isArabic
                                                   ? 'كلمة المرور مطلوبة'
                                                   : 'Password is required')
                                             : null,
                                       ),
                                       Gap(18.h),
-      
+
                                       // Connection Name
                                       _buildLabel(
                                         isArabic
@@ -388,27 +372,32 @@ class _LoginScreenState extends State<LoginScreen> {
                                         textStyle: TextStyle(
                                           fontSize: 13.5.sp,
                                           fontWeight: FontWeight.w600,
-                                          color: const Color(0xFF0F172A),
+                                          color: AppColor.textFormColor(
+                                            context,
+                                          ),
                                         ),
                                         prefixIcon: const Icon(
                                           Icons.storage_rounded,
                                           color: Color(0xFF3B82F6),
                                         ),
                                         radius: 12.r,
-                                        fillColor: const Color(0xFFF8FAFC),
+                                        fillColor: AppColor.textFormFillColor(
+                                          context,
+                                        ),
                                         unFocusColor:
-                                            const Color(0xFFE2E8F0),
+                                            AppColor.textFormBorderColor(
+                                              context,
+                                            ),
                                         focusColor: const Color(0xFF3B82F6),
-                                        validator: (value) =>
-                                            value!.isEmpty
+                                        validator: (value) => value!.isEmpty
                                             ? (isArabic
                                                   ? 'اسم الاتصال مطلوب'
                                                   : 'Connection name is required')
                                             : null,
                                       ),
-      
+
                                       Gap(30.h),
-      
+
                                       // Login Button
                                       SizedBox(
                                         width: double.infinity,
@@ -423,8 +412,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                               begin: Alignment.centerLeft,
                                               end: Alignment.centerRight,
                                             ),
-                                            borderRadius:
-                                                BorderRadius.circular(14.r),
+                                            borderRadius: BorderRadius.circular(
+                                              14.r,
+                                            ),
                                             boxShadow: [
                                               BoxShadow(
                                                 color: const Color(
@@ -439,8 +429,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                             onPressed: isLoading
                                                 ? null
                                                 : () {
-                                                    if (_formKey
-                                                        .currentState!
+                                                    if (_formKey.currentState!
                                                         .validate()) {
                                                       cubit.login(
                                                         context: context,
@@ -453,9 +442,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                               shadowColor: Colors.transparent,
                                               shape: RoundedRectangleBorder(
                                                 borderRadius:
-                                                    BorderRadius.circular(
-                                                      14.r,
-                                                    ),
+                                                    BorderRadius.circular(14.r),
                                               ),
                                             ),
                                             child: isLoading
@@ -480,8 +467,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                                           fontSize: 15.sp,
                                                           fontWeight:
                                                               FontWeight.w800,
-                                                          color:
-                                                              Colors.white,
+                                                          color: Colors.white,
                                                           letterSpacing: 0.5,
                                                         ),
                                                       ),
@@ -500,9 +486,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                           ),
                                         ),
                                       ),
-      
+
                                       Gap(32.h),
-      
+
                                       // Version Info
                                       Center(
                                         child: Text(
@@ -558,11 +544,7 @@ class _BrandingPanel extends StatelessWidget {
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            Color(0xFF0F172A),
-            Color(0xFF1E3A8A),
-            Color(0xFF1E40AF),
-          ],
+          colors: [Color(0xFF0F172A), Color(0xFF1E3A8A), Color(0xFF1E40AF)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -607,9 +589,7 @@ class _BrandingPanel extends StatelessWidget {
             ),
           ),
           // Grid pattern
-          Positioned.fill(
-            child: CustomPaint(painter: _GridPainter()),
-          ),
+          Positioned.fill(child: CustomPaint(painter: _GridPainter())),
           // Content
           Padding(
             padding: EdgeInsets.all(48.r),

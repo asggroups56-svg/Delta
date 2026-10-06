@@ -11,19 +11,19 @@ class ChipBadgeWidget extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
       decoration: BoxDecoration(
-        color: AppColor.whiteColor(context).withValues(alpha: 0.12),
+        color: AppColor.buttonTextColor(context).withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(color: AppColor.whiteColor(context).withValues(alpha: 0.18)),
+        border: Border.all(color: AppColor.buttonTextColor(context).withValues(alpha: 0.18)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14.r, color: AppColor.whiteColor(context)),
+          Icon(icon, size: 14.r, color: AppColor.buttonTextColor(context)),
           Gap(6.w),
           Text(
             label,
             style: AppTextStyle.bodySmall(context).copyWith(
-              color: AppColor.whiteColor(context),
+              color: AppColor.buttonTextColor(context),
               fontWeight: FontWeight.w500,
             ),
           ),

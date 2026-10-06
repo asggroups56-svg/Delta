@@ -24,11 +24,9 @@ class _ReportsChartWidgetState extends State<ReportsChartWidget> {
     return Container(
       padding: EdgeInsets.all(18.r),
       decoration: BoxDecoration(
-        color: AppColor.darkCardBackground,
+        color: AppColor.cardColor(context),
         borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(
-          color: AppColor.whiteColor(context).withValues(alpha: 0.08),
-        ),
+        border: Border.all(color: AppColor.borderColor(context)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.25),
@@ -53,7 +51,7 @@ class _ReportsChartWidgetState extends State<ReportsChartWidget> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: AppColor.whiteColor(context),
+                        color: AppColor.titleFormFiledColor(context),
                         fontSize: 13.5.sp,
                         fontWeight: FontWeight.bold,
                       ),
@@ -121,16 +119,14 @@ class _ReportsChartWidgetState extends State<ReportsChartWidget> {
                           margin: EdgeInsets.only(bottom: 4.h),
                           decoration: BoxDecoration(
                             gradient: const LinearGradient(
-                              colors: [
-                                Color(0xFF4F46E5),
-                                Color(0xFF06B6D4),
-                              ],
+                              colors: [Color(0xFF4F46E5), Color(0xFF06B6D4)],
                             ),
                             borderRadius: BorderRadius.circular(6.r),
                             boxShadow: [
                               BoxShadow(
-                                color: AppColor.royalIndigo
-                                    .withValues(alpha: 0.4),
+                                color: AppColor.royalIndigo.withValues(
+                                  alpha: 0.4,
+                                ),
                                 blurRadius: 6,
                               ),
                             ],
@@ -159,12 +155,17 @@ class _ReportsChartWidgetState extends State<ReportsChartWidget> {
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
                                 colors: isSelected
-                                    ? [AppColor.royalIndigo, AppColor.electricCyan]
+                                    ? [
+                                        AppColor.royalIndigo,
+                                        AppColor.electricCyan,
+                                      ]
                                     : [
-                                        AppColor.royalIndigo
-                                            .withValues(alpha: 0.4),
-                                        AppColor.electricCyan
-                                            .withValues(alpha: 0.4)
+                                        AppColor.royalIndigo.withValues(
+                                          alpha: 0.4,
+                                        ),
+                                        AppColor.electricCyan.withValues(
+                                          alpha: 0.4,
+                                        ),
                                       ],
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
@@ -173,8 +174,9 @@ class _ReportsChartWidgetState extends State<ReportsChartWidget> {
                               boxShadow: isSelected
                                   ? [
                                       BoxShadow(
-                                        color: AppColor.royalIndigo
-                                            .withValues(alpha: 0.4),
+                                        color: AppColor.royalIndigo.withValues(
+                                          alpha: 0.4,
+                                        ),
                                         blurRadius: 8,
                                         offset: const Offset(0, 2),
                                       ),
@@ -196,10 +198,12 @@ class _ReportsChartWidgetState extends State<ReportsChartWidget> {
                                         const Color(0xFFFB7185),
                                       ]
                                     : [
-                                        AppColor.roseDanger
-                                            .withValues(alpha: 0.4),
-                                        const Color(0xFFFB7185)
-                                            .withValues(alpha: 0.4)
+                                        AppColor.roseDanger.withValues(
+                                          alpha: 0.4,
+                                        ),
+                                        const Color(
+                                          0xFFFB7185,
+                                        ).withValues(alpha: 0.4),
                                       ],
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
@@ -214,12 +218,12 @@ class _ReportsChartWidgetState extends State<ReportsChartWidget> {
                         _months[index],
                         style: TextStyle(
                           fontSize: 11.sp,
-                          fontWeight:
-                              isSelected ? FontWeight.bold : FontWeight.normal,
+                          fontWeight: isSelected
+                              ? FontWeight.bold
+                              : FontWeight.normal,
                           color: isSelected
-                              ? AppColor.whiteColor(context)
-                              : AppColor.whiteColor(context)
-                                  .withValues(alpha: 0.4),
+                              ? AppColor.titleFormFiledColor(context)
+                              : AppColor.darkTextColor(context),
                         ),
                       ),
                     ],
@@ -247,7 +251,7 @@ class _ReportsChartWidgetState extends State<ReportsChartWidget> {
           label,
           style: TextStyle(
             fontSize: 10.sp,
-            color: AppColor.whiteColor(context).withValues(alpha: 0.7),
+            color: AppColor.darkTextColor(context),
           ),
         ),
       ],

@@ -58,7 +58,7 @@ class _CategoryFiltersWidgetState extends State<CategoryFiltersWidget> {
                             colors: [Color(0xFF00B894), Color(0xFF0984E3)],
                           )
                         : null,
-                    color: isSelected ? null : const Color(0xFF141D2B),
+                    color: isSelected ? null : AppColor.cardColor(context),
                     borderRadius: BorderRadius.circular(20.r),
                     border: Border.all(
                       color: isSelected

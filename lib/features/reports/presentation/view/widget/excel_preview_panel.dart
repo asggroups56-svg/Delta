@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:my_template/core/theme/app_colors.dart';
 
 class ExcelPreviewPanel extends StatelessWidget {
   final List<List<String>> rows;
@@ -18,9 +19,9 @@ class ExcelPreviewPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF0F172A),
+        color: AppColor.cardColor(context),
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+        border: Border.all(color: AppColor.borderColor(context)),
       ),
       child: Column(
         children: [
@@ -48,7 +49,7 @@ class ExcelPreviewPanel extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AppColor.titleFormFiledColor(context),
                       fontWeight: FontWeight.bold,
                       fontSize: 12.sp,
                     ),
@@ -56,8 +57,11 @@ class ExcelPreviewPanel extends StatelessWidget {
                 ),
                 if (onClose != null)
                   IconButton(
-                    icon: const Icon(Icons.close_rounded,
-                        color: Colors.white, size: 18),
+                    icon: Icon(
+                      Icons.close_rounded,
+                      color: AppColor.darkTextColor(context),
+                      size: 18,
+                    ),
                     onPressed: onClose,
                   ),
               ],
@@ -72,7 +76,7 @@ class ExcelPreviewPanel extends StatelessWidget {
                 padding: EdgeInsets.all(12.r),
                 child: DataTable(
                   headingRowColor: WidgetStateProperty.all(
-                    Colors.white.withValues(alpha: 0.05),
+                    AppColor.cardSurfaceColor(context),
                   ),
                   columns: rows.first
                       .map(
@@ -80,7 +84,7 @@ class ExcelPreviewPanel extends StatelessWidget {
                           label: Text(
                             h,
                             style: TextStyle(
-                              color: Colors.white,
+                              color: AppColor.titleFormFiledColor(context),
                               fontWeight: FontWeight.bold,
                               fontSize: 11.sp,
                             ),
@@ -98,7 +102,7 @@ class ExcelPreviewPanel extends StatelessWidget {
                                   Text(
                                     c,
                                     style: TextStyle(
-                                      color: Colors.white70,
+                                      color: AppColor.darkTextColor(context),
                                       fontSize: 10.5.sp,
                                     ),
                                   ),

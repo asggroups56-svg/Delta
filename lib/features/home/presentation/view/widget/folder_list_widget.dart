@@ -61,7 +61,7 @@ class _FolderListWidgetState extends State<FolderListWidget> {
               child: Container(
                 margin: EdgeInsets.only(bottom: 10.h),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF141D2B),
+                  color: AppColor.cardColor(context),
                   borderRadius: BorderRadius.circular(16.r),
                   border: Border.all(
                     color: AppColor.whiteColor(context).withValues(alpha: 0.06),

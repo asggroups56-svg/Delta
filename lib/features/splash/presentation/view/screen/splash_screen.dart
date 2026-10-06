@@ -99,7 +99,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   child: Container(
                     padding: EdgeInsets.all(22.r),
                     decoration: BoxDecoration(
-                      color: AppColor.whiteColor(
+                      color: AppColor.buttonTextColor(
                         context,
                       ).withValues(alpha: 0.12),
                       shape: BoxShape.circle,
@@ -140,7 +140,7 @@ class _SplashScreenState extends State<SplashScreen> {
                       fontSize: 28.sp,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 2.5,
-                      color: AppColor.whiteColor(context),
+                      color: AppColor.buttonTextColor(context),
                       shadows: [
                         Shadow(
                           color: AppColor.backColor(
@@ -163,7 +163,7 @@ class _SplashScreenState extends State<SplashScreen> {
                     AppLocaleKey.integratedBusinessManagementSystem.tr(),
                     textAlign: TextAlign.center,
                     style: AppTextStyle.bodySmall(context).copyWith(
-                      color: AppColor.whiteColor(
+                      color: AppColor.buttonTextColor(
                         context,
                       ).withValues(alpha: 0.85),
                       letterSpacing: 0.5,

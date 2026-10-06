@@ -29,7 +29,7 @@ class _SalesCardWidgetState extends State<SalesCardWidget> {
         {'label': '24 - 30 أغسطس', 'height': 0.70, 'amount': '32,500 ر.س'},
         {'label': '31 أغسطس - 6 سبتمبر', 'height': 0.20, 'amount': '8,600 ر.س'},
         {'label': 'غير مستحق', 'height': 0.35, 'amount': '15,000 ر.س'},
-      ]
+      ],
     },
     {
       'title': 'يوليو - أغسطس 2026',
@@ -40,25 +40,24 @@ class _SalesCardWidgetState extends State<SalesCardWidget> {
         {'label': '15 - 21 يوليو', 'height': 0.40, 'amount': '16,800 ر.س'},
         {'label': '22 - 31 يوليو', 'height': 0.55, 'amount': '24,200 ر.س'},
         {'label': 'غير مستحق', 'height': 0.25, 'amount': '9,500 ر.س'},
-      ]
+      ],
     },
   ];
 
   @override
   Widget build(BuildContext context) {
     final currentPeriod = _chartPeriods[_currentPeriodIndex];
-    final List<Map<String, dynamic>> barData = currentPeriod['bars'] as List<Map<String, dynamic>>;
+    final List<Map<String, dynamic>> barData =
+        currentPeriod['bars'] as List<Map<String, dynamic>>;
 
     return FadeInUp(
       duration: const Duration(milliseconds: 350),
       child: Container(
         padding: EdgeInsets.all(16.r),
         decoration: BoxDecoration(
-          color: AppColor.darkCardBackground,
+          color: AppColor.cardColor(context),
           borderRadius: BorderRadius.circular(16.r),
-          border: Border.all(
-            color: AppColor.whiteColor(context).withValues(alpha: 0.08),
-          ),
+          border: Border.all(color: AppColor.borderColor(context)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -77,9 +76,12 @@ class _SalesCardWidgetState extends State<SalesCardWidget> {
                     ),
                     Gap(10.w),
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 6.w,
+                        vertical: 2.h,
+                      ),
                       decoration: BoxDecoration(
-                        color: AppColor.darkSurface,
+                        color: AppColor.cardSurfaceColor(context),
                         borderRadius: BorderRadius.circular(8.r),
                       ),
                       child: Row(
@@ -87,7 +89,9 @@ class _SalesCardWidgetState extends State<SalesCardWidget> {
                         children: [
                           InkWell(
                             onTap: () => setState(() {
-                              _currentPeriodIndex = (_currentPeriodIndex + 1) % _chartPeriods.length;
+                              _currentPeriodIndex =
+                                  (_currentPeriodIndex + 1) %
+                                  _chartPeriods.length;
                             }),
                             child: Icon(
                               Icons.chevron_left_rounded,
@@ -100,14 +104,18 @@ class _SalesCardWidgetState extends State<SalesCardWidget> {
                             currentPeriod['title'] as String,
                             style: AppTextStyle.text10SDark(context).copyWith(
                               fontSize: 9.sp,
-                              color: AppColor.whiteColor(context).withValues(alpha: 0.7),
+                              color: AppColor.darkTextColor(context),
                               fontWeight: FontWeight.w500,
                             ),
                           ),
                           Gap(4.w),
                           InkWell(
                             onTap: () => setState(() {
-                              _currentPeriodIndex = (_currentPeriodIndex - 1 + _chartPeriods.length) % _chartPeriods.length;
+                              _currentPeriodIndex =
+                                  (_currentPeriodIndex -
+                                      1 +
+                                      _chartPeriods.length) %
+                                  _chartPeriods.length;
                             }),
                             child: Icon(
                               Icons.chevron_right_rounded,
@@ -122,7 +130,7 @@ class _SalesCardWidgetState extends State<SalesCardWidget> {
                 ),
                 Icon(
                   Icons.more_vert_rounded,
-                  color: AppColor.whiteColor(context).withValues(alpha: 0.7),
+                  color: AppColor.darkTextColor(context),
                   size: 20.r,
                 ),
               ],
@@ -130,18 +138,23 @@ class _SalesCardWidgetState extends State<SalesCardWidget> {
             Gap(6.h),
             Text(
               AppLocaleKey.salesDesc.tr(),
-              style: AppTextStyle.text10SDark(context).copyWith(
-                color: AppColor.whiteColor(context).withValues(alpha: 0.6),
-                height: 1.4,
-              ),
+              style: AppTextStyle.text10SDark(
+                context,
+              ).copyWith(color: AppColor.darkTextColor(context), height: 1.4),
             ),
             Gap(14.h),
             Align(
               alignment: Alignment.centerLeft,
               child: GestureDetector(
-                onTap: () => NewEntryBottomSheetWidget.show(context, AppLocaleKey.salesCard.tr()),
+                onTap: () => NewEntryBottomSheetWidget.show(
+                  context,
+                  AppLocaleKey.salesCard.tr(),
+                ),
                 child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 8.h),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 24.w,
+                    vertical: 8.h,
+                  ),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [const Color(0xFF8E44AD), AppColor.purpleAccent],
@@ -159,7 +172,7 @@ class _SalesCardWidgetState extends State<SalesCardWidget> {
                     AppLocaleKey.newBtn.tr(),
                     style: AppTextStyle.text12SDark(context).copyWith(
                       fontWeight: FontWeight.bold,
-                      color: AppColor.whiteColor(context),
+                      color: AppColor.buttonTextColor(context),
                     ),
                   ),
                 ),
@@ -183,9 +196,9 @@ class _SalesCardWidgetState extends State<SalesCardWidget> {
                   children: [
                     Text(
                       '${barData[_selectedBarIndex]['label']}:',
-                      style: AppTextStyle.text10SDark(context).copyWith(
-                        color: AppColor.whiteColor(context).withValues(alpha: 0.7),
-                      ),
+                      style: AppTextStyle.text10SDark(
+                        context,
+                      ).copyWith(color: AppColor.darkTextColor(context)),
                     ),
                     Text(
                       barData[_selectedBarIndex]['amount'] as String,
@@ -223,23 +236,32 @@ class _SalesCardWidgetState extends State<SalesCardWidget> {
                             decoration: BoxDecoration(
                               gradient: isSelected
                                   ? LinearGradient(
-                                      colors: [AppColor.purpleAccent, AppColor.emeraldTeal],
+                                      colors: [
+                                        AppColor.purpleAccent,
+                                        AppColor.emeraldTeal,
+                                      ],
                                       begin: Alignment.bottomCenter,
                                       end: Alignment.topCenter,
                                     )
                                   : null,
-                              color: isSelected ? null : const Color(0xFF2C3E50),
+                              color: isSelected
+                                  ? null
+                                  : const Color(0xFF2C3E50),
                               borderRadius: BorderRadius.circular(4.r),
                               border: Border.all(
                                 color: isSelected
                                     ? AppColor.emeraldTeal
-                                    : AppColor.whiteColor(context).withValues(alpha: 0.12),
+                                    : AppColor.whiteColor(
+                                        context,
+                                      ).withValues(alpha: 0.12),
                                 width: isSelected ? 1.5 : 1,
                               ),
                               boxShadow: isSelected
                                   ? [
                                       BoxShadow(
-                                        color: AppColor.emeraldTeal.withValues(alpha: 0.4),
+                                        color: AppColor.emeraldTeal.withValues(
+                                          alpha: 0.4,
+                                        ),
                                         blurRadius: 8,
                                       ),
                                     ]
@@ -258,8 +280,12 @@ class _SalesCardWidgetState extends State<SalesCardWidget> {
                                 fontSize: 8.sp,
                                 color: isSelected
                                     ? AppColor.emeraldTeal
-                                    : AppColor.whiteColor(context).withValues(alpha: 0.54),
-                                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                    : AppColor.whiteColor(
+                                        context,
+                                      ).withValues(alpha: 0.54),
+                                fontWeight: isSelected
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
                               ),
                             ),
                           ),

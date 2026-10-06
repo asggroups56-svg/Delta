@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:my_template/core/theme/app_colors.dart';
 import 'package:my_template/core/utils/app_locale_key.dart';
 
 class RecentActivitiesWidget extends StatelessWidget {
@@ -39,12 +40,9 @@ class RecentActivitiesWidget extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.all(16.r),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColor.cardColor(context),
           borderRadius: BorderRadius.circular(18.r),
-          border: Border.all(
-            color: const Color(0xFFE2E8F0),
-            width: 1.2,
-          ),
+          border: Border.all(color: AppColor.borderColor(context), width: 1.2),
           boxShadow: [
             BoxShadow(
               color: const Color(0xFF0F172A).withValues(alpha: 0.04),
@@ -72,7 +70,7 @@ class RecentActivitiesWidget extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 13.5.sp,
                         fontWeight: FontWeight.w800,
-                        color: const Color(0xFF0F172A),
+                        color: AppColor.titleFormFiledColor(context),
                       ),
                     ),
                   ],
@@ -121,7 +119,7 @@ class RecentActivitiesWidget extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 12.sp,
                                 fontWeight: FontWeight.w700,
-                                color: const Color(0xFF0F172A),
+                                color: AppColor.titleFormFiledColor(context),
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -131,7 +129,7 @@ class RecentActivitiesWidget extends StatelessWidget {
                               item['desc'] as String,
                               style: TextStyle(
                                 fontSize: 11.sp,
-                                color: const Color(0xFF64748B),
+                                color: AppColor.darkTextColor(context),
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -144,7 +142,7 @@ class RecentActivitiesWidget extends StatelessWidget {
                         item['time'] as String,
                         style: TextStyle(
                           fontSize: 10.sp,
-                          color: const Color(0xFF94A3B8),
+                          color: AppColor.hintColor(context),
                         ),
                       ),
                     ],
@@ -152,8 +150,8 @@ class RecentActivitiesWidget extends StatelessWidget {
                   if (!isLast)
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: 8.h),
-                      child: const Divider(
-                        color: Color(0xFFF1F5F9),
+                      child: Divider(
+                        color: AppColor.borderColor(context),
                         height: 1,
                       ),
                     ),

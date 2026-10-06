@@ -94,7 +94,7 @@ class _MainShellScreenState extends State<MainShellScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColor.darkBackground,
+      backgroundColor: AppColor.scaffoldColor(context),
       body: Stack(
         children: [
           // ── Main Content with fade transition ────────────────────

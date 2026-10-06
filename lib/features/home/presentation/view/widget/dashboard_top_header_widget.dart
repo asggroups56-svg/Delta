@@ -32,13 +32,10 @@ class DashboardTopHeaderWidget extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
       decoration: BoxDecoration(
-        color: AppColor.whiteColor(context),
+        color: AppColor.cardColor(context),
         borderRadius: BorderRadius.vertical(bottom: Radius.circular(20.r)),
-        border: const Border(
-          bottom: BorderSide(
-            color: Color(0xFFE2E8F0),
-            width: 1.2,
-          ),
+        border: Border(
+          bottom: BorderSide(color: AppColor.borderColor(context), width: 1.2),
         ),
         boxShadow: [
           BoxShadow(
@@ -59,22 +56,28 @@ class DashboardTopHeaderWidget extends StatelessWidget {
                         Container(
                           padding: EdgeInsets.all(8.r),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF1F5F9),
+                            color: AppColor.cardSurfaceColor(context),
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: const Color(0xFFE2E8F0),
+                              color: AppColor.borderColor(context),
                             ),
                           ),
                           child: Icon(
                             context.locale.languageCode == 'ar'
                                 ? Icons.arrow_forward_ios_rounded
                                 : Icons.arrow_back_ios_new_rounded,
-                            color: const Color(0xFF0F172A),
+                            color: AppColor.titleFormFiledColor(context),
                             size: 14.r,
                           ),
                         ),
                         Gap(10.w),
-                        Expanded(child: _buildTitleColumn(context, displayTitle, displaySubtitle)),
+                        Expanded(
+                          child: _buildTitleColumn(
+                            context,
+                            displayTitle,
+                            displaySubtitle,
+                          ),
+                        ),
                       ],
                     ),
                   )
@@ -90,7 +93,10 @@ class DashboardTopHeaderWidget extends StatelessWidget {
                               decoration: const BoxDecoration(
                                 shape: BoxShape.circle,
                                 gradient: LinearGradient(
-                                  colors: [Color(0xFF1E40AF), Color(0xFF2563EB)],
+                                  colors: [
+                                    Color(0xFF1E40AF),
+                                    Color(0xFF2563EB),
+                                  ],
                                 ),
                               ),
                               child: CircleAvatar(
@@ -101,7 +107,7 @@ class DashboardTopHeaderWidget extends StatelessWidget {
                                   style: TextStyle(
                                     fontSize: 14.sp,
                                     fontWeight: FontWeight.bold,
-                                    color: AppColor.whiteColor(context),
+                                    color: AppColor.buttonTextColor(context),
                                   ),
                                 ),
                               ),
@@ -116,7 +122,7 @@ class DashboardTopHeaderWidget extends StatelessWidget {
                                   color: const Color(0xFF10B981),
                                   shape: BoxShape.circle,
                                   border: Border.all(
-                                    color: AppColor.whiteColor(context),
+                                    color: AppColor.buttonTextColor(context),
                                     width: 1.5,
                                   ),
                                 ),
@@ -125,7 +131,13 @@ class DashboardTopHeaderWidget extends StatelessWidget {
                           ],
                         ),
                         Gap(10.w),
-                        Expanded(child: _buildTitleColumn(context, displayTitle, displaySubtitle)),
+                        Expanded(
+                          child: _buildTitleColumn(
+                            context,
+                            displayTitle,
+                            displaySubtitle,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -165,9 +177,9 @@ class DashboardTopHeaderWidget extends StatelessWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                       Icon(
+                      Icon(
                         Icons.auto_awesome_rounded,
-                        color:AppColor.whiteColor(context),
+                        color: AppColor.buttonTextColor(context),
                         size: 13,
                       ),
                       Gap(4.w),
@@ -176,7 +188,7 @@ class DashboardTopHeaderWidget extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 10.5.sp,
                           fontWeight: FontWeight.w800,
-                          color: AppColor.whiteColor(context),
+                          color: AppColor.buttonTextColor(context),
                           letterSpacing: 0.5,
                         ),
                       ),
@@ -203,15 +215,13 @@ class DashboardTopHeaderWidget extends StatelessWidget {
                     child: Container(
                       padding: EdgeInsets.all(6.r),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF1F5F9),
+                        color: AppColor.cardSurfaceColor(context),
                         borderRadius: BorderRadius.circular(10.r),
-                        border: Border.all(
-                          color: const Color(0xFFE2E8F0),
-                        ),
+                        border: Border.all(color: const Color(0xFFE2E8F0)),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.notifications_none_rounded,
-                        color: Color(0xFF334155),
+                        color: AppColor.darkTextColor(context),
                         size: 18,
                       ),
                     ),
@@ -253,11 +263,9 @@ class DashboardTopHeaderWidget extends StatelessWidget {
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 5.h),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF1F5F9),
+                    color: AppColor.cardSurfaceColor(context),
                     borderRadius: BorderRadius.circular(10.r),
-                    border: Border.all(
-                      color: const Color(0xFFE2E8F0),
-                    ),
+                    border: Border.all(color: AppColor.borderColor(context)),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -271,7 +279,7 @@ class DashboardTopHeaderWidget extends StatelessWidget {
                       Text(
                         AppLocaleKey.langSwitchShort.tr(),
                         style: TextStyle(
-                          color: const Color(0xFF0F172A),
+                          color: AppColor.titleFormFiledColor(context),
                           fontWeight: FontWeight.w800,
                           fontSize: 10.5.sp,
                         ),
@@ -289,15 +297,13 @@ class DashboardTopHeaderWidget extends StatelessWidget {
                 child: Container(
                   padding: EdgeInsets.all(6.r),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF1F5F9),
+                    color: AppColor.cardSurfaceColor(context),
                     borderRadius: BorderRadius.circular(10.r),
-                    border: Border.all(
-                      color: const Color(0xFFE2E8F0),
-                    ),
+                    border: Border.all(color: AppColor.borderColor(context)),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.menu_rounded,
-                    color: Color(0xFF0F172A),
+                    color: AppColor.titleFormFiledColor(context),
                     size: 18,
                   ),
                 ),
@@ -309,7 +315,11 @@ class DashboardTopHeaderWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildTitleColumn(BuildContext context, String displayTitle, String displaySubtitle) {
+  Widget _buildTitleColumn(
+    BuildContext context,
+    String displayTitle,
+    String displaySubtitle,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -321,7 +331,7 @@ class DashboardTopHeaderWidget extends StatelessWidget {
           style: TextStyle(
             fontWeight: FontWeight.w900,
             fontSize: 14.5.sp,
-            color: const Color(0xFF0F172A),
+            color: AppColor.titleFormFiledColor(context),
             letterSpacing: -0.2,
           ),
         ),
@@ -344,7 +354,7 @@ class DashboardTopHeaderWidget extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 10.sp,
                   fontWeight: FontWeight.w500,
-                  color: const Color(0xFF64748B),
+                  color: AppColor.darkTextColor(context),
                 ),
               ),
             ),

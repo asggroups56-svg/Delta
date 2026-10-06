@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:my_template/core/theme/app_colors.dart';
 
 class BottomNavBarWidget extends StatelessWidget {
   final int currentIndex;
@@ -50,16 +51,15 @@ class BottomNavBarWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final isRtl = Directionality.of(context) == TextDirection.rtl;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
+    final accentColor = AppColor.primaryColor(context);
+    final inactiveColor = AppColor.darkTextColor(context);
 
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: Colors.white,
-        border: const Border(
-          top: BorderSide(
-            color: Color(0xFFE2E8F0),
-            width: 1.2,
-          ),
+        color: AppColor.cardColor(context),
+        border: Border(
+          top: BorderSide(color: AppColor.borderColor(context), width: 1.2),
         ),
         boxShadow: [
           BoxShadow(
@@ -70,7 +70,7 @@ class BottomNavBarWidget extends StatelessWidget {
         ],
       ),
       child: Container(
-        color: Colors.white,
+        color: AppColor.cardColor(context),
         padding: EdgeInsets.only(
           top: 6.h,
           bottom: bottomPadding > 0 ? bottomPadding : 10.h,
@@ -83,7 +83,8 @@ class BottomNavBarWidget extends StatelessWidget {
             final activeIndex = isRtl
                 ? (_items.length - 1 - currentIndex)
                 : currentIndex;
-            final leftIndicatorOffset = (activeIndex * itemWidth) + (itemWidth - 36.w) / 2;
+            final leftIndicatorOffset =
+                (activeIndex * itemWidth) + (itemWidth - 36.w) / 2;
 
             return Stack(
               alignment: Alignment.topCenter,
@@ -129,7 +130,9 @@ class BottomNavBarWidget extends StatelessWidget {
                               onTap(index);
                             },
                             borderRadius: BorderRadius.circular(16.r),
-                            splashColor: const Color(0xFF1E40AF).withValues(alpha: 0.1),
+                            splashColor: const Color(
+                              0xFF1E40AF,
+                            ).withValues(alpha: 0.1),
                             highlightColor: Colors.transparent,
                             child: Padding(
                               padding: EdgeInsets.symmetric(vertical: 4.h),
@@ -146,13 +149,15 @@ class BottomNavBarWidget extends StatelessWidget {
                                     ),
                                     decoration: BoxDecoration(
                                       color: isSelected
-                                          ? const Color(0xFFEFF6FF)
+                                          ? accentColor.withValues(alpha: 0.1)
                                           : Colors.transparent,
                                       borderRadius: BorderRadius.circular(14.r),
                                     ),
                                     child: AnimatedScale(
                                       scale: isSelected ? 1.1 : 1.0,
-                                      duration: const Duration(milliseconds: 250),
+                                      duration: const Duration(
+                                        milliseconds: 250,
+                                      ),
                                       curve: Curves.easeOutBack,
                                       child: Icon(
                                         isSelected
@@ -160,8 +165,8 @@ class BottomNavBarWidget extends StatelessWidget {
                                             : item.inactiveIcon,
                                         size: isSelected ? 22.r : 20.r,
                                         color: isSelected
-                                            ? const Color(0xFF1E40AF)
-                                            : const Color(0xFF64748B),
+                                            ? accentColor
+                                            : inactiveColor,
                                       ),
                                     ),
                                   ),
@@ -174,8 +179,8 @@ class BottomNavBarWidget extends StatelessWidget {
                                           ? FontWeight.w800
                                           : FontWeight.w600,
                                       color: isSelected
-                                          ? const Color(0xFF1E40AF)
-                                          : const Color(0xFF64748B),
+                                          ? accentColor
+                                          : inactiveColor,
                                       fontFamily: 'Tajawal',
                                     ),
                                     child: Text(

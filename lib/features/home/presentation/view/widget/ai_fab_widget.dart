@@ -12,7 +12,8 @@ class AiFabWidget extends StatefulWidget {
   State<AiFabWidget> createState() => _AiFabWidgetState();
 }
 
-class _AiFabWidgetState extends State<AiFabWidget> with SingleTickerProviderStateMixin {
+class _AiFabWidgetState extends State<AiFabWidget>
+    with SingleTickerProviderStateMixin {
   late AnimationController _aiPulseController;
   late Animation<double> _aiPulseAnimation;
 
@@ -72,7 +73,7 @@ class _AiFabWidgetState extends State<AiFabWidget> with SingleTickerProviderStat
               children: [
                 Icon(
                   Icons.auto_awesome_rounded,
-                  color: AppColor.whiteColor(context),
+                  color: AppColor.buttonTextColor(context),
                   size: 18.r,
                 ),
                 Gap(6.w),
@@ -81,7 +82,7 @@ class _AiFabWidgetState extends State<AiFabWidget> with SingleTickerProviderStat
                   style: AppTextStyle.bodySmall(context).copyWith(
                     fontSize: 13.sp,
                     fontWeight: FontWeight.bold,
-                    color: AppColor.whiteColor(context),
+                    color: AppColor.buttonTextColor(context),
                   ),
                 ),
               ],

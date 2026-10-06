@@ -64,7 +64,7 @@ class _AccountingDashboardScreenState extends State<AccountingDashboardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: AppColor.darkBackground,
+      backgroundColor: AppColor.scaffoldColor(context),
       drawer: widget.embeddedInShell
           ? null
           : SideDrawerAccountingWidget(onTap: _logout, openAiChatTap: () {}),

@@ -24,7 +24,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final TextEditingController _identityController = TextEditingController();
   final TextEditingController _otpController = TextEditingController();
   final TextEditingController _newPasswordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   int _currentStep = 1; // 1 = Enter Email/Mobile, 2 = Enter OTP & New Password
   bool _isLoading = false;
@@ -54,7 +55,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           _currentStep = 2;
         });
         CommonMethods.showToast(
-          message: isArabicLocale ? 'تم إرسال رمز التحقق' : 'Verification code sent',
+          message: isArabicLocale
+              ? 'تم إرسال رمز التحقق'
+              : 'Verification code sent',
           type: ToastType.success,
         );
       }
@@ -98,7 +101,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     final isArabic = isArabicLocale;
 
     return Scaffold(
-      backgroundColor: AppColor.darkBackground,
+      backgroundColor: AppColor.scaffoldColor(context),
       body: Stack(
         children: [
           // ── Background Ambient Glows ───────────────────────────────────────
@@ -166,10 +169,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                             child: Container(
                               padding: EdgeInsets.all(8.r),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF131C2E),
+                                color: AppColor.cardSurfaceColor(context),
                                 borderRadius: BorderRadius.circular(12.r),
                                 border: Border.all(
-                                  color: const Color(0xFF38BDF8).withValues(alpha: 0.25),
+                                  color: const Color(
+                                    0xFF38BDF8,
+                                  ).withValues(alpha: 0.25),
                                 ),
                               ),
                               child: Icon(
@@ -177,7 +182,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                     ? Icons.arrow_forward_ios_rounded
                                     : Icons.arrow_back_ios_new_rounded,
                                 size: 15.r,
-                                color: Colors.white,
+                                color: AppColor.darkTextColor(context),
                               ),
                             ),
                           ),
@@ -188,7 +193,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                               fontSize: 15.sp,
                               fontWeight: FontWeight.w900,
                               letterSpacing: 1.2,
-                              color: Colors.white,
+                              color: AppColor.darkTextColor(context),
                             ),
                           ),
                         ],
@@ -204,10 +209,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                             vertical: 5.h,
                           ),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF131C2E),
+                            color: AppColor.cardSurfaceColor(context),
                             borderRadius: BorderRadius.circular(20.r),
                             border: Border.all(
-                              color: const Color(0xFF38BDF8).withValues(alpha: 0.3),
+                              color: const Color(
+                                0xFF38BDF8,
+                              ).withValues(alpha: 0.3),
                             ),
                           ),
                           child: Row(
@@ -238,9 +245,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
                   // Step Indicator
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 14.w,
+                      vertical: 10.h,
+                    ),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF131C2E),
+                      color: AppColor.cardColor(context),
                       borderRadius: BorderRadius.circular(16.r),
                       border: Border.all(
                         color: const Color(0xFF0284C7).withValues(alpha: 0.25),
@@ -261,7 +271,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           margin: EdgeInsets.symmetric(horizontal: 6.w),
                           color: _currentStep >= 2
                               ? const Color(0xFF0284C7)
-                              : Colors.white.withValues(alpha: 0.1),
+                              : AppColor.borderColor(context),
                         ),
                         Expanded(
                           child: _buildStepItem(
@@ -282,10 +292,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     child: Container(
                       padding: EdgeInsets.all(20.r),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF131C2E),
+                        color: AppColor.cardColor(context),
                         borderRadius: BorderRadius.circular(22.r),
                         border: Border.all(
-                          color: const Color(0xFF0284C7).withValues(alpha: 0.28),
+                          color: const Color(
+                            0xFF0284C7,
+                          ).withValues(alpha: 0.28),
                           width: 1.2,
                         ),
                         boxShadow: [
@@ -360,13 +372,15 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     colors: [Color(0xFF0284C7), Color(0xFF0EA5E9)],
                   )
                 : null,
-            color: isActive ? null : Colors.white.withValues(alpha: 0.08),
+            color: isActive ? null : AppColor.cardSurfaceColor(context),
           ),
           child: Center(
             child: Text(
               '$step',
               style: TextStyle(
-                color: isActive ? Colors.white : Colors.white.withValues(alpha: 0.4),
+                color: isActive
+                    ? AppColor.buttonTextColor(context)
+                    : AppColor.darkTextColor(context),
                 fontWeight: FontWeight.bold,
                 fontSize: 12.sp,
               ),
@@ -382,7 +396,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             style: TextStyle(
               fontSize: 11.sp,
               fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
-              color: isActive ? const Color(0xFF38BDF8) : Colors.white.withValues(alpha: 0.5),
+              color: isActive
+                  ? const Color(0xFF38BDF8)
+                  : AppColor.darkTextColor(context),
             ),
           ),
         ),
@@ -413,14 +429,20 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           Gap(14.h),
           Text(
             AppLocaleKey.forgotPasswordHeader.tr(),
-            style: AppTextStyle.titleBold(context, fontSize: 18, color: Colors.white).copyWith(
-              fontWeight: FontWeight.w800,
-            ),
+            style: AppTextStyle.titleBold(
+              context,
+              fontSize: 18,
+              color: AppColor.titleFormFiledColor(context),
+            ).copyWith(fontWeight: FontWeight.w800),
           ),
           Gap(6.h),
           Text(
             AppLocaleKey.forgotPasswordHeaderSubtitle.tr(),
-            style: AppTextStyle.bodySmall(context, fontSize: 11.5, color: const Color(0xFF94A3B8)),
+            style: AppTextStyle.bodySmall(
+              context,
+              fontSize: 11.5,
+              color: AppColor.darkTextColor(context),
+            ),
           ),
           Gap(20.h),
 
@@ -432,10 +454,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               color: Color(0xFF38BDF8),
             ),
             radius: 12.r,
-            fillColor: const Color(0xFF0E1626),
-            unFocusColor: const Color(0xFF243048),
-            validator: (value) =>
-                value == null || value.trim().isEmpty ? AppLocaleKey.mobileOrEmail.tr() : null,
+            fillColor: AppColor.textFormFillColor(context),
+            unFocusColor: AppColor.textFormBorderColor(context),
+            validator: (value) => value == null || value.trim().isEmpty
+                ? AppLocaleKey.mobileOrEmail.tr()
+                : null,
           ),
           Gap(20.h),
 
@@ -515,14 +538,20 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           Gap(14.h),
           Text(
             AppLocaleKey.verificationCode.tr(),
-            style: AppTextStyle.titleBold(context, fontSize: 18, color: Colors.white).copyWith(
-              fontWeight: FontWeight.w800,
-            ),
+            style: AppTextStyle.titleBold(
+              context,
+              fontSize: 18,
+              color: AppColor.titleFormFiledColor(context),
+            ).copyWith(fontWeight: FontWeight.w800),
           ),
           Gap(6.h),
           Text(
             AppLocaleKey.enterVerificationCode.tr(),
-            style: AppTextStyle.bodySmall(context, fontSize: 11.5, color: const Color(0xFF94A3B8)),
+            style: AppTextStyle.bodySmall(
+              context,
+              fontSize: 11.5,
+              color: AppColor.darkTextColor(context),
+            ),
           ),
           Gap(18.h),
 
@@ -531,10 +560,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             title: AppLocaleKey.verificationCode.tr(),
             keyboardType: TextInputType.number,
             maxLength: 6,
-            prefixIcon: const Icon(Icons.dialpad_rounded, color: Color(0xFF38BDF8)),
+            prefixIcon: const Icon(
+              Icons.dialpad_rounded,
+              color: Color(0xFF38BDF8),
+            ),
             radius: 12.r,
-            fillColor: const Color(0xFF0E1626),
-            unFocusColor: const Color(0xFF243048),
+            fillColor: AppColor.textFormFillColor(context),
+            unFocusColor: AppColor.textFormBorderColor(context),
             validator: (value) => value == null || value.trim().length < 4
                 ? AppLocaleKey.enterVerificationCode.tr()
                 : null,
@@ -544,12 +576,15 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           CustomFormField(
             controller: _newPasswordController,
             title: AppLocaleKey.newPassword.tr(),
-            prefixIcon: const Icon(Icons.lock_outline_rounded, color: Color(0xFF38BDF8)),
+            prefixIcon: const Icon(
+              Icons.lock_outline_rounded,
+              color: Color(0xFF38BDF8),
+            ),
             isPassword: true,
             passwordColor: const Color(0xFF38BDF8),
             radius: 12.r,
-            fillColor: const Color(0xFF0E1626),
-            unFocusColor: const Color(0xFF243048),
+            fillColor: AppColor.textFormFillColor(context),
+            unFocusColor: AppColor.textFormBorderColor(context),
             validator: (value) => value == null || value.isEmpty
                 ? AppLocaleKey.newPassword.tr()
                 : null,
@@ -559,16 +594,22 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           CustomFormField(
             controller: _confirmPasswordController,
             title: AppLocaleKey.confirmNewPassword.tr(),
-            prefixIcon: const Icon(Icons.lock_reset_rounded, color: Color(0xFF38BDF8)),
+            prefixIcon: const Icon(
+              Icons.lock_reset_rounded,
+              color: Color(0xFF38BDF8),
+            ),
             isPassword: true,
             passwordColor: const Color(0xFF38BDF8),
             radius: 12.r,
-            fillColor: const Color(0xFF0E1626),
-            unFocusColor: const Color(0xFF243048),
+            fillColor: AppColor.textFormFillColor(context),
+            unFocusColor: AppColor.textFormBorderColor(context),
             validator: (value) {
-              if (value == null || value.isEmpty) return AppLocaleKey.confirmNewPassword.tr();
+              if (value == null || value.isEmpty)
+                return AppLocaleKey.confirmNewPassword.tr();
               if (value != _newPasswordController.text) {
-                return isArabicLocale ? 'كلمات المرور غير متطابقة' : 'Passwords do not match';
+                return isArabicLocale
+                    ? 'كلمات المرور غير متطابقة'
+                    : 'Passwords do not match';
               }
               return null;
             },
@@ -582,13 +623,15 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 AppLocaleKey.resendCode.tr(),
                 style: TextStyle(
                   fontSize: 11.5.sp,
-                  color: Colors.white.withValues(alpha: 0.6),
+                  color: AppColor.darkTextColor(context),
                 ),
               ),
               InkWell(
                 onTap: () {
                   CommonMethods.showToast(
-                    message: isArabicLocale ? 'تم إرسال الرمز مجدداً' : 'Code resent',
+                    message: isArabicLocale
+                        ? 'تم إرسال الرمز مجدداً'
+                        : 'Code resent',
                     type: ToastType.success,
                   );
                 },

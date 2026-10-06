@@ -157,7 +157,7 @@ class _FullscreenPdfViewerScreenState extends State<FullscreenPdfViewerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F172A),
+      backgroundColor: AppColor.cardColor(context),
       body: SafeArea(
         child: Column(
           children: [
@@ -170,7 +170,7 @@ class _FullscreenPdfViewerScreenState extends State<FullscreenPdfViewerScreen> {
             // ── منطقة عرض الـ PDF مع التكبير والتصغير التفاعلي ──────────────
             Expanded(
               child: Container(
-                color: const Color(0xFF0F172A),
+                color: AppColor.cardSurfaceColor(context),
                 child: InteractiveViewer(
                   transformationController: _transformController,
                   minScale: 1.0,
@@ -275,8 +275,11 @@ class _FullscreenPdfViewerScreenState extends State<FullscreenPdfViewerScreen> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF1E293B), Color(0xFF0F172A)],
+        gradient: LinearGradient(
+          colors: [
+            AppColor.cardColor(context),
+            AppColor.cardSurfaceColor(context),
+          ],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
         ),
@@ -300,7 +303,7 @@ class _FullscreenPdfViewerScreenState extends State<FullscreenPdfViewerScreen> {
               ),
               child:  Icon(
                 Icons.arrow_back_ios_new_rounded,
-                color: AppColor.whiteColor(context),
+                color: Colors.white,
                 size: 16,
               ),
             ),
@@ -442,7 +445,7 @@ class _FullscreenPdfViewerScreenState extends State<FullscreenPdfViewerScreen> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 6.h),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B),
+        color: AppColor.cardSurfaceColor(context),
         border: Border(
           bottom: BorderSide(
             color: AppColor.whiteColor(context).withValues(alpha: 0.06),
@@ -549,7 +552,7 @@ class _FullscreenPdfViewerScreenState extends State<FullscreenPdfViewerScreen> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B),
+        color: AppColor.cardSurfaceColor(context),
         border: Border(
           top: BorderSide(
             color: AppColor.whiteColor(context).withValues(alpha: 0.1),

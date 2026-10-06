@@ -22,25 +22,25 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   int _currentIndex = 0;
 
   List<OnboardingItemModel> _getItems() => [
-        OnboardingItemModel(
-          titleKey: AppLocaleKey.onboardingTitle1,
-          subtitleKey: AppLocaleKey.onboardingSubtitle1,
-          accentColor: const Color(0xFF00B894),
-          type: OnboardingType.allInOne,
-        ),
-        OnboardingItemModel(
-          titleKey: AppLocaleKey.onboardingTitle2,
-          subtitleKey: AppLocaleKey.onboardingSubtitle2,
-          accentColor: const Color(0xFF0984E3),
-          type: OnboardingType.analytics,
-        ),
-        OnboardingItemModel(
-          titleKey: AppLocaleKey.onboardingTitle3,
-          subtitleKey: AppLocaleKey.onboardingSubtitle3,
-          accentColor: const Color(0xFF6C5CE7),
-          type: OnboardingType.automation,
-        ),
-      ];
+    OnboardingItemModel(
+      titleKey: AppLocaleKey.onboardingTitle1,
+      subtitleKey: AppLocaleKey.onboardingSubtitle1,
+      accentColor: const Color(0xFF00B894),
+      type: OnboardingType.allInOne,
+    ),
+    OnboardingItemModel(
+      titleKey: AppLocaleKey.onboardingTitle2,
+      subtitleKey: AppLocaleKey.onboardingSubtitle2,
+      accentColor: const Color(0xFF0984E3),
+      type: OnboardingType.analytics,
+    ),
+    OnboardingItemModel(
+      titleKey: AppLocaleKey.onboardingTitle3,
+      subtitleKey: AppLocaleKey.onboardingSubtitle3,
+      accentColor: const Color(0xFF6C5CE7),
+      type: OnboardingType.automation,
+    ),
+  ];
 
   void _onNext() {
     final items = _getItems();
@@ -75,7 +75,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final currentItem = items[_currentIndex];
 
     return Scaffold(
-      backgroundColor: AppColor.darkBackground,
+      backgroundColor: AppColor.scaffoldColor(context),
       body: SafeArea(
         child: Column(
           children: [
@@ -95,7 +95,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           color: currentItem.accentColor,
                           boxShadow: [
                             BoxShadow(
-                              color: currentItem.accentColor.withValues(alpha: 0.5),
+                              color: currentItem.accentColor.withValues(
+                                alpha: 0.5,
+                              ),
                               blurRadius: 6,
                             ),
                           ],
@@ -120,12 +122,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         borderRadius: BorderRadius.circular(20.r),
                         child: Container(
                           padding: EdgeInsets.symmetric(
-                              horizontal: 12.w, vertical: 6.h),
+                            horizontal: 12.w,
+                            vertical: 6.h,
+                          ),
                           decoration: BoxDecoration(
-                            color: currentItem.accentColor.withValues(alpha: 0.12),
+                            color: currentItem.accentColor.withValues(
+                              alpha: 0.12,
+                            ),
                             borderRadius: BorderRadius.circular(20.r),
                             border: Border.all(
-                              color: currentItem.accentColor.withValues(alpha: 0.3),
+                              color: currentItem.accentColor.withValues(
+                                alpha: 0.3,
+                              ),
                             ),
                           ),
                           child: Row(
@@ -154,9 +162,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           onPressed: _navigateToLogin,
                           style: TextButton.styleFrom(
                             padding: EdgeInsets.symmetric(
-                                horizontal: 14.w, vertical: 6.h),
-                            backgroundColor:
-                                AppColor.whiteColor(context).withValues(alpha: 0.06),
+                              horizontal: 14.w,
+                              vertical: 6.h,
+                            ),
+                            backgroundColor: AppColor.buttonTextColor(
+                              context,
+                            ).withValues(alpha: 0.06),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20.r),
                             ),
@@ -166,7 +177,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             style: AppTextStyle.bodySmall(context).copyWith(
                               fontSize: 13.sp,
                               fontWeight: FontWeight.w600,
-                              color: AppColor.whiteColor(context).withValues(alpha: 0.7),
+                              color: AppColor.buttonTextColor(
+                                context,
+                              ).withValues(alpha: 0.7),
                             ),
                           ),
                         ),
@@ -215,7 +228,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           boxShadow: _currentIndex == index
                               ? [
                                   BoxShadow(
-                                    color: currentItem.accentColor.withValues(alpha: 0.5),
+                                    color: currentItem.accentColor.withValues(
+                                      alpha: 0.5,
+                                    ),
                                     blurRadius: 6,
                                   ),
                                 ]
@@ -239,7 +254,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         borderRadius: BorderRadius.circular(30.r),
                         boxShadow: [
                           BoxShadow(
-                            color: currentItem.accentColor.withValues(alpha: 0.4),
+                            color: currentItem.accentColor.withValues(
+                              alpha: 0.4,
+                            ),
                             blurRadius: 12.r,
                             offset: const Offset(0, 4),
                           ),
@@ -249,8 +266,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         onPressed: _onNext,
                         style: ElevatedButton.styleFrom(
                           padding: EdgeInsets.symmetric(
-                            horizontal:
-                                _currentIndex == items.length - 1 ? 28.w : 22.w,
+                            horizontal: _currentIndex == items.length - 1
+                                ? 28.w
+                                : 22.w,
                             vertical: 14.h,
                           ),
                           backgroundColor: Colors.transparent,
@@ -277,8 +295,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               _currentIndex == items.length - 1
                                   ? Icons.rocket_launch_rounded
                                   : (context.locale.languageCode == 'ar'
-                                      ? Icons.arrow_back_rounded
-                                      : Icons.arrow_forward_rounded),
+                                        ? Icons.arrow_back_rounded
+                                        : Icons.arrow_forward_rounded),
                               size: 18.r,
                               color: Colors.white,
                             ),

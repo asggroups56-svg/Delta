@@ -50,7 +50,7 @@ class OcrItemsTable extends StatelessWidget {
       textDirection: TextDirection.rtl,
       child: Container(
         decoration: BoxDecoration(
-          color: const Color(0xFF0A0F1E),
+          color: AppColor.cardColor(context),
           borderRadius: BorderRadius.circular(16.r),
           border: Border.all(
             color: AppColor.emeraldTeal.withValues(alpha: 0.25),
@@ -88,6 +88,7 @@ class OcrItemsTable extends StatelessWidget {
       ),
     );
   }
+
   // ── رأس القسم (أيقونة + عنوان + عدد) ─────────────────────────────────────
   Widget _buildHeader(BuildContext context) {
     return Padding(
@@ -140,9 +141,7 @@ class OcrItemsTable extends StatelessWidget {
   }
 
   // ── صف العناوين (Header) ─────────────────────────────────────────────────
-  Widget _buildColumnHeaders(
-    BuildContext context
-    ) {
+  Widget _buildColumnHeaders(BuildContext context) {
     return Container(
       color: AppColor.whiteColor(context).withValues(alpha: 0.03),
       padding: EdgeInsets.symmetric(vertical: 10.h),
@@ -187,41 +186,49 @@ class OcrItemsTable extends StatelessWidget {
   }
 
   // ── صف بيانات ────────────────────────────────────────────────────────────
-  Widget _buildRow(int index, OcrItemRow item,BuildContext context) {
+  Widget _buildRow(int index, OcrItemRow item, BuildContext context) {
     final isEven = index.isEven;
-
 
     return Container(
       color: isEven
-                ? Colors.transparent
-                : AppColor.whiteColor(context).withValues(alpha: 0.02),
+          ? Colors.transparent
+          : AppColor.whiteColor(context).withValues(alpha: 0.02),
       padding: EdgeInsets.symmetric(vertical: 11.h),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           _bodyCell(
             '${index + 1}',
+            context,
             width: _colIndex,
             color: AppColor.emeraldTeal,
             weight: FontWeight.w800,
           ),
-          _bodyCell(item.itemCode, width: _colCode, weight: FontWeight.bold),
+          _bodyCell(
+            item.itemCode,
+            context,
+            width: _colCode,
+            weight: FontWeight.bold,
+          ),
           _bodyCell(
             item.description.isEmpty ? 'صنف بدون وصف' : item.description,
+            context,
             width: _colDescription,
             align: TextAlign.start,
           ),
-          _bodyCell(item.quantity, width: _colQty),
-          _bodyCell(item.price, width: _colPrice),
+          _bodyCell(item.quantity, context, width: _colQty),
+          _bodyCell(item.price, context, width: _colPrice),
           _bodyCell(
             item.total,
+            context,
             width: _colTotal,
             color: AppColor.mintTeal,
             weight: FontWeight.bold,
           ),
-          _bodyCell(item.vat, width: _colVat),
+          _bodyCell(item.vat, context, width: _colVat),
           _bodyCell(
             item.discount,
+            context,
             width: _colDiscount,
             color: item.discount != '—'
                 ? const Color(0xFFFF7675)
@@ -229,6 +236,7 @@ class OcrItemsTable extends StatelessWidget {
           ),
           _bodyCell(
             item.net,
+            context,
             width: _colNet,
             color: AppColor.emeraldTeal,
             weight: FontWeight.bold,
@@ -239,7 +247,8 @@ class OcrItemsTable extends StatelessWidget {
   }
 
   Widget _bodyCell(
-    String text, {
+    String text,
+    BuildContext context, {
     required double width,
     TextAlign align = TextAlign.center,
     Color? color,
@@ -257,7 +266,7 @@ class OcrItemsTable extends StatelessWidget {
           style: TextStyle(
             fontSize: 10.sp,
             fontWeight: weight ?? FontWeight.w500,
-            color: color ?? Colors.white.withValues(alpha: 0.85),
+            color: color ?? AppColor.titleFormFiledColor(context),
             fontFamily: 'Tajawal',
             height: 1.35,
           ),
@@ -267,19 +276,20 @@ class OcrItemsTable extends StatelessWidget {
   }
 
   // ── حالة عدم وجود أصناف ──────────────────────────────────────────────────
-  Widget _buildEmpty( BuildContext context) {
+  Widget _buildEmpty(BuildContext context) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(18.r),
       decoration: BoxDecoration(
-        color: const Color(0xFF111827),
+        color: AppColor.cardColor(context),
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: AppColor.whiteColor(context).withValues(alpha: 0.08)),
+        border: Border.all(
+          color: AppColor.whiteColor(context).withValues(alpha: 0.08),
+        ),
       ),
       child: Row(
         children: [
-          Icon(Icons.info_outline_rounded,
-              color: Colors.orange, size: 20.r),
+          Icon(Icons.info_outline_rounded, color: Colors.orange, size: 20.r),
           Gap(8.w),
           Expanded(
             child: Text(

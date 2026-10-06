@@ -41,21 +41,16 @@ class ReportsTableItemWidget extends StatelessWidget {
       margin: EdgeInsets.only(bottom: 12.h),
       padding: EdgeInsets.all(16.r),
       decoration: BoxDecoration(
-        color: AppColor.darkCardBackground,
+        color: AppColor.cardColor(context),
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-          color: AppColor.whiteColor(context).withValues(alpha: 0.08),
-        ),
+        border: Border.all(color: AppColor.borderColor(context)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildHeader(context, isAudited),
           Gap(12.h),
-          Divider(
-            color: AppColor.whiteColor(context).withValues(alpha: 0.08),
-            height: 1,
-          ),
+          Divider(color: AppColor.borderColor(context), height: 1),
           Gap(10.h),
           _buildFooter(context),
         ],
@@ -86,7 +81,7 @@ class ReportsTableItemWidget extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 13.sp,
                   fontWeight: FontWeight.bold,
-                  color: AppColor.whiteColor(context),
+                  color: AppColor.titleFormFiledColor(context),
                 ),
               ),
               Gap(2.h),
@@ -96,7 +91,7 @@ class ReportsTableItemWidget extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 10.sp,
-                  color: AppColor.whiteColor(context).withValues(alpha: 0.6),
+                  color: AppColor.darkTextColor(context),
                 ),
               ),
             ],
@@ -109,9 +104,7 @@ class ReportsTableItemWidget extends StatelessWidget {
   }
 
   Widget _statusChip(bool isAudited) {
-    final color = isAudited
-        ? AppColor.emeraldTeal
-        : const Color(0xFFF39C12);
+    final color = isAudited ? AppColor.emeraldTeal : const Color(0xFFF39C12);
 
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
@@ -141,7 +134,7 @@ class ReportsTableItemWidget extends StatelessWidget {
               Icon(
                 Icons.calendar_today_outlined,
                 size: 12.r,
-                color: AppColor.whiteColor(context).withValues(alpha: 0.5),
+                color: AppColor.darkTextColor(context),
               ),
               Gap(4.w),
               Flexible(
@@ -151,7 +144,7 @@ class ReportsTableItemWidget extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 10.5.sp,
-                    color: AppColor.whiteColor(context).withValues(alpha: 0.5),
+                    color: AppColor.darkTextColor(context),
                   ),
                 ),
               ),

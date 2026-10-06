@@ -18,7 +18,7 @@ class SideDrawerWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: const Color(0xFF0D121B),
+      backgroundColor: AppColor.cardColor(context),
       child: SafeArea(
         child: Column(
           children: [
@@ -26,15 +26,9 @@ class SideDrawerWidget extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(18.r),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF162338), Color(0xFF101926)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+                color: AppColor.cardSurfaceColor(context),
                 border: Border(
-                  bottom: BorderSide(
-                    color: AppColor.whiteColor(context).withValues(alpha: 0.08),
-                  ),
+                  bottom: BorderSide(color: AppColor.borderColor(context)),
                 ),
               ),
               child: Row(
@@ -51,13 +45,13 @@ class SideDrawerWidget extends StatelessWidget {
                         ),
                         child: CircleAvatar(
                           radius: 22.r,
-                          backgroundColor: const Color(0xFF1B2431),
+                          backgroundColor: AppColor.cardColor(context),
                           child: Text(
                             'A',
                             style: TextStyle(
                               fontSize: 18.sp,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: AppColor.titleFormFiledColor(context),
                             ),
                           ),
                         ),
@@ -72,7 +66,7 @@ class SideDrawerWidget extends StatelessWidget {
                             color: const Color(0xFF00E676),
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: const Color(0xFF0D121B),
+                              color: AppColor.cardColor(context),
                               width: 2,
                             ),
                           ),
@@ -131,7 +125,10 @@ class SideDrawerWidget extends StatelessWidget {
                     color: AppColor.emeraldTeal,
                     onTap: () {
                       Navigator.pop(context);
-                      NavigatorMethods.pushNamed(context, RoutesName.accountingDashboardScreen);
+                      NavigatorMethods.pushNamed(
+                        context,
+                        RoutesName.accountingDashboardScreen,
+                      );
                     },
                   ),
                   DrawerTileWidget(
@@ -140,7 +137,10 @@ class SideDrawerWidget extends StatelessWidget {
                     color: AppColor.oceanBlue,
                     onTap: () {
                       Navigator.pop(context);
-                      NavigatorMethods.pushNamed(context, RoutesName.reportsScreen);
+                      NavigatorMethods.pushNamed(
+                        context,
+                        RoutesName.reportsScreen,
+                      );
                     },
                   ),
                   DrawerTileWidget(
@@ -154,7 +154,10 @@ class SideDrawerWidget extends StatelessWidget {
                     color: AppColor.mintTeal,
                     onTap: () {
                       Navigator.pop(context);
-                      NavigatorMethods.pushNamed(context, RoutesName.knowledgeScreen);
+                      NavigatorMethods.pushNamed(
+                        context,
+                        RoutesName.knowledgeScreen,
+                      );
                     },
                   ),
 
@@ -216,12 +219,17 @@ class SideDrawerWidget extends StatelessWidget {
                     'Delta ERP v3.2.0',
                     style: TextStyle(
                       fontSize: 10.5.sp,
-                      color: AppColor.whiteColor(context).withValues(alpha: 0.4),
+                      color: AppColor.whiteColor(
+                        context,
+                      ).withValues(alpha: 0.4),
                       fontWeight: FontWeight.w500,
                     ),
                   ),
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 6.w,
+                      vertical: 2.h,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColor.emeraldTeal.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(4.r),

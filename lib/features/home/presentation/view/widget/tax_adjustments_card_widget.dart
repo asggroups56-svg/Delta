@@ -20,9 +20,11 @@ class TaxAdjustmentsCardWidget extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.all(16.r),
         decoration: BoxDecoration(
-          color: AppColor.darkCardBackground,
+          color: AppColor.cardColor(context),
           borderRadius: BorderRadius.circular(16.r),
-          border: Border.all(color: AppColor.whiteColor(context).withValues(alpha: 0.08)),
+          border: Border.all(
+            color: AppColor.whiteColor(context).withValues(alpha: 0.08),
+          ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -32,9 +34,16 @@ class TaxAdjustmentsCardWidget extends StatelessWidget {
               children: [
                 Text(
                   AppLocaleKey.taxAdjustments.tr(),
-                  style: AppTextStyle.text16SDark(context).copyWith(fontWeight: FontWeight.bold, color: AppColor.emeraldTeal),
+                  style: AppTextStyle.text16SDark(context).copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: AppColor.emeraldTeal,
+                  ),
                 ),
-                Icon(Icons.more_vert_rounded, color: AppColor.whiteColor(context).withValues(alpha: 0.54), size: 20.r),
+                Icon(
+                  Icons.more_vert_rounded,
+                  color: AppColor.whiteColor(context).withValues(alpha: 0.54),
+                  size: 20.r,
+                ),
               ],
             ),
             Gap(16.h),
@@ -43,15 +52,29 @@ class TaxAdjustmentsCardWidget extends StatelessWidget {
               child: GestureDetector(
                 onTap: onTap,
                 child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 8.h),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 24.w,
+                    vertical: 8.h,
+                  ),
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(colors: [const Color(0xFF8E44AD), AppColor.purpleAccent]),
+                    gradient: LinearGradient(
+                      colors: [const Color(0xFF8E44AD), AppColor.purpleAccent],
+                    ),
                     borderRadius: BorderRadius.circular(10.r),
-                    boxShadow: [BoxShadow(color: AppColor.purpleAccent.withValues(alpha: 0.4), blurRadius: 10, offset: const Offset(0, 3))],
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColor.purpleAccent.withValues(alpha: 0.4),
+                        blurRadius: 10,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
                   ),
                   child: Text(
                     AppLocaleKey.newBtn.tr(),
-                    style: AppTextStyle.bodyMedium(context).copyWith(fontWeight: FontWeight.bold, color: AppColor.whiteColor(context)),
+                    style: AppTextStyle.bodyMedium(context).copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: AppColor.buttonTextColor(context),
+                    ),
                   ),
                 ),
               ),
