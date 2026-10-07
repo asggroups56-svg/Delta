@@ -1,3 +1,5 @@
+import 'report_date_formatter.dart';
+
 class SalesWithVatReportRequestModel {
   final double? fromCustomerNo;
   final double? toCustomerNo;
@@ -27,9 +29,12 @@ class SalesWithVatReportRequestModel {
     return {
       'FromCustomerNo': fromCustomerNo,
       'ToCustomerNo': toCustomerNo,
-      'FromTransDate':
-          fromTransDate != null ? _formatDate(fromTransDate!) : null,
-      'ToTransDate': toTransDate != null ? _formatDate(toTransDate!) : null,
+      'FromTransDate': fromTransDate != null
+          ? formatReportDate(fromTransDate!)
+          : null,
+      'ToTransDate': toTransDate != null
+          ? formatReportDate(toTransDate!)
+          : null,
       'DocumentType': documentType,
       'TaxTreatment': taxTreatment,
       'TaxPeriod': taxPeriod,
@@ -37,12 +42,5 @@ class SalesWithVatReportRequestModel {
       'ReportName': reportName,
       'ExportType': exportType,
     };
-  }
-
-  String _formatDate(DateTime date) {
-    final year = date.year.toString().padLeft(4, '0');
-    final month = date.month.toString().padLeft(2, '0');
-    final day = date.day.toString().padLeft(2, '0');
-    return '$year-$month-${day}T00:00:00';
   }
 }

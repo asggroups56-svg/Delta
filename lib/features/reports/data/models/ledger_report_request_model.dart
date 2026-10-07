@@ -1,3 +1,5 @@
+import 'report_date_formatter.dart';
+
 class LedgerReportRequestModel {
   final DateTime fromDate;
   final DateTime toDate;
@@ -17,20 +19,13 @@ class LedgerReportRequestModel {
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{
-      'FromDate': _formatDate(fromDate),
-      'ToDate': _formatDate(toDate),
+      'FromDate': formatReportDate(fromDate),
+      'ToDate': formatReportDate(toDate),
       'ReportName': reportName,
       'ExportType': exportType,
     };
     if (fromAccountNo != null) map['FromAccountNo'] = fromAccountNo;
     if (toAccountNo != null) map['ToAccountNo'] = toAccountNo;
     return map;
-  }
-
-  String _formatDate(DateTime date) {
-    final year = date.year.toString().padLeft(4, '0');
-    final month = date.month.toString().padLeft(2, '0');
-    final day = date.day.toString().padLeft(2, '0');
-    return '$year-$month-${day}T00:00:00';
   }
 }

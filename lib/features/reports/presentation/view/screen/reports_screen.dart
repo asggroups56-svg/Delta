@@ -800,8 +800,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
       {
         'title': AppLocaleKey.statementDailyIncome.tr(),
         'desc': AppLocaleKey.statementDailyIncomeDesc.tr(),
-        'amount': 'AGL300_D',
-        'date': 'Live API',
         'status': AppLocaleKey.statusAudited.tr(),
         'icon': Icons.calendar_view_day_rounded,
         'iconColor': AppColor.oceanBlue,

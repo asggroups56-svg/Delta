@@ -131,33 +131,37 @@ class ReportsTableItemWidget extends StatelessWidget {
         Expanded(
           child: Row(
             children: [
-              Icon(
-                Icons.calendar_today_outlined,
-                size: 12.r,
-                color: AppColor.darkTextColor(context),
-              ),
-              Gap(4.w),
-              Flexible(
-                child: Text(
-                  date,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 10.5.sp,
-                    color: AppColor.darkTextColor(context),
+              if (date.isNotEmpty) ...[
+                Icon(
+                  Icons.calendar_today_outlined,
+                  size: 12.r,
+                  color: AppColor.darkTextColor(context),
+                ),
+                Gap(4.w),
+                Flexible(
+                  child: Text(
+                    date,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 10.5.sp,
+                      color: AppColor.darkTextColor(context),
+                    ),
                   ),
                 ),
-              ),
-              Gap(6.w),
-              Text(
-                amount,
-                style: TextStyle(
-                  fontSize: 11.sp,
-                  fontWeight: FontWeight.bold,
-                  color: AppColor.mintTeal,
+                Gap(6.w),
+              ],
+              if (amount.isNotEmpty) ...[
+                Text(
+                  amount,
+                  style: TextStyle(
+                    fontSize: 11.sp,
+                    fontWeight: FontWeight.bold,
+                    color: AppColor.mintTeal,
+                  ),
                 ),
-              ),
-              Gap(6.w),
+                Gap(6.w),
+              ],
             ],
           ),
         ),

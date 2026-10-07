@@ -1,3 +1,5 @@
+import 'report_date_formatter.dart';
+
 class ExpensesWithVatReportRequestModel {
   final DateTime? fromVoucherDate;
   final DateTime? toVoucherDate;
@@ -27,25 +29,17 @@ class ExpensesWithVatReportRequestModel {
       'ExportType': exportType,
     };
     if (fromVoucherDate != null) {
-      map['FromVoucherDate'] = _formatDate(fromVoucherDate!);
+      map['FromVoucherDate'] = formatReportDate(fromVoucherDate!);
     }
     if (toVoucherDate != null) {
-      map['ToVoucherDate'] = _formatDate(toVoucherDate!);
+      map['ToVoucherDate'] = formatReportDate(toVoucherDate!);
     }
     if (fromTransDate != null) {
-      map['FromTransDate'] = _formatDate(fromTransDate!);
+      map['FromTransDate'] = formatReportDate(fromTransDate!);
     }
     if (toTransDate != null) {
-      map['ToTransDate'] = _formatDate(toTransDate!);
+      map['ToTransDate'] = formatReportDate(toTransDate!);
     }
     return map;
-  }
-
-  String _formatDate(DateTime date) {
-    final year = date.year.toString().padLeft(4, '0');
-    final month = date.month.toString().padLeft(2, '0');
-    final day = date.day.toString().padLeft(2, '0');
-
-    return "$year-$month-${day}T00:00:00";
   }
 }
