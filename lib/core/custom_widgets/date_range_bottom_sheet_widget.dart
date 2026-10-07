@@ -50,22 +50,21 @@ class DateRangeBottomSheetWidget extends StatefulWidget {
 
 class _DateRangeBottomSheetWidgetState
     extends State<DateRangeBottomSheetWidget> {
-  late DateTime _fromDate;
-  late DateTime _toDate;
+  DateTime? _fromDate;
+  DateTime? _toDate;
+  bool _includeDates = false;
   String? _validationMessage;
 
   @override
   void initState() {
     super.initState();
-    final today = DateUtils.dateOnly(DateTime.now());
-    _toDate = today.subtract(const Duration(days: 1));
-    _fromDate = _toDate.subtract(const Duration(days: 7));
   }
 
   Future<void> _selectDate({required bool isFromDate}) async {
+    final initial = (isFromDate ? _fromDate : _toDate) ?? DateTime.now();
     final selected = await showDatePicker(
       context: context,
-      initialDate: isFromDate ? _fromDate : _toDate,
+      initialDate: initial,
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
     );
@@ -86,7 +85,10 @@ class _DateRangeBottomSheetWidgetState
   }
 
   void _submit() {
-    if (_fromDate.isAfter(_toDate)) {
+    if (_includeDates &&
+        _fromDate != null &&
+        _toDate != null &&
+        _fromDate!.isAfter(_toDate!)) {
       setState(() {
         _validationMessage = AppLocaleKey.invalidDateRange.tr();
       });
@@ -95,7 +97,10 @@ class _DateRangeBottomSheetWidgetState
 
     Navigator.pop(
       context,
-      DateRangeSelection(fromDate: _fromDate, toDate: _toDate),
+      DateRangeSelection(
+        fromDate: _includeDates ? _fromDate : null,
+        toDate: _includeDates ? _toDate : null,
+      ),
     );
   }
 
@@ -107,6 +112,7 @@ class _DateRangeBottomSheetWidgetState
   Widget build(BuildContext context) {
     final foreground = AppColor.titleFormFiledColor(context);
     final accent = AppColor.emeraldTeal;
+    final isAr = context.locale.languageCode == 'ar';
 
     return Container(
       constraints: BoxConstraints(
@@ -172,34 +178,60 @@ class _DateRangeBottomSheetWidgetState
                   ),
                 ],
               ),
-              Gap(12.h),
-              Text(
-                AppLocaleKey.fromDate.tr(),
-                style: TextStyle(
-                  color: foreground.withValues(alpha: 0.65),
-                  fontSize: 12.sp,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              Gap(8.h),
-              _DateSelectionTile(
-                date: _formatDate(_fromDate),
-                onTap: () => _selectDate(isFromDate: true),
-              ),
               Gap(16.h),
-              Text(
-                AppLocaleKey.toDate.tr(),
-                style: TextStyle(
-                  color: foreground.withValues(alpha: 0.65),
-                  fontSize: 12.sp,
-                  fontWeight: FontWeight.w600,
+              // ── Date Range Toggle Switch ──
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    isAr ? 'تحديد فترة التاريخ' : 'Filter by Date Range',
+                    style: TextStyle(
+                      color: foreground,
+                      fontSize: 13.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  Switch.adaptive(
+                    value: _includeDates,
+                    activeThumbColor: accent,
+                    onChanged: (val) => setState(() => _includeDates = val),
+                  ),
+                ],
+              ),
+              if (_includeDates) ...[
+                Gap(12.h),
+                Text(
+                  AppLocaleKey.fromDate.tr(),
+                  style: TextStyle(
+                    color: foreground.withValues(alpha: 0.65),
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-              ),
-              Gap(8.h),
-              _DateSelectionTile(
-                date: _formatDate(_toDate),
-                onTap: () => _selectDate(isFromDate: false),
-              ),
+                Gap(8.h),
+                _DateSelectionTile(
+                  date: _fromDate != null ? _formatDate(_fromDate!) : null,
+                  hint: isAr ? 'من تاريخ' : 'From date',
+                  onTap: () => _selectDate(isFromDate: true),
+                  onClear: () => setState(() => _fromDate = null),
+                ),
+                Gap(16.h),
+                Text(
+                  AppLocaleKey.toDate.tr(),
+                  style: TextStyle(
+                    color: foreground.withValues(alpha: 0.65),
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Gap(8.h),
+                _DateSelectionTile(
+                  date: _toDate != null ? _formatDate(_toDate!) : null,
+                  hint: isAr ? 'إلى تاريخ' : 'To date',
+                  onTap: () => _selectDate(isFromDate: false),
+                  onClear: () => setState(() => _toDate = null),
+                ),
+              ],
               if (_validationMessage != null) ...[
                 Gap(12.h),
                 Row(
@@ -264,14 +296,22 @@ class _DateRangeBottomSheetWidgetState
 }
 
 class _DateSelectionTile extends StatelessWidget {
-  final String date;
+  final String? date;
+  final String hint;
   final VoidCallback onTap;
+  final VoidCallback onClear;
 
-  const _DateSelectionTile({required this.date, required this.onTap});
+  const _DateSelectionTile({
+    required this.date,
+    required this.hint,
+    required this.onTap,
+    required this.onClear,
+  });
 
   @override
   Widget build(BuildContext context) {
     final foreground = AppColor.titleFormFiledColor(context);
+    final hasValue = date != null && date!.isNotEmpty;
 
     return Material(
       color: foreground.withValues(alpha: 0.045),
@@ -280,34 +320,59 @@ class _DateSelectionTile extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(14.r),
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 14.h),
+          padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 13.h),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(14.r),
-            border: Border.all(color: foreground.withValues(alpha: 0.08)),
+            border: Border.all(
+              color: hasValue
+                  ? AppColor.emeraldTeal.withValues(alpha: 0.4)
+                  : foreground.withValues(alpha: 0.08),
+            ),
           ),
           child: Row(
             children: [
               Icon(
                 Icons.calendar_month_rounded,
-                color: AppColor.emeraldTeal,
+                color: hasValue
+                    ? AppColor.emeraldTeal
+                    : foreground.withValues(alpha: 0.5),
                 size: 20.r,
               ),
               Gap(10.w),
               Expanded(
                 child: Text(
-                  date,
-                  style: TextStyle(
-                    color: foreground,
-                    fontSize: 13.sp,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  hasValue ? date! : hint,
+                  style: hasValue
+                      ? TextStyle(
+                          color: foreground,
+                          fontSize: 13.sp,
+                          fontWeight: FontWeight.w600,
+                        )
+                      : TextStyle(
+                          color: foreground.withValues(alpha: 0.45),
+                          fontSize: 13.sp,
+                        ),
                 ),
               ),
-              Icon(
-                Icons.edit_calendar_rounded,
-                color: foreground.withValues(alpha: 0.55),
-                size: 18.r,
-              ),
+              if (hasValue)
+                InkWell(
+                  onTap: onClear,
+                  borderRadius: BorderRadius.circular(12.r),
+                  child: Padding(
+                    padding: EdgeInsets.all(2.r),
+                    child: Icon(
+                      Icons.close_rounded,
+                      color: foreground.withValues(alpha: 0.5),
+                      size: 17.r,
+                    ),
+                  ),
+                )
+              else
+                Icon(
+                  Icons.edit_calendar_rounded,
+                  color: foreground.withValues(alpha: 0.55),
+                  size: 18.r,
+                ),
             ],
           ),
         ),

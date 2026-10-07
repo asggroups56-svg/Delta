@@ -228,6 +228,8 @@
   "statementTrialBalanceByCategoriesDesc": "عرض أرصدة الحسابات مجمعة حسب الفئات",
   "statementCostCenters": "مراكز التكلفة (AGL007)",
   "statementCostCentersDesc": "تقرير مراكز التكلفة الرئيسية والفرعية",
+  "statementCostCentersProjects": "مراكز تكلفة المشاريع (Agl026)",
+  "statementCostCentersProjectsDesc": "تقرير مراكز تكلفة المشاريع وملخص مراكز المشاريع",
   "selectCostCenterType": "اختر نوع مركز التكلفة",
   "allCostCenters": "جميع مراكز التكلفة",
   "mainCostCenters": "مراكز التكلفة الرئيسية",

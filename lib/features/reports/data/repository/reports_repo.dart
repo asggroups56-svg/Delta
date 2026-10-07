@@ -10,6 +10,7 @@ import '../../../../core/network/api_consumer.dart';
 import '../../../../core/network/end_points.dart';
 import '../models/account_statement_report_request_model.dart';
 import '../models/chart_of_account_report_request_model.dart';
+import '../models/cost_centers_projects_report_request_model.dart';
 import '../models/cost_centers_report_request_model.dart';
 import '../models/daily_income_and_expense_situation_report_request_model.dart';
 import '../models/expenses_with_vat_report_request_model.dart';
@@ -28,18 +29,21 @@ abstract interface class ReportsRepo {
   Future<Either<Failure, File>> getIncomeAndExpenseSituationReport({
     int? fromMonth,
     int? toMonth,
+    String exportType = 'pdf',
   });
 
   Future<Either<Failure, File>> getDailyIncomeAndExpenseSituationReport({
-    required DateTime fromDate,
-    required DateTime toDate,
+    DateTime? fromDate,
+    DateTime? toDate,
     required String languageCode,
+    String exportType = 'pdf',
   });
 
   Future<Either<Failure, File>> getExpensesWithVatReport({
     DateTime? fromVoucherDate,
     DateTime? toVoucherDate,
     required String languageCode,
+    String exportType = 'pdf',
   });
 
   Future<Either<Failure, File>> getSalesWithVatReport({
@@ -48,6 +52,7 @@ abstract interface class ReportsRepo {
     DateTime? fromTransDate,
     DateTime? toTransDate,
     required String languageCode,
+    String exportType = 'pdf',
   });
 
   Future<Either<Failure, File>> getPurchasesWithVatReport({
@@ -56,12 +61,14 @@ abstract interface class ReportsRepo {
     DateTime? fromTransDate,
     DateTime? toTransDate,
     required String languageCode,
+    String exportType = 'pdf',
   });
 
   Future<Either<Failure, File>> getLedgerReportForAllAccounts({
-    required DateTime fromDate,
-    required DateTime toDate,
+    DateTime? fromDate,
+    DateTime? toDate,
     required String languageCode,
+    String exportType = 'pdf',
   });
 
   Future<Either<Failure, File>> getAccountStatementReport({
@@ -73,11 +80,23 @@ abstract interface class ReportsRepo {
 
   Future<Either<Failure, File>> getTrialBalanceByCategoriesReport({
     required String languageCode,
+    String exportType = 'pdf',
   });
 
   Future<Either<Failure, File>> getCostCentersReport({
     required int costCenterType,
     required String languageCode,
+    String exportType = 'pdf',
+  });
+
+  Future<Either<Failure, File>> getCostCentersProjectsReport({
+    num? fromCostCenterNo,
+    num? toCostCenterNo,
+    DateTime? fromDate,
+    DateTime? toDate,
+    required String reportName,
+    required String languageCode,
+    String exportType = 'pdf',
   });
 }
 
@@ -112,12 +131,14 @@ class ReportsRepoImpl implements ReportsRepo {
   Future<Either<Failure, File>> getIncomeAndExpenseSituationReport({
     int? fromMonth,
     int? toMonth,
+    String exportType = 'pdf',
   }) {
     return handleDioRequest(
       request: () async {
         final requestModel = IncomeAndExpenseSituationReportRequestModel(
           fromMonth: fromMonth,
           toMonth: toMonth,
+          exportType: exportType,
         );
 
         return _downloadReport(
@@ -132,15 +153,17 @@ class ReportsRepoImpl implements ReportsRepo {
 
   @override
   Future<Either<Failure, File>> getDailyIncomeAndExpenseSituationReport({
-    required DateTime fromDate,
-    required DateTime toDate,
+    DateTime? fromDate,
+    DateTime? toDate,
     required String languageCode,
+    String exportType = 'pdf',
   }) {
     return handleDioRequest(
       request: () async {
         final requestModel = DailyIncomeAndExpenseSituationReportRequestModel(
           fromDate: fromDate,
           toDate: toDate,
+          exportType: exportType,
         );
 
         return _downloadReport(
@@ -159,12 +182,14 @@ class ReportsRepoImpl implements ReportsRepo {
     DateTime? fromVoucherDate,
     DateTime? toVoucherDate,
     required String languageCode,
+    String exportType = 'pdf',
   }) {
     return handleDioRequest(
       request: () async {
         final requestModel = ExpensesWithVatReportRequestModel(
           fromVoucherDate: fromVoucherDate,
           toVoucherDate: toVoucherDate,
+          exportType: exportType,
         );
 
         return _downloadReport(
@@ -185,6 +210,7 @@ class ReportsRepoImpl implements ReportsRepo {
     DateTime? fromTransDate,
     DateTime? toTransDate,
     required String languageCode,
+    String exportType = 'pdf',
   }) {
     return handleDioRequest(
       request: () async {
@@ -193,6 +219,7 @@ class ReportsRepoImpl implements ReportsRepo {
           toCustomerNo: toCustomerNo,
           fromTransDate: fromTransDate,
           toTransDate: toTransDate,
+          exportType: exportType,
         );
 
         return _downloadReport(
@@ -213,6 +240,7 @@ class ReportsRepoImpl implements ReportsRepo {
     DateTime? fromTransDate,
     DateTime? toTransDate,
     required String languageCode,
+    String exportType = 'pdf',
   }) {
     return handleDioRequest(
       request: () async {
@@ -221,6 +249,7 @@ class ReportsRepoImpl implements ReportsRepo {
           toCustomerNo: toCustomerNo,
           fromTransDate: fromTransDate,
           toTransDate: toTransDate,
+          exportType: exportType,
         );
 
         return _downloadReport(
@@ -236,15 +265,17 @@ class ReportsRepoImpl implements ReportsRepo {
 
   @override
   Future<Either<Failure, File>> getLedgerReportForAllAccounts({
-    required DateTime fromDate,
-    required DateTime toDate,
+    DateTime? fromDate,
+    DateTime? toDate,
     required String languageCode,
+    String exportType = 'pdf',
   }) {
     return handleDioRequest(
       request: () async {
         final requestModel = LedgerReportRequestModel(
           fromDate: fromDate,
           toDate: toDate,
+          exportType: exportType,
         );
 
         return _downloadReport(
@@ -287,10 +318,13 @@ class ReportsRepoImpl implements ReportsRepo {
   @override
   Future<Either<Failure, File>> getTrialBalanceByCategoriesReport({
     required String languageCode,
+    String exportType = 'pdf',
   }) {
     return handleDioRequest(
       request: () async {
-        const requestModel = TrialBalanceByCategoriesReportRequestModel();
+        final requestModel = TrialBalanceByCategoriesReportRequestModel(
+          exportType: exportType,
+        );
         return _downloadReport(
           endpoint: EndPoints.trialBalanceByCategoriesReport,
           body: requestModel.toJson(),
@@ -306,16 +340,49 @@ class ReportsRepoImpl implements ReportsRepo {
   Future<Either<Failure, File>> getCostCentersReport({
     required int costCenterType,
     required String languageCode,
+    String exportType = 'pdf',
   }) {
     return handleDioRequest(
       request: () async {
         final requestModel = CostCentersReportRequestModel(
           costCenterType: costCenterType,
+          exportType: exportType,
         );
         return _downloadReport(
           endpoint: EndPoints.costCentersReport,
           body: requestModel.toJson(),
           fileNamePrefix: 'cost_centers',
+          exportType: requestModel.exportType,
+          headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+        );
+      },
+    );
+  }
+
+  @override
+  Future<Either<Failure, File>> getCostCentersProjectsReport({
+    num? fromCostCenterNo,
+    num? toCostCenterNo,
+    DateTime? fromDate,
+    DateTime? toDate,
+    required String reportName,
+    required String languageCode,
+    String exportType = 'pdf',
+  }) {
+    return handleDioRequest(
+      request: () async {
+        final requestModel = CostCentersProjectsReportRequestModel(
+          fromCostCenterNo: fromCostCenterNo,
+          toCostCenterNo: toCostCenterNo,
+          fromDate: fromDate,
+          toDate: toDate,
+          reportName: reportName,
+          exportType: exportType,
+        );
+        return _downloadReport(
+          endpoint: EndPoints.costCentersProjectsReport,
+          body: requestModel.toJson(),
+          fileNamePrefix: reportName.toLowerCase(),
           exportType: requestModel.exportType,
           headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
         );
@@ -352,7 +419,12 @@ class ReportsRepoImpl implements ReportsRepo {
     }
 
     final dir = await getTemporaryDirectory();
-    final ext = isPdf ? 'pdf' : exportType.toLowerCase();
+    final ext = switch (exportType.toLowerCase()) {
+      'pdf' => 'pdf',
+      'excel' || 'excelformatted' => 'xlsx',
+      'word' => 'docx',
+      _ => throw ArgumentError.value(exportType, 'exportType', 'Unsupported'),
+    };
     final file = File(
       '${dir.path}/${fileNamePrefix}_${DateTime.now().millisecondsSinceEpoch}.$ext',
     );

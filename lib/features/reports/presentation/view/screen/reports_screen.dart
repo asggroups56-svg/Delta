@@ -14,10 +14,9 @@ import 'package:my_template/core/utils/app_locale_key.dart';
 import 'package:my_template/core/utils/common_methods.dart';
 import 'package:my_template/features/home/presentation/view/widget/ai_chat_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/data/repository/reports_repo.dart';
-import 'package:my_template/features/reports/presentation/view/widget/excel_export_service.dart';
-import 'package:my_template/features/reports/presentation/view/widget/excel_preview_panel.dart';
 import 'package:my_template/features/reports/presentation/view/widget/file_download_service.dart';
 import 'package:my_template/features/reports/presentation/view/widget/account_statement_filter_bottom_sheet_widget.dart';
+import 'package:my_template/features/reports/presentation/view/widget/cost_centers_projects_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/fullscreen_pdf_viewer_screen.dart';
 import 'package:my_template/features/reports/presentation/view/widget/ledger_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/party_vat_report_filter_bottom_sheet_widget.dart';
@@ -30,7 +29,7 @@ import 'package:my_template/features/reports/presentation/view/widget/reports_ta
 import 'package:my_template/features/lookup/presentation/widgets/customer_datum_dropdown.dart';
 
 /// نوع المعاينة المعروضة حاليًا داخل الصفحة.
-enum _PreviewKind { none, pdf, excel }
+enum _PreviewKind { none, pdf }
 
 class ReportsScreen extends StatefulWidget {
   const ReportsScreen({super.key});
@@ -49,7 +48,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
   // ── Preview state ────────────────────────────────────────────────────────
   _PreviewKind _previewKind = _PreviewKind.none;
   File? _pdfFile;
-  List<List<String>>? _excelRows;
   String _previewTitle = '';
   bool _isGenerating = false;
 
@@ -139,251 +137,320 @@ class _ReportsScreenState extends State<ReportsScreen> {
 
   // ── Export Modal (اختيار نوع التصدير) ────────────────────────────────────
   void _showExportModal() {
+    var selectedExportType = 'pdf';
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (ctx) => Container(
-        padding: EdgeInsets.all(20.r),
-        decoration: BoxDecoration(
-          color: AppColor.cardColor(context),
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
-          border: Border.all(color: AppColor.borderColor(context)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Container(
-                width: 40.w,
-                height: 4.h,
-                decoration: BoxDecoration(
-                  color: AppColor.darkTextColor(context),
-                  borderRadius: BorderRadius.circular(4.r),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setModalState) => Container(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.sizeOf(ctx).height * 0.85,
+          ),
+          padding: EdgeInsets.all(20.r),
+          decoration: BoxDecoration(
+            color: AppColor.cardColor(context),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
+            border: Border.all(color: AppColor.borderColor(context)),
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40.w,
+                    height: 4.h,
+                    decoration: BoxDecoration(
+                      color: AppColor.darkTextColor(context),
+                      borderRadius: BorderRadius.circular(4.r),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            Gap(16.h),
-            Text(
-              AppLocaleKey.exportReport.tr(),
-              style: TextStyle(
-                color: AppColor.titleFormFiledColor(context),
-                fontSize: 16.sp,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Gap(16.h),
-            _buildExportOption(
-              icon: Icons.account_tree_rounded,
-              color: AppColor.oceanBlue,
-              title: '${AppLocaleKey.statementChartOfAccount.tr()} (PDF)',
-              subtitle: 'Report/ChartOfAccountReport (AGL001 - Live API)',
-              onTap: () {
-                Navigator.pop(ctx);
-                _handleExportPdf(
+                Gap(16.h),
+                Text(
+                  AppLocaleKey.exportReport.tr(),
+                  style: TextStyle(
+                    color: AppColor.titleFormFiledColor(context),
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Gap(16.h),
+                Wrap(
+                  spacing: 8.w,
+                  runSpacing: 8.h,
+                  children:
+                      const [
+                        ('pdf', 'PDF'),
+                        ('excel', 'Excel'),
+                        ('word', 'Word'),
+                        ('excelformatted', 'Excel formatted'),
+                      ].map((format) {
+                        final (value, label) = format;
+                        return ChoiceChip(
+                          label: Text(label),
+                          selected: selectedExportType == value,
+                          onSelected: (_) =>
+                              setModalState(() => selectedExportType = value),
+                        );
+                      }).toList(),
+                ),
+                Gap(16.h),
+                _buildExportOption(
+                  icon: Icons.account_tree_rounded,
+                  color: AppColor.oceanBlue,
                   title: AppLocaleKey.statementChartOfAccount.tr(),
-                  description: AppLocaleKey.statementChartOfAccountDesc.tr(),
-                  amount: 'AGL001',
-                  date: 'Live API',
-                  status: AppLocaleKey.statusAudited.tr(),
-                  reportName: 'AGL001',
-                  isApiReport: true,
-                );
-              },
-            ),
-            Gap(10.h),
-            _buildExportOption(
-              icon: Icons.show_chart_rounded,
-              color: AppColor.emeraldTeal,
-              title: '${AppLocaleKey.statementIncome.tr()} (PDF)',
-              subtitle:
-                  'Report/IncomeAndExpenseSituationReport (AGL300_M - Live API)',
-              onTap: () {
-                Navigator.pop(ctx);
-                _handleExportPdf(
+                  subtitle: 'Report/ChartOfAccountReport (AGL001 - Live API)',
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    _handleExportReport(
+                      title: AppLocaleKey.statementChartOfAccount.tr(),
+                      description: AppLocaleKey.statementChartOfAccountDesc
+                          .tr(),
+                      amount: 'AGL001',
+                      date: 'Live API',
+                      status: AppLocaleKey.statusAudited.tr(),
+                      reportName: 'AGL001',
+                      isApiReport: true,
+                      exportType: selectedExportType,
+                    );
+                  },
+                ),
+                Gap(10.h),
+                _buildExportOption(
+                  icon: Icons.show_chart_rounded,
+                  color: AppColor.emeraldTeal,
                   title: AppLocaleKey.statementIncome.tr(),
-                  description: AppLocaleKey.statementIncomeDesc.tr(),
-                  amount: 'AGL300_M',
-                  date: 'Live API',
-                  status: AppLocaleKey.statusAudited.tr(),
-                  reportName: 'AGL300_M',
-                  isIncomeAndExpenseSituationReport: true,
-                );
-              },
-            ),
-            Gap(10.h),
-            _buildExportOption(
-              icon: Icons.calendar_view_day_rounded,
-              color: AppColor.oceanBlue,
-              title: '${AppLocaleKey.statementDailyIncome.tr()} (PDF)',
-              subtitle:
-                  'Report/IncomeAndExpenseSituationReport (AGL300_D - Live API)',
-              onTap: () {
-                Navigator.pop(ctx);
-                _handleExportPdf(
+                  subtitle:
+                      'Report/IncomeAndExpenseSituationReport (AGL300_M - Live API)',
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    _handleExportReport(
+                      title: AppLocaleKey.statementIncome.tr(),
+                      description: AppLocaleKey.statementIncomeDesc.tr(),
+                      amount: 'AGL300_M',
+                      date: 'Live API',
+                      status: AppLocaleKey.statusAudited.tr(),
+                      reportName: 'AGL300_M',
+                      isIncomeAndExpenseSituationReport: true,
+                      exportType: selectedExportType,
+                    );
+                  },
+                ),
+                Gap(10.h),
+                _buildExportOption(
+                  icon: Icons.calendar_view_day_rounded,
+                  color: AppColor.oceanBlue,
                   title: AppLocaleKey.statementDailyIncome.tr(),
-                  description: AppLocaleKey.statementDailyIncomeDesc.tr(),
-                  amount: 'AGL300_D',
-                  date: 'Live API',
-                  status: AppLocaleKey.statusAudited.tr(),
-                  reportName: 'AGL300_D',
-                  isDailyIncomeAndExpenseReport: true,
-                );
-              },
-            ),
-            Gap(10.h),
-            _buildExportOption(
-              icon: Icons.receipt_long_outlined,
-              color: AppColor.purpleAccent,
-              title: '${AppLocaleKey.statementExpensesWithVat.tr()} (PDF)',
-              subtitle: 'Report/ExpensesWithVatReport (AGL1001E - Live API)',
-              onTap: () {
-                Navigator.pop(ctx);
-                _handleExportPdf(
+                  subtitle:
+                      'Report/IncomeAndExpenseSituationReport (AGL300_D - Live API)',
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    _handleExportReport(
+                      title: AppLocaleKey.statementDailyIncome.tr(),
+                      description: AppLocaleKey.statementDailyIncomeDesc.tr(),
+                      amount: 'AGL300_D',
+                      date: 'Live API',
+                      status: AppLocaleKey.statusAudited.tr(),
+                      reportName: 'AGL300_D',
+                      isDailyIncomeAndExpenseReport: true,
+                      exportType: selectedExportType,
+                    );
+                  },
+                ),
+                Gap(10.h),
+                _buildExportOption(
+                  icon: Icons.receipt_long_outlined,
+                  color: AppColor.purpleAccent,
                   title: AppLocaleKey.statementExpensesWithVat.tr(),
-                  description: AppLocaleKey.statementExpensesWithVatDesc.tr(),
-                  amount: 'AGL1001E',
-                  date: 'Live API',
-                  status: AppLocaleKey.statusAudited.tr(),
-                  reportName: 'AGL1001E',
-                  isExpensesWithVatReport: true,
-                );
-              },
-            ),
-            Gap(10.h),
-            _buildExportOption(
-              icon: Icons.point_of_sale_rounded,
-              color: AppColor.emeraldTeal,
-              title: '${AppLocaleKey.statementSalesWithVat.tr()} (PDF)',
-              subtitle: 'Report/SalesWithVatReport (AAR1000 - Live API)',
-              onTap: () {
-                Navigator.pop(ctx);
-                _handleExportPdf(
+                  subtitle:
+                      'Report/ExpensesWithVatReport (AGL1001E - Live API)',
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    _handleExportReport(
+                      title: AppLocaleKey.statementExpensesWithVat.tr(),
+                      description: AppLocaleKey.statementExpensesWithVatDesc
+                          .tr(),
+                      amount: 'AGL1001E',
+                      date: 'Live API',
+                      status: AppLocaleKey.statusAudited.tr(),
+                      reportName: 'AGL1001E',
+                      isExpensesWithVatReport: true,
+                      exportType: selectedExportType,
+                    );
+                  },
+                ),
+                Gap(10.h),
+                _buildExportOption(
+                  icon: Icons.point_of_sale_rounded,
+                  color: AppColor.emeraldTeal,
                   title: AppLocaleKey.statementSalesWithVat.tr(),
-                  description: AppLocaleKey.statementSalesWithVatDesc.tr(),
-                  amount: 'AAR1000',
-                  date: 'Live API',
-                  status: AppLocaleKey.statusAudited.tr(),
-                  reportName: 'AAR1000',
-                  isSalesWithVatReport: true,
-                );
-              },
-            ),
-            Gap(10.h),
-            _buildExportOption(
-              icon: Icons.shopping_bag_rounded,
-              color: AppColor.oceanBlue,
-              title: '${AppLocaleKey.statementPurchasesWithVat.tr()} (PDF)',
-              subtitle: 'Report/PurchasesWithVatReport (AAR1001 - Live API)',
-              onTap: () {
-                Navigator.pop(ctx);
-                _handleExportPdf(
+                  subtitle: 'Report/SalesWithVatReport (AAR1000 - Live API)',
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    _handleExportReport(
+                      title: AppLocaleKey.statementSalesWithVat.tr(),
+                      description: AppLocaleKey.statementSalesWithVatDesc.tr(),
+                      amount: 'AAR1000',
+                      date: 'Live API',
+                      status: AppLocaleKey.statusAudited.tr(),
+                      reportName: 'AAR1000',
+                      isSalesWithVatReport: true,
+                      exportType: selectedExportType,
+                    );
+                  },
+                ),
+                Gap(10.h),
+                _buildExportOption(
+                  icon: Icons.shopping_bag_rounded,
+                  color: AppColor.oceanBlue,
                   title: AppLocaleKey.statementPurchasesWithVat.tr(),
-                  description: AppLocaleKey.statementPurchasesWithVatDesc.tr(),
-                  amount: 'AAR1001',
-                  date: 'Live API',
-                  status: AppLocaleKey.statusAudited.tr(),
-                  reportName: 'AAR1001',
-                  isPurchasesWithVatReport: true,
-                );
-              },
-            ),
-            Gap(10.h),
-            _buildExportOption(
-              icon: Icons.menu_book_rounded,
-              color: AppColor.oceanBlue,
-              title: '${AppLocaleKey.statementLedger.tr()} (PDF)',
-              subtitle: 'Report/LedgerReportForAllAccounts (AGL025 - Live API)',
-              onTap: () {
-                Navigator.pop(ctx);
-                _handleExportPdf(
+                  subtitle:
+                      'Report/PurchasesWithVatReport (AAR1001 - Live API)',
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    _handleExportReport(
+                      title: AppLocaleKey.statementPurchasesWithVat.tr(),
+                      description: AppLocaleKey.statementPurchasesWithVatDesc
+                          .tr(),
+                      amount: 'AAR1001',
+                      date: 'Live API',
+                      status: AppLocaleKey.statusAudited.tr(),
+                      reportName: 'AAR1001',
+                      isPurchasesWithVatReport: true,
+                      exportType: selectedExportType,
+                    );
+                  },
+                ),
+                Gap(10.h),
+                _buildExportOption(
+                  icon: Icons.menu_book_rounded,
+                  color: AppColor.oceanBlue,
                   title: AppLocaleKey.statementLedger.tr(),
-                  description: AppLocaleKey.statementLedgerDesc.tr(),
-                  amount: 'AGL025',
-                  date: 'Live API',
-                  status: AppLocaleKey.statusAudited.tr(),
-                  reportName: 'AGL025',
-                  isLedgerReport: true,
-                );
-              },
-            ),
-            Gap(10.h),
-            _buildExportOption(
-              icon: Icons.receipt_long_rounded,
-              color: AppColor.oceanBlue,
-              title: '${AppLocaleKey.statementAccountStatement.tr()} (PDF)',
-              subtitle: 'Report/AccountStatementReport (AGL079 - Live API)',
-              onTap: () {
-                Navigator.pop(ctx);
-                _handleExportPdf(
+                  subtitle:
+                      'Report/LedgerReportForAllAccounts (AGL025 - Live API)',
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    _handleExportReport(
+                      title: AppLocaleKey.statementLedger.tr(),
+                      description: AppLocaleKey.statementLedgerDesc.tr(),
+                      amount: 'AGL025',
+                      date: 'Live API',
+                      status: AppLocaleKey.statusAudited.tr(),
+                      reportName: 'AGL025',
+                      isLedgerReport: true,
+                      exportType: selectedExportType,
+                    );
+                  },
+                ),
+                Gap(10.h),
+                _buildExportOption(
+                  icon: Icons.receipt_long_rounded,
+                  color: AppColor.oceanBlue,
                   title: AppLocaleKey.statementAccountStatement.tr(),
-                  description: AppLocaleKey.statementAccountStatementDesc.tr(),
-                  amount: 'AGL079',
-                  date: 'Live API',
-                  status: AppLocaleKey.statusAudited.tr(),
-                  reportName: 'AGL079',
-                  isAccountStatementReport: true,
-                );
-              },
-            ),
-            Gap(10.h),
-            _buildExportOption(
-              icon: Icons.account_balance_wallet_outlined,
-              color: AppColor.emeraldTeal,
-              title:
-                  '${AppLocaleKey.statementTrialBalanceByCategories.tr()} (PDF)',
-              subtitle:
-                  'Report/TrialBalanceByCategoriesReport (AGL055 - Live API)',
-              onTap: () {
-                Navigator.pop(ctx);
-                _handleExportPdf(
+                  subtitle: 'Report/AccountStatementReport (AGL079 - Live API)',
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    _handleExportReport(
+                      title: AppLocaleKey.statementAccountStatement.tr(),
+                      description: AppLocaleKey.statementAccountStatementDesc
+                          .tr(),
+                      amount: 'AGL079',
+                      date: 'Live API',
+                      status: AppLocaleKey.statusAudited.tr(),
+                      reportName: 'AGL079',
+                      isAccountStatementReport: true,
+                      exportType: selectedExportType,
+                    );
+                  },
+                ),
+                Gap(10.h),
+                _buildExportOption(
+                  icon: Icons.account_balance_wallet_outlined,
+                  color: AppColor.emeraldTeal,
                   title: AppLocaleKey.statementTrialBalanceByCategories.tr(),
-                  description: AppLocaleKey
-                      .statementTrialBalanceByCategoriesDesc
-                      .tr(),
-                  amount: 'AGL055',
-                  date: 'Live API',
-                  status: AppLocaleKey.statusAudited.tr(),
-                  reportName: 'AGL055',
-                  isTrialBalanceByCategoriesReport: true,
-                );
-              },
-            ),
-            Gap(10.h),
-            _buildExportOption(
-              icon: Icons.business_outlined,
-              color: AppColor.purpleAccent,
-              title: '${AppLocaleKey.statementCostCenters.tr()} (PDF)',
-              subtitle: 'Report/CostCentersReport (AGL007 - Live API)',
-              onTap: () {
-                Navigator.pop(ctx);
-                _handleExportPdf(
+                  subtitle:
+                      'Report/TrialBalanceByCategoriesReport (AGL055 - Live API)',
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    _handleExportReport(
+                      title: AppLocaleKey.statementTrialBalanceByCategories
+                          .tr(),
+                      description: AppLocaleKey
+                          .statementTrialBalanceByCategoriesDesc
+                          .tr(),
+                      amount: 'AGL055',
+                      date: 'Live API',
+                      status: AppLocaleKey.statusAudited.tr(),
+                      reportName: 'AGL055',
+                      isTrialBalanceByCategoriesReport: true,
+                      exportType: selectedExportType,
+                    );
+                  },
+                ),
+                Gap(10.h),
+                _buildExportOption(
+                  icon: Icons.business_outlined,
+                  color: AppColor.purpleAccent,
                   title: AppLocaleKey.statementCostCenters.tr(),
-                  description: AppLocaleKey.statementCostCentersDesc.tr(),
-                  amount: 'AGL007',
-                  date: 'Live API',
-                  status: AppLocaleKey.statusAudited.tr(),
-                  reportName: 'AGL007',
-                  isCostCentersReport: true,
-                );
-              },
+                  subtitle: 'Report/CostCentersReport (AGL007 - Live API)',
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    _handleExportReport(
+                      title: AppLocaleKey.statementCostCenters.tr(),
+                      description: AppLocaleKey.statementCostCentersDesc.tr(),
+                      amount: 'AGL007',
+                      date: 'Live API',
+                      status: AppLocaleKey.statusAudited.tr(),
+                      reportName: 'AGL007',
+                      isCostCentersReport: true,
+                      exportType: selectedExportType,
+                    );
+                  },
+                ),
+                Gap(10.h),
+                _buildExportOption(
+                  icon: Icons.domain_rounded,
+                  color: AppColor.oceanBlue,
+                  title: AppLocaleKey.statementCostCentersProjects.tr(),
+                  subtitle:
+                      'Report/CostCentersProjectsReport (Agl026 - Live API)',
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    _handleExportReport(
+                      title: AppLocaleKey.statementCostCentersProjects.tr(),
+                      description: AppLocaleKey
+                          .statementCostCentersProjectsDesc
+                          .tr(),
+                      amount: 'Agl026_Project2',
+                      date: 'Live API',
+                      status: AppLocaleKey.statusAudited.tr(),
+                      reportName: 'Agl026_Project2',
+                      isCostCentersProjectsReport: true,
+                      exportType: selectedExportType,
+                    );
+                  },
+                ),
+                Gap(10.h),
+                _buildExportOption(
+                  icon: Icons.share_rounded,
+                  color: AppColor.purpleAccent,
+                  title: AppLocaleKey.shareReport.tr(),
+                  subtitle: 'Direct Link & Board Presentation Format',
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    CommonMethods.showToast(
+                      message: AppLocaleKey.reportExportSuccess.tr(),
+                      type: ToastType.success,
+                    );
+                  },
+                ),
+                Gap(20.h),
+              ],
             ),
-            Gap(10.h),
-            _buildExportOption(
-              icon: Icons.share_rounded,
-              color: AppColor.purpleAccent,
-              title: AppLocaleKey.shareReport.tr(),
-              subtitle: 'Direct Link & Board Presentation Format',
-              onTap: () {
-                Navigator.pop(ctx);
-                CommonMethods.showToast(
-                  message: AppLocaleKey.reportExportSuccess.tr(),
-                  type: ToastType.success,
-                );
-              },
-            ),
-            Gap(20.h),
-          ],
+          ),
         ),
       ),
     );
@@ -450,13 +517,14 @@ class _ReportsScreenState extends State<ReportsScreen> {
     );
   }
 
-  // ── PDF Export ───────────────────────────────────────────────────────────
-  Future<void> _handleExportPdf({
+  // ── Report Export ────────────────────────────────────────────────────────
+  Future<void> _handleExportReport({
     required String title,
     required String description,
     required String amount,
     required String date,
     required String status,
+    String exportType = 'pdf',
     String? reportName,
     bool isApiReport = false,
     bool isIncomeAndExpenseSituationReport = false,
@@ -468,6 +536,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
     bool isAccountStatementReport = false,
     bool isTrialBalanceByCategoriesReport = false,
     bool isCostCentersReport = false,
+    bool isCostCentersProjectsReport = false,
   }) async {
     final languageCode = context.locale.languageCode;
     MonthRangeSelection? monthRange;
@@ -490,9 +559,9 @@ class _ReportsScreenState extends State<ReportsScreen> {
     if (isAccountStatementReport) {
       accountStatementFilter =
           await AccountStatementFilterBottomSheetWidget.show(
-        context,
-        title: title,
-      );
+            context,
+            title: title,
+          );
       if (!mounted || accountStatementFilter == null) return;
     }
     PartyVatReportFilterSelection? partyVatFilter;
@@ -508,8 +577,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
       if (!mounted || partyVatFilter == null) return;
     }
     DateRangeSelection? dateRange;
-    if (isDailyIncomeAndExpenseReport ||
-        isExpensesWithVatReport) {
+    if (isDailyIncomeAndExpenseReport || isExpensesWithVatReport) {
       dateRange = await DateRangeBottomSheetWidget.show(
         context,
         title: AppLocaleKey.selectDateRange.tr(),
@@ -521,6 +589,16 @@ class _ReportsScreenState extends State<ReportsScreen> {
     if (isCostCentersReport) {
       costCenterType = await _selectCostCenterType();
       if (!mounted || costCenterType == null) return;
+    }
+    CostCentersProjectsReportFilterSelection? costCentersProjectsFilter;
+    if (isCostCentersProjectsReport) {
+      costCentersProjectsFilter =
+          await CostCentersProjectsReportFilterBottomSheetWidget.show(
+            context,
+            title: title,
+            initialReportName: reportName ?? 'Agl026_Project2',
+          );
+      if (!mounted || costCentersProjectsFilter == null) return;
     }
 
     setState(() {
@@ -540,24 +618,28 @@ class _ReportsScreenState extends State<ReportsScreen> {
           isAccountStatementReport ||
           isTrialBalanceByCategoriesReport ||
           isCostCentersReport ||
+          isCostCentersProjectsReport ||
           reportName != null) {
         final reportsRepo = sl<ReportsRepo>();
         final result = isIncomeAndExpenseSituationReport
             ? await reportsRepo.getIncomeAndExpenseSituationReport(
                 fromMonth: monthRange?.fromMonth,
                 toMonth: monthRange?.toMonth,
+                exportType: exportType,
               )
             : isDailyIncomeAndExpenseReport
             ? await reportsRepo.getDailyIncomeAndExpenseSituationReport(
-                fromDate: dateRange!.fromDate!,
-                toDate: dateRange.toDate!,
+                fromDate: dateRange?.fromDate,
+                toDate: dateRange?.toDate,
                 languageCode: languageCode,
+                exportType: exportType,
               )
             : isExpensesWithVatReport
             ? await reportsRepo.getExpensesWithVatReport(
-                fromVoucherDate: dateRange!.fromDate,
-                toVoucherDate: dateRange.toDate,
+                fromVoucherDate: dateRange?.fromDate,
+                toVoucherDate: dateRange?.toDate,
                 languageCode: languageCode,
+                exportType: exportType,
               )
             : isSalesWithVatReport
             ? await reportsRepo.getSalesWithVatReport(
@@ -566,6 +648,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 fromTransDate: partyVatFilter?.fromTransDate,
                 toTransDate: partyVatFilter?.toTransDate,
                 languageCode: languageCode,
+                exportType: exportType,
               )
             : isPurchasesWithVatReport
             ? await reportsRepo.getPurchasesWithVatReport(
@@ -574,34 +657,51 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 fromTransDate: partyVatFilter?.fromTransDate,
                 toTransDate: partyVatFilter?.toTransDate,
                 languageCode: languageCode,
+                exportType: exportType,
               )
             : isLedgerReport
             ? await reportsRepo.getLedgerReportForAllAccounts(
-                fromDate: ledgerFilter!.fromDate,
-                toDate: ledgerFilter.toDate,
+                fromDate: ledgerFilter?.fromDate,
+                toDate: ledgerFilter?.toDate,
                 languageCode: languageCode,
+                exportType: exportType,
               )
             : isAccountStatementReport
             ? await reportsRepo.getAccountStatementReport(
                 subVoucherAccountNo:
                     accountStatementFilter?.subVoucherAccountNo,
-                subVoucherOraDate:
-                    accountStatementFilter?.subVoucherOraDate,
+                subVoucherOraDate: accountStatementFilter?.subVoucherOraDate,
                 languageCode: languageCode,
-                exportType: 'pdf',
+                exportType: exportType,
               )
             : isTrialBalanceByCategoriesReport
             ? await reportsRepo.getTrialBalanceByCategoriesReport(
                 languageCode: languageCode,
+                exportType: exportType,
               )
             : isCostCentersReport
             ? await reportsRepo.getCostCentersReport(
                 costCenterType: costCenterType!,
                 languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isCostCentersProjectsReport
+            ? await reportsRepo.getCostCentersProjectsReport(
+                fromCostCenterNo:
+                    costCentersProjectsFilter?.fromCostCenterNo,
+                toCostCenterNo:
+                    costCentersProjectsFilter?.toCostCenterNo,
+                fromDate: costCentersProjectsFilter?.fromDate,
+                toDate: costCentersProjectsFilter?.toDate,
+                reportName: costCentersProjectsFilter?.reportName ??
+                    reportName ??
+                    'Agl026_Project2',
+                languageCode: languageCode,
+                exportType: exportType,
               )
             : await reportsRepo.getChartOfAccountReport(
                 reportName: reportName ?? 'AGL001',
-                exportType: 'pdf',
+                exportType: exportType,
               );
 
         file = result.fold(
@@ -609,6 +709,11 @@ class _ReportsScreenState extends State<ReportsScreen> {
           (savedFile) => savedFile,
         );
       } else {
+        if (exportType != 'pdf') {
+          throw UnsupportedError(
+            'صيغة ${_exportFormatLabel(exportType)} غير مدعومة لهذا التقرير',
+          );
+        }
         file = await PdfExportService.generate(
           title: title,
           description: description,
@@ -625,30 +730,28 @@ class _ReportsScreenState extends State<ReportsScreen> {
           ? reportName
           : title;
       final fileName =
-          '${baseName.replaceAll(RegExp(r'\s+'), '_')}_${DateTime.now().millisecondsSinceEpoch}.pdf';
-      await FileDownloadService.saveFileToDevice(
+          '${baseName.replaceAll(RegExp(r'\s+'), '_')}_${DateTime.now().millisecondsSinceEpoch}.${_fileExtension(exportType)}';
+      final savedFile = await FileDownloadService.saveFileToDevice(
         sourceFile: file,
         defaultFileName: fileName,
       );
+      if (savedFile == null) {
+        throw Exception('تعذر حفظ التقرير على الجهاز');
+      }
+      if (!mounted) return;
 
-      setState(() {
-        _pdfFile = file;
-        _excelRows = null;
-        _previewTitle = title;
-        _previewKind = _PreviewKind.pdf;
-        _isGenerating = false;
-      });
-
-      // نمرّر للأعلى لعرض المعاينة داخل الصفحة كخيار إضافي.
-      _scrollToPreview();
-
-      CommonMethods.showToast(
-        message: 'تم جلب وتنزيل التقرير بنجاح ($title)',
-        type: ToastType.success,
-      );
-
-      // ── فتح التقرير فوراً بملء الشاشة بجودة فائقة ووضوح كامل ──
-      if (mounted) {
+      if (exportType == 'pdf') {
+        setState(() {
+          _pdfFile = file;
+          _previewTitle = title;
+          _previewKind = _PreviewKind.pdf;
+          _isGenerating = false;
+        });
+        _scrollToPreview();
+        CommonMethods.showToast(
+          message: 'تم جلب وتنزيل التقرير بنجاح ($title)',
+          type: ToastType.success,
+        );
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -660,6 +763,24 @@ class _ReportsScreenState extends State<ReportsScreen> {
             ),
           ),
         );
+      } else {
+        final opened = await FileDownloadService.openFile(savedFile.path);
+        if (!mounted) return;
+        if (!opened) {
+          throw Exception(
+            'تم تنزيل التقرير، لكن لا يوجد تطبيق لفتح صيغة ${_exportFormatLabel(exportType)}',
+          );
+        }
+        setState(() {
+          _previewKind = _PreviewKind.none;
+          _pdfFile = null;
+          _isGenerating = false;
+        });
+        CommonMethods.showToast(
+          message:
+              'تم تنزيل وفتح التقرير بصيغة ${_exportFormatLabel(exportType)}',
+          type: ToastType.success,
+        );
       }
     } catch (e) {
       if (!mounted) return;
@@ -667,59 +788,26 @@ class _ReportsScreenState extends State<ReportsScreen> {
       CommonMethods.showToast(
         message: e is Exception
             ? e.toString().replaceFirst('Exception: ', '')
-            : 'حدث خطأ أثناء تحميل ملف PDF',
+            : 'حدث خطأ أثناء تحميل ملف ${_exportFormatLabel(exportType)}',
         type: ToastType.error,
       );
     }
   }
 
-  // ── Excel Export ─────────────────────────────────────────────────────────
-  Future<void> _handleExportExcel({
-    required String title,
-    required String description,
-    required String amount,
-    required String date,
-    required String status,
-  }) async {
-    setState(() => _isGenerating = true);
+  String _exportFormatLabel(String exportType) => switch (exportType) {
+    'pdf' => 'PDF',
+    'excel' => 'Excel',
+    'word' => 'Word',
+    'excelformatted' => 'Excel formatted',
+    _ => exportType,
+  };
 
-    try {
-      await ExcelExportService.generate(
-        title: title,
-        description: description,
-        amount: amount,
-        date: date,
-        status: status,
-      );
-
-      if (!mounted) return;
-
-      setState(() {
-        _excelRows = [
-          ['البند', 'التفاصيل', 'المبلغ', 'التاريخ', 'الحالة'],
-          [title, description, amount, date, status],
-        ];
-        _pdfFile = null;
-        _previewTitle = title;
-        _previewKind = _PreviewKind.excel;
-        _isGenerating = false;
-      });
-
-      _scrollToPreview();
-
-      CommonMethods.showToast(
-        message: '${AppLocaleKey.exportingExcel.tr()} ($title)',
-        type: ToastType.success,
-      );
-    } catch (e) {
-      if (!mounted) return;
-      setState(() => _isGenerating = false);
-      CommonMethods.showToast(
-        message: 'حدث خطأ أثناء إنشاء ملف Excel',
-        type: ToastType.error,
-      );
-    }
-  }
+  String _fileExtension(String exportType) => switch (exportType) {
+    'pdf' => 'pdf',
+    'excel' || 'excelformatted' => 'xlsx',
+    'word' => 'docx',
+    _ => throw ArgumentError.value(exportType, 'exportType', 'Unsupported'),
+  };
 
   // ── Scroll to preview ────────────────────────────────────────────────────
   final ScrollController _scrollController = ScrollController();
@@ -740,7 +828,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
     setState(() {
       _previewKind = _PreviewKind.none;
       _pdfFile = null;
-      _excelRows = null;
     });
   }
 
@@ -878,6 +965,18 @@ class _ReportsScreenState extends State<ReportsScreen> {
         'category': 1,
         'reportName': 'AGL007',
         'isCostCentersReport': true,
+      },
+      {
+        'title': AppLocaleKey.statementCostCentersProjects.tr(),
+        'desc': AppLocaleKey.statementCostCentersProjectsDesc.tr(),
+        'amount': 'Agl026',
+        'date': 'Live API',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.domain_rounded,
+        'iconColor': AppColor.oceanBlue,
+        'category': 1,
+        'reportName': 'Agl026_Project2',
+        'isCostCentersProjectsReport': true,
       },
     ];
 
@@ -1162,14 +1261,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
         if (_pdfFile == null) return const SizedBox.shrink();
         return PdfPreviewPanel(
           file: _pdfFile!,
-          title: _previewTitle,
-          onClose: _closePreview,
-        );
-
-      case _PreviewKind.excel:
-        if (_excelRows == null) return const SizedBox.shrink();
-        return ExcelPreviewPanel(
-          rows: _excelRows!,
           title: _previewTitle,
           onClose: _closePreview,
         );
@@ -1508,9 +1599,34 @@ class _ReportsScreenState extends State<ReportsScreen> {
           final st = filteredStatements[index];
           final title = st['title'] as String;
           final description = st['desc'] as String;
-          final amount = st['amount'] as String;
-          final date = st['date'] as String;
+          final amount = st['amount'] as String? ?? '';
+          final date = st['date'] as String? ?? '';
           final status = st['status'] as String;
+
+          Future<void> exportReport(String exportType) => _handleExportReport(
+            title: title,
+            description: description,
+            amount: amount,
+            date: date,
+            status: status,
+            exportType: exportType,
+            reportName: st['reportName'] as String?,
+            isApiReport: st['isApiReport'] == true,
+            isIncomeAndExpenseSituationReport:
+                st['isIncomeAndExpenseSituationReport'] == true,
+            isDailyIncomeAndExpenseReport:
+                st['isDailyIncomeAndExpenseReport'] == true,
+            isExpensesWithVatReport: st['isExpensesWithVatReport'] == true,
+            isSalesWithVatReport: st['isSalesWithVatReport'] == true,
+            isPurchasesWithVatReport: st['isPurchasesWithVatReport'] == true,
+            isLedgerReport: st['isLedgerReport'] == true,
+            isAccountStatementReport: st['isAccountStatementReport'] == true,
+            isTrialBalanceByCategoriesReport:
+                st['isTrialBalanceByCategoriesReport'] == true,
+            isCostCentersReport: st['isCostCentersReport'] == true,
+            isCostCentersProjectsReport:
+                st['isCostCentersProjectsReport'] == true,
+          );
 
           return FadeInUp(
             delay: Duration(milliseconds: 80 * index),
@@ -1523,34 +1639,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
               icon: st['icon'] as IconData,
               iconColor: st['iconColor'] as Color,
               // ── ربط المعاينة داخل الصفحة نفسها ──
-              onExportPdf: () => _handleExportPdf(
-                title: title,
-                description: description,
-                amount: amount,
-                date: date,
-                status: status,
-                reportName: st['reportName'] as String?,
-                isApiReport: st['isApiReport'] == true,
-                isIncomeAndExpenseSituationReport:
-                    st['isIncomeAndExpenseSituationReport'] == true,
-                isDailyIncomeAndExpenseReport:
-                    st['isDailyIncomeAndExpenseReport'] == true,
-                isExpensesWithVatReport: st['isExpensesWithVatReport'] == true,
-                isSalesWithVatReport: st['isSalesWithVatReport'] == true,
-                isPurchasesWithVatReport:
-                    st['isPurchasesWithVatReport'] == true,
-                isLedgerReport: st['isLedgerReport'] == true,
-                isTrialBalanceByCategoriesReport:
-                    st['isTrialBalanceByCategoriesReport'] == true,
-                isCostCentersReport: st['isCostCentersReport'] == true,
-              ),
-              onExportExcel: () => _handleExportExcel(
-                title: title,
-                description: description,
-                amount: amount,
-                date: date,
-                status: status,
-              ),
+              onExportPdf: () => exportReport('pdf'),
+              onExportFormat: exportReport,
             ),
           );
         },

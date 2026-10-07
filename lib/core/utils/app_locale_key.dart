@@ -276,6 +276,10 @@ class AppLocaleKey {
       'statementTrialBalanceByCategoriesDesc';
   static const String statementCostCenters = 'statementCostCenters';
   static const String statementCostCentersDesc = 'statementCostCentersDesc';
+  static const String statementCostCentersProjects =
+      'statementCostCentersProjects';
+  static const String statementCostCentersProjectsDesc =
+      'statementCostCentersProjectsDesc';
   static const String selectCostCenterType = 'selectCostCenterType';
   static const String allCostCenters = 'allCostCenters';
   static const String mainCostCenters = 'mainCostCenters';

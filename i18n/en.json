@@ -228,6 +228,8 @@
   "statementTrialBalanceByCategoriesDesc": "Account balances grouped by category",
   "statementCostCenters": "Cost Centers (AGL007)",
   "statementCostCentersDesc": "Report of main and sub cost centers",
+  "statementCostCentersProjects": "Projects Cost Centers (Agl026)",
+  "statementCostCentersProjectsDesc": "Projects cost centers and summary report",
   "selectCostCenterType": "Select cost center type",
   "allCostCenters": "All cost centers",
   "mainCostCenters": "Main cost centers",

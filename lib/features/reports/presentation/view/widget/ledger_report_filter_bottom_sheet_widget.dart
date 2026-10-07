@@ -9,14 +9,14 @@ import 'package:my_template/features/lookup/data/models/chart_of_account_light_m
 import 'package:my_template/features/lookup/presentation/widgets/chart_of_account_dropdown.dart';
 
 class LedgerReportFilterSelection {
-  final DateTime fromDate;
-  final DateTime toDate;
+  final DateTime? fromDate;
+  final DateTime? toDate;
   final int? fromAccountNo;
   final int? toAccountNo;
 
   const LedgerReportFilterSelection({
-    required this.fromDate,
-    required this.toDate,
+    this.fromDate,
+    this.toDate,
     this.fromAccountNo,
     this.toAccountNo,
   });
@@ -52,8 +52,9 @@ class LedgerReportFilterBottomSheetWidget extends StatefulWidget {
 
 class _LedgerReportFilterBottomSheetWidgetState
     extends State<LedgerReportFilterBottomSheetWidget> {
-  late DateTime _fromDate;
-  late DateTime _toDate;
+  DateTime? _fromDate;
+  DateTime? _toDate;
+  bool _includeDates = false;
   ChartOfAccountLightModel? _fromAccount;
   ChartOfAccountLightModel? _toAccount;
   String? _validationMessage;
@@ -61,15 +62,13 @@ class _LedgerReportFilterBottomSheetWidgetState
   @override
   void initState() {
     super.initState();
-    final today = DateUtils.dateOnly(DateTime.now());
-    _toDate = today;
-    _fromDate = today.subtract(const Duration(days: 7));
   }
 
   Future<void> _selectDate({required bool isFromDate}) async {
+    final initial = (isFromDate ? _fromDate : _toDate) ?? DateTime.now();
     final selected = await showDatePicker(
       context: context,
-      initialDate: isFromDate ? _fromDate : _toDate,
+      initialDate: initial,
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
     );
@@ -90,7 +89,10 @@ class _LedgerReportFilterBottomSheetWidgetState
   }
 
   void _submit() {
-    if (_fromDate.isAfter(_toDate)) {
+    if (_includeDates &&
+        _fromDate != null &&
+        _toDate != null &&
+        _fromDate!.isAfter(_toDate!)) {
       setState(() {
         _validationMessage = AppLocaleKey.invalidDateRange.tr();
       });
@@ -100,8 +102,8 @@ class _LedgerReportFilterBottomSheetWidgetState
     Navigator.pop(
       context,
       LedgerReportFilterSelection(
-        fromDate: _fromDate,
-        toDate: _toDate,
+        fromDate: _includeDates ? _fromDate : null,
+        toDate: _includeDates ? _toDate : null,
         fromAccountNo: _fromAccount?.accountNo,
         toAccountNo: _toAccount?.accountNo,
       ),
@@ -112,6 +114,7 @@ class _LedgerReportFilterBottomSheetWidgetState
   Widget build(BuildContext context) {
     final foreground = AppColor.titleFormFiledColor(context);
     final accent = AppColor.primaryColor(context);
+    final isAr = context.locale.languageCode == 'ar';
 
     return Container(
       constraints: BoxConstraints(
@@ -182,54 +185,80 @@ class _LedgerReportFilterBottomSheetWidgetState
                   ],
                 ),
                 Gap(16.h),
-                // ── Date Range Section ──
+                // ── Date Range Toggle Switch ──
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            AppLocaleKey.fromDate.tr(),
-                            style: TextStyle(
-                              color: foreground.withValues(alpha: 0.65),
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          Gap(6.h),
-                          _buildDateTile(
-                            date: _fromDate,
-                            onTap: () => _selectDate(isFromDate: true),
-                            foreground: foreground,
-                          ),
-                        ],
+                    Text(
+                      isAr ? 'تحديد فترة التاريخ' : 'Filter by Date Range',
+                      style: AppTextStyle.formTitleStyle(context).copyWith(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13.sp,
                       ),
                     ),
-                    Gap(12.w),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            AppLocaleKey.toDate.tr(),
-                            style: TextStyle(
-                              color: foreground.withValues(alpha: 0.65),
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          Gap(6.h),
-                          _buildDateTile(
-                            date: _toDate,
-                            onTap: () => _selectDate(isFromDate: false),
-                            foreground: foreground,
-                          ),
-                        ],
-                      ),
+                    Switch.adaptive(
+                      value: _includeDates,
+                      activeThumbColor: accent,
+                      onChanged: (val) => setState(() => _includeDates = val),
                     ),
                   ],
                 ),
+                if (_includeDates) ...[
+                  Gap(8.h),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              AppLocaleKey.fromDate.tr(),
+                              style: TextStyle(
+                                color: foreground.withValues(alpha: 0.65),
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            Gap(6.h),
+                            _buildDateTile(
+                              date: _fromDate,
+                              hint: isAr ? 'من تاريخ' : 'From date',
+                              onTap: () => _selectDate(isFromDate: true),
+                              onClear: () => setState(() => _fromDate = null),
+                              foreground: foreground,
+                              accent: accent,
+                            ),
+                          ],
+                        ),
+                      ),
+                      Gap(12.w),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              AppLocaleKey.toDate.tr(),
+                              style: TextStyle(
+                                color: foreground.withValues(alpha: 0.65),
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            Gap(6.h),
+                            _buildDateTile(
+                              date: _toDate,
+                              hint: isAr ? 'إلى تاريخ' : 'To date',
+                              onTap: () => _selectDate(isFromDate: false),
+                              onClear: () => setState(() => _toDate = null),
+                              foreground: foreground,
+                              accent: accent,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
                 Gap(16.h),
                 // ── Account Range Section ──
                 ChartOfAccountDropdown(
@@ -312,20 +341,27 @@ class _LedgerReportFilterBottomSheetWidgetState
   }
 
   Widget _buildDateTile({
-    required DateTime date,
+    required DateTime? date,
+    required String hint,
     required VoidCallback onTap,
+    required VoidCallback onClear,
     required Color foreground,
+    required Color accent,
   }) {
+    final hasValue = date != null;
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12.r),
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 11.h),
         decoration: BoxDecoration(
           color: AppColor.textFormFillColor(context),
           borderRadius: BorderRadius.circular(12.r),
           border: Border.all(
-            color: foreground.withValues(alpha: 0.12),
+            color: hasValue
+                ? accent.withValues(alpha: 0.5)
+                : foreground.withValues(alpha: 0.12),
           ),
         ),
         child: Row(
@@ -333,19 +369,36 @@ class _LedgerReportFilterBottomSheetWidgetState
             Icon(
               Icons.calendar_today_rounded,
               size: 16.sp,
-              color: AppColor.primaryColor(context),
+              color: hasValue ? accent : foreground.withValues(alpha: 0.5),
             ),
             Gap(8.w),
             Expanded(
               child: Text(
-                _formatDate(date),
-                style: AppTextStyle.textFormStyle(context).copyWith(
-                  fontSize: 13.sp,
-                  fontWeight: FontWeight.w500,
-                ),
+                hasValue ? _formatDate(date) : hint,
+                style: hasValue
+                    ? AppTextStyle.textFormStyle(context).copyWith(
+                        fontSize: 13.sp,
+                        fontWeight: FontWeight.w500,
+                      )
+                    : AppTextStyle.hintStyle(context).copyWith(
+                        fontSize: 13.sp,
+                      ),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
+            if (hasValue)
+              InkWell(
+                onTap: onClear,
+                borderRadius: BorderRadius.circular(12.r),
+                child: Padding(
+                  padding: EdgeInsets.all(2.r),
+                  child: Icon(
+                    Icons.close_rounded,
+                    size: 15.sp,
+                    color: foreground.withValues(alpha: 0.5),
+                  ),
+                ),
+              ),
           ],
         ),
       ),

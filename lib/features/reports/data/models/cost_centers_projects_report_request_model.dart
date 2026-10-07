@@ -1,31 +1,30 @@
 import 'report_date_formatter.dart';
 
-class LedgerReportRequestModel {
+class CostCentersProjectsReportRequestModel {
+  final num? fromCostCenterNo;
+  final num? toCostCenterNo;
   final DateTime? fromDate;
   final DateTime? toDate;
   final String reportName;
   final String exportType;
-  final int? fromAccountNo;
-  final int? toAccountNo;
 
-  const LedgerReportRequestModel({
+  const CostCentersProjectsReportRequestModel({
+    this.fromCostCenterNo,
+    this.toCostCenterNo,
     this.fromDate,
     this.toDate,
-    this.reportName = 'AGL025',
+    required this.reportName,
     this.exportType = 'pdf',
-    this.fromAccountNo,
-    this.toAccountNo,
   });
 
   Map<String, dynamic> toJson() {
-    final map = <String, dynamic>{
+    return {
+      'FromCostCenterNo': fromCostCenterNo,
+      'ToCostCenterNo': toCostCenterNo,
       'FromDate': fromDate != null ? formatReportDate(fromDate!) : null,
       'ToDate': toDate != null ? formatReportDate(toDate!) : null,
       'ReportName': reportName,
       'ExportType': exportType,
     };
-    if (fromAccountNo != null) map['FromAccountNo'] = fromAccountNo;
-    if (toAccountNo != null) map['ToAccountNo'] = toAccountNo;
-    return map;
   }
 }

@@ -5,6 +5,7 @@ import '../../../../core/error/failures.dart';
 import '../../../../core/network/api_consumer.dart';
 import '../../../../core/network/end_points.dart';
 import '../models/chart_of_account_light_model.dart';
+import '../models/cost_center_light_model.dart';
 import '../models/customer_datum_light_model.dart';
 
 abstract interface class LookupRepo {
@@ -23,6 +24,16 @@ abstract interface class LookupRepo {
     String? searchWord,
     int page = 1,
     int pageSize = 50,
+  });
+
+  Future<Either<Failure, CostCenterLightResponse>> getCostCenterLight({
+    required String languageCode,
+    int centerType = 1,
+    int centerKind = 0,
+    String? idAsString,
+    String? searchWord,
+    int page = 1,
+    int pageSize = 20,
   });
 }
 
@@ -91,6 +102,41 @@ class LookupRepoImpl implements LookupRepo {
           ),
         );
         return CustomerDatumLightResponse.fromJson(
+          response as Map<String, dynamic>,
+        );
+      },
+    );
+  }
+
+  @override
+  Future<Either<Failure, CostCenterLightResponse>> getCostCenterLight({
+    required String languageCode,
+    int centerType = 1,
+    int centerKind = 0,
+    String? idAsString,
+    String? searchWord,
+    int page = 1,
+    int pageSize = 20,
+  }) {
+    return handleDioRequest(
+      request: () async {
+        final response = await apiConsumer.post(
+          EndPoints.costCenterLight,
+          body: {
+            'CenterType': centerType,
+            'CenterKind': centerKind,
+            'idAsString': idAsString,
+            'SearchWord': searchWord,
+            'page': page.toString(),
+            'pageSize': pageSize.toString(),
+          },
+          options: Options(
+            headers: {
+              'Accept-Language': languageCode == 'ar' ? 'ar' : 'en',
+            },
+          ),
+        );
+        return CostCenterLightResponse.fromJson(
           response as Map<String, dynamic>,
         );
       },

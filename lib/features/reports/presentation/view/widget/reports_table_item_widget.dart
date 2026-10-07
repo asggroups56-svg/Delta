@@ -17,8 +17,8 @@ class ReportsTableItemWidget extends StatelessWidget {
   /// يُستدعى عند الضغط على زر PDF. الشاشة الأم مسؤولة عن المعاينة.
   final VoidCallback onExportPdf;
 
-  /// يُستدعى عند الضغط على زر Excel. الشاشة الأم مسؤولة عن المعاينة.
-  final VoidCallback onExportExcel;
+  /// يُستدعى عند اختيار صيغة تصدير غير PDF.
+  final ValueChanged<String> onExportFormat;
 
   const ReportsTableItemWidget({
     super.key,
@@ -30,7 +30,7 @@ class ReportsTableItemWidget extends StatelessWidget {
     required this.icon,
     required this.iconColor,
     required this.onExportPdf,
-    required this.onExportExcel,
+    required this.onExportFormat,
   });
 
   @override
@@ -175,11 +175,44 @@ class ReportsTableItemWidget extends StatelessWidget {
               onTap: onExportPdf,
             ),
             Gap(8.w),
-            _exportButton(
-              label: 'XLSX',
-              icon: Icons.table_chart_outlined,
-              color: const Color(0xFF10B981),
-              onTap: onExportExcel,
+            PopupMenuButton<String>(
+              onSelected: onExportFormat,
+              itemBuilder: (context) => const [
+                PopupMenuItem(value: 'excel', child: Text('Excel')),
+                PopupMenuItem(value: 'word', child: Text('Word')),
+                PopupMenuItem(
+                  value: 'excelformatted',
+                  child: Text('Excel formatted'),
+                ),
+              ],
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 5.h),
+                decoration: BoxDecoration(
+                  color: AppColor.oceanBlue.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(8.r),
+                  border: Border.all(
+                    color: AppColor.oceanBlue.withValues(alpha: 0.3),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.more_horiz_rounded,
+                      size: 13.r,
+                      color: AppColor.oceanBlue,
+                    ),
+                    Gap(3.w),
+                    Text(
+                      'MORE',
+                      style: TextStyle(
+                        fontSize: 10.sp,
+                        fontWeight: FontWeight.bold,
+                        color: AppColor.oceanBlue,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         ),

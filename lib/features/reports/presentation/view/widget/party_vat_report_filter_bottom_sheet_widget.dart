@@ -62,6 +62,7 @@ class _PartyVatReportFilterBottomSheetWidgetState
     extends State<PartyVatReportFilterBottomSheetWidget> {
   DateTime? _fromDate;
   DateTime? _toDate;
+  bool _includeDates = false;
   CustomerDatumLightModel? _fromParty;
   CustomerDatumLightModel? _toParty;
   String? _validationMessage;
@@ -90,7 +91,10 @@ class _PartyVatReportFilterBottomSheetWidgetState
   }
 
   void _submit() {
-    if (_fromDate != null && _toDate != null && _fromDate!.isAfter(_toDate!)) {
+    if (_includeDates &&
+        _fromDate != null &&
+        _toDate != null &&
+        _fromDate!.isAfter(_toDate!)) {
       setState(() {
         _validationMessage = AppLocaleKey.invalidDateRange.tr();
       });
@@ -102,8 +106,8 @@ class _PartyVatReportFilterBottomSheetWidgetState
       PartyVatReportFilterSelection(
         fromCustomerNo: _fromParty?.customerNo.toDouble(),
         toCustomerNo: _toParty?.customerNo.toDouble(),
-        fromTransDate: _fromDate,
-        toTransDate: _toDate,
+        fromTransDate: _includeDates ? _fromDate : null,
+        toTransDate: _includeDates ? _toDate : null,
       ),
     );
   }
@@ -198,65 +202,87 @@ class _PartyVatReportFilterBottomSheetWidgetState
                     ),
                   ],
                 ),
-                Gap(18.h),
-                // ── Date Range Section ──
+                Gap(16.h),
+                // ── Date Range Toggle Switch ──
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            AppLocaleKey.fromDate.tr(),
-                            style: TextStyle(
-                              color: foreground.withValues(alpha: 0.65),
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          Gap(6.h),
-                          _buildDateTile(
-                            date: _fromDate,
-                            hint: context.locale.languageCode == 'ar'
-                                ? 'من تاريخ'
-                                : 'From date',
-                            onTap: () => _selectDate(isFromDate: true),
-                            onClear: () => setState(() => _fromDate = null),
-                            foreground: foreground,
-                            accent: accent,
-                          ),
-                        ],
+                    Text(
+                      context.locale.languageCode == 'ar'
+                          ? 'تحديد فترة التاريخ'
+                          : 'Filter by Date Range',
+                      style: AppTextStyle.formTitleStyle(context).copyWith(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13.sp,
                       ),
                     ),
-                    Gap(12.w),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            AppLocaleKey.toDate.tr(),
-                            style: TextStyle(
-                              color: foreground.withValues(alpha: 0.65),
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          Gap(6.h),
-                          _buildDateTile(
-                            date: _toDate,
-                            hint: context.locale.languageCode == 'ar'
-                                ? 'إلى تاريخ'
-                                : 'To date',
-                            onTap: () => _selectDate(isFromDate: false),
-                            onClear: () => setState(() => _toDate = null),
-                            foreground: foreground,
-                            accent: accent,
-                          ),
-                        ],
-                      ),
+                    Switch.adaptive(
+                      value: _includeDates,
+                      activeThumbColor: accent,
+                      onChanged: (val) => setState(() => _includeDates = val),
                     ),
                   ],
                 ),
+                if (_includeDates) ...[
+                  Gap(8.h),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              AppLocaleKey.fromDate.tr(),
+                              style: TextStyle(
+                                color: foreground.withValues(alpha: 0.65),
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            Gap(6.h),
+                            _buildDateTile(
+                              date: _fromDate,
+                              hint: context.locale.languageCode == 'ar'
+                                  ? 'من تاريخ'
+                                  : 'From date',
+                              onTap: () => _selectDate(isFromDate: true),
+                              onClear: () => setState(() => _fromDate = null),
+                              foreground: foreground,
+                              accent: accent,
+                            ),
+                          ],
+                        ),
+                      ),
+                      Gap(12.w),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              AppLocaleKey.toDate.tr(),
+                              style: TextStyle(
+                                color: foreground.withValues(alpha: 0.65),
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            Gap(6.h),
+                            _buildDateTile(
+                              date: _toDate,
+                              hint: context.locale.languageCode == 'ar'
+                                  ? 'إلى تاريخ'
+                                  : 'To date',
+                              onTap: () => _selectDate(isFromDate: false),
+                              onClear: () => setState(() => _toDate = null),
+                              foreground: foreground,
+                              accent: accent,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
                 Gap(16.h),
                 // ── Party Range Section ──
                 CustomerDatumDropdown(
