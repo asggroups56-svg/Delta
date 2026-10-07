@@ -202,15 +202,15 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   icon: Icons.account_tree_rounded,
                   color: AppColor.oceanBlue,
                   title: AppLocaleKey.statementChartOfAccount.tr(),
-                  subtitle: 'Report/ChartOfAccountReport (AGL001 - Live API)',
+                  subtitle: 'Report/ChartOfAccountReport (AGL001)',
                   onTap: () {
                     Navigator.pop(ctx);
                     _handleExportReport(
                       title: AppLocaleKey.statementChartOfAccount.tr(),
                       description: AppLocaleKey.statementChartOfAccountDesc
                           .tr(),
-                      amount: 'AGL001',
-                      date: 'Live API',
+                      amount: '',
+                      date: '',
                       status: AppLocaleKey.statusAudited.tr(),
                       reportName: 'AGL001',
                       isApiReport: true,
@@ -224,14 +224,14 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   color: AppColor.emeraldTeal,
                   title: AppLocaleKey.statementIncome.tr(),
                   subtitle:
-                      'Report/IncomeAndExpenseSituationReport (AGL300_M - Live API)',
+                      'Report/IncomeAndExpenseSituationReport (AGL300_M)',
                   onTap: () {
                     Navigator.pop(ctx);
                     _handleExportReport(
                       title: AppLocaleKey.statementIncome.tr(),
                       description: AppLocaleKey.statementIncomeDesc.tr(),
-                      amount: 'AGL300_M',
-                      date: 'Live API',
+                      amount: '',
+                      date: '',
                       status: AppLocaleKey.statusAudited.tr(),
                       reportName: 'AGL300_M',
                       isIncomeAndExpenseSituationReport: true,
@@ -245,14 +245,14 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   color: AppColor.oceanBlue,
                   title: AppLocaleKey.statementDailyIncome.tr(),
                   subtitle:
-                      'Report/IncomeAndExpenseSituationReport (AGL300_D - Live API)',
+                      'Report/IncomeAndExpenseSituationReport (AGL300_D)',
                   onTap: () {
                     Navigator.pop(ctx);
                     _handleExportReport(
                       title: AppLocaleKey.statementDailyIncome.tr(),
                       description: AppLocaleKey.statementDailyIncomeDesc.tr(),
-                      amount: 'AGL300_D',
-                      date: 'Live API',
+                      amount: '',
+                      date: '',
                       status: AppLocaleKey.statusAudited.tr(),
                       reportName: 'AGL300_D',
                       isDailyIncomeAndExpenseReport: true,
@@ -266,15 +266,15 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   color: AppColor.purpleAccent,
                   title: AppLocaleKey.statementExpensesWithVat.tr(),
                   subtitle:
-                      'Report/ExpensesWithVatReport (AGL1001E - Live API)',
+                      'Report/ExpensesWithVatReport (AGL1001E)',
                   onTap: () {
                     Navigator.pop(ctx);
                     _handleExportReport(
                       title: AppLocaleKey.statementExpensesWithVat.tr(),
                       description: AppLocaleKey.statementExpensesWithVatDesc
                           .tr(),
-                      amount: 'AGL1001E',
-                      date: 'Live API',
+                      amount: '',
+                      date: '',
                       status: AppLocaleKey.statusAudited.tr(),
                       reportName: 'AGL1001E',
                       isExpensesWithVatReport: true,
@@ -287,14 +287,14 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   icon: Icons.point_of_sale_rounded,
                   color: AppColor.emeraldTeal,
                   title: AppLocaleKey.statementSalesWithVat.tr(),
-                  subtitle: 'Report/SalesWithVatReport (AAR1000 - Live API)',
+                  subtitle: 'Report/SalesWithVatReport (AAR1000)',
                   onTap: () {
                     Navigator.pop(ctx);
                     _handleExportReport(
                       title: AppLocaleKey.statementSalesWithVat.tr(),
                       description: AppLocaleKey.statementSalesWithVatDesc.tr(),
-                      amount: 'AAR1000',
-                      date: 'Live API',
+                      amount: '',
+                      date: '',
                       status: AppLocaleKey.statusAudited.tr(),
                       reportName: 'AAR1000',
                       isSalesWithVatReport: true,
@@ -308,15 +308,15 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   color: AppColor.oceanBlue,
                   title: AppLocaleKey.statementPurchasesWithVat.tr(),
                   subtitle:
-                      'Report/PurchasesWithVatReport (AAR1001 - Live API)',
+                      'Report/PurchasesWithVatReport (AAR1001)',
                   onTap: () {
                     Navigator.pop(ctx);
                     _handleExportReport(
                       title: AppLocaleKey.statementPurchasesWithVat.tr(),
                       description: AppLocaleKey.statementPurchasesWithVatDesc
                           .tr(),
-                      amount: 'AAR1001',
-                      date: 'Live API',
+                      amount: '',
+                      date: '',
                       status: AppLocaleKey.statusAudited.tr(),
                       reportName: 'AAR1001',
                       isPurchasesWithVatReport: true,
@@ -330,14 +330,14 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   color: AppColor.oceanBlue,
                   title: AppLocaleKey.statementLedger.tr(),
                   subtitle:
-                      'Report/LedgerReportForAllAccounts (AGL025 - Live API)',
+                      'Report/LedgerReportForAllAccounts (AGL025)',
                   onTap: () {
                     Navigator.pop(ctx);
                     _handleExportReport(
                       title: AppLocaleKey.statementLedger.tr(),
                       description: AppLocaleKey.statementLedgerDesc.tr(),
-                      amount: 'AGL025',
-                      date: 'Live API',
+                      amount: '',
+                      date: '',
                       status: AppLocaleKey.statusAudited.tr(),
                       reportName: 'AGL025',
                       isLedgerReport: true,
@@ -350,15 +350,15 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   icon: Icons.receipt_long_rounded,
                   color: AppColor.oceanBlue,
                   title: AppLocaleKey.statementAccountStatement.tr(),
-                  subtitle: 'Report/AccountStatementReport (AGL079 - Live API)',
+                  subtitle: 'Report/AccountStatementReport (AGL079)',
                   onTap: () {
                     Navigator.pop(ctx);
                     _handleExportReport(
                       title: AppLocaleKey.statementAccountStatement.tr(),
                       description: AppLocaleKey.statementAccountStatementDesc
                           .tr(),
-                      amount: 'AGL079',
-                      date: 'Live API',
+                      amount: '',
+                      date: '',
                       status: AppLocaleKey.statusAudited.tr(),
                       reportName: 'AGL079',
                       isAccountStatementReport: true,
@@ -372,7 +372,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   color: AppColor.emeraldTeal,
                   title: AppLocaleKey.statementTrialBalanceByCategories.tr(),
                   subtitle:
-                      'Report/TrialBalanceByCategoriesReport (AGL055 - Live API)',
+                      'Report/TrialBalanceByCategoriesReport (AGL055)',
                   onTap: () {
                     Navigator.pop(ctx);
                     _handleExportReport(
@@ -381,8 +381,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
                       description: AppLocaleKey
                           .statementTrialBalanceByCategoriesDesc
                           .tr(),
-                      amount: 'AGL055',
-                      date: 'Live API',
+                      amount: '',
+                      date: '',
                       status: AppLocaleKey.statusAudited.tr(),
                       reportName: 'AGL055',
                       isTrialBalanceByCategoriesReport: true,
@@ -395,14 +395,14 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   icon: Icons.business_outlined,
                   color: AppColor.purpleAccent,
                   title: AppLocaleKey.statementCostCenters.tr(),
-                  subtitle: 'Report/CostCentersReport (AGL007 - Live API)',
+                  subtitle: 'Report/CostCentersReport (AGL007)',
                   onTap: () {
                     Navigator.pop(ctx);
                     _handleExportReport(
                       title: AppLocaleKey.statementCostCenters.tr(),
                       description: AppLocaleKey.statementCostCentersDesc.tr(),
-                      amount: 'AGL007',
-                      date: 'Live API',
+                      amount: '',
+                      date: '',
                       status: AppLocaleKey.statusAudited.tr(),
                       reportName: 'AGL007',
                       isCostCentersReport: true,
@@ -416,7 +416,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   color: AppColor.oceanBlue,
                   title: AppLocaleKey.statementCostCentersProjects.tr(),
                   subtitle:
-                      'Report/CostCentersProjectsReport (Agl026 - Live API)',
+                      'Report/CostCentersProjectsReport (Agl026)',
                   onTap: () {
                     Navigator.pop(ctx);
                     _handleExportReport(
@@ -424,8 +424,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
                       description: AppLocaleKey
                           .statementCostCentersProjectsDesc
                           .tr(),
-                      amount: 'Agl026_Project2',
-                      date: 'Live API',
+                      amount: '',
+                      date: '',
                       status: AppLocaleKey.statusAudited.tr(),
                       reportName: 'Agl026_Project2',
                       isCostCentersProjectsReport: true,
@@ -865,8 +865,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
         'isApiReport': true,
         'title': AppLocaleKey.statementChartOfAccount.tr(),
         'desc': AppLocaleKey.statementChartOfAccountDesc.tr(),
-        'amount': 'AGL001',
-        'date': 'Live API',
         'status': AppLocaleKey.statusAudited.tr(),
         'icon': Icons.account_tree_rounded,
         'iconColor': AppColor.oceanBlue,
@@ -875,8 +873,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
       {
         'title': AppLocaleKey.statementIncome.tr(),
         'desc': AppLocaleKey.statementIncomeDesc.tr(),
-        'amount': 'AGL300_M',
-        'date': 'Live API',
         'status': AppLocaleKey.statusAudited.tr(),
         'icon': Icons.show_chart_rounded,
         'iconColor': AppColor.emeraldTeal,
@@ -897,8 +893,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
       {
         'title': AppLocaleKey.statementExpensesWithVat.tr(),
         'desc': AppLocaleKey.statementExpensesWithVatDesc.tr(),
-        'amount': 'AGL1001E',
-        'date': 'Live API',
         'status': AppLocaleKey.statusAudited.tr(),
         'icon': Icons.receipt_long_outlined,
         'iconColor': AppColor.purpleAccent,
@@ -909,8 +903,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
       {
         'title': AppLocaleKey.statementSalesWithVat.tr(),
         'desc': AppLocaleKey.statementSalesWithVatDesc.tr(),
-        'amount': 'AAR1000',
-        'date': 'Live API',
         'status': AppLocaleKey.statusAudited.tr(),
         'icon': Icons.point_of_sale_rounded,
         'iconColor': AppColor.emeraldTeal,
@@ -921,8 +913,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
       {
         'title': AppLocaleKey.statementPurchasesWithVat.tr(),
         'desc': AppLocaleKey.statementPurchasesWithVatDesc.tr(),
-        'amount': 'AAR1001',
-        'date': 'Live API',
         'status': AppLocaleKey.statusAudited.tr(),
         'icon': Icons.shopping_bag_rounded,
         'iconColor': AppColor.oceanBlue,
@@ -933,8 +923,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
       {
         'title': AppLocaleKey.statementLedger.tr(),
         'desc': AppLocaleKey.statementLedgerDesc.tr(),
-        'amount': 'AGL025',
-        'date': 'Live API',
         'status': AppLocaleKey.statusAudited.tr(),
         'icon': Icons.menu_book_rounded,
         'iconColor': AppColor.oceanBlue,
@@ -945,8 +933,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
       {
         'title': AppLocaleKey.statementTrialBalanceByCategories.tr(),
         'desc': AppLocaleKey.statementTrialBalanceByCategoriesDesc.tr(),
-        'amount': 'AGL055',
-        'date': 'Live API',
         'status': AppLocaleKey.statusAudited.tr(),
         'icon': Icons.account_balance_wallet_outlined,
         'iconColor': AppColor.emeraldTeal,
@@ -957,8 +943,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
       {
         'title': AppLocaleKey.statementCostCenters.tr(),
         'desc': AppLocaleKey.statementCostCentersDesc.tr(),
-        'amount': 'AGL007',
-        'date': 'Live API',
         'status': AppLocaleKey.statusAudited.tr(),
         'icon': Icons.business_outlined,
         'iconColor': AppColor.purpleAccent,
@@ -969,8 +953,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
       {
         'title': AppLocaleKey.statementCostCentersProjects.tr(),
         'desc': AppLocaleKey.statementCostCentersProjectsDesc.tr(),
-        'amount': 'Agl026',
-        'date': 'Live API',
         'status': AppLocaleKey.statusAudited.tr(),
         'icon': Icons.domain_rounded,
         'iconColor': AppColor.oceanBlue,

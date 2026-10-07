@@ -183,7 +183,7 @@ class _PartyVatReportFilterBottomSheetWidgetState
                             ),
                           ),
                           Text(
-                            '${widget.reportCode} - Live API',
+                            widget.reportCode,
                             style: TextStyle(
                               color: foreground.withValues(alpha: 0.45),
                               fontSize: 11.sp,
