@@ -4,13 +4,11 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
 import 'core/routes/app_routers_import.dart';
 import 'core/routes/routes_name.dart';
 import 'core/theme/cubit/app_theme_cubit.dart';
 import 'core/theme/style.dart';
 import 'core/theme/theme_enum.dart';
-
 class DeltaApp extends StatelessWidget {
   const DeltaApp({super.key});
   @override
@@ -20,7 +18,6 @@ class DeltaApp extends StatelessWidget {
         final themeMode = context.read<AppThemeCubit>().theme == ThemeEnum.dark
             ? ThemeMode.dark
             : ThemeMode.light;
-
         return ScreenUtilInit(
           designSize: const Size(360, 690),
           minTextAdapt: true,

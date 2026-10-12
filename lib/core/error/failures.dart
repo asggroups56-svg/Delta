@@ -16,11 +16,26 @@ abstract class Failure {
 
 /// Represents a failure coming from Dio / the server.
 class ServerFailure extends Failure {
-  ServerFailure(super.errMessage);
+  final int? statusCode;
+
+  ServerFailure(super.errMessage, {this.statusCode});
 
   /// Map Dio exceptions to our ServerFailure, extracting server‑side messages when present.
   factory ServerFailure.fromDioError(DioException dioError) {
     try {
+      final statusCode = dioError.response?.statusCode;
+
+      // Handle 404 and 401/403 status codes with localized Arabic messages
+      if (statusCode == StatusCode.notFound || statusCode == 404) {
+        return ServerFailure('لا توجد بيانات', statusCode: 404);
+      }
+      if (statusCode == StatusCode.unauthorized || statusCode == 401) {
+        return ServerFailure('لا توجد صلاحيات', statusCode: 401);
+      }
+      if (statusCode == StatusCode.forbidden || statusCode == 403) {
+        return ServerFailure('لا توجد صلاحيات', statusCode: 403);
+      }
+
       // Attempt to parse raw response data into a Map<String, dynamic>
       final raw = dioError.response?.data;
       Map<String, dynamic>? map;
@@ -33,35 +48,44 @@ class ServerFailure extends Failure {
           } catch (_) {
             map = null;
           }
+        } else if (raw is List<int>) {
+          try {
+            final decoded = utf8.decode(raw);
+            map = jsonDecode(decoded) as Map<String, dynamic>;
+          } catch (_) {
+            map = null;
+          }
         }
       }
 
       // If we got a JSON map with a "message" field, return it immediately
-      if (map != null && map['message'] is String) {
-        return ServerFailure(map['message'] as String);
+      if (map != null &&
+          map['message'] is String &&
+          (map['message'] as String).trim().isNotEmpty) {
+        return ServerFailure(map['message'] as String, statusCode: statusCode);
       }
 
       // Otherwise fall back based on DioException type
       switch (dioError.type) {
         case DioExceptionType.connectionTimeout:
-          return ServerFailure('Connection timeout with API server');
+          return ServerFailure('Connection timeout with API server', statusCode: statusCode);
         case DioExceptionType.sendTimeout:
-          return ServerFailure('Send timeout with API server');
+          return ServerFailure('Send timeout with API server', statusCode: statusCode);
         case DioExceptionType.receiveTimeout:
-          return ServerFailure('Receive timeout with API server');
+          return ServerFailure('Receive timeout with API server', statusCode: statusCode);
         case DioExceptionType.cancel:
-          return ServerFailure('Request to API server was cancelled');
+          return ServerFailure('Request to API server was cancelled', statusCode: statusCode);
         case DioExceptionType.connectionError:
-          return ServerFailure('No internet connection');
+          return ServerFailure('No internet connection', statusCode: statusCode);
         case DioExceptionType.unknown:
-          return ServerFailure('Unexpected error, please try again!');
+          return ServerFailure('Unexpected error, please try again!', statusCode: statusCode);
         case DioExceptionType.badResponse:
           return ServerFailure.fromResponse(
-            dioError.response?.statusCode,
+            statusCode,
             map ?? raw,
           );
         default:
-          return ServerFailure('Oops! There was an error, please try again.');
+          return ServerFailure('Oops! There was an error, please try again.', statusCode: statusCode);
       }
     } catch (e, stack) {
       log('ServerFailure.fromDioError error: $e\n$stack');
@@ -69,27 +93,35 @@ class ServerFailure extends Failure {
     }
   }
 
-  /// Handle different status codes, but always prefer the server‑sent "message" if available.
+  /// Handle different status codes, prioritizing 404 & 401/403 requirements.
   factory ServerFailure.fromResponse(int? statusCode, dynamic response) {
     try {
-      if (response is Map<String, dynamic> && response['message'] is String) {
-        return ServerFailure(response['message'] as String);
+      if (statusCode == StatusCode.notFound || statusCode == 404) {
+        return ServerFailure('لا توجد بيانات', statusCode: 404);
+      }
+      if (statusCode == StatusCode.unauthorized || statusCode == 401) {
+        return ServerFailure('لا توجد صلاحيات', statusCode: 401);
+      }
+      if (statusCode == StatusCode.forbidden || statusCode == 403) {
+        return ServerFailure('لا توجد صلاحيات', statusCode: 403);
+      }
+
+      if (response is Map<String, dynamic> &&
+          response['message'] is String &&
+          (response['message'] as String).trim().isNotEmpty) {
+        return ServerFailure(response['message'] as String, statusCode: statusCode);
       }
 
       switch (statusCode) {
         case StatusCode.badRequest:
-        case StatusCode.unauthorized:
-        case StatusCode.forbidden:
-          return ServerFailure('Invalid request, please check your input');
-        case StatusCode.notFound:
-          return ServerFailure('Requested resource not found');
+          return ServerFailure('Invalid request, please check your input', statusCode: statusCode);
         case StatusCode.internalServerError:
-          return ServerFailure('Internal server error, please try later');
+          return ServerFailure('Internal server error, please try later', statusCode: statusCode);
         default:
-          return ServerFailure('Request failed with status $statusCode');
+          return ServerFailure('Request failed with status $statusCode', statusCode: statusCode);
       }
     } catch (e) {
-      return ServerFailure('Failed to parse server response');
+      return ServerFailure('Failed to parse server response', statusCode: statusCode);
     }
   }
 }
@@ -124,6 +156,12 @@ String? _extractServerMessage(dynamic rawData) {
     }
     if (rawData is String) {
       final decoded = jsonDecode(rawData);
+      if (decoded is Map<String, dynamic> && decoded['message'] is String) {
+        return decoded['message'] as String;
+      }
+    }
+    if (rawData is List<int>) {
+      final decoded = jsonDecode(utf8.decode(rawData));
       if (decoded is Map<String, dynamic> && decoded['message'] is String) {
         return decoded['message'] as String;
       }

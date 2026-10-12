@@ -354,7 +354,7 @@ class _FullscreenPdfViewerScreenState extends State<FullscreenPdfViewerScreen> {
                             ),
                             Gap(4.w),
                             Text(
-                              'ASG DELTA API LIVE',
+                              'PDF DOCUMENT',
                               style: TextStyle(
                                 color: AppColor.mintTeal,
                                 fontSize: 8.5.sp,

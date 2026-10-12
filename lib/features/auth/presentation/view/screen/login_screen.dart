@@ -13,17 +13,14 @@ import 'package:my_template/core/utils/app_locale_key.dart';
 import 'package:my_template/core/utils/common_methods.dart';
 import 'package:my_template/core/utils/navigator_methods.dart';
 import 'package:my_template/features/auth/presentation/view/cubit/auth_cubit.dart';
-
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
-
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-
   Future<void> _toggleLanguage() async {
     if (context.locale.languageCode == 'ar') {
       await context.setLocale(const Locale('en'));
@@ -32,7 +29,6 @@ class _LoginScreenState extends State<LoginScreen> {
     }
     if (mounted) setState(() {});
   }
-
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<AuthCubit>();

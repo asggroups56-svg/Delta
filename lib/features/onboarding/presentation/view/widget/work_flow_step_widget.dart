@@ -4,17 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:my_template/core/theme/app_text_style.dart';
-
 class WorkFlowStepWidget extends StatelessWidget {
   const WorkFlowStepWidget({super.key,
     required this.icon, required this.titleKey, required this.statusKey, required this.stepColor, required this.isCompleted,});
-
   final IconData icon;
   final String titleKey;
   final String statusKey;
   final Color stepColor;
   final bool isCompleted;
-
   @override
   Widget build(BuildContext context) {
     return Row(

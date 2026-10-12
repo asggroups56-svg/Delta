@@ -247,7 +247,7 @@ class _PdfPreviewPanelState extends State<PdfPreviewPanel> {
                                   ),
                                   Gap(4.w),
                                   Text(
-                                    'API LIVE',
+                                    'PDF',
                                     style: TextStyle(
                                       color: AppColor.mintTeal,
                                       fontSize: 8.5.sp,

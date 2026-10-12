@@ -27,17 +27,12 @@ import 'package:my_template/features/reports/presentation/view/widget/reports_do
 import 'package:my_template/features/reports/presentation/view/widget/reports_kpi_card_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/reports_table_item_widget.dart';
 import 'package:my_template/features/lookup/presentation/widgets/customer_datum_dropdown.dart';
-
-/// نوع المعاينة المعروضة حاليًا داخل الصفحة.
 enum _PreviewKind { none, pdf }
-
 class ReportsScreen extends StatefulWidget {
   const ReportsScreen({super.key});
-
   @override
   State<ReportsScreen> createState() => _ReportsScreenState();
 }
-
 class _ReportsScreenState extends State<ReportsScreen> {
   // ── State ────────────────────────────────────────────────────────────────
   int _selectedPeriodIndex = 2;
@@ -114,7 +109,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
       ),
     );
   }
-
   // ── Language ─────────────────────────────────────────────────────────────
   Future<void> _toggleLanguage() async {
     if (context.locale.languageCode == 'ar') {
@@ -178,24 +172,48 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   ),
                 ),
                 Gap(16.h),
-                Wrap(
-                  spacing: 8.w,
-                  runSpacing: 8.h,
-                  children:
-                      const [
-                        ('pdf', 'PDF'),
-                        ('excel', 'Excel'),
-                        ('word', 'Word'),
-                        ('excelformatted', 'Excel formatted'),
-                      ].map((format) {
-                        final (value, label) = format;
-                        return ChoiceChip(
-                          label: Text(label),
-                          selected: selectedExportType == value,
-                          onSelected: (_) =>
-                              setModalState(() => selectedExportType = value),
-                        );
-                      }).toList(),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _formatSelectCard(
+                        icon: Icons.picture_as_pdf_rounded,
+                        label: 'PDF',
+                        color: const Color(0xFFEF4444),
+                        isSelected: selectedExportType == 'pdf',
+                        onTap: () => setModalState(() => selectedExportType = 'pdf'),
+                      ),
+                    ),
+                    Gap(8.w),
+                    Expanded(
+                      child: _formatSelectCard(
+                        icon: Icons.table_chart_rounded,
+                        label: 'Excel',
+                        color: const Color(0xFF10B981),
+                        isSelected: selectedExportType == 'excel',
+                        onTap: () => setModalState(() => selectedExportType = 'excel'),
+                      ),
+                    ),
+                    Gap(8.w),
+                    Expanded(
+                      child: _formatSelectCard(
+                        icon: Icons.description_rounded,
+                        label: 'Word',
+                        color: const Color(0xFF3B82F6),
+                        isSelected: selectedExportType == 'word',
+                        onTap: () => setModalState(() => selectedExportType = 'word'),
+                      ),
+                    ),
+                    Gap(8.w),
+                    Expanded(
+                      child: _formatSelectCard(
+                        icon: Icons.grid_on_rounded,
+                        label: 'PRO',
+                        color: const Color(0xFF8B5CF6),
+                        isSelected: selectedExportType == 'excelformatted',
+                        onTap: () => setModalState(() => selectedExportType = 'excelformatted'),
+                      ),
+                    ),
+                  ],
                 ),
                 Gap(16.h),
                 _buildExportOption(
@@ -517,6 +535,57 @@ class _ReportsScreenState extends State<ReportsScreen> {
     );
   }
 
+  Widget _formatSelectCard({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12.r),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: EdgeInsets.symmetric(vertical: 10.h),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? color.withValues(alpha: 0.18)
+              : AppColor.primaryColor(context).withValues(alpha: 0.04),
+          borderRadius: BorderRadius.circular(12.r),
+          border: Border.all(
+            color: isSelected ? color : AppColor.borderColor(context),
+            width: isSelected ? 1.5 : 1,
+          ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: color.withValues(alpha: 0.25),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : null,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 20.r, color: color),
+            Gap(4.h),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 11.sp,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                color: isSelected ? color : AppColor.titleFormFiledColor(context),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   // ── Report Export ────────────────────────────────────────────────────────
   Future<void> _handleExportReport({
     required String title,
@@ -785,10 +854,18 @@ class _ReportsScreenState extends State<ReportsScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() => _isGenerating = false);
+      String errorMessage = e is Exception
+          ? e.toString().replaceFirst('Exception: ', '')
+          : 'حدث خطأ أثناء تحميل ملف ${_exportFormatLabel(exportType)}';
+
+      if (errorMessage.contains('404')) {
+        errorMessage = 'لا توجد بيانات';
+      } else if (errorMessage.contains('401') || errorMessage.contains('403')) {
+        errorMessage = 'لا توجد صلاحيات';
+      }
+
       CommonMethods.showToast(
-        message: e is Exception
-            ? e.toString().replaceFirst('Exception: ', '')
-            : 'حدث خطأ أثناء تحميل ملف ${_exportFormatLabel(exportType)}',
+        message: errorMessage,
         type: ToastType.error,
       );
     }
@@ -931,6 +1008,16 @@ class _ReportsScreenState extends State<ReportsScreen> {
         'isLedgerReport': true,
       },
       {
+        'title': AppLocaleKey.statementAccountStatement.tr(),
+        'desc': AppLocaleKey.statementAccountStatementDesc.tr(),
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.receipt_long_rounded,
+        'iconColor': AppColor.oceanBlue,
+        'category': 1,
+        'reportName': 'AGL079',
+        'isAccountStatementReport': true,
+      },
+      {
         'title': AppLocaleKey.statementTrialBalanceByCategories.tr(),
         'desc': AppLocaleKey.statementTrialBalanceByCategoriesDesc.tr(),
         'status': AppLocaleKey.statusAudited.tr(),
@@ -1017,16 +1104,61 @@ class _ReportsScreenState extends State<ReportsScreen> {
               // ── Reports List Header ────────────────────────────────────
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.w),
-                child: Text(
-                  AppLocaleKey.topReportsListTitle.tr(),
-                  style: TextStyle(
-                    color: AppColor.titleFormFiledColor(context),
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.bold,
-                  ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(6.r),
+                          decoration: BoxDecoration(
+                            color: AppColor.emeraldTeal.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(8.r),
+                          ),
+                          child: Icon(
+                            Icons.analytics_rounded,
+                            size: 16.r,
+                            color: AppColor.emeraldTeal,
+                          ),
+                        ),
+                        Gap(8.w),
+                        Text(
+                          AppLocaleKey.topReportsListTitle.tr(),
+                          style: TextStyle(
+                            color: AppColor.titleFormFiledColor(context),
+                            fontSize: 15.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 10.w,
+                        vertical: 4.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColor.primaryColor(
+                          context,
+                        ).withValues(alpha: 0.08),
+                        borderRadius: BorderRadius.circular(12.r),
+                        border: Border.all(
+                          color: AppColor.borderColor(context),
+                        ),
+                      ),
+                      child: Text(
+                        '${filteredStatements.length} ${context.locale.languageCode == 'ar' ? 'تقارير' : 'Reports'}',
+                        style: TextStyle(
+                          color: AppColor.mintTeal,
+                          fontSize: 11.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              Gap(12.h),
+              Gap(14.h),
 
               // ── Search Bar ─────────────────────────────────────────────
               _buildSearchBar(),
@@ -1482,20 +1614,33 @@ class _ReportsScreenState extends State<ReportsScreen> {
   // Search Bar
   // ─────────────────────────────────────────────────────────────────────────
   Widget _buildSearchBar() {
+    final hasSearchText = _searchController.text.isNotEmpty;
+
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.w),
       child: Container(
         decoration: BoxDecoration(
           color: AppColor.cardColor(context),
-          borderRadius: BorderRadius.circular(14.r),
-          border: Border.all(color: AppColor.borderColor(context)),
+          borderRadius: BorderRadius.circular(16.r),
+          border: Border.all(
+            color: hasSearchText
+                ? AppColor.mintTeal.withValues(alpha: 0.5)
+                : AppColor.borderColor(context),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.03),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
+          ],
         ),
         child: TextField(
           controller: _searchController,
           onChanged: (val) => setState(() {}),
           style: TextStyle(
             color: AppColor.titleFormFiledColor(context),
-            fontSize: 12.sp,
+            fontSize: 13.sp,
           ),
           decoration: InputDecoration(
             hintText: AppLocaleKey.searchReports.tr(),
@@ -1508,10 +1653,23 @@ class _ReportsScreenState extends State<ReportsScreen> {
               color: AppColor.mintTeal,
               size: 20.r,
             ),
+            suffixIcon: hasSearchText
+                ? IconButton(
+                    icon: Icon(
+                      Icons.clear_rounded,
+                      color: AppColor.darkTextColor(context),
+                      size: 18.r,
+                    ),
+                    onPressed: () {
+                      _searchController.clear();
+                      setState(() {});
+                    },
+                  )
+                : null,
             border: InputBorder.none,
             contentPadding: EdgeInsets.symmetric(
               horizontal: 14.w,
-              vertical: 12.h,
+              vertical: 13.h,
             ),
           ),
         ),
@@ -1533,30 +1691,46 @@ class _ReportsScreenState extends State<ReportsScreen> {
             padding: EdgeInsets.only(right: 8.w),
             child: InkWell(
               onTap: () => setState(() => _selectedCategoryTab = index),
-              borderRadius: BorderRadius.circular(12.r),
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+              borderRadius: BorderRadius.circular(16.r),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
                 decoration: BoxDecoration(
-                  color: isSelected
-                      ? AppColor.primaryColor(context).withValues(alpha: 0.1)
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(12.r),
+                  gradient: isSelected
+                      ? LinearGradient(
+                          colors: [
+                            AppColor.emeraldTeal,
+                            AppColor.mintTeal,
+                          ],
+                        )
+                      : null,
+                  color: isSelected ? null : AppColor.cardColor(context),
+                  borderRadius: BorderRadius.circular(16.r),
                   border: Border.all(
                     color: isSelected
-                        ? AppColor.mintTeal
+                        ? AppColor.emeraldTeal
                         : AppColor.borderColor(context),
                   ),
+                  boxShadow: isSelected
+                      ? [
+                          BoxShadow(
+                            color: AppColor.emeraldTeal.withValues(alpha: 0.35),
+                            blurRadius: 8,
+                            offset: const Offset(0, 3),
+                          ),
+                        ]
+                      : null,
                 ),
                 child: Text(
                   categoryTabs[index],
                   style: TextStyle(
-                    fontSize: 11.sp,
+                    fontSize: 11.5.sp,
                     fontWeight: isSelected
                         ? FontWeight.bold
-                        : FontWeight.normal,
+                        : FontWeight.w500,
                     color: isSelected
-                        ? AppColor.mintTeal
-                        : AppColor.darkTextColor(context),
+                        ? AppColor.whiteColor(context)
+                        : AppColor.titleFormFiledColor(context),
                   ),
                 ),
               ),
@@ -1571,6 +1745,93 @@ class _ReportsScreenState extends State<ReportsScreen> {
   // Statements List
   // ─────────────────────────────────────────────────────────────────────────
   Widget _buildStatementsList(List<Map<String, dynamic>> filteredStatements) {
+    if (filteredStatements.isEmpty) {
+      return Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 32.h),
+        child: Container(
+          width: double.infinity,
+          padding: EdgeInsets.all(28.r),
+          decoration: BoxDecoration(
+            color: AppColor.cardColor(context),
+            borderRadius: BorderRadius.circular(20.r),
+            border: Border.all(color: AppColor.borderColor(context)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: EdgeInsets.all(16.r),
+                decoration: BoxDecoration(
+                  color: AppColor.emeraldTeal.withValues(alpha: 0.12),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.search_off_rounded,
+                  size: 32.r,
+                  color: AppColor.emeraldTeal,
+                ),
+              ),
+              Gap(14.h),
+              Text(
+                context.locale.languageCode == 'ar'
+                    ? 'لا توجد تقارير مطابقة للبحث'
+                    : 'No matching reports found',
+                style: TextStyle(
+                  fontSize: 13.5.sp,
+                  fontWeight: FontWeight.bold,
+                  color: AppColor.titleFormFiledColor(context),
+                ),
+              ),
+              Gap(6.h),
+              Text(
+                context.locale.languageCode == 'ar'
+                    ? 'جرب البحث بكلمات أخرى أو اختر قسماً مختلفاً'
+                    : 'Try different search terms or select another category',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 11.sp,
+                  color: AppColor.darkTextColor(context),
+                ),
+              ),
+              if (_searchController.text.isNotEmpty) ...[
+                Gap(14.h),
+                InkWell(
+                  onTap: () {
+                    _searchController.clear();
+                    setState(() {});
+                  },
+                  borderRadius: BorderRadius.circular(12.r),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 16.w,
+                      vertical: 8.h,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColor.emeraldTeal.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(12.r),
+                      border: Border.all(
+                        color: AppColor.emeraldTeal.withValues(alpha: 0.3),
+                      ),
+                    ),
+                    child: Text(
+                      context.locale.languageCode == 'ar'
+                          ? 'مسح البحث'
+                          : 'Clear Search',
+                      style: TextStyle(
+                        fontSize: 11.5.sp,
+                        fontWeight: FontWeight.bold,
+                        color: AppColor.emeraldTeal,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      );
+    }
+
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.w),
       child: ListView.builder(
@@ -1611,7 +1872,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
           );
 
           return FadeInUp(
-            delay: Duration(milliseconds: 80 * index),
+            delay: Duration(milliseconds: 60 * index),
             child: ReportsTableItemWidget(
               title: title,
               description: description,
