@@ -27,12 +27,29 @@ import 'package:my_template/features/reports/presentation/view/widget/reports_do
 import 'package:my_template/features/reports/presentation/view/widget/reports_kpi_card_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/reports_table_item_widget.dart';
 import 'package:my_template/features/lookup/presentation/widgets/customer_datum_dropdown.dart';
+
 enum _PreviewKind { none, pdf }
+
+class _ReportOption {
+  final String title;
+  final String description;
+  final String reportName;
+  final int? financialStatementReportType;
+
+  const _ReportOption({
+    required this.title,
+    required this.description,
+    required this.reportName,
+    this.financialStatementReportType,
+  });
+}
+
 class ReportsScreen extends StatefulWidget {
   const ReportsScreen({super.key});
   @override
   State<ReportsScreen> createState() => _ReportsScreenState();
 }
+
 class _ReportsScreenState extends State<ReportsScreen> {
   // ── State ────────────────────────────────────────────────────────────────
   int _selectedPeriodIndex = 2;
@@ -45,6 +62,71 @@ class _ReportsScreenState extends State<ReportsScreen> {
   File? _pdfFile;
   String _previewTitle = '';
   bool _isGenerating = false;
+
+  Future<_ReportOption?> _selectReportOption({
+    required String title,
+    required List<_ReportOption> options,
+  }) {
+    return showModalBottomSheet<_ReportOption>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: Colors.transparent,
+      builder: (sheetContext) => Container(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.sizeOf(sheetContext).height * 0.85,
+        ),
+        decoration: BoxDecoration(
+          color: AppColor.cardColor(sheetContext),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
+        ),
+        child: SingleChildScrollView(
+          padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 24.h),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 42.w,
+                  height: 4.h,
+                  decoration: BoxDecoration(
+                    color: AppColor.borderColor(sheetContext),
+                    borderRadius: BorderRadius.circular(4.r),
+                  ),
+                ),
+              ),
+              Gap(18.h),
+              Text(
+                title,
+                style: TextStyle(
+                  color: AppColor.titleFormFiledColor(sheetContext),
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Gap(10.h),
+              ...options.map(
+                (option) => Card(
+                  margin: EdgeInsets.only(bottom: 8.h),
+                  child: ListTile(
+                    leading: const Icon(Icons.description_outlined),
+                    title: Text(option.title),
+                    subtitle: Text(
+                      '${option.description}\n${option.reportName}',
+                    ),
+                    isThreeLine: true,
+                    trailing: const Icon(Icons.chevron_left_rounded),
+                    onTap: () => Navigator.pop(sheetContext, option),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
   Future<int?> _selectCostCenterType() {
     final options = [
@@ -109,6 +191,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
       ),
     );
   }
+
   // ── Language ─────────────────────────────────────────────────────────────
   Future<void> _toggleLanguage() async {
     if (context.locale.languageCode == 'ar') {
@@ -180,7 +263,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
                         label: 'PDF',
                         color: const Color(0xFFEF4444),
                         isSelected: selectedExportType == 'pdf',
-                        onTap: () => setModalState(() => selectedExportType = 'pdf'),
+                        onTap: () =>
+                            setModalState(() => selectedExportType = 'pdf'),
                       ),
                     ),
                     Gap(8.w),
@@ -190,7 +274,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
                         label: 'Excel',
                         color: const Color(0xFF10B981),
                         isSelected: selectedExportType == 'excel',
-                        onTap: () => setModalState(() => selectedExportType = 'excel'),
+                        onTap: () =>
+                            setModalState(() => selectedExportType = 'excel'),
                       ),
                     ),
                     Gap(8.w),
@@ -200,7 +285,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
                         label: 'Word',
                         color: const Color(0xFF3B82F6),
                         isSelected: selectedExportType == 'word',
-                        onTap: () => setModalState(() => selectedExportType = 'word'),
+                        onTap: () =>
+                            setModalState(() => selectedExportType = 'word'),
                       ),
                     ),
                     Gap(8.w),
@@ -210,7 +296,9 @@ class _ReportsScreenState extends State<ReportsScreen> {
                         label: 'PRO',
                         color: const Color(0xFF8B5CF6),
                         isSelected: selectedExportType == 'excelformatted',
-                        onTap: () => setModalState(() => selectedExportType = 'excelformatted'),
+                        onTap: () => setModalState(
+                          () => selectedExportType = 'excelformatted',
+                        ),
                       ),
                     ),
                   ],
@@ -241,8 +329,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   icon: Icons.show_chart_rounded,
                   color: AppColor.emeraldTeal,
                   title: AppLocaleKey.statementIncome.tr(),
-                  subtitle:
-                      'Report/IncomeAndExpenseSituationReport (AGL300_M)',
+                  subtitle: 'Report/IncomeAndExpenseSituationReport (AGL300_M)',
                   onTap: () {
                     Navigator.pop(ctx);
                     _handleExportReport(
@@ -262,8 +349,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   icon: Icons.calendar_view_day_rounded,
                   color: AppColor.oceanBlue,
                   title: AppLocaleKey.statementDailyIncome.tr(),
-                  subtitle:
-                      'Report/IncomeAndExpenseSituationReport (AGL300_D)',
+                  subtitle: 'Report/IncomeAndExpenseSituationReport (AGL300_D)',
                   onTap: () {
                     Navigator.pop(ctx);
                     _handleExportReport(
@@ -283,8 +369,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   icon: Icons.receipt_long_outlined,
                   color: AppColor.purpleAccent,
                   title: AppLocaleKey.statementExpensesWithVat.tr(),
-                  subtitle:
-                      'Report/ExpensesWithVatReport (AGL1001E)',
+                  subtitle: 'Report/ExpensesWithVatReport (AGL1001E)',
                   onTap: () {
                     Navigator.pop(ctx);
                     _handleExportReport(
@@ -325,8 +410,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   icon: Icons.shopping_bag_rounded,
                   color: AppColor.oceanBlue,
                   title: AppLocaleKey.statementPurchasesWithVat.tr(),
-                  subtitle:
-                      'Report/PurchasesWithVatReport (AAR1001)',
+                  subtitle: 'Report/PurchasesWithVatReport (AAR1001)',
                   onTap: () {
                     Navigator.pop(ctx);
                     _handleExportReport(
@@ -347,8 +431,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   icon: Icons.menu_book_rounded,
                   color: AppColor.oceanBlue,
                   title: AppLocaleKey.statementLedger.tr(),
-                  subtitle:
-                      'Report/LedgerReportForAllAccounts (AGL025)',
+                  subtitle: 'Report/LedgerReportForAllAccounts (AGL025)',
                   onTap: () {
                     Navigator.pop(ctx);
                     _handleExportReport(
@@ -389,8 +472,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   icon: Icons.account_balance_wallet_outlined,
                   color: AppColor.emeraldTeal,
                   title: AppLocaleKey.statementTrialBalanceByCategories.tr(),
-                  subtitle:
-                      'Report/TrialBalanceByCategoriesReport (AGL055)',
+                  subtitle: 'Report/TrialBalanceByCategoriesReport (AGL055)',
                   onTap: () {
                     Navigator.pop(ctx);
                     _handleExportReport(
@@ -433,14 +515,12 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   icon: Icons.domain_rounded,
                   color: AppColor.oceanBlue,
                   title: AppLocaleKey.statementCostCentersProjects.tr(),
-                  subtitle:
-                      'Report/CostCentersProjectsReport (Agl026)',
+                  subtitle: 'Report/CostCentersProjectsReport (Agl026)',
                   onTap: () {
                     Navigator.pop(ctx);
                     _handleExportReport(
                       title: AppLocaleKey.statementCostCentersProjects.tr(),
-                      description: AppLocaleKey
-                          .statementCostCentersProjectsDesc
+                      description: AppLocaleKey.statementCostCentersProjectsDesc
                           .tr(),
                       amount: '',
                       date: '',
@@ -577,7 +657,9 @@ class _ReportsScreenState extends State<ReportsScreen> {
               style: TextStyle(
                 fontSize: 11.sp,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-                color: isSelected ? color : AppColor.titleFormFiledColor(context),
+                color: isSelected
+                    ? color
+                    : AppColor.titleFormFiledColor(context),
               ),
             ),
           ],
@@ -604,10 +686,71 @@ class _ReportsScreenState extends State<ReportsScreen> {
     bool isLedgerReport = false,
     bool isAccountStatementReport = false,
     bool isTrialBalanceByCategoriesReport = false,
+    bool isFinancialStatementsReport = false,
     bool isCostCentersReport = false,
     bool isCostCentersProjectsReport = false,
   }) async {
     final languageCode = context.locale.languageCode;
+    if (isTrialBalanceByCategoriesReport) {
+      final selection = await _selectReportOption(
+        title: 'اختر طريقة ترتيب ميزان المراجعة',
+        options: const [
+          _ReportOption(
+            title: 'بدون ترتيب',
+            description: 'ميزان المراجعة حسب الفئات',
+            reportName: 'AGL055',
+          ),
+          _ReportOption(
+            title: 'ترتيب رقمي',
+            description: 'عرض الحسابات بترتيب رقمي',
+            reportName: 'AGL055H',
+          ),
+          _ReportOption(
+            title: 'ترتيب شجري',
+            description: 'عرض الحسابات كتسلسل شجري',
+            reportName: 'AGL055H',
+          ),
+        ],
+      );
+      if (!mounted || selection == null) return;
+      reportName = selection.reportName;
+    }
+
+    _ReportOption? financialStatementSelection;
+    if (isFinancialStatementsReport) {
+      financialStatementSelection = await _selectReportOption(
+        title: 'اختر نوع القائمة المالية',
+        options: const [
+          _ReportOption(
+            title: 'الأرباح والخسائر',
+            description: 'قائمة الأرباح والخسائر',
+            reportName: 'AGL035',
+            financialStatementReportType: 2,
+          ),
+          _ReportOption(
+            title: 'الميزانية العمومية',
+            description: 'بيان الأصول والخصوم وحقوق الملكية',
+            reportName: 'AGL036',
+            financialStatementReportType: 3,
+          ),
+          _ReportOption(
+            title: 'قائمة الدخل',
+            description: 'بيان الدخل والإيرادات والمصروفات',
+            reportName: 'AGL069',
+            financialStatementReportType: 4,
+          ),
+          _ReportOption(
+            title: 'التدفقات النقدية',
+            description: 'التدفقات التشغيلية والاستثمارية والتمويلية',
+            reportName: 'AGL073',
+            financialStatementReportType: 5,
+          ),
+        ],
+      );
+      if (!mounted || financialStatementSelection == null) return;
+      reportName = financialStatementSelection.reportName;
+    }
+
     MonthRangeSelection? monthRange;
     if (isIncomeAndExpenseSituationReport) {
       monthRange = await MonthRangeBottomSheetWidget.show(
@@ -674,6 +817,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
       _isGenerating = true;
       _previewTitle = title;
     });
+    _showReportPreparationDialog();
 
     try {
       final File file;
@@ -686,11 +830,20 @@ class _ReportsScreenState extends State<ReportsScreen> {
           isLedgerReport ||
           isAccountStatementReport ||
           isTrialBalanceByCategoriesReport ||
+          isFinancialStatementsReport ||
           isCostCentersReport ||
           isCostCentersProjectsReport ||
           reportName != null) {
         final reportsRepo = sl<ReportsRepo>();
-        final result = isIncomeAndExpenseSituationReport
+        final result = isFinancialStatementsReport
+            ? await reportsRepo.getFinancialStatementsReport(
+                financialStatementReportType:
+                    financialStatementSelection!.financialStatementReportType!,
+                reportName: reportName!,
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isIncomeAndExpenseSituationReport
             ? await reportsRepo.getIncomeAndExpenseSituationReport(
                 fromMonth: monthRange?.fromMonth,
                 toMonth: monthRange?.toMonth,
@@ -745,6 +898,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
               )
             : isTrialBalanceByCategoriesReport
             ? await reportsRepo.getTrialBalanceByCategoriesReport(
+                reportName: reportName ?? 'AGL055',
                 languageCode: languageCode,
                 exportType: exportType,
               )
@@ -756,13 +910,12 @@ class _ReportsScreenState extends State<ReportsScreen> {
               )
             : isCostCentersProjectsReport
             ? await reportsRepo.getCostCentersProjectsReport(
-                fromCostCenterNo:
-                    costCentersProjectsFilter?.fromCostCenterNo,
-                toCostCenterNo:
-                    costCentersProjectsFilter?.toCostCenterNo,
+                fromCostCenterNo: costCentersProjectsFilter?.fromCostCenterNo,
+                toCostCenterNo: costCentersProjectsFilter?.toCostCenterNo,
                 fromDate: costCentersProjectsFilter?.fromDate,
                 toDate: costCentersProjectsFilter?.toDate,
-                reportName: costCentersProjectsFilter?.reportName ??
+                reportName:
+                    costCentersProjectsFilter?.reportName ??
                     reportName ??
                     'Agl026_Project2',
                 languageCode: languageCode,
@@ -808,6 +961,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
         throw Exception('تعذر حفظ التقرير على الجهاز');
       }
       if (!mounted) return;
+      Navigator.of(context, rootNavigator: true).pop();
 
       if (exportType == 'pdf') {
         setState(() {
@@ -853,6 +1007,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
       }
     } catch (e) {
       if (!mounted) return;
+      Navigator.of(context, rootNavigator: true).pop();
       setState(() => _isGenerating = false);
       String errorMessage = e is Exception
           ? e.toString().replaceFirst('Exception: ', '')
@@ -864,11 +1019,62 @@ class _ReportsScreenState extends State<ReportsScreen> {
         errorMessage = 'لا توجد صلاحيات';
       }
 
-      CommonMethods.showToast(
-        message: errorMessage,
-        type: ToastType.error,
-      );
+      CommonMethods.showToast(message: errorMessage, type: ToastType.error);
     }
+  }
+
+  void _showReportPreparationDialog() {
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => PopScope(
+        canPop: false,
+        child: Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: EdgeInsets.symmetric(horizontal: 30.w),
+          child: Container(
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(horizontal: 28.w, vertical: 30.h),
+            decoration: BoxDecoration(
+              color: AppColor.cardColor(dialogContext),
+              borderRadius: BorderRadius.circular(24.r),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  width: 48.r,
+                  height: 48.r,
+                  child: const CircularProgressIndicator(
+                    strokeWidth: 4,
+                    color: AppColor.oceanBlue,
+                  ),
+                ),
+                Gap(22.h),
+                Text(
+                  'جاري تحضير التقرير...',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: AppColor.titleFormFiledColor(dialogContext),
+                    fontSize: 22.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Gap(10.h),
+                Text(
+                  'قد يستغرق هذا بعض الوقت للتقارير الكبيرة',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: AppColor.darkTextColor(dialogContext),
+                    fontSize: 14.sp,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   String _exportFormatLabel(String exportType) => switch (exportType) {
@@ -948,14 +1154,13 @@ class _ReportsScreenState extends State<ReportsScreen> {
         'category': 1,
       },
       {
-        'title': AppLocaleKey.statementIncome.tr(),
-        'desc': AppLocaleKey.statementIncomeDesc.tr(),
+        'title': 'القوائم المالية',
+        'desc': 'اختر: الأرباح والخسائر، الميزانية، الدخل أو التدفقات النقدية',
         'status': AppLocaleKey.statusAudited.tr(),
-        'icon': Icons.show_chart_rounded,
+        'icon': Icons.account_balance_rounded,
         'iconColor': AppColor.emeraldTeal,
         'category': 1,
-        'reportName': 'AGL300_M',
-        'isIncomeAndExpenseSituationReport': true,
+        'isFinancialStatementsReport': true,
       },
       {
         'title': AppLocaleKey.statementDailyIncome.tr(),
@@ -1698,10 +1903,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 decoration: BoxDecoration(
                   gradient: isSelected
                       ? LinearGradient(
-                          colors: [
-                            AppColor.emeraldTeal,
-                            AppColor.mintTeal,
-                          ],
+                          colors: [AppColor.emeraldTeal, AppColor.mintTeal],
                         )
                       : null,
                   color: isSelected ? null : AppColor.cardColor(context),
@@ -1725,9 +1927,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   categoryTabs[index],
                   style: TextStyle(
                     fontSize: 11.5.sp,
-                    fontWeight: isSelected
-                        ? FontWeight.bold
-                        : FontWeight.w500,
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                     color: isSelected
                         ? AppColor.whiteColor(context)
                         : AppColor.titleFormFiledColor(context),
@@ -1866,6 +2066,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
             isAccountStatementReport: st['isAccountStatementReport'] == true,
             isTrialBalanceByCategoriesReport:
                 st['isTrialBalanceByCategoriesReport'] == true,
+            isFinancialStatementsReport:
+                st['isFinancialStatementsReport'] == true,
             isCostCentersReport: st['isCostCentersReport'] == true,
             isCostCentersProjectsReport:
                 st['isCostCentersProjectsReport'] == true,

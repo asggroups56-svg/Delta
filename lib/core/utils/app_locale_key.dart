@@ -255,6 +255,9 @@ class AppLocaleKey {
       'statementChartOfAccountDesc';
   static const String statementIncome = 'statementIncome';
   static const String statementIncomeDesc = 'statementIncomeDesc';
+  static const String statementIncomeStatement = 'statementIncomeStatement';
+  static const String statementIncomeStatementDesc =
+      'statementIncomeStatementDesc';
   static const String statementDailyIncome = 'statementDailyIncome';
   static const String statementDailyIncomeDesc = 'statementDailyIncomeDesc';
   static const String statementExpensesWithVat = 'statementExpensesWithVat';

@@ -14,6 +14,7 @@ import '../models/cost_centers_projects_report_request_model.dart';
 import '../models/cost_centers_report_request_model.dart';
 import '../models/daily_income_and_expense_situation_report_request_model.dart';
 import '../models/expenses_with_vat_report_request_model.dart';
+import '../models/financial_statement_report_request_model.dart';
 import '../models/income_and_expense_situation_report_request_model.dart';
 import '../models/ledger_report_request_model.dart';
 import '../models/purchases_with_vat_report_request_model.dart';
@@ -79,6 +80,14 @@ abstract interface class ReportsRepo {
   });
 
   Future<Either<Failure, File>> getTrialBalanceByCategoriesReport({
+    String reportName = 'AGL055',
+    required String languageCode,
+    String exportType = 'pdf',
+  });
+
+  Future<Either<Failure, File>> getFinancialStatementsReport({
+    required int financialStatementReportType,
+    required String reportName,
     required String languageCode,
     String exportType = 'pdf',
   });
@@ -317,18 +326,46 @@ class ReportsRepoImpl implements ReportsRepo {
 
   @override
   Future<Either<Failure, File>> getTrialBalanceByCategoriesReport({
+    String reportName = 'AGL055',
     required String languageCode,
     String exportType = 'pdf',
   }) {
     return handleDioRequest(
       request: () async {
         final requestModel = TrialBalanceByCategoriesReportRequestModel(
+          reportName: reportName,
           exportType: exportType,
         );
         return _downloadReport(
           endpoint: EndPoints.trialBalanceByCategoriesReport,
           body: requestModel.toJson(),
           fileNamePrefix: 'trial_balance_by_categories',
+          exportType: requestModel.exportType,
+          headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+        );
+      },
+    );
+  }
+
+  @override
+  Future<Either<Failure, File>> getFinancialStatementsReport({
+    required int financialStatementReportType,
+    required String reportName,
+    required String languageCode,
+    String exportType = 'pdf',
+  }) {
+    return handleDioRequest(
+      request: () async {
+        final requestModel = FinancialStatementReportRequestModel(
+          financialStatementReportType: financialStatementReportType,
+          reportName: reportName,
+          exportType: exportType,
+        );
+
+        return _downloadReport(
+          endpoint: EndPoints.financialStatementsReport,
+          body: requestModel.toJson(),
+          fileNamePrefix: reportName.toLowerCase(),
           exportType: requestModel.exportType,
           headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
         );

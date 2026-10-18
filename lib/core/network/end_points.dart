@@ -7,6 +7,8 @@ class EndPoints {
   static const String chartOfAccountReport = 'Report/ChartOfAccountReport';
   static const String incomeAndExpenseSituationReport =
       'Report/IncomeAndExpenseSituationReport';
+  static const String financialStatementsReport =
+      'Report/FinancialStatementsReport';
   static const String expensesWithVatReport = 'Report/ExpensesWithVatReport';
   static const String ledgerReportForAllAccounts =
       'Report/LedgerReportForAllAccounts';
