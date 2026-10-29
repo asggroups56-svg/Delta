@@ -86,6 +86,12 @@ class _PurchaseOcrScreenState extends State<PurchaseOcrScreen>
   // كل أصناف الفاتورة، وليس أول صنف فقط
   List<OcrItem> _items = [];
 
+  int get _filledFieldsCount => _fields
+      .where((field) => field.value.trim().isNotEmpty && field.value != '—')
+      .length;
+
+  bool get _hasExtractedData => _items.isNotEmpty || _filledFieldsCount > 1;
+
   // ── Animations ─────────────────────────────────────────────────────────────
   late AnimationController _laserCtrl;
   late Animation<double> _laserAnim;
@@ -270,8 +276,8 @@ class _PurchaseOcrScreenState extends State<PurchaseOcrScreen>
       if (!mounted) return;
 
       final rawText = combinedText.toString();
-      final extracted = _parseInvoiceFields(rawText);
       final extractedItems = _parseInvoiceItems(rawText);
+      final extracted = _parseInvoiceFields(rawText, items: extractedItems);
 
       setState(() {
         _fields = extracted;
@@ -325,8 +331,8 @@ class _PurchaseOcrScreenState extends State<PurchaseOcrScreen>
       final raw = _buildLayoutAwareOcrText(recognized);
       setState(() => _rawOcrText = raw);
 
-      final extracted = _parseInvoiceFields(raw);
       final extractedItems = _parseInvoiceItems(raw);
+      final extracted = _parseInvoiceFields(raw, items: extractedItems);
 
       await Future.delayed(const Duration(milliseconds: 400));
 
@@ -339,9 +345,10 @@ class _PurchaseOcrScreenState extends State<PurchaseOcrScreen>
         });
         _resultFadeCtrl.forward();
         CommonMethods.showToast(
-          message:
-              'تم استخراج ${_items.length} صنف و${_fields.length} حقل من الفاتورة بنجاح!',
-          type: ToastType.success,
+          message: _hasExtractedData
+              ? 'تم استخراج ${_items.length} صنف و${_filledFieldsCount} حقول من الفاتورة.'
+              : 'لم تُقرأ بيانات كافية. راجع الصورة أو أدخل الحقول يدوياً.',
+          type: _hasExtractedData ? ToastType.success : ToastType.warning,
         );
       }
     } catch (e) {
@@ -634,8 +641,11 @@ class _PurchaseOcrScreenState extends State<PurchaseOcrScreen>
   }
 
   // ── Smart invoice field parser ─────────────────────────────────────────────
-  List<OcrField> _parseInvoiceFields(String text) {
-    final lines = text
+  List<OcrField> _parseInvoiceFields(String text, {List<OcrItem>? items}) {
+    final normalizedText = _normalizeInvoiceDigits(
+      text,
+    ).replaceAll('٫', '.').replaceAll('٬', ',');
+    final lines = normalizedText
         .split('\n')
         .map((l) => l.trim())
         .where((l) => l.isNotEmpty)
@@ -645,13 +655,17 @@ class _PurchaseOcrScreenState extends State<PurchaseOcrScreen>
       for (final pattern in patterns) {
         for (final line in lines) {
           final m = pattern.firstMatch(line);
-          if (m != null) return m.group(0) ?? fallback;
+          if (m != null)
+            return (m.groupCount > 0 ? m.group(1) : m.group(0))?.trim() ??
+                fallback;
         }
       }
       // Fallback: scan full text
       for (final pattern in patterns) {
-        final m = pattern.firstMatch(text);
-        if (m != null) return m.group(0) ?? fallback;
+        final m = pattern.firstMatch(normalizedText);
+        if (m != null)
+          return (m.groupCount > 0 ? m.group(1) : m.group(0))?.trim() ??
+              fallback;
       }
       return fallback;
     }
@@ -673,41 +687,41 @@ class _PurchaseOcrScreenState extends State<PurchaseOcrScreen>
     // ── Invoice number ─────────────────────────────────────────────────────
     final invoiceNo = _find([
       RegExp(
-        r'(?:Invoice|Inv|فاتورة|رقم)\s*[#:№]?\s*([A-Z0-9\-]+)',
+        r'(?:Invoice(?:\s*(?:No|Number))?|Inv|فاتورة(?:\s*رقم)?|رقم\s*الفاتورة)\s*[#:№\-]?\s*([A-Z0-9\-/]+)',
         caseSensitive: false,
       ),
-      RegExp(r'[A-Z]{2,4}[-/]?\d{4,10}'),
-    ], fallback: 'غير معروف');
+      RegExp(r'\b([A-Z]{2,4}[-/]?\d{4,10})\b'),
+    ]);
 
     // ── Date ───────────────────────────────────────────────────────────────
     final date = _find([
-      RegExp(r'\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4}'),
-      RegExp(r'\d{4}[\/\-]\d{2}[\/\-]\d{2}'),
+      RegExp(r'(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})'),
+      RegExp(r'(\d{4}[\/\-]\d{2}[\/\-]\d{2})'),
     ]);
 
     // ── VAT / Tax number ───────────────────────────────────────────────────
     final vatNo = _find([
       RegExp(
-        r'(?:VAT|Tax|ضريبي|الضريبي|رقم ضريبي)[:\s#]*(\d{10,15})',
+        r'(?:VAT(?:\s*(?:No|Number))?|Tax(?:\s*(?:No|Number))?|ضريبي|الضريبي|رقم ضريبي)[:\s#-]*(\d{10,15})',
         caseSensitive: false,
       ),
-      RegExp(r'\b3\d{14}\b'), // Saudi VAT 15-digit starting with 3
+      RegExp(r'\b(3\d{14})\b'), // Saudi VAT 15-digit starting with 3
     ]);
 
     // ── Total amount ───────────────────────────────────────────────────────
     final totalAmount = _find([
       RegExp(
-        r'(?:Total|الإجمالي|Grand Total|المجموع الكلي)[:\s]*([0-9,\.]+)',
+        r'(?:Grand\s*Total|Total\s*Due|الإجمالي\s*(?:النهائي|الكلي)?|المجموع\s*الكلي)[:\s]*([0-9,.]+)',
         caseSensitive: false,
       ),
-      RegExp(r'(?:SAR|ر\.?س\.?)\s*([0-9,\.]+)', caseSensitive: false),
-      RegExp(r'([0-9,\.]+)\s*(?:SAR|ر\.?س\.?)', caseSensitive: false),
+      RegExp(r'(?:SAR|ر\.?س\.?)\s*([0-9,.]+)', caseSensitive: false),
+      RegExp(r'([0-9,.]+)\s*(?:SAR|ر\.?س\.?)', caseSensitive: false),
     ]);
 
     // ── VAT amount ─────────────────────────────────────────────────────────
     final vatAmount = _find([
       RegExp(
-        r'(?:VAT|Vat|Tax Amount|الضريبة|ضريبة القيمة)[:\s]*([0-9,\.]+)',
+        r'(?:VAT\s*(?:Amount)?|Tax\s*Amount|الضريبة|ضريبة\s*القيمة)[:\s]*([0-9,.]+)',
         caseSensitive: false,
       ),
     ]);
@@ -715,24 +729,52 @@ class _PurchaseOcrScreenState extends State<PurchaseOcrScreen>
     // ── Subtotal ───────────────────────────────────────────────────────────
     final subtotal = _find([
       RegExp(
-        r'(?:Subtotal|Sub-?total|المجموع الفرعي|قبل الضريبة)[:\s]*([0-9,\.]+)',
+        r'(?:Subtotal|Sub-?total|Net\s*Amount|المجموع\s*الفرعي|قبل\s*الضريبة)[:\s]*([0-9,.]+)',
         caseSensitive: false,
       ),
     ]);
-    // ── Quantity ───────────────────────────────────────────────────────────
+
+    double? sumItemValues(String Function(OcrItem item) selector) {
+      final detectedItems = items ?? _items;
+      if (detectedItems.isEmpty) return null;
+      var sum = 0.0;
+      var found = false;
+      for (final item in detectedItems) {
+        final value = double.tryParse(selector(item).replaceAll(',', ''));
+        if (value != null) {
+          sum += value;
+          found = true;
+        }
+      }
+      return found ? sum : null;
+    }
+
+    String formattedItemSum(
+      String current,
+      String Function(OcrItem item) selector,
+    ) {
+      if (current != '—') return current;
+      final sum = sumItemValues(selector);
+      return sum == null ? current : sum.toStringAsFixed(2);
+    }
+
+    final resolvedSubtotal = formattedItemSum(subtotal, (item) => item.net);
+    final resolvedVat = formattedItemSum(vatAmount, (item) => item.vat);
+    final resolvedTotal = formattedItemSum(totalAmount, (item) => item.total);
+
     final quantity = _find([
       RegExp(
         r'(?:Qty|Quantity|الكمية|العدد)[:\s]*([0-9]+(?:\.[0-9]+)?)',
         caseSensitive: false,
       ),
       RegExp(r'\b([0-9]{1,4})\s*(?:pcs|قطعة|قطع|وحدة)\b', caseSensitive: false),
-    ], fallback: '1');
+    ]);
 
     // ── Currency ───────────────────────────────────────────────────────────
     final currency = _find([
       RegExp(r'\b(SAR|USD|EUR|AED|EGP|KWD)\b'),
       RegExp(r'(ر\.?س\.?|دولار|يورو|درهم)'),
-    ], fallback: 'SAR');
+    ]);
 
     // ── Payment terms ──────────────────────────────────────────────────────
     final paymentTerms = _find([
@@ -740,7 +782,7 @@ class _PurchaseOcrScreenState extends State<PurchaseOcrScreen>
         r'(?:Net\s?\d+|Payment Terms?|شروط الدفع)[:\s]*(.+)',
         caseSensitive: false,
       ),
-    ], fallback: 'آجل 30 يوم');
+    ]);
 
     // Build fields list
     final accent1 = const Color(0xFF06B6D4);
@@ -784,20 +826,26 @@ class _PurchaseOcrScreenState extends State<PurchaseOcrScreen>
       OcrField(
         label: 'الإجمالي قبل الضريبة',
         icon: '💰',
-        value: totalAmount,
+        value: resolvedSubtotal,
         accentColor: accent5,
       ),
       OcrField(
         label: 'مبلغ الضريبة (15%)',
         icon: '📊',
-        value: vatAmount,
+        value: resolvedVat,
         accentColor: accent6,
       ),
       OcrField(
         label: 'الإجمالي بعد الضريبة',
         icon: '✅',
-        value: paymentTerms,
+        value: resolvedTotal,
         accentColor: accent3,
+      ),
+      OcrField(
+        label: 'شروط الدفع',
+        icon: '🗓️',
+        value: paymentTerms,
+        accentColor: accent5,
       ),
       OcrField(
         label: 'العملة',
@@ -845,11 +893,13 @@ class _PurchaseOcrScreenState extends State<PurchaseOcrScreen>
                   children: [
                     _buildOcrTable(),
                     Gap(12.h),
-                    if (_rawOcrText.isNotEmpty) _buildRawTextToggle(),
                     Gap(20.h),
-                    _buildAccountingSection(),
-                    Gap(20.h),
-                    _buildConfirmButton(),
+                    if (_hasExtractedData) ...[
+                      _buildAccountingSection(),
+                      Gap(20.h),
+                      _buildConfirmButton(),
+                    ] else
+                      _buildNoDataNotice(),
                   ],
                 ),
               ),
@@ -867,11 +917,14 @@ class _PurchaseOcrScreenState extends State<PurchaseOcrScreen>
   // ── AppBar ─────────────────────────────────────────────────────────────────
   AppBar _buildAppBar() {
     return AppBar(
-      backgroundColor: AppColor.titleFormFiledColor(context),
+      backgroundColor: AppColor.appBarColor(context),
       elevation: 0,
       centerTitle: true,
       leading: IconButton(
-        icon: Icon(Icons.arrow_back_ios_new_rounded, color: AppColor.titleFormFiledColor(context)),
+        icon: Icon(
+          Icons.arrow_back_ios_new_rounded,
+          color: AppColor.appBarTextColor(context),
+        ),
         onPressed: () => Navigator.pop(context),
       ),
       title: Text(
@@ -879,7 +932,7 @@ class _PurchaseOcrScreenState extends State<PurchaseOcrScreen>
         style: TextStyle(
           fontSize: 15.sp,
           fontWeight: FontWeight.w700,
-          color: AppColor.titleFormFiledColor(context),
+          color: AppColor.appBarTextColor(context),
           fontFamily: 'Tajawal',
         ),
       ),
@@ -898,7 +951,7 @@ class _PurchaseOcrScreenState extends State<PurchaseOcrScreen>
             children: [
               Icon(
                 Icons.document_scanner_rounded,
-                color: AppColor.titleFormFiledColor(context),
+                color: AppColor.buttonTextColor(context),
                 size: 11.r,
               ),
               Gap(4.w),
@@ -907,7 +960,7 @@ class _PurchaseOcrScreenState extends State<PurchaseOcrScreen>
                 style: TextStyle(
                   fontSize: 9.sp,
                   fontWeight: FontWeight.w800,
-                  color: AppColor.titleFormFiledColor(context),
+                  color: AppColor.buttonTextColor(context),
                   fontFamily: 'Tajawal',
                   letterSpacing: 0.5,
                 ),
@@ -1097,7 +1150,10 @@ class _PurchaseOcrScreenState extends State<PurchaseOcrScreen>
                 child: Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [AppColor.titleFormFiledColor(context), AppColor.textFormFillColor(context)],
+                      colors: [
+                        AppColor.titleFormFiledColor(context),
+                        AppColor.textFormFillColor(context),
+                      ],
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                     ),
@@ -1618,7 +1674,7 @@ class _PurchaseOcrScreenState extends State<PurchaseOcrScreen>
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
-          color: AppColor.titleFormFiledColor(context),
+          color: AppColor.cardColor(context),
           borderRadius: BorderRadius.circular(20.r),
           border: Border.all(
             color: const Color(0xFF06B6D4).withValues(alpha: 0.35),
@@ -1821,9 +1877,9 @@ class _PurchaseOcrScreenState extends State<PurchaseOcrScreen>
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 9.w, vertical: 7.h),
       decoration: BoxDecoration(
-        color: AppColor.darkTextColor(context),
+        color: AppColor.cardSurfaceColor(context),
         borderRadius: BorderRadius.circular(9.r),
-        border: Border.all(color: AppColor.darkTextColor(context)),
+        border: Border.all(color: AppColor.borderColor(context)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -1859,7 +1915,7 @@ class _PurchaseOcrScreenState extends State<PurchaseOcrScreen>
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
-          color: AppColor.titleFormFiledColor(context),
+          color: AppColor.cardColor(context),
           borderRadius: BorderRadius.circular(20.r),
           border: Border.all(
             color: AppColor.emeraldTeal.withValues(alpha: 0.35),
@@ -1876,10 +1932,9 @@ class _PurchaseOcrScreenState extends State<PurchaseOcrScreen>
         clipBehavior: Clip.antiAlias,
         child: Column(
           children: [
-            // ── Header ────────────────────────────────────────────────────
             Container(
               width: double.infinity,
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
@@ -1891,7 +1946,7 @@ class _PurchaseOcrScreenState extends State<PurchaseOcrScreen>
               child: Row(
                 children: [
                   Icon(
-                    Icons.table_chart_rounded,
+                    Icons.receipt_long_rounded,
                     color: AppColor.emeraldTeal,
                     size: 18.r,
                   ),
@@ -1917,7 +1972,7 @@ class _PurchaseOcrScreenState extends State<PurchaseOcrScreen>
                       borderRadius: BorderRadius.circular(8.r),
                     ),
                     child: Text(
-                      '${_fields.length} حقل',
+                      'النص الأصلي أولاً',
                       style: TextStyle(
                         fontSize: 9.5.sp,
                         fontWeight: FontWeight.bold,
@@ -1930,17 +1985,47 @@ class _PurchaseOcrScreenState extends State<PurchaseOcrScreen>
               ),
             ),
 
-            // ── Field cards ───────────────────────────────────────────────
-            ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
+            // The complete OCR transcript is the source of truth. It is
+            // deliberately visible instead of being hidden behind a toggle so
+            // the user can compare every displayed value with the invoice.
+            Padding(
               padding: EdgeInsets.all(12.r),
-              itemCount: _fields.length,
-              separatorBuilder: (_, __) => Gap(8.h),
-              itemBuilder: (context, i) => _buildOcrFieldCard(_fields[i], i),
+              child: _buildScannedDocumentCard(),
             ),
 
-            // ── Invoice items: inside the SAME main results table ────────────
+            if (_fields.isNotEmpty) ...[
+              Padding(
+                padding: EdgeInsets.fromLTRB(16.w, 2.h, 16.w, 8.h),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.fact_check_outlined,
+                      size: 17.r,
+                      color: AppColor.emeraldTeal,
+                    ),
+                    Gap(7.w),
+                    Text(
+                      'حقول تم التعرّف عليها من النص',
+                      style: TextStyle(
+                        fontSize: 11.5.sp,
+                        fontWeight: FontWeight.w700,
+                        color: AppColor.titleFormFiledColor(context),
+                        fontFamily: 'Tajawal',
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                padding: EdgeInsets.fromLTRB(12.w, 0, 12.w, 12.h),
+                itemCount: _fields.length,
+                separatorBuilder: (_, __) => Gap(8.h),
+                itemBuilder: (context, i) => _buildOcrFieldCard(_fields[i], i),
+              ),
+            ],
+
             if (_items.isNotEmpty) ...[
               Padding(
                 padding: EdgeInsets.fromLTRB(12.w, 4.h, 12.w, 4.h),
@@ -1948,12 +2033,11 @@ class _PurchaseOcrScreenState extends State<PurchaseOcrScreen>
               ),
             ],
 
-            // ── Confidence badge ──────────────────────────────────────────
             Container(
               width: double.infinity,
               padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
               decoration: BoxDecoration(
-                color: AppColor.darkTextColor(context),
+                color: AppColor.cardSurfaceColor(context),
               ),
               child: Row(
                 children: [
@@ -1965,10 +2049,14 @@ class _PurchaseOcrScreenState extends State<PurchaseOcrScreen>
                   Gap(6.w),
                   Expanded(
                     child: Text(
-                      'دقة الاستخراج: ${_calcConfidence()}%  •  محرك: Google ML Kit OCR',
+                      _hasExtractedData
+                          ? 'هذه القيم مستخرجة من النص المعروض أعلاه • اضغط أي حقل لتعديله'
+                          : 'لم يتعرّف الماسح على حقول كافية؛ راجع النص الممسوح',
                       style: TextStyle(
                         fontSize: 9.5.sp,
-                        color: AppColor.darkTextColor(context),
+                        color: _hasExtractedData
+                            ? AppColor.darkTextColor(context)
+                            : AppColor.roseDanger,
                         fontFamily: 'Tajawal',
                       ),
                     ),
@@ -1978,6 +2066,90 @@ class _PurchaseOcrScreenState extends State<PurchaseOcrScreen>
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  /// A receipt-style presentation of every line returned by the OCR engine.
+  /// No parsing or calculation happens here, so it always mirrors the scan.
+  Widget _buildScannedDocumentCard() {
+    final lines = _rawOcrText
+        .split(RegExp(r'\r?\n'))
+        .map((line) => line.trim())
+        .where((line) => line.isNotEmpty)
+        .toList();
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(14.r),
+      decoration: BoxDecoration(
+        color: AppColor.scaffoldColor(context),
+        borderRadius: BorderRadius.circular(14.r),
+        border: Border.all(color: AppColor.emeraldTeal.withValues(alpha: 0.25)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: EdgeInsets.all(7.r),
+                decoration: BoxDecoration(
+                  color: AppColor.emeraldTeal.withValues(alpha: 0.14),
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+                child: Icon(
+                  Icons.document_scanner_outlined,
+                  size: 16.r,
+                  color: AppColor.emeraldTeal,
+                ),
+              ),
+              Gap(8.w),
+              Expanded(
+                child: Text(
+                  'النص المقروء من الفاتورة',
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w800,
+                    color: AppColor.titleFormFiledColor(context),
+                    fontFamily: 'Tajawal',
+                  ),
+                ),
+              ),
+              Text(
+                '${lines.length} سطر',
+                style: TextStyle(
+                  fontSize: 9.5.sp,
+                  color: AppColor.darkTextColor(context),
+                  fontFamily: 'Tajawal',
+                ),
+              ),
+            ],
+          ),
+          Gap(12.h),
+          ...List.generate(lines.length, (index) {
+            final isLast = index == lines.length - 1;
+            return Container(
+              width: double.infinity,
+              margin: EdgeInsets.only(bottom: isLast ? 0 : 6.h),
+              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
+              decoration: BoxDecoration(
+                color: AppColor.cardColor(context),
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+              child: SelectableText(
+                lines[index],
+                textDirection: TextDirection.rtl,
+                style: TextStyle(
+                  fontSize: 11.sp,
+                  height: 1.45,
+                  color: AppColor.titleFormFiledColor(context),
+                  fontFamily: 'Tajawal',
+                ),
+              ),
+            );
+          }),
+        ],
       ),
     );
   }
@@ -2333,7 +2505,10 @@ class _PurchaseOcrScreenState extends State<PurchaseOcrScreen>
         content: TextField(
           controller: ctrl,
           autofocus: true,
-          style: TextStyle(color: AppColor.titleFormFiledColor(context), fontFamily: 'Tajawal'),
+          style: TextStyle(
+            color: AppColor.titleFormFiledColor(context),
+            fontFamily: 'Tajawal',
+          ),
           decoration: InputDecoration(
             filled: true,
             fillColor: AppColor.titleFormFiledColor(context),
@@ -2349,7 +2524,9 @@ class _PurchaseOcrScreenState extends State<PurchaseOcrScreen>
             child: Text(
               'إلغاء',
               style: TextStyle(
-                color: AppColor.titleFormFiledColor(context).withValues(alpha: 0.54),
+                color: AppColor.titleFormFiledColor(
+                  context,
+                ).withValues(alpha: 0.54),
                 fontFamily: 'Tajawal',
                 fontSize: 12.sp,
               ),
@@ -2380,75 +2557,37 @@ class _PurchaseOcrScreenState extends State<PurchaseOcrScreen>
     );
   }
 
-  // ── Raw OCR text toggle ───────────────────────────────────────────────────
-  bool _showRaw = false;
-
-  Widget _buildRawTextToggle() {
-    return Column(
-      children: [
-        InkWell(
-          onTap: () => setState(() => _showRaw = !_showRaw),
-          borderRadius: BorderRadius.circular(10.r),
-          child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
-            decoration: BoxDecoration(
-              color: AppColor.cardColor(context),
-              borderRadius: BorderRadius.circular(10.r),
-              border: Border.all(color: AppColor.darkTextColor(context)),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.code_rounded,
-                  color: const Color(0xFF8B5CF6),
-                  size: 16.r,
-                ),
-                Gap(8.w),
-                Expanded(
-                  child: Text(
-                    'عرض النص الخام المستخرج',
-                    style: TextStyle(
-                      fontSize: 11.sp,
-                      color: AppColor.darkTextColor(context),
-                      fontFamily: 'Tajawal',
-                    ),
-                  ),
-                ),
-                Icon(
-                  _showRaw
-                      ? Icons.keyboard_arrow_up_rounded
-                      : Icons.keyboard_arrow_down_rounded,
-                  color: AppColor.darkTextColor(context),
-                  size: 18.r,
-                ),
-              ],
-            ),
+  Widget _buildNoDataNotice() {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(14.r),
+      decoration: BoxDecoration(
+        color: AppColor.roseDanger.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(14.r),
+        border: Border.all(color: AppColor.roseDanger.withValues(alpha: 0.28)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            Icons.info_outline_rounded,
+            color: AppColor.roseDanger,
+            size: 20.r,
           ),
-        ),
-        if (_showRaw) ...[
-          Gap(6.h),
-          Container(
-            width: double.infinity,
-            padding: EdgeInsets.all(12.r),
-            decoration: BoxDecoration(
-              color: AppColor.scaffoldColor(context),
-              borderRadius: BorderRadius.circular(10.r),
-              border: Border.all(
-                color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
-              ),
-            ),
-            child: SelectableText(
-              _rawOcrText.isEmpty ? '(لا يوجد نص)' : _rawOcrText,
+          Gap(10.w),
+          Expanded(
+            child: Text(
+              'لم يتم التعرف على بيانات قابلة للاعتماد، لذلك تم إيقاف الترحيل. التقط صورة أوضح أو اختر ملفاً آخر.',
               style: TextStyle(
-                fontSize: 10.sp,
-                color: AppColor.darkTextColor(context),
-                fontFamily: 'monospace',
-                height: 1.6,
+                fontSize: 11.sp,
+                height: 1.55,
+                color: AppColor.titleFormFiledColor(context),
+                fontFamily: 'Tajawal',
               ),
             ),
           ),
         ],
-      ],
+      ),
     );
   }
 
@@ -2490,7 +2629,10 @@ class _PurchaseOcrScreenState extends State<PurchaseOcrScreen>
             value: _accountCode,
             isExpanded: true,
             dropdownColor: AppColor.textFormFillColor(context),
-            style: TextStyle(color: AppColor.titleFormFiledColor(context), fontFamily: 'Tajawal'),
+            style: TextStyle(
+              color: AppColor.titleFormFiledColor(context),
+              fontFamily: 'Tajawal',
+            ),
             decoration: InputDecoration(
               labelText: 'حساب المصروف',
               labelStyle: TextStyle(
@@ -2515,9 +2657,7 @@ class _PurchaseOcrScreenState extends State<PurchaseOcrScreen>
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12.r),
-                borderSide: BorderSide(
-                  color: AppColor.darkTextColor(context),
-                ),
+                borderSide: BorderSide(color: AppColor.darkTextColor(context)),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12.r),
@@ -2647,13 +2787,5 @@ class _PurchaseOcrScreenState extends State<PurchaseOcrScreen>
         ],
       ),
     );
-  }
-
-  // ── Confidence calculator ──────────────────────────────────────────────────
-  String _calcConfidence() {
-    if (_fields.isEmpty) return '0';
-    final filled = _fields.where((f) => f.value != '—').length;
-    final pct = (filled / _fields.length * 100).round();
-    return '$pct';
   }
 }

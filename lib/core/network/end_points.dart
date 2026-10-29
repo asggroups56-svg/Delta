@@ -20,6 +20,10 @@ class EndPoints {
   static const String accountStatementReport = 'Report/AccountStatementReport';
   static const String salesWithVatReport = 'Report/SalesWithVatReport';
   static const String purchasesWithVatReport = 'Report/PurchasesWithVatReport';
+  static const String monthlyAccountComparisonReport =
+      'Report/MonthlyAccountComparsionReport';
+  static const String monthlyCostCentersComparisonReport =
+      'Report/MonthlyCostCentersComparsionReport';
   static const String currenciesReport = 'Report/CurrenciesReport';
   static const String chartOfAccountLight = 'ChartOfAccount/GetLight';
   static const String customerDatumLight = 'CustomerDatum/GetLight';

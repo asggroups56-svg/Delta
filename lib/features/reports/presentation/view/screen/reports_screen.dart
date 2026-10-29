@@ -19,6 +19,7 @@ import 'package:my_template/features/reports/presentation/view/widget/account_st
 import 'package:my_template/features/reports/presentation/view/widget/cost_centers_projects_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/fullscreen_pdf_viewer_screen.dart';
 import 'package:my_template/features/reports/presentation/view/widget/ledger_report_filter_bottom_sheet_widget.dart';
+import 'package:my_template/features/reports/presentation/view/widget/monthly_comparison_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/party_vat_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/pdf_export_service.dart';
 import 'package:my_template/features/reports/presentation/view/widget/pdf_preview_panel.dart';
@@ -533,6 +534,54 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 ),
                 Gap(10.h),
                 _buildExportOption(
+                  icon: Icons.compare_arrows_rounded,
+                  color: AppColor.oceanBlue,
+                  title: AppLocaleKey.statementMonthlyAccountsComparison.tr(),
+                  subtitle: 'Report/MonthlyAccountComparsionReport (AGL003)',
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    _handleExportReport(
+                      title: AppLocaleKey.statementMonthlyAccountsComparison
+                          .tr(),
+                      description: AppLocaleKey
+                          .statementMonthlyAccountsComparisonDesc
+                          .tr(),
+                      amount: '',
+                      date: '',
+                      status: AppLocaleKey.statusAudited.tr(),
+                      reportName: 'AGL003_Bar',
+                      isMonthlyAccountComparisonReport: true,
+                      exportType: selectedExportType,
+                    );
+                  },
+                ),
+                Gap(10.h),
+                _buildExportOption(
+                  icon: Icons.insights_rounded,
+                  color: AppColor.purpleAccent,
+                  title: AppLocaleKey.statementMonthlyCostCentersComparison
+                      .tr(),
+                  subtitle:
+                      'Report/MonthlyCostCentersComparsionReport (AGL008)',
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    _handleExportReport(
+                      title: AppLocaleKey.statementMonthlyCostCentersComparison
+                          .tr(),
+                      description: AppLocaleKey
+                          .statementMonthlyCostCentersComparisonDesc
+                          .tr(),
+                      amount: '',
+                      date: '',
+                      status: AppLocaleKey.statusAudited.tr(),
+                      reportName: 'AGL008_Chart',
+                      isMonthlyCostCentersComparisonReport: true,
+                      exportType: selectedExportType,
+                    );
+                  },
+                ),
+                Gap(10.h),
+                _buildExportOption(
                   icon: Icons.share_rounded,
                   color: AppColor.purpleAccent,
                   title: AppLocaleKey.shareReport.tr(),
@@ -689,6 +738,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
     bool isFinancialStatementsReport = false,
     bool isCostCentersReport = false,
     bool isCostCentersProjectsReport = false,
+    bool isMonthlyAccountComparisonReport = false,
+    bool isMonthlyCostCentersComparisonReport = false,
   }) async {
     final languageCode = context.locale.languageCode;
     if (isTrialBalanceByCategoriesReport) {
@@ -812,6 +863,20 @@ class _ReportsScreenState extends State<ReportsScreen> {
           );
       if (!mounted || costCentersProjectsFilter == null) return;
     }
+    MonthlyComparisonReportFilterSelection? monthlyComparisonFilter;
+    if (isMonthlyAccountComparisonReport ||
+        isMonthlyCostCentersComparisonReport) {
+      monthlyComparisonFilter =
+          await MonthlyComparisonReportFilterBottomSheetWidget.show(
+            context,
+            title: title,
+            mode: isMonthlyAccountComparisonReport
+                ? MonthlyComparisonReportMode.accounts
+                : MonthlyComparisonReportMode.costCenters,
+          );
+      if (!mounted || monthlyComparisonFilter == null) return;
+      reportName = monthlyComparisonFilter.reportName;
+    }
 
     setState(() {
       _isGenerating = true;
@@ -833,6 +898,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
           isFinancialStatementsReport ||
           isCostCentersReport ||
           isCostCentersProjectsReport ||
+          isMonthlyAccountComparisonReport ||
+          isMonthlyCostCentersComparisonReport ||
           reportName != null) {
         final reportsRepo = sl<ReportsRepo>();
         final result = isFinancialStatementsReport
@@ -918,6 +985,25 @@ class _ReportsScreenState extends State<ReportsScreen> {
                     costCentersProjectsFilter?.reportName ??
                     reportName ??
                     'Agl026_Project2',
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isMonthlyAccountComparisonReport
+            ? await reportsRepo.getMonthlyAccountComparisonReport(
+                fromAccountNo: monthlyComparisonFilter?.fromNo,
+                toAccountNo: monthlyComparisonFilter?.toNo,
+                accountType: monthlyComparisonFilter?.accountType ?? 3,
+                reportName: monthlyComparisonFilter?.reportName ?? 'AGL003_Bar',
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isMonthlyCostCentersComparisonReport
+            ? await reportsRepo.getMonthlyCostCentersComparisonReport(
+                fromCostCenterNo: monthlyComparisonFilter?.fromNo,
+                toCostCenterNo: monthlyComparisonFilter?.toNo,
+                accountType: monthlyComparisonFilter?.accountType ?? 3,
+                reportName:
+                    monthlyComparisonFilter?.reportName ?? 'AGL008_Chart',
                 languageCode: languageCode,
                 exportType: exportType,
               )
@@ -1251,6 +1337,26 @@ class _ReportsScreenState extends State<ReportsScreen> {
         'category': 1,
         'reportName': 'Agl026_Project2',
         'isCostCentersProjectsReport': true,
+      },
+      {
+        'title': AppLocaleKey.statementMonthlyAccountsComparison.tr(),
+        'desc': AppLocaleKey.statementMonthlyAccountsComparisonDesc.tr(),
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.compare_arrows_rounded,
+        'iconColor': AppColor.oceanBlue,
+        'category': 1,
+        'reportName': 'AGL003_Bar',
+        'isMonthlyAccountComparisonReport': true,
+      },
+      {
+        'title': AppLocaleKey.statementMonthlyCostCentersComparison.tr(),
+        'desc': AppLocaleKey.statementMonthlyCostCentersComparisonDesc.tr(),
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.insights_rounded,
+        'iconColor': AppColor.purpleAccent,
+        'category': 1,
+        'reportName': 'AGL008_Chart',
+        'isMonthlyCostCentersComparisonReport': true,
       },
     ];
 
@@ -2071,6 +2177,10 @@ class _ReportsScreenState extends State<ReportsScreen> {
             isCostCentersReport: st['isCostCentersReport'] == true,
             isCostCentersProjectsReport:
                 st['isCostCentersProjectsReport'] == true,
+            isMonthlyAccountComparisonReport:
+                st['isMonthlyAccountComparisonReport'] == true,
+            isMonthlyCostCentersComparisonReport:
+                st['isMonthlyCostCentersComparisonReport'] == true,
           );
 
           return FadeInUp(

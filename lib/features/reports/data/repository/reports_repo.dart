@@ -17,6 +17,8 @@ import '../models/expenses_with_vat_report_request_model.dart';
 import '../models/financial_statement_report_request_model.dart';
 import '../models/income_and_expense_situation_report_request_model.dart';
 import '../models/ledger_report_request_model.dart';
+import '../models/monthly_account_comparison_report_request_model.dart';
+import '../models/monthly_cost_centers_comparison_report_request_model.dart';
 import '../models/purchases_with_vat_report_request_model.dart';
 import '../models/sales_with_vat_report_request_model.dart';
 import '../models/trial_balance_by_categories_report_request_model.dart';
@@ -104,6 +106,24 @@ abstract interface class ReportsRepo {
     DateTime? fromDate,
     DateTime? toDate,
     required String reportName,
+    required String languageCode,
+    String exportType = 'pdf',
+  });
+
+  Future<Either<Failure, File>> getMonthlyAccountComparisonReport({
+    num? fromAccountNo,
+    num? toAccountNo,
+    int accountType = 3,
+    String reportName = 'AGL003_Bar',
+    required String languageCode,
+    String exportType = 'pdf',
+  });
+
+  Future<Either<Failure, File>> getMonthlyCostCentersComparisonReport({
+    num? fromCostCenterNo,
+    num? toCostCenterNo,
+    int accountType = 3,
+    String reportName = 'AGL008_Chart',
     required String languageCode,
     String exportType = 'pdf',
   });
@@ -418,6 +438,66 @@ class ReportsRepoImpl implements ReportsRepo {
         );
         return _downloadReport(
           endpoint: EndPoints.costCentersProjectsReport,
+          body: requestModel.toJson(),
+          fileNamePrefix: reportName.toLowerCase(),
+          exportType: requestModel.exportType,
+          headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+        );
+      },
+    );
+  }
+
+  @override
+  Future<Either<Failure, File>> getMonthlyAccountComparisonReport({
+    num? fromAccountNo,
+    num? toAccountNo,
+    int accountType = 3,
+    String reportName = 'AGL003_Bar',
+    required String languageCode,
+    String exportType = 'pdf',
+  }) {
+    return handleDioRequest(
+      request: () async {
+        final requestModel = MonthlyAccountComparisonReportRequestModel(
+          fromAccountNo: fromAccountNo,
+          toAccountNo: toAccountNo,
+          accountType: accountType,
+          reportName: reportName,
+          exportType: exportType,
+        );
+
+        return _downloadReport(
+          endpoint: EndPoints.monthlyAccountComparisonReport,
+          body: requestModel.toJson(),
+          fileNamePrefix: reportName.toLowerCase(),
+          exportType: requestModel.exportType,
+          headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+        );
+      },
+    );
+  }
+
+  @override
+  Future<Either<Failure, File>> getMonthlyCostCentersComparisonReport({
+    num? fromCostCenterNo,
+    num? toCostCenterNo,
+    int accountType = 3,
+    String reportName = 'AGL008_Chart',
+    required String languageCode,
+    String exportType = 'pdf',
+  }) {
+    return handleDioRequest(
+      request: () async {
+        final requestModel = MonthlyCostCentersComparisonReportRequestModel(
+          fromCostCenterNo: fromCostCenterNo,
+          toCostCenterNo: toCostCenterNo,
+          accountType: accountType,
+          reportName: reportName,
+          exportType: exportType,
+        );
+
+        return _downloadReport(
+          endpoint: EndPoints.monthlyCostCentersComparisonReport,
           body: requestModel.toJson(),
           fileNamePrefix: reportName.toLowerCase(),
           exportType: requestModel.exportType,

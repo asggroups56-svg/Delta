@@ -9,7 +9,6 @@ import 'package:my_template/core/theme/cubit/app_theme_cubit.dart';
 import 'package:my_template/core/theme/theme_enum.dart';
 import 'package:my_template/core/utils/app_locale_key.dart';
 import 'package:my_template/features/home/presentation/view/widget/ai_chat_bottom_sheet_widget.dart';
-
 class ProfileScreen extends StatefulWidget {
   final VoidCallback? onLogout;
   final VoidCallback? onToggleLanguage;

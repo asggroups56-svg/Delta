@@ -283,10 +283,26 @@ class AppLocaleKey {
       'statementCostCentersProjects';
   static const String statementCostCentersProjectsDesc =
       'statementCostCentersProjectsDesc';
+  static const String statementMonthlyAccountsComparison =
+      'statementMonthlyAccountsComparison';
+  static const String statementMonthlyAccountsComparisonDesc =
+      'statementMonthlyAccountsComparisonDesc';
+  static const String statementMonthlyCostCentersComparison =
+      'statementMonthlyCostCentersComparison';
+  static const String statementMonthlyCostCentersComparisonDesc =
+      'statementMonthlyCostCentersComparisonDesc';
   static const String selectCostCenterType = 'selectCostCenterType';
+  static const String selectAccountType = 'selectAccountType';
   static const String allCostCenters = 'allCostCenters';
   static const String mainCostCenters = 'mainCostCenters';
   static const String subCostCenters = 'subCostCenters';
+  static const String allAccounts = 'allAccounts';
+  static const String mainAccounts = 'mainAccounts';
+  static const String subAccounts = 'subAccounts';
+  static const String comparisonReportType = 'comparisonReportType';
+  static const String chartBar = 'chartBar';
+  static const String chartLine = 'chartLine';
+  static const String chartPie = 'chartPie';
   static const String selectMonthRange = 'selectMonthRange';
   static const String selectDateRange = 'selectDateRange';
   static const String fromMonth = 'fromMonth';
