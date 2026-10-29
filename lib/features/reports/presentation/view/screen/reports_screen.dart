@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:animate_do/animate_do.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -57,12 +58,65 @@ class _ReportsScreenState extends State<ReportsScreen> {
   int _selectedCategoryTab = 0;
 
   final TextEditingController _searchController = TextEditingController();
+  final FocusNode _searchFocusNode = FocusNode();
+  Timer? _searchDebounce;
+  String _searchQuery = '';
 
   // ── Preview state ────────────────────────────────────────────────────────
   _PreviewKind _previewKind = _PreviewKind.none;
   File? _pdfFile;
   String _previewTitle = '';
   bool _isGenerating = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchFocusNode.addListener(_handleSearchFocus);
+  }
+
+  void _handleSearchFocus() {
+    if (mounted) setState(() {});
+  }
+
+  String _normalizeSearchText(String value) {
+    return value
+        .toLowerCase()
+        .replaceAll(RegExp(r'[\u064B-\u0652\u0670]'), '')
+        .replaceAll('أ', 'ا')
+        .replaceAll('إ', 'ا')
+        .replaceAll('آ', 'ا')
+        .replaceAll('ى', 'ي')
+        .replaceAll('ة', 'ه')
+        .trim();
+  }
+
+  void _onSearchChanged(String value) {
+    _searchDebounce?.cancel();
+    if (value.trim().isNotEmpty && _selectedCategoryTab != 0) {
+      setState(() => _selectedCategoryTab = 0);
+    }
+    _searchDebounce = Timer(const Duration(milliseconds: 180), () {
+      if (!mounted) return;
+      setState(() => _searchQuery = value.trim());
+    });
+  }
+
+  void _applySearch(String value) {
+    _searchDebounce?.cancel();
+    _searchController
+      ..text = value
+      ..selection = TextSelection.collapsed(offset: value.length);
+    setState(() {
+      _searchQuery = value.trim();
+      _selectedCategoryTab = 0;
+    });
+  }
+
+  void _clearSearch() {
+    _searchDebounce?.cancel();
+    _searchController.clear();
+    setState(() => _searchQuery = '');
+  }
 
   Future<_ReportOption?> _selectReportOption({
     required String title,
@@ -1203,6 +1257,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
   // ── Dispose ──────────────────────────────────────────────────────────────
   @override
   void dispose() {
+    _searchDebounce?.cancel();
+    _searchFocusNode.dispose();
     _searchController.dispose();
     _scrollController.dispose();
     super.dispose();
@@ -1220,7 +1276,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
     ];
 
     final categoryTabs = [
-      AppLocaleKey.tabOverview.tr(),
+      AppLocaleKey.allReports.tr(),
       AppLocaleKey.tabFinancials.tr(),
       AppLocaleKey.tabSales.tr(),
       AppLocaleKey.tabInventory.tr(),
@@ -1360,19 +1416,31 @@ class _ReportsScreenState extends State<ReportsScreen> {
       },
     ];
 
+    final normalizedQuery = _normalizeSearchText(_searchQuery);
     final filteredStatements = statements.where((item) {
-      if (_selectedCategoryTab != 0 &&
-          item['category'] != _selectedCategoryTab) {
-        return false;
+      if (normalizedQuery.isEmpty) {
+        return _selectedCategoryTab == 0 ||
+            item['category'] == _selectedCategoryTab;
       }
-      if (_searchController.text.trim().isNotEmpty) {
-        final query = _searchController.text.toLowerCase();
-        final title = (item['title'] as String).toLowerCase();
-        final desc = (item['desc'] as String).toLowerCase();
-        return title.contains(query) || desc.contains(query);
-      }
-      return true;
+
+      final title = _normalizeSearchText(item['title'] as String);
+      final desc = _normalizeSearchText(item['desc'] as String);
+      final code = _normalizeSearchText(item['reportName'] as String? ?? '');
+      final category = _normalizeSearchText(
+        categoryTabs[(item['category'] as int)],
+      );
+      return title.contains(normalizedQuery) ||
+          desc.contains(normalizedQuery) ||
+          code.contains(normalizedQuery) ||
+          category.contains(normalizedQuery);
     }).toList();
+
+    final categoryCounts = List<int>.generate(
+      categoryTabs.length,
+      (index) => statements
+          .where((item) => index == 0 || item['category'] == index)
+          .length,
+    );
 
     return Scaffold(
       backgroundColor: AppColor.scaffoldColor(context),
@@ -1382,15 +1450,27 @@ class _ReportsScreenState extends State<ReportsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ── Top Bar ────────────────────────────────────────────────
-              _buildTopBar(),
+              // ── Hero Header ────────────────────────────────────────────
+              _buildHeroHeader(
+                reportCount: statements.length,
+                sectionCount: categoryTabs.length - 1,
+              ),
 
               // ── Preview Panel (داخل الصفحة نفسها) ─────────────────────
               _buildPreviewArea(),
 
+              // ── Overview Section ───────────────────────────────────────
+              _buildSectionHeader(
+                icon: Icons.insights_rounded,
+                title: AppLocaleKey.insightsSectionTitle.tr(),
+                subtitle: AppLocaleKey.insightsSectionSubtitle.tr(),
+                accent: AppColor.emeraldTeal,
+              ),
+              Gap(8.h),
+
               // ── Time-Period Selector ───────────────────────────────────
               _buildPeriodSelector(periods),
-              Gap(12.h),
+              Gap(10.h),
 
               // ── AI Executive Insights Banner ───────────────────────────
               _buildAiBanner(),
@@ -1410,77 +1490,51 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 padding: EdgeInsets.symmetric(horizontal: 16.w),
                 child: const ReportsDonutChartWidget(),
               ),
-              Gap(24.h),
+              Gap(28.h),
 
-              // ── Reports List Header ────────────────────────────────────
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: EdgeInsets.all(6.r),
-                          decoration: BoxDecoration(
-                            color: AppColor.emeraldTeal.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(8.r),
-                          ),
-                          child: Icon(
-                            Icons.analytics_rounded,
-                            size: 16.r,
-                            color: AppColor.emeraldTeal,
-                          ),
-                        ),
-                        Gap(8.w),
-                        Text(
-                          AppLocaleKey.topReportsListTitle.tr(),
-                          style: TextStyle(
-                            color: AppColor.titleFormFiledColor(context),
-                            fontSize: 15.sp,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
+              // ── Reports Library Section ────────────────────────────────
+              _buildSectionHeader(
+                icon: Icons.analytics_rounded,
+                title: AppLocaleKey.reportsLibraryTitle.tr(),
+                subtitle: AppLocaleKey.reportsLibrarySubtitle.tr(),
+                accent: AppColor.oceanBlue,
+                trailing: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 10.w,
+                    vertical: 4.h,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColor.primaryColor(
+                      context,
+                    ).withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(12.r),
+                    border: Border.all(color: AppColor.borderColor(context)),
+                  ),
+                  child: Text(
+                    '${filteredStatements.length} ${AppLocaleKey.reportsCount.tr()}',
+                    style: TextStyle(
+                      color: AppColor.mintTeal,
+                      fontSize: 11.sp,
+                      fontWeight: FontWeight.bold,
                     ),
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 10.w,
-                        vertical: 4.h,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColor.primaryColor(
-                          context,
-                        ).withValues(alpha: 0.08),
-                        borderRadius: BorderRadius.circular(12.r),
-                        border: Border.all(
-                          color: AppColor.borderColor(context),
-                        ),
-                      ),
-                      child: Text(
-                        '${filteredStatements.length} ${context.locale.languageCode == 'ar' ? 'تقارير' : 'Reports'}',
-                        style: TextStyle(
-                          color: AppColor.mintTeal,
-                          fontSize: 11.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
               Gap(14.h),
 
               // ── Search Bar ─────────────────────────────────────────────
               _buildSearchBar(),
+
+              // ── Search summary / suggestions ───────────────────────────
+              _buildSearchMeta(filteredStatements.length),
               Gap(12.h),
 
               // ── Category Chips ─────────────────────────────────────────
-              _buildCategoryChips(categoryTabs),
+              _buildCategoryChips(categoryTabs, categoryCounts),
               Gap(16.h),
 
               // ── Statements List ────────────────────────────────────────
-              _buildStatementsList(filteredStatements),
+              _buildStatementsList(filteredStatements, categoryTabs),
 
               Gap(100.h),
             ],
@@ -1491,112 +1545,290 @@ class _ReportsScreenState extends State<ReportsScreen> {
   }
 
   // ─────────────────────────────────────────────────────────────────────────
-  // Top Bar
+  // Hero Header
   // ─────────────────────────────────────────────────────────────────────────
-  Widget _buildTopBar() {
+  Widget _buildHeroHeader({
+    required int reportCount,
+    required int sectionCount,
+  }) {
+    final isAr = context.locale.languageCode == 'ar';
+
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+      padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 8.h),
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [
+              AppColor.royalNavy,
+              AppColor.oceanBlue,
+              AppColor.emeraldTeal,
+            ],
+            stops: [0, 0.58, 1],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(26.r),
+          boxShadow: [
+            BoxShadow(
+              color: AppColor.royalNavy.withValues(alpha: 0.24),
+              blurRadius: 22,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(26.r),
+          child: Stack(
+            children: [
+              Positioned(
+                top: -46.r,
+                right: -28.r,
+                child: _heroCircle(150.r, Colors.white),
+              ),
+              Positioned(
+                bottom: -72.r,
+                left: -34.r,
+                child: _heroCircle(180.r, Colors.white),
+              ),
+              Padding(
+                padding: EdgeInsets.all(18.r),
+                child: Column(
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: 46.r,
+                          height: 46.r,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.16),
+                            borderRadius: BorderRadius.circular(15.r),
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.22),
+                            ),
+                          ),
+                          child: Icon(
+                            Icons.analytics_rounded,
+                            color: Colors.white,
+                            size: 24.r,
+                          ),
+                        ),
+                        Gap(12.w),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                AppLocaleKey.reportsDashboardTitle.tr(),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 18.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              Gap(3.h),
+                              Text(
+                                AppLocaleKey.reportsDashboardSubtitle.tr(),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 10.5.sp,
+                                  height: 1.4,
+                                  color: Colors.white.withValues(alpha: 0.72),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Gap(8.w),
+                        _heroLanguageButton(isAr),
+                      ],
+                    ),
+                    Gap(18.h),
+                    Container(
+                      height: 1,
+                      color: Colors.white.withValues(alpha: 0.12),
+                    ),
+                    Gap(14.h),
+                    Wrap(
+                      alignment: WrapAlignment.spaceBetween,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: 14.w,
+                      runSpacing: 12.h,
+                      children: [
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            _heroStat(
+                              value: '$reportCount',
+                              label: AppLocaleKey.reportsCount.tr(),
+                            ),
+                            Container(
+                              width: 1,
+                              height: 24.h,
+                              margin: EdgeInsets.symmetric(horizontal: 16.w),
+                              color: Colors.white.withValues(alpha: 0.16),
+                            ),
+                            _heroStat(
+                              value: '$sectionCount',
+                              label: AppLocaleKey.sectionsCount.tr(),
+                            ),
+                          ],
+                        ),
+                        FilledButton.icon(
+                          onPressed: _showExportModal,
+                          icon: Icon(Icons.download_rounded, size: 17.r),
+                          label: Text(
+                            AppLocaleKey.exportReport.tr(),
+                            style: TextStyle(
+                              fontSize: 11.5.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          style: FilledButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: AppColor.royalNavy,
+                            elevation: 0,
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 14.w,
+                              vertical: 11.h,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(13.r),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _heroCircle(double size, Color color) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: color.withValues(alpha: 0.07),
+      ),
+    );
+  }
+
+  Widget _heroStat({required String value, required String label}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 18.sp,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            height: 1,
+          ),
+        ),
+        Gap(3.h),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 10.sp,
+            fontWeight: FontWeight.w500,
+            color: Colors.white.withValues(alpha: 0.68),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _heroLanguageButton(bool isAr) {
+    return InkWell(
+      onTap: _toggleLanguage,
+      borderRadius: BorderRadius.circular(13.r),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.13),
+          borderRadius: BorderRadius.circular(13.r),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.translate_rounded, size: 15.r, color: Colors.white),
+            Gap(5.w),
+            Text(
+              isAr ? 'EN' : 'AR',
+              style: TextStyle(
+                fontSize: 11.sp,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Section Header
+  // ─────────────────────────────────────────────────────────────────────────
+  Widget _buildSectionHeader({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required Color accent,
+    Widget? trailing,
+  }) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+          Container(
+            padding: EdgeInsets.all(8.r),
+            decoration: BoxDecoration(
+              color: accent.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(10.r),
+              border: Border.all(color: accent.withValues(alpha: 0.18)),
+            ),
+            child: Icon(icon, size: 18.r, color: accent),
+          ),
+          Gap(10.w),
           Expanded(
-            child: Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // IconButton(
-                //   onPressed: () => Navigator.pop(context),
-                //   icon: Icon(
-                //     context.locale.languageCode == 'ar'
-                //         ? Icons.arrow_forward_ios_rounded
-                //         : Icons.arrow_back_ios_rounded,
-                //     size: 18.r,
-                //     color: AppColor.whiteColor(context),
-                //   ),
-                // ),
-                Gap(4.w),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        AppLocaleKey.reportsDashboardTitle.tr(),
-                        style: TextStyle(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.bold,
-                          color: AppColor.titleFormFiledColor(context),
-                        ),
-                      ),
-                      Text(
-                        AppLocaleKey.reportsDashboardSubtitle.tr(),
-                        style: TextStyle(
-                          fontSize: 10.sp,
-                          color: AppColor.darkTextColor(context),
-                        ),
-                      ),
-                    ],
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: AppColor.titleFormFiledColor(context),
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Gap(2.h),
+                Text(
+                  subtitle,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 10.sp,
+                    color: AppColor.darkTextColor(context),
                   ),
                 ),
               ],
             ),
           ),
-          Row(
-            children: [
-              InkWell(
-                onTap: _showExportModal,
-                borderRadius: BorderRadius.circular(12.r),
-                child: Container(
-                  padding: EdgeInsets.all(8.r),
-                  decoration: BoxDecoration(
-                    color: AppColor.emeraldTeal.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(12.r),
-                    border: Border.all(
-                      color: AppColor.emeraldTeal.withValues(alpha: 0.3),
-                    ),
-                  ),
-                  child: Icon(
-                    Icons.download_rounded,
-                    size: 18.r,
-                    color: AppColor.emeraldTeal,
-                  ),
-                ),
-              ),
-              Gap(8.w),
-              InkWell(
-                onTap: _toggleLanguage,
-                borderRadius: BorderRadius.circular(20.r),
-                child: Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 10.w,
-                    vertical: 6.h,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColor.primaryColor(
-                      context,
-                    ).withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(20.r),
-                    border: Border.all(color: AppColor.borderColor(context)),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.language_rounded,
-                        size: 14.r,
-                        color: AppColor.mintTeal,
-                      ),
-                      Gap(4.w),
-                      Text(
-                        AppLocaleKey.langSwitchShort.tr(),
-                        style: TextStyle(
-                          fontSize: 11.sp,
-                          fontWeight: FontWeight.bold,
-                          color: AppColor.titleFormFiledColor(context),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
+          if (trailing != null) ...[Gap(8.w), trailing],
         ],
       ),
     );
@@ -1701,7 +1933,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
   Widget _buildPeriodSelector(List<String> periods) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 2.h),
       child: Row(
         children: List.generate(periods.length, (index) {
           final isSelected = _selectedPeriodIndex == index;
@@ -1712,21 +1944,29 @@ class _ReportsScreenState extends State<ReportsScreen> {
               borderRadius: BorderRadius.circular(20.r),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 250),
-                padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 7.h),
+                padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
                 decoration: BoxDecoration(
-                  color: isSelected
-                      ? AppColor.emeraldTeal
-                      : AppColor.cardColor(context),
+                  gradient: isSelected
+                      ? LinearGradient(
+                          colors: [
+                            AppColor.primaryColor(context),
+                            AppColor.oceanBlue,
+                          ],
+                        )
+                      : null,
+                  color: isSelected ? null : AppColor.cardColor(context),
                   borderRadius: BorderRadius.circular(20.r),
                   border: Border.all(
                     color: isSelected
-                        ? AppColor.emeraldTeal
+                        ? AppColor.primaryColor(context)
                         : AppColor.borderColor(context),
                   ),
                   boxShadow: isSelected
                       ? [
                           BoxShadow(
-                            color: AppColor.emeraldTeal.withValues(alpha: 0.4),
+                            color: AppColor.primaryColor(
+                              context,
+                            ).withValues(alpha: 0.28),
                             blurRadius: 10,
                             offset: const Offset(0, 3),
                           ),
@@ -1737,11 +1977,9 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   periods[index],
                   style: AppTextStyle.bodySmall(context).copyWith(
                     fontSize: 11.sp,
-                    fontWeight: isSelected
-                        ? FontWeight.bold
-                        : FontWeight.normal,
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                     color: isSelected
-                        ? AppColor.buttonTextColor(context)
+                        ? Colors.white
                         : AppColor.titleFormFiledColor(context),
                   ),
                 ),
@@ -1926,32 +2164,40 @@ class _ReportsScreenState extends State<ReportsScreen> {
   // ─────────────────────────────────────────────────────────────────────────
   Widget _buildSearchBar() {
     final hasSearchText = _searchController.text.isNotEmpty;
+    final isFocused = _searchFocusNode.hasFocus;
+    final accent = AppColor.primaryColor(context);
 
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.w),
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
         decoration: BoxDecoration(
           color: AppColor.cardColor(context),
-          borderRadius: BorderRadius.circular(16.r),
+          borderRadius: BorderRadius.circular(18.r),
           border: Border.all(
-            color: hasSearchText
-                ? AppColor.mintTeal.withValues(alpha: 0.5)
+            color: hasSearchText || isFocused
+                ? accent.withValues(alpha: 0.55)
                 : AppColor.borderColor(context),
+            width: isFocused ? 1.4 : 1,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.03),
-              blurRadius: 10,
-              offset: const Offset(0, 3),
+              color: accent.withValues(alpha: isFocused ? 0.12 : 0.04),
+              blurRadius: isFocused ? 18 : 10,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
         child: TextField(
           controller: _searchController,
-          onChanged: (val) => setState(() {}),
+          focusNode: _searchFocusNode,
+          onChanged: _onSearchChanged,
+          onSubmitted: (value) => _applySearch(value),
+          textInputAction: TextInputAction.search,
           style: TextStyle(
             color: AppColor.titleFormFiledColor(context),
             fontSize: 13.sp,
+            fontWeight: FontWeight.w500,
           ),
           decoration: InputDecoration(
             hintText: AppLocaleKey.searchReports.tr(),
@@ -1959,28 +2205,146 @@ class _ReportsScreenState extends State<ReportsScreen> {
               color: AppColor.darkTextColor(context),
               fontSize: 12.sp,
             ),
-            prefixIcon: Icon(
-              Icons.search_rounded,
-              color: AppColor.mintTeal,
-              size: 20.r,
+            prefixIcon: Container(
+              margin: EdgeInsets.all(7.r),
+              decoration: BoxDecoration(
+                color: accent.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(10.r),
+              ),
+              child: Icon(Icons.search_rounded, color: accent, size: 20.r),
             ),
             suffixIcon: hasSearchText
                 ? IconButton(
+                    tooltip: AppLocaleKey.clearSearch.tr(),
                     icon: Icon(
-                      Icons.clear_rounded,
+                      Icons.close_rounded,
                       color: AppColor.darkTextColor(context),
                       size: 18.r,
                     ),
-                    onPressed: () {
-                      _searchController.clear();
-                      setState(() {});
-                    },
+                    onPressed: _clearSearch,
                   )
-                : null,
+                : Icon(
+                    Icons.tune_rounded,
+                    color: AppColor.darkTextColor(
+                      context,
+                    ).withValues(alpha: 0.55),
+                    size: 18.r,
+                  ),
             border: InputBorder.none,
             contentPadding: EdgeInsets.symmetric(
               horizontal: 14.w,
-              vertical: 13.h,
+              vertical: 14.h,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  bool get _hasSearch => _searchQuery.trim().isNotEmpty;
+
+  Widget _buildSearchMeta(int resultCount) {
+    if (_hasSearch) {
+      final accent = AppColor.primaryColor(context);
+      return Padding(
+        padding: EdgeInsets.fromLTRB(16.w, 10.h, 16.w, 0),
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+          decoration: BoxDecoration(
+            color: accent.withValues(alpha: 0.06),
+            borderRadius: BorderRadius.circular(13.r),
+            border: Border.all(color: accent.withValues(alpha: 0.14)),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.search_rounded, size: 15.r, color: accent),
+              Gap(7.w),
+              Expanded(
+                child: Text(
+                  '${AppLocaleKey.searchResultsFor.tr()} "$_searchQuery" • $resultCount',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 11.sp,
+                    fontWeight: FontWeight.w600,
+                    color: AppColor.titleFormFiledColor(context),
+                  ),
+                ),
+              ),
+              InkWell(
+                onTap: _clearSearch,
+                borderRadius: BorderRadius.circular(8.r),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 3.h),
+                  child: Text(
+                    AppLocaleKey.clearSearch.tr(),
+                    style: TextStyle(
+                      fontSize: 10.5.sp,
+                      fontWeight: FontWeight.bold,
+                      color: accent,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final quickSearches = [
+      'AGL001',
+      'AGL055',
+      'AGL003',
+      'AGL008',
+      AppLocaleKey.tabTax.tr(),
+    ];
+
+    return Padding(
+      padding: EdgeInsets.fromLTRB(16.w, 10.h, 0, 0),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            Icon(Icons.bolt_rounded, size: 15.r, color: AppColor.warningOrange),
+            Gap(5.w),
+            Text(
+              AppLocaleKey.quickSearch.tr(),
+              style: TextStyle(
+                fontSize: 10.5.sp,
+                fontWeight: FontWeight.w600,
+                color: AppColor.darkTextColor(context),
+              ),
+            ),
+            Gap(8.w),
+            ...quickSearches.map(_buildQuickSearchChip),
+            Gap(16.w),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildQuickSearchChip(String label) {
+    return Padding(
+      padding: EdgeInsets.only(right: 6.w),
+      child: InkWell(
+        onTap: () => _applySearch(label),
+        borderRadius: BorderRadius.circular(10.r),
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 9.w, vertical: 5.h),
+          decoration: BoxDecoration(
+            color: AppColor.cardColor(context),
+            borderRadius: BorderRadius.circular(10.r),
+            border: Border.all(color: AppColor.borderColor(context)),
+          ),
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 9.5.sp,
+              fontFamily: 'monospace',
+              fontWeight: FontWeight.w600,
+              color: AppColor.darkTextColor(context),
             ),
           ),
         ),
@@ -1991,13 +2355,17 @@ class _ReportsScreenState extends State<ReportsScreen> {
   // ─────────────────────────────────────────────────────────────────────────
   // Category Chips
   // ─────────────────────────────────────────────────────────────────────────
-  Widget _buildCategoryChips(List<String> categoryTabs) {
+  Widget _buildCategoryChips(
+    List<String> categoryTabs,
+    List<int> categoryCounts,
+  ) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       padding: EdgeInsets.symmetric(horizontal: 16.w),
       child: Row(
         children: List.generate(categoryTabs.length, (index) {
           final isSelected = _selectedCategoryTab == index;
+          final count = categoryCounts[index];
           return Padding(
             padding: EdgeInsets.only(right: 8.w),
             child: InkWell(
@@ -2005,39 +2373,76 @@ class _ReportsScreenState extends State<ReportsScreen> {
               borderRadius: BorderRadius.circular(16.r),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
-                padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
+                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
                 decoration: BoxDecoration(
                   gradient: isSelected
                       ? LinearGradient(
-                          colors: [AppColor.emeraldTeal, AppColor.mintTeal],
+                          colors: [
+                            AppColor.primaryColor(context),
+                            AppColor.oceanBlue,
+                          ],
                         )
                       : null,
                   color: isSelected ? null : AppColor.cardColor(context),
                   borderRadius: BorderRadius.circular(16.r),
                   border: Border.all(
                     color: isSelected
-                        ? AppColor.emeraldTeal
+                        ? AppColor.primaryColor(context)
                         : AppColor.borderColor(context),
                   ),
                   boxShadow: isSelected
                       ? [
                           BoxShadow(
-                            color: AppColor.emeraldTeal.withValues(alpha: 0.35),
-                            blurRadius: 8,
+                            color: AppColor.primaryColor(
+                              context,
+                            ).withValues(alpha: 0.28),
+                            blurRadius: 10,
                             offset: const Offset(0, 3),
                           ),
                         ]
                       : null,
                 ),
-                child: Text(
-                  categoryTabs[index],
-                  style: TextStyle(
-                    fontSize: 11.5.sp,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                    color: isSelected
-                        ? AppColor.whiteColor(context)
-                        : AppColor.titleFormFiledColor(context),
-                  ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      categoryTabs[index],
+                      style: TextStyle(
+                        fontSize: 11.5.sp,
+                        fontWeight: isSelected
+                            ? FontWeight.bold
+                            : FontWeight.w500,
+                        color: isSelected
+                            ? Colors.white
+                            : AppColor.titleFormFiledColor(context),
+                      ),
+                    ),
+                    Gap(6.w),
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 5.w,
+                        vertical: 1.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? Colors.white.withValues(alpha: 0.2)
+                            : AppColor.primaryColor(
+                                context,
+                              ).withValues(alpha: 0.08),
+                        borderRadius: BorderRadius.circular(7.r),
+                      ),
+                      child: Text(
+                        '$count',
+                        style: TextStyle(
+                          fontSize: 9.sp,
+                          fontWeight: FontWeight.bold,
+                          color: isSelected
+                              ? Colors.white
+                              : AppColor.darkTextColor(context),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -2050,10 +2455,15 @@ class _ReportsScreenState extends State<ReportsScreen> {
   // ─────────────────────────────────────────────────────────────────────────
   // Statements List
   // ─────────────────────────────────────────────────────────────────────────
-  Widget _buildStatementsList(List<Map<String, dynamic>> filteredStatements) {
+  Widget _buildStatementsList(
+    List<Map<String, dynamic>> filteredStatements,
+    List<String> categoryTabs,
+  ) {
     if (filteredStatements.isEmpty) {
+      final isAr = context.locale.languageCode == 'ar';
+
       return Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 32.h),
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 28.h),
         child: Container(
           width: double.infinity,
           padding: EdgeInsets.all(28.r),
@@ -2061,6 +2471,13 @@ class _ReportsScreenState extends State<ReportsScreen> {
             color: AppColor.cardColor(context),
             borderRadius: BorderRadius.circular(20.r),
             border: Border.all(color: AppColor.borderColor(context)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.03),
+                blurRadius: 14,
+                offset: const Offset(0, 5),
+              ),
+            ],
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -2068,20 +2485,30 @@ class _ReportsScreenState extends State<ReportsScreen> {
               Container(
                 padding: EdgeInsets.all(16.r),
                 decoration: BoxDecoration(
-                  color: AppColor.emeraldTeal.withValues(alpha: 0.12),
+                  color: AppColor.primaryColor(context).withValues(alpha: 0.1),
                   shape: BoxShape.circle,
+                  border: Border.all(
+                    color: AppColor.primaryColor(
+                      context,
+                    ).withValues(alpha: 0.16),
+                  ),
                 ),
                 child: Icon(
                   Icons.search_off_rounded,
                   size: 32.r,
-                  color: AppColor.emeraldTeal,
+                  color: AppColor.primaryColor(context),
                 ),
               ),
               Gap(14.h),
               Text(
-                context.locale.languageCode == 'ar'
-                    ? 'لا توجد تقارير مطابقة للبحث'
-                    : 'No matching reports found',
+                _hasSearch
+                    ? (isAr
+                          ? 'لا توجد نتائج لـ "$_searchQuery"'
+                          : 'No results for "$_searchQuery"')
+                    : (isAr
+                          ? 'لا توجد تقارير في هذا القسم'
+                          : 'No reports in this section'),
+                textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 13.5.sp,
                   fontWeight: FontWeight.bold,
@@ -2090,48 +2517,58 @@ class _ReportsScreenState extends State<ReportsScreen> {
               ),
               Gap(6.h),
               Text(
-                context.locale.languageCode == 'ar'
-                    ? 'جرب البحث بكلمات أخرى أو اختر قسماً مختلفاً'
-                    : 'Try different search terms or select another category',
+                _hasSearch
+                    ? (isAr
+                          ? 'جرّب البحث برقم التقرير أو باسم آخر، أو امسح البحث لعرض كل التقارير'
+                          : 'Try a report code or another keyword, or clear the search to view all reports')
+                    : (isAr
+                          ? 'اختر قسماً آخر أو اعرض كل التقارير'
+                          : 'Select another category or view all reports'),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 11.sp,
+                  height: 1.5,
                   color: AppColor.darkTextColor(context),
                 ),
               ),
-              if (_searchController.text.isNotEmpty) ...[
-                Gap(14.h),
-                InkWell(
-                  onTap: () {
-                    _searchController.clear();
-                    setState(() {});
-                  },
-                  borderRadius: BorderRadius.circular(12.r),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 16.w,
-                      vertical: 8.h,
+              Gap(14.h),
+              InkWell(
+                onTap: () {
+                  if (_hasSearch) {
+                    _clearSearch();
+                  } else {
+                    setState(() => _selectedCategoryTab = 0);
+                  }
+                },
+                borderRadius: BorderRadius.circular(12.r),
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 16.w,
+                    vertical: 8.h,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColor.primaryColor(
+                      context,
+                    ).withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12.r),
+                    border: Border.all(
+                      color: AppColor.primaryColor(
+                        context,
+                      ).withValues(alpha: 0.2),
                     ),
-                    decoration: BoxDecoration(
-                      color: AppColor.emeraldTeal.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(12.r),
-                      border: Border.all(
-                        color: AppColor.emeraldTeal.withValues(alpha: 0.3),
-                      ),
-                    ),
-                    child: Text(
-                      context.locale.languageCode == 'ar'
-                          ? 'مسح البحث'
-                          : 'Clear Search',
-                      style: TextStyle(
-                        fontSize: 11.5.sp,
-                        fontWeight: FontWeight.bold,
-                        color: AppColor.emeraldTeal,
-                      ),
+                  ),
+                  child: Text(
+                    _hasSearch
+                        ? AppLocaleKey.clearSearch.tr()
+                        : AppLocaleKey.allReports.tr(),
+                    style: TextStyle(
+                      fontSize: 11.5.sp,
+                      fontWeight: FontWeight.bold,
+                      color: AppColor.primaryColor(context),
                     ),
                   ),
                 ),
-              ],
+              ),
             ],
           ),
         ),
@@ -2151,6 +2588,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
           final amount = st['amount'] as String? ?? '';
           final date = st['date'] as String? ?? '';
           final status = st['status'] as String;
+          final code = st['reportName'] as String? ?? '';
+          final category = categoryTabs[st['category'] as int];
 
           Future<void> exportReport(String exportType) => _handleExportReport(
             title: title,
@@ -2193,6 +2632,9 @@ class _ReportsScreenState extends State<ReportsScreen> {
               status: status,
               icon: st['icon'] as IconData,
               iconColor: st['iconColor'] as Color,
+              reportCode: code.isEmpty ? null : code,
+              categoryLabel: category,
+              searchQuery: _searchQuery,
               // ── ربط المعاينة داخل الصفحة نفسها ──
               onExportPdf: () => exportReport('pdf'),
               onExportFormat: exportReport,

@@ -250,6 +250,16 @@ class AppLocaleKey {
   static const String salesByCategoryTitle = 'salesByCategoryTitle';
   static const String topReportsListTitle = 'topReportsListTitle';
   static const String searchReports = 'searchReports';
+  static const String allReports = 'allReports';
+  static const String quickSearch = 'quickSearch';
+  static const String searchResultsFor = 'searchResultsFor';
+  static const String clearSearch = 'clearSearch';
+  static const String reportsLibraryTitle = 'reportsLibraryTitle';
+  static const String reportsLibrarySubtitle = 'reportsLibrarySubtitle';
+  static const String insightsSectionTitle = 'insightsSectionTitle';
+  static const String insightsSectionSubtitle = 'insightsSectionSubtitle';
+  static const String reportsCount = 'reportsCount';
+  static const String sectionsCount = 'sectionsCount';
   static const String statementChartOfAccount = 'statementChartOfAccount';
   static const String statementChartOfAccountDesc =
       'statementChartOfAccountDesc';

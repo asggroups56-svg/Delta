@@ -22,7 +22,6 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   bool _notificationsEnabled = true;
   bool _biometricEnabled = false;
-
   void _openAiChat() {
     showModalBottomSheet(
       context: context,

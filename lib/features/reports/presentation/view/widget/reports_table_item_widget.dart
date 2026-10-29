@@ -13,6 +13,9 @@ class ReportsTableItemWidget extends StatelessWidget {
   final String status;
   final IconData icon;
   final Color iconColor;
+  final String? reportCode;
+  final String? categoryLabel;
+  final String searchQuery;
 
   /// يُستدعى عند الضغط على زر التقرير / معاينة PDF
   final VoidCallback onExportPdf;
@@ -29,6 +32,9 @@ class ReportsTableItemWidget extends StatelessWidget {
     required this.status,
     required this.icon,
     required this.iconColor,
+    this.reportCode,
+    this.categoryLabel,
+    this.searchQuery = '',
     required this.onExportPdf,
     required this.onExportFormat,
   });
@@ -46,15 +52,12 @@ class ReportsTableItemWidget extends StatelessWidget {
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(18.r),
-        border: Border.all(
-          color: borderColor.withValues(alpha: 0.8),
-          width: 1,
-        ),
+        border: Border.all(color: iconColor.withValues(alpha: 0.16), width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+            color: iconColor.withValues(alpha: 0.07),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
@@ -67,26 +70,27 @@ class ReportsTableItemWidget extends StatelessWidget {
           splashColor: iconColor.withValues(alpha: 0.08),
           highlightColor: iconColor.withValues(alpha: 0.04),
           child: Padding(
-            padding: EdgeInsets.all(16.r),
+            padding: EdgeInsets.all(15.r),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildHeader(isAudited, titleColor, descColor),
+                _buildHeader(isAudited, titleColor, descColor, context),
                 Gap(10.h),
-                Text(
-                  description,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+                _buildHighlightedText(
+                  context: context,
+                  text: description,
+                  query: searchQuery,
                   style: TextStyle(
                     fontSize: 11.5.sp,
-                    height: 1.35,
+                    height: 1.4,
                     color: descColor,
                   ),
+                  maxLines: 2,
                 ),
                 Gap(14.h),
                 Container(
                   height: 1,
-                  color: borderColor.withValues(alpha: 0.6),
+                  color: borderColor.withValues(alpha: 0.65),
                 ),
                 Gap(12.h),
                 _buildActionStrip(context, descColor),
@@ -102,18 +106,19 @@ class ReportsTableItemWidget extends StatelessWidget {
     bool isAudited,
     Color titleColor,
     Color descColor,
+    BuildContext context,
   ) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Glowing Icon Container
+        // Gradient icon container
         Container(
           width: 44.r,
           height: 44.r,
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                iconColor.withValues(alpha: 0.22),
+                iconColor.withValues(alpha: 0.24),
                 iconColor.withValues(alpha: 0.08),
               ],
               begin: Alignment.topLeft,
@@ -128,34 +133,46 @@ class ReportsTableItemWidget extends StatelessWidget {
           child: Icon(icon, color: iconColor, size: 22.r),
         ),
         Gap(12.w),
-        // Title & Optional tags
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                title,
+              _buildHighlightedText(
+                context: context,
+                text: title,
+                query: searchQuery,
                 style: TextStyle(
-                  fontSize: 13.5.sp,
+                  fontSize: 14.sp,
                   fontWeight: FontWeight.w700,
                   color: titleColor,
                   height: 1.25,
                 ),
+                maxLines: 2,
               ),
-              if (date.isNotEmpty || amount.isNotEmpty) ...[
-                Gap(4.h),
-                Row(
+              if ((reportCode != null && reportCode!.isNotEmpty) ||
+                  (categoryLabel != null && categoryLabel!.isNotEmpty) ||
+                  date.isNotEmpty ||
+                  amount.isNotEmpty) ...[
+                Gap(6.h),
+                Wrap(
+                  spacing: 6.w,
+                  runSpacing: 4.h,
+                  crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
+                    if (reportCode != null && reportCode!.isNotEmpty)
+                      _infoChip(
+                        label: reportCode!,
+                        color: iconColor,
+                        monospace: true,
+                      ),
+                    if (categoryLabel != null && categoryLabel!.isNotEmpty)
+                      _infoChip(label: categoryLabel!, color: descColor),
                     if (date.isNotEmpty)
                       Text(
                         date,
-                        style: TextStyle(
-                          fontSize: 10.sp,
-                          color: descColor,
-                        ),
+                        style: TextStyle(fontSize: 10.sp, color: descColor),
                       ),
-                    if (amount.isNotEmpty) ...[
-                      Gap(6.w),
+                    if (amount.isNotEmpty)
                       Text(
                         amount,
                         style: TextStyle(
@@ -164,7 +181,6 @@ class ReportsTableItemWidget extends StatelessWidget {
                           color: AppColor.mintTeal,
                         ),
                       ),
-                    ],
                   ],
                 ),
               ],
@@ -174,6 +190,30 @@ class ReportsTableItemWidget extends StatelessWidget {
         Gap(8.w),
         _statusChip(isAudited),
       ],
+    );
+  }
+
+  Widget _infoChip({
+    required String label,
+    required Color color,
+    bool monospace = false,
+  }) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 7.w, vertical: 2.h),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(6.r),
+        border: Border.all(color: color.withValues(alpha: 0.14)),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 9.sp,
+          fontFamily: monospace ? 'monospace' : null,
+          fontWeight: FontWeight.w600,
+          color: color,
+        ),
+      ),
     );
   }
 
@@ -219,69 +259,138 @@ class ReportsTableItemWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildActionStrip(BuildContext context, Color descColor) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        // Label with icon
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.file_download_outlined,
-              size: 15.r,
-              color: AppColor.mintTeal,
-            ),
-            Gap(4.w),
-            Text(
-              context.locale.languageCode == 'ar' ? 'الصيغ :' : 'Formats:',
-              style: TextStyle(
-                fontSize: 11.sp,
-                fontWeight: FontWeight.w600,
-                color: descColor,
-              ),
-            ),
-          ],
-        ),
+  Widget _buildHighlightedText({
+    required BuildContext context,
+    required String text,
+    required String query,
+    required TextStyle style,
+    int? maxLines,
+  }) {
+    final trimmedQuery = query.trim();
+    if (trimmedQuery.isEmpty) {
+      return Text(
+        text,
+        maxLines: maxLines,
+        overflow: maxLines == null ? null : TextOverflow.ellipsis,
+        style: style,
+      );
+    }
 
-        // Quick Format Icons: PDF, Excel, Word, Formatted Excel
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // PDF Button
-            _formatIconButton(
-              icon: Icons.picture_as_pdf_rounded,
-              label: 'PDF',
-              color: const Color(0xFFEF4444),
-              onTap: onExportPdf,
-            ),
-            Gap(6.w),
-            // Excel Button
-            _formatIconButton(
-              icon: Icons.table_chart_rounded,
-              label: 'Excel',
-              color: const Color(0xFF10B981),
-              onTap: () => onExportFormat('excel'),
-            ),
-            Gap(6.w),
-            // Word Button
-            _formatIconButton(
-              icon: Icons.description_rounded,
-              label: 'Word',
-              color: const Color(0xFF3B82F6),
-              onTap: () => onExportFormat('word'),
-            ),
-            Gap(6.w),
-            // Excel Formatted Button
-            _formatIconButton(
-              icon: Icons.grid_on_rounded,
-              label: 'PRO',
-              color: const Color(0xFF8B5CF6),
-              onTap: () => onExportFormat('excelformatted'),
-            ),
-          ],
+    final lowerText = text.toLowerCase();
+    final lowerQuery = trimmedQuery.toLowerCase();
+    final spans = <TextSpan>[];
+    final highlightColor = AppColor.primaryColor(context);
+
+    var start = 0;
+    while (start < text.length) {
+      final matchIndex = lowerText.indexOf(lowerQuery, start);
+      if (matchIndex == -1) {
+        spans.add(TextSpan(text: text.substring(start)));
+        break;
+      }
+      if (matchIndex > start) {
+        spans.add(TextSpan(text: text.substring(start, matchIndex)));
+      }
+      spans.add(
+        TextSpan(
+          text: text.substring(matchIndex, matchIndex + lowerQuery.length),
+          style: style.copyWith(
+            color: highlightColor,
+            fontWeight: FontWeight.bold,
+            backgroundColor: highlightColor.withValues(alpha: 0.12),
+          ),
         ),
-      ],
+      );
+      start = matchIndex + lowerQuery.length;
+    }
+
+    return Text.rich(
+      TextSpan(style: style, children: spans),
+      maxLines: maxLines,
+      overflow: maxLines == null ? TextOverflow.clip : TextOverflow.ellipsis,
+    );
+  }
+
+  Widget _buildActionStrip(BuildContext context, Color descColor) {
+    return Container(
+      padding: EdgeInsets.all(10.r),
+      decoration: BoxDecoration(
+        color: AppColor.cardSurfaceColor(context),
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(color: AppColor.borderColor(context)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.file_download_outlined,
+                size: 15.r,
+                color: AppColor.mintTeal,
+              ),
+              Gap(5.w),
+              Text(
+                context.locale.languageCode == 'ar'
+                    ? 'صيغ التصدير'
+                    : 'Export formats',
+                style: TextStyle(
+                  fontSize: 10.5.sp,
+                  fontWeight: FontWeight.w700,
+                  color: descColor,
+                ),
+              ),
+              const Spacer(),
+              Icon(
+                Icons.touch_app_outlined,
+                size: 13.r,
+                color: descColor.withValues(alpha: 0.55),
+              ),
+              Gap(3.w),
+              Text(
+                context.locale.languageCode == 'ar'
+                    ? 'اضغط لعرض التقرير'
+                    : 'Tap to open',
+                style: TextStyle(
+                  fontSize: 9.5.sp,
+                  color: descColor.withValues(alpha: 0.7),
+                ),
+              ),
+            ],
+          ),
+          Gap(8.h),
+          Wrap(
+            spacing: 6.w,
+            runSpacing: 6.h,
+            children: [
+              _formatIconButton(
+                icon: Icons.picture_as_pdf_rounded,
+                label: 'PDF',
+                color: const Color(0xFFEF4444),
+                onTap: onExportPdf,
+              ),
+              _formatIconButton(
+                icon: Icons.table_chart_rounded,
+                label: 'Excel',
+                color: const Color(0xFF10B981),
+                onTap: () => onExportFormat('excel'),
+              ),
+              _formatIconButton(
+                icon: Icons.description_rounded,
+                label: 'Word',
+                color: const Color(0xFF3B82F6),
+                onTap: () => onExportFormat('word'),
+              ),
+              _formatIconButton(
+                icon: Icons.grid_on_rounded,
+                label: 'PRO',
+                color: const Color(0xFF8B5CF6),
+                onTap: () => onExportFormat('excelformatted'),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -295,14 +404,11 @@ class ReportsTableItemWidget extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(8.r),
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 5.h),
+        padding: EdgeInsets.symmetric(horizontal: 9.w, vertical: 6.h),
         decoration: BoxDecoration(
           color: color.withValues(alpha: 0.12),
           borderRadius: BorderRadius.circular(8.r),
-          border: Border.all(
-            color: color.withValues(alpha: 0.35),
-            width: 1,
-          ),
+          border: Border.all(color: color.withValues(alpha: 0.35), width: 1),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
