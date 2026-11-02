@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:my_template/core/theme/app_colors.dart';
+import 'package:my_template/core/theme/app_text_style.dart';
 import 'package:my_template/core/utils/app_locale_key.dart';
 
 class ReportsTableItemWidget extends StatelessWidget {
@@ -16,13 +17,8 @@ class ReportsTableItemWidget extends StatelessWidget {
   final String? reportCode;
   final String? categoryLabel;
   final String searchQuery;
-
-  /// يُستدعى عند الضغط على زر التقرير / معاينة PDF
   final VoidCallback onExportPdf;
-
-  /// يُستدعى عند اختيار صيغة تصدير إضافية (Excel / Word / Formatted)
   final ValueChanged<String> onExportFormat;
-
   const ReportsTableItemWidget({
     super.key,
     required this.title,
@@ -141,7 +137,7 @@ class ReportsTableItemWidget extends StatelessWidget {
                 context: context,
                 text: title,
                 query: searchQuery,
-                style: TextStyle(
+                style: AppTextStyle.bodyLarge(context).copyWith(
                   fontSize: 14.sp,
                   fontWeight: FontWeight.w700,
                   color: titleColor,
@@ -164,18 +160,22 @@ class ReportsTableItemWidget extends StatelessWidget {
                         label: reportCode!,
                         color: iconColor,
                         monospace: true,
+                        context: context
                       ),
                     if (categoryLabel != null && categoryLabel!.isNotEmpty)
-                      _infoChip(label: categoryLabel!, color: descColor),
+                      _infoChip(label: categoryLabel!, color: descColor, context: context),
                     if (date.isNotEmpty)
                       Text(
                         date,
-                        style: TextStyle(fontSize: 10.sp, color: descColor),
+                        style: AppTextStyle.bodySmall(context).copyWith(
+                          fontSize: 10.sp,
+                          color: descColor,
+                        ),
                       ),
                     if (amount.isNotEmpty)
                       Text(
                         amount,
-                        style: TextStyle(
+                        style: AppTextStyle.bodySmall(context).copyWith(
                           fontSize: 10.5.sp,
                           fontWeight: FontWeight.bold,
                           color: AppColor.mintTeal,
@@ -188,7 +188,7 @@ class ReportsTableItemWidget extends StatelessWidget {
           ),
         ),
         Gap(8.w),
-        _statusChip(isAudited),
+        _statusChip(isAudited, context),
       ],
     );
   }
@@ -197,6 +197,7 @@ class ReportsTableItemWidget extends StatelessWidget {
     required String label,
     required Color color,
     bool monospace = false,
+    required BuildContext context,
   }) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 7.w, vertical: 2.h),
@@ -207,7 +208,7 @@ class ReportsTableItemWidget extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: TextStyle(
+        style: AppTextStyle.bodySmall(context).copyWith(
           fontSize: 9.sp,
           fontFamily: monospace ? 'monospace' : null,
           fontWeight: FontWeight.w600,
@@ -217,8 +218,9 @@ class ReportsTableItemWidget extends StatelessWidget {
     );
   }
 
-  Widget _statusChip(bool isAudited) {
+  Widget _statusChip(bool isAudited, BuildContext context) {
     final color = isAudited ? AppColor.emeraldTeal : const Color(0xFFF39C12);
+
 
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
@@ -248,7 +250,7 @@ class ReportsTableItemWidget extends StatelessWidget {
           Gap(4.w),
           Text(
             status,
-            style: TextStyle(
+            style: AppTextStyle.bodySmall(context).copyWith(
               fontSize: 9.5.sp,
               fontWeight: FontWeight.w600,
               color: color,

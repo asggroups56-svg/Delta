@@ -10,10 +10,8 @@ import 'package:my_template/core/custom_widgets/date_range_bottom_sheet_widget.d
 import 'package:my_template/core/custom_widgets/month_range_bottom_sheet_widget.dart';
 import 'package:my_template/core/services/services_locator.dart';
 import 'package:my_template/core/theme/app_colors.dart';
-import 'package:my_template/core/theme/app_text_style.dart';
 import 'package:my_template/core/utils/app_locale_key.dart';
 import 'package:my_template/core/utils/common_methods.dart';
-import 'package:my_template/features/home/presentation/view/widget/ai_chat_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/data/repository/reports_repo.dart';
 import 'package:my_template/features/reports/presentation/view/widget/file_download_service.dart';
 import 'package:my_template/features/reports/presentation/view/widget/account_statement_filter_bottom_sheet_widget.dart';
@@ -24,9 +22,7 @@ import 'package:my_template/features/reports/presentation/view/widget/monthly_co
 import 'package:my_template/features/reports/presentation/view/widget/party_vat_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/pdf_export_service.dart';
 import 'package:my_template/features/reports/presentation/view/widget/pdf_preview_panel.dart';
-import 'package:my_template/features/reports/presentation/view/widget/reports_chart_widget.dart';
-import 'package:my_template/features/reports/presentation/view/widget/reports_donut_chart_widget.dart';
-import 'package:my_template/features/reports/presentation/view/widget/reports_kpi_card_widget.dart';
+import 'package:my_template/features/reports/presentation/view/widget/reports_screen_widgets.dart';
 import 'package:my_template/features/reports/presentation/view/widget/reports_table_item_widget.dart';
 import 'package:my_template/features/lookup/presentation/widgets/customer_datum_dropdown.dart';
 
@@ -54,7 +50,6 @@ class ReportsScreen extends StatefulWidget {
 
 class _ReportsScreenState extends State<ReportsScreen> {
   // ── State ────────────────────────────────────────────────────────────────
-  int _selectedPeriodIndex = 2;
   int _selectedCategoryTab = 0;
 
   final TextEditingController _searchController = TextEditingController();
@@ -255,16 +250,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
       await context.setLocale(const Locale('ar'));
     }
     if (mounted) setState(() {});
-  }
-
-  // ── AI Chat ──────────────────────────────────────────────────────────────
-  void _openAiChat() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) => const AiChatBottomSheetWidget(),
-    );
   }
 
   // ── Export Modal (اختيار نوع التصدير) ────────────────────────────────────
@@ -1267,14 +1252,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
   // ── Build ────────────────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
-    final periods = [
-      AppLocaleKey.periodToday.tr(),
-      AppLocaleKey.periodThisWeek.tr(),
-      AppLocaleKey.periodThisMonth.tr(),
-      AppLocaleKey.periodThisQuarter.tr(),
-      AppLocaleKey.periodThisYear.tr(),
-    ];
-
     final categoryTabs = [
       AppLocaleKey.allReports.tr(),
       AppLocaleKey.tabFinancials.tr(),
@@ -1445,391 +1422,50 @@ class _ReportsScreenState extends State<ReportsScreen> {
     return Scaffold(
       backgroundColor: AppColor.scaffoldColor(context),
       body: SafeArea(
-        child: SingleChildScrollView(
+        child: CustomScrollView(
           controller: _scrollController,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ── Hero Header ────────────────────────────────────────────
-              _buildHeroHeader(
+          slivers: [
+            SliverToBoxAdapter(
+              child: ReportsPageHeaderWidget(
                 reportCount: statements.length,
-                sectionCount: categoryTabs.length - 1,
+                onExport: _showExportModal,
+                onToggleLanguage: _toggleLanguage,
               ),
-
-              // ── Preview Panel (داخل الصفحة نفسها) ─────────────────────
-              _buildPreviewArea(),
-
-              // ── Overview Section ───────────────────────────────────────
-              _buildSectionHeader(
-                icon: Icons.insights_rounded,
-                title: AppLocaleKey.insightsSectionTitle.tr(),
-                subtitle: AppLocaleKey.insightsSectionSubtitle.tr(),
-                accent: AppColor.emeraldTeal,
-              ),
-              Gap(8.h),
-
-              // ── Time-Period Selector ───────────────────────────────────
-              _buildPeriodSelector(periods),
-              Gap(10.h),
-
-              // ── AI Executive Insights Banner ───────────────────────────
-              _buildAiBanner(),
-              Gap(20.h),
-
-              // ── KPI Cards ──────────────────────────────────────────────
-              _buildKpiGrid(),
-              Gap(24.h),
-
-              // ── Charts ─────────────────────────────────────────────────
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
-                child: const ReportsChartWidget(),
-              ),
-              Gap(16.h),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
-                child: const ReportsDonutChartWidget(),
-              ),
-              Gap(28.h),
-
-              // ── Reports Library Section ────────────────────────────────
-              _buildSectionHeader(
-                icon: Icons.analytics_rounded,
-                title: AppLocaleKey.reportsLibraryTitle.tr(),
-                subtitle: AppLocaleKey.reportsLibrarySubtitle.tr(),
-                accent: AppColor.oceanBlue,
-                trailing: Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 10.w,
-                    vertical: 4.h,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColor.primaryColor(
-                      context,
-                    ).withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(12.r),
-                    border: Border.all(color: AppColor.borderColor(context)),
-                  ),
-                  child: Text(
-                    '${filteredStatements.length} ${AppLocaleKey.reportsCount.tr()}',
-                    style: TextStyle(
-                      color: AppColor.mintTeal,
-                      fontSize: 11.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-              Gap(14.h),
-
-              // ── Search Bar ─────────────────────────────────────────────
-              _buildSearchBar(),
-
-              // ── Search summary / suggestions ───────────────────────────
-              _buildSearchMeta(filteredStatements.length),
-              Gap(12.h),
-
-              // ── Category Chips ─────────────────────────────────────────
-              _buildCategoryChips(categoryTabs, categoryCounts),
-              Gap(16.h),
-
-              // ── Statements List ────────────────────────────────────────
-              _buildStatementsList(filteredStatements, categoryTabs),
-
-              Gap(100.h),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  // ─────────────────────────────────────────────────────────────────────────
-  // Hero Header
-  // ─────────────────────────────────────────────────────────────────────────
-  Widget _buildHeroHeader({
-    required int reportCount,
-    required int sectionCount,
-  }) {
-    final isAr = context.locale.languageCode == 'ar';
-
-    return Padding(
-      padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 8.h),
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [
-              AppColor.royalNavy,
-              AppColor.oceanBlue,
-              AppColor.emeraldTeal,
-            ],
-            stops: [0, 0.58, 1],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(26.r),
-          boxShadow: [
-            BoxShadow(
-              color: AppColor.royalNavy.withValues(alpha: 0.24),
-              blurRadius: 22,
-              offset: const Offset(0, 10),
             ),
+            SliverToBoxAdapter(child: _buildPreviewArea()),
+            SliverToBoxAdapter(child: Gap(14.h)),
+            SliverToBoxAdapter(
+              child: ReportsSearchFieldWidget(
+                controller: _searchController,
+                focusNode: _searchFocusNode,
+                isFocused: _searchFocusNode.hasFocus,
+                onChanged: _onSearchChanged,
+                onSubmitted: _applySearch,
+                onClear: _clearSearch,
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: ReportsSearchSummaryWidget(
+                query: _searchQuery,
+                resultCount: filteredStatements.length,
+              ),
+            ),
+            SliverToBoxAdapter(child: Gap(12.h)),
+            SliverToBoxAdapter(
+              child: ReportsCategoryFiltersWidget(
+                categories: categoryTabs,
+                counts: categoryCounts,
+                selectedIndex: _selectedCategoryTab,
+                onSelected: (index) {
+                  setState(() => _selectedCategoryTab = index);
+                },
+              ),
+            ),
+            SliverToBoxAdapter(child: Gap(16.h)),
+            _buildStatementsList(filteredStatements, categoryTabs),
+            SliverToBoxAdapter(child: Gap(100.h)),
           ],
         ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(26.r),
-          child: Stack(
-            children: [
-              Positioned(
-                top: -46.r,
-                right: -28.r,
-                child: _heroCircle(150.r, AppColor.whiteColor(context)),
-              ),
-              Positioned(
-                bottom: -72.r,
-                left: -34.r,
-                child: _heroCircle(180.r, AppColor.whiteColor(context)),
-              ),
-              Padding(
-                padding: EdgeInsets.all(18.r),
-                child: Column(
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: 46.r,
-                          height: 46.r,
-                          decoration: BoxDecoration(
-                            color: AppColor.whiteColor(context).withValues(alpha: 0.16),
-                            borderRadius: BorderRadius.circular(15.r),
-                            border: Border.all(
-                              color: AppColor.whiteColor(context).withValues(alpha: 0.22),
-                            ),
-                          ),
-                          child: Icon(
-                            Icons.analytics_rounded,
-                            color: AppColor.whiteColor(context),
-                            size: 24.r,
-                          ),
-                        ),
-                        Gap(12.w),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                AppLocaleKey.reportsDashboardTitle.tr(),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontSize: 18.sp,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColor.whiteColor(context),
-                                ),
-                              ),
-                              Gap(3.h),
-                              Text(
-                                AppLocaleKey.reportsDashboardSubtitle.tr(),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontSize: 10.5.sp,
-                                  height: 1.4,
-                                  color: AppColor.whiteColor(context).withValues(alpha: 0.72),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Gap(8.w),
-                        _heroLanguageButton(isAr),
-                      ],
-                    ),
-                    Gap(18.h),
-                    Container(
-                      height: 1,
-                      color: AppColor.whiteColor(context).withValues(alpha: 0.12),
-                    ),
-                    Gap(14.h),
-                    Wrap(
-                      alignment: WrapAlignment.spaceBetween,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      spacing: 14.w,
-                      runSpacing: 12.h,
-                      children: [
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            _heroStat(
-                              value: '$reportCount',
-                              label: AppLocaleKey.reportsCount.tr(),
-                            ),
-                            Container(
-                              width: 1,
-                              height: 24.h,
-                              margin: EdgeInsets.symmetric(horizontal: 16.w),
-                              color: AppColor.whiteColor(context).withValues(alpha: 0.16),
-                            ),
-                            _heroStat(
-                              value: '$sectionCount',
-                              label: AppLocaleKey.sectionsCount.tr(),
-                            ),
-                          ],
-                        ),
-                        FilledButton.icon(
-                          onPressed: _showExportModal,
-                          icon: Icon(Icons.download_rounded, size: 17.r),
-                          label: Text(
-                            AppLocaleKey.exportReport.tr(),
-                            style: TextStyle(
-                              fontSize: 11.5.sp,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          style: FilledButton.styleFrom(
-                            backgroundColor: AppColor.whiteColor(context),
-                            foregroundColor: AppColor.royalNavy,
-                            elevation: 0,
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 14.w,
-                              vertical: 11.h,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(13.r),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _heroCircle(double size, Color color) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: color.withValues(alpha: 0.07),
-      ),
-    );
-  }
-
-  Widget _heroStat({required String value, required String label}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 18.sp,
-            fontWeight: FontWeight.bold,
-            color: AppColor.whiteColor(context),
-            height: 1,
-          ),
-        ),
-        Gap(3.h),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 10.sp,
-            fontWeight: FontWeight.w500,
-            color: AppColor.whiteColor(context).withValues(alpha: 0.68),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _heroLanguageButton(bool isAr) {
-    return InkWell(
-      onTap: _toggleLanguage,
-      borderRadius: BorderRadius.circular(13.r),
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
-        decoration: BoxDecoration(
-          color: AppColor.whiteColor(context).withValues(alpha: 0.13),
-          borderRadius: BorderRadius.circular(13.r),
-          border: Border.all(color: AppColor.whiteColor(context).withValues(alpha: 0.2)),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.translate_rounded, size: 15.r, color: AppColor.whiteColor(context)),
-            Gap(5.w),
-            Text(
-              isAr ? 'EN' : 'AR',
-              style: TextStyle(
-                fontSize: 11.sp,
-                fontWeight: FontWeight.bold,
-                color: AppColor.whiteColor(context),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // ─────────────────────────────────────────────────────────────────────────
-  // Section Header
-  // ─────────────────────────────────────────────────────────────────────────
-  Widget _buildSectionHeader({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required Color accent,
-    Widget? trailing,
-  }) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w),
-      child: Row(
-        children: [
-          Container(
-            padding: EdgeInsets.all(8.r),
-            decoration: BoxDecoration(
-              color: accent.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(10.r),
-              border: Border.all(color: accent.withValues(alpha: 0.18)),
-            ),
-            child: Icon(icon, size: 18.r, color: accent),
-          ),
-          Gap(10.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    color: AppColor.titleFormFiledColor(context),
-                    fontSize: 15.sp,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Gap(2.h),
-                Text(
-                  subtitle,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 10.sp,
-                    color: AppColor.darkTextColor(context),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          if (trailing != null) ...[Gap(8.w), trailing],
-        ],
       ),
     );
   }
@@ -1928,530 +1564,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
   }
 
   // ─────────────────────────────────────────────────────────────────────────
-  // Period Selector
-  // ─────────────────────────────────────────────────────────────────────────
-  Widget _buildPeriodSelector(List<String> periods) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 2.h),
-      child: Row(
-        children: List.generate(periods.length, (index) {
-          final isSelected = _selectedPeriodIndex == index;
-          return Padding(
-            padding: EdgeInsets.only(right: 8.w),
-            child: InkWell(
-              onTap: () => setState(() => _selectedPeriodIndex = index),
-              borderRadius: BorderRadius.circular(20.r),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 250),
-                padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
-                decoration: BoxDecoration(
-                  gradient: isSelected
-                      ? LinearGradient(
-                          colors: [
-                            AppColor.primaryColor(context),
-                            AppColor.oceanBlue,
-                          ],
-                        )
-                      : null,
-                  color: isSelected ? null : AppColor.cardColor(context),
-                  borderRadius: BorderRadius.circular(20.r),
-                  border: Border.all(
-                    color: isSelected
-                        ? AppColor.primaryColor(context)
-                        : AppColor.borderColor(context),
-                  ),
-                  boxShadow: isSelected
-                      ? [
-                          BoxShadow(
-                            color: AppColor.primaryColor(
-                              context,
-                            ).withValues(alpha: 0.28),
-                            blurRadius: 10,
-                            offset: const Offset(0, 3),
-                          ),
-                        ]
-                      : null,
-                ),
-                child: Text(
-                  periods[index],
-                  style: AppTextStyle.bodySmall(context).copyWith(
-                    fontSize: 11.sp,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                    color: isSelected
-                        ? AppColor.whiteColor(context)
-                        : AppColor.titleFormFiledColor(context),
-                  ),
-                ),
-              ),
-            ),
-          );
-        }),
-      ),
-    );
-  }
-
-  // ─────────────────────────────────────────────────────────────────────────
-  // AI Banner
-  // ─────────────────────────────────────────────────────────────────────────
-  Widget _buildAiBanner() {
-    return FadeInDown(
-      duration: const Duration(milliseconds: 500),
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16.w),
-        child: Container(
-          padding: EdgeInsets.all(16.r),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                const Color(0xFF0D9488).withValues(alpha: 0.2),
-                const Color(0xFF6C5CE7).withValues(alpha: 0.15),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(20.r),
-            border: Border.all(
-              color: AppColor.mintTeal.withValues(alpha: 0.35),
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: EdgeInsets.all(6.r),
-                          decoration: const BoxDecoration(
-                            color: Color(0xFF0D9488),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            Icons.auto_awesome_rounded,
-                            size: 15.r,
-                            color: AppColor.titleFormFiledColor(context),
-                          ),
-                        ),
-                        Gap(8.w),
-                        Expanded(
-                          child: Text(
-                            AppLocaleKey.aiExecutiveInsightTitle.tr(),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.bold,
-                              color: AppColor.mintTeal,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Gap(8.w),
-                  InkWell(
-                    onTap: _openAiChat,
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 8.w,
-                        vertical: 4.h,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColor.primaryColor(
-                          context,
-                        ).withValues(alpha: 0.08),
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                      child: Row(
-                        children: [
-                          Text(
-                            'Ask AI',
-                            style: TextStyle(
-                              fontSize: 10.sp,
-                              fontWeight: FontWeight.bold,
-                              color: AppColor.titleFormFiledColor(context),
-                            ),
-                          ),
-                          Gap(3.w),
-                          Icon(
-                            Icons.arrow_forward_rounded,
-                            size: 11.r,
-                            color: AppColor.titleFormFiledColor(context),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              Gap(10.h),
-              Text(
-                AppLocaleKey.aiExecutiveInsightBody.tr(),
-                style: TextStyle(
-                  fontSize: 11.sp,
-                  height: 1.5,
-                  color: AppColor.darkTextColor(context),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  // ─────────────────────────────────────────────────────────────────────────
-  // KPI Grid
-  // ─────────────────────────────────────────────────────────────────────────
-  Widget _buildKpiGrid() {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w),
-      child: GridView.count(
-        crossAxisCount: 2,
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        crossAxisSpacing: 12.w,
-        mainAxisSpacing: 12.h,
-        childAspectRatio: 0.85,
-        children: [
-          ReportsKpiCardWidget(
-            title: AppLocaleKey.kpiTotalRevenue.tr(),
-            value: 'SAR 1.39M',
-            change: '+18.4%',
-            isPositive: true,
-            icon: Icons.payments_outlined,
-            gradient: [AppColor.emeraldTeal, AppColor.mintTeal],
-            sparklineData: const [20, 30, 45, 40, 65, 75, 90],
-          ),
-          ReportsKpiCardWidget(
-            title: AppLocaleKey.kpiNetProfit.tr(),
-            value: 'SAR 345K',
-            change: '+24.8%',
-            isPositive: true,
-            icon: Icons.trending_up_rounded,
-            gradient: [AppColor.purpleAccent, const Color(0xFFA29BFE)],
-            sparklineData: const [15, 25, 20, 40, 50, 60, 85],
-          ),
-          ReportsKpiCardWidget(
-            title: AppLocaleKey.kpiOperatingExpenses.tr(),
-            value: 'SAR 602K',
-            change: '-6.2%',
-            isPositive: true,
-            icon: Icons.receipt_long_rounded,
-            gradient: [const Color(0xFFFF7675), const Color(0xFFE84393)],
-            sparklineData: const [80, 75, 70, 65, 60, 58, 55],
-          ),
-          ReportsKpiCardWidget(
-            title: AppLocaleKey.kpiCashFlow.tr(),
-            value: 'SAR +444K',
-            change: '+12.1%',
-            isPositive: true,
-            icon: Icons.account_balance_wallet_outlined,
-            gradient: [AppColor.oceanBlue, AppColor.skyBlue],
-            sparklineData: const [30, 35, 45, 50, 60, 70, 80],
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ─────────────────────────────────────────────────────────────────────────
-  // Search Bar
-  // ─────────────────────────────────────────────────────────────────────────
-  Widget _buildSearchBar() {
-    final hasSearchText = _searchController.text.isNotEmpty;
-    final isFocused = _searchFocusNode.hasFocus;
-    final accent = AppColor.primaryColor(context);
-
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        decoration: BoxDecoration(
-          color: AppColor.cardColor(context),
-          borderRadius: BorderRadius.circular(18.r),
-          border: Border.all(
-            color: hasSearchText || isFocused
-                ? accent.withValues(alpha: 0.55)
-                : AppColor.borderColor(context),
-            width: isFocused ? 1.4 : 1,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: accent.withValues(alpha: isFocused ? 0.12 : 0.04),
-              blurRadius: isFocused ? 18 : 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: TextField(
-          controller: _searchController,
-          focusNode: _searchFocusNode,
-          onChanged: _onSearchChanged,
-          onSubmitted: (value) => _applySearch(value),
-          textInputAction: TextInputAction.search,
-          style: TextStyle(
-            color: AppColor.titleFormFiledColor(context),
-            fontSize: 13.sp,
-            fontWeight: FontWeight.w500,
-          ),
-          decoration: InputDecoration(
-            hintText: AppLocaleKey.searchReports.tr(),
-            hintStyle: TextStyle(
-              color: AppColor.darkTextColor(context),
-              fontSize: 12.sp,
-            ),
-            prefixIcon: Container(
-              margin: EdgeInsets.all(7.r),
-              decoration: BoxDecoration(
-                color: accent.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(10.r),
-              ),
-              child: Icon(Icons.search_rounded, color: accent, size: 20.r),
-            ),
-            suffixIcon: hasSearchText
-                ? IconButton(
-                    tooltip: AppLocaleKey.clearSearch.tr(),
-                    icon: Icon(
-                      Icons.close_rounded,
-                      color: AppColor.darkTextColor(context),
-                      size: 18.r,
-                    ),
-                    onPressed: _clearSearch,
-                  )
-                : Icon(
-                    Icons.tune_rounded,
-                    color: AppColor.darkTextColor(
-                      context,
-                    ).withValues(alpha: 0.55),
-                    size: 18.r,
-                  ),
-            border: InputBorder.none,
-            contentPadding: EdgeInsets.symmetric(
-              horizontal: 14.w,
-              vertical: 14.h,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  bool get _hasSearch => _searchQuery.trim().isNotEmpty;
-
-  Widget _buildSearchMeta(int resultCount) {
-    if (_hasSearch) {
-      final accent = AppColor.primaryColor(context);
-      return Padding(
-        padding: EdgeInsets.fromLTRB(16.w, 10.h, 16.w, 0),
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-          decoration: BoxDecoration(
-            color: accent.withValues(alpha: 0.06),
-            borderRadius: BorderRadius.circular(13.r),
-            border: Border.all(color: accent.withValues(alpha: 0.14)),
-          ),
-          child: Row(
-            children: [
-              Icon(Icons.search_rounded, size: 15.r, color: accent),
-              Gap(7.w),
-              Expanded(
-                child: Text(
-                  '${AppLocaleKey.searchResultsFor.tr()} "$_searchQuery" • $resultCount',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 11.sp,
-                    fontWeight: FontWeight.w600,
-                    color: AppColor.titleFormFiledColor(context),
-                  ),
-                ),
-              ),
-              InkWell(
-                onTap: _clearSearch,
-                borderRadius: BorderRadius.circular(8.r),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 3.h),
-                  child: Text(
-                    AppLocaleKey.clearSearch.tr(),
-                    style: TextStyle(
-                      fontSize: 10.5.sp,
-                      fontWeight: FontWeight.bold,
-                      color: accent,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    final quickSearches = [
-      'AGL001',
-      'AGL055',
-      'AGL003',
-      'AGL008',
-      AppLocaleKey.tabTax.tr(),
-    ];
-
-    return Padding(
-      padding: EdgeInsets.fromLTRB(16.w, 10.h, 0, 0),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: [
-            Icon(Icons.bolt_rounded, size: 15.r, color: AppColor.warningOrange),
-            Gap(5.w),
-            Text(
-              AppLocaleKey.quickSearch.tr(),
-              style: TextStyle(
-                fontSize: 10.5.sp,
-                fontWeight: FontWeight.w600,
-                color: AppColor.darkTextColor(context),
-              ),
-            ),
-            Gap(8.w),
-            ...quickSearches.map(_buildQuickSearchChip),
-            Gap(16.w),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildQuickSearchChip(String label) {
-    return Padding(
-      padding: EdgeInsets.only(right: 6.w),
-      child: InkWell(
-        onTap: () => _applySearch(label),
-        borderRadius: BorderRadius.circular(10.r),
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 9.w, vertical: 5.h),
-          decoration: BoxDecoration(
-            color: AppColor.cardColor(context),
-            borderRadius: BorderRadius.circular(10.r),
-            border: Border.all(color: AppColor.borderColor(context)),
-          ),
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 9.5.sp,
-              fontFamily: 'monospace',
-              fontWeight: FontWeight.w600,
-              color: AppColor.darkTextColor(context),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  // ─────────────────────────────────────────────────────────────────────────
-  // Category Chips
-  // ─────────────────────────────────────────────────────────────────────────
-  Widget _buildCategoryChips(
-    List<String> categoryTabs,
-    List<int> categoryCounts,
-  ) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      padding: EdgeInsets.symmetric(horizontal: 16.w),
-      child: Row(
-        children: List.generate(categoryTabs.length, (index) {
-          final isSelected = _selectedCategoryTab == index;
-          final count = categoryCounts[index];
-          return Padding(
-            padding: EdgeInsets.only(right: 8.w),
-            child: InkWell(
-              onTap: () => setState(() => _selectedCategoryTab = index),
-              borderRadius: BorderRadius.circular(16.r),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-                decoration: BoxDecoration(
-                  gradient: isSelected
-                      ? LinearGradient(
-                          colors: [
-                            AppColor.primaryColor(context),
-                            AppColor.oceanBlue,
-                          ],
-                        )
-                      : null,
-                  color: isSelected ? null : AppColor.cardColor(context),
-                  borderRadius: BorderRadius.circular(16.r),
-                  border: Border.all(
-                    color: isSelected
-                        ? AppColor.primaryColor(context)
-                        : AppColor.borderColor(context),
-                  ),
-                  boxShadow: isSelected
-                      ? [
-                          BoxShadow(
-                            color: AppColor.primaryColor(
-                              context,
-                            ).withValues(alpha: 0.28),
-                            blurRadius: 10,
-                            offset: const Offset(0, 3),
-                          ),
-                        ]
-                      : null,
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      categoryTabs[index],
-                      style: TextStyle(
-                        fontSize: 11.5.sp,
-                        fontWeight: isSelected
-                            ? FontWeight.bold
-                            : FontWeight.w500,
-                        color: isSelected
-                            ? AppColor.whiteColor(context)
-                            : AppColor.titleFormFiledColor(context),
-                      ),
-                    ),
-                    Gap(6.w),
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 5.w,
-                        vertical: 1.h,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? AppColor.whiteColor(context).withValues(alpha: 0.2)
-                            : AppColor.primaryColor(
-                                context,
-                              ).withValues(alpha: 0.08),
-                        borderRadius: BorderRadius.circular(7.r),
-                      ),
-                      child: Text(
-                        '$count',
-                        style: TextStyle(
-                          fontSize: 9.sp,
-                          fontWeight: FontWeight.bold,
-                          color: isSelected
-                              ? AppColor.whiteColor(context)
-                              : AppColor.darkTextColor(context),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        }),
-      ),
-    );
-  }
-  // ─────────────────────────────────────────────────────────────────────────
   // Statements List
   // ─────────────────────────────────────────────────────────────────────────
   Widget _buildStatementsList(
@@ -2459,185 +1571,80 @@ class _ReportsScreenState extends State<ReportsScreen> {
     List<String> categoryTabs,
   ) {
     if (filteredStatements.isEmpty) {
-      final isAr = context.locale.languageCode == 'ar';
-
-      return Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 28.h),
-        child: Container(
-          width: double.infinity,
-          padding: EdgeInsets.all(28.r),
-          decoration: BoxDecoration(
-            color: AppColor.cardColor(context),
-            borderRadius: BorderRadius.circular(20.r),
-            border: Border.all(color: AppColor.borderColor(context)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.03),
-                blurRadius: 14,
-                offset: const Offset(0, 5),
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: EdgeInsets.all(16.r),
-                decoration: BoxDecoration(
-                  color: AppColor.primaryColor(context).withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: AppColor.primaryColor(
-                      context,
-                    ).withValues(alpha: 0.16),
-                  ),
-                ),
-                child: Icon(
-                  Icons.search_off_rounded,
-                  size: 32.r,
-                  color: AppColor.primaryColor(context),
-                ),
-              ),
-              Gap(14.h),
-              Text(
-                _hasSearch
-                    ? (isAr
-                          ? 'لا توجد نتائج لـ "$_searchQuery"'
-                          : 'No results for "$_searchQuery"')
-                    : (isAr
-                          ? 'لا توجد تقارير في هذا القسم'
-                          : 'No reports in this section'),
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 13.5.sp,
-                  fontWeight: FontWeight.bold,
-                  color: AppColor.titleFormFiledColor(context),
-                ),
-              ),
-              Gap(6.h),
-              Text(
-                _hasSearch
-                    ? (isAr
-                          ? 'جرّب البحث برقم التقرير أو باسم آخر، أو امسح البحث لعرض كل التقارير'
-                          : 'Try a report code or another keyword, or clear the search to view all reports')
-                    : (isAr
-                          ? 'اختر قسماً آخر أو اعرض كل التقارير'
-                          : 'Select another category or view all reports'),
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 11.sp,
-                  height: 1.5,
-                  color: AppColor.darkTextColor(context),
-                ),
-              ),
-              Gap(14.h),
-              InkWell(
-                onTap: () {
-                  if (_hasSearch) {
-                    _clearSearch();
-                  } else {
-                    setState(() => _selectedCategoryTab = 0);
-                  }
-                },
-                borderRadius: BorderRadius.circular(12.r),
-                child: Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 16.w,
-                    vertical: 8.h,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColor.primaryColor(
-                      context,
-                    ).withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12.r),
-                    border: Border.all(
-                      color: AppColor.primaryColor(
-                        context,
-                      ).withValues(alpha: 0.2),
-                    ),
-                  ),
-                  child: Text(
-                    _hasSearch
-                        ? AppLocaleKey.clearSearch.tr()
-                        : AppLocaleKey.allReports.tr(),
-                    style: TextStyle(
-                      fontSize: 11.5.sp,
-                      fontWeight: FontWeight.bold,
-                      color: AppColor.primaryColor(context),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
+      return SliverToBoxAdapter(
+        child: ReportsEmptyStateWidget(
+          query: _searchQuery,
+          onClearSearch: _clearSearch,
+          onShowAllReports: () {
+            setState(() => _selectedCategoryTab = 0);
+          },
         ),
       );
     }
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w),
-      child: ListView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: filteredStatements.length,
-        itemBuilder: (context, index) {
-          final st = filteredStatements[index];
-          final title = st['title'] as String;
-          final description = st['desc'] as String;
-          final amount = st['amount'] as String? ?? '';
-          final date = st['date'] as String? ?? '';
-          final status = st['status'] as String;
-          final code = st['reportName'] as String? ?? '';
-          final category = categoryTabs[st['category'] as int];
-          Future<void> exportReport(String exportType) => _handleExportReport(
+
+    return ReportsStatementsSliverWidget(
+      itemCount: filteredStatements.length,
+      itemBuilder: (context, index) {
+        final statement = filteredStatements[index];
+        final title = statement['title'] as String;
+        final description = statement['desc'] as String;
+        final amount = statement['amount'] as String? ?? '';
+        final date = statement['date'] as String? ?? '';
+        final status = statement['status'] as String;
+        final code = statement['reportName'] as String? ?? '';
+        final category = categoryTabs[statement['category'] as int];
+
+        Future<void> exportReport(String exportType) => _handleExportReport(
+          title: title,
+          description: description,
+          amount: amount,
+          date: date,
+          status: status,
+          exportType: exportType,
+          reportName: statement['reportName'] as String?,
+          isApiReport: statement['isApiReport'] == true,
+          isIncomeAndExpenseSituationReport:
+              statement['isIncomeAndExpenseSituationReport'] == true,
+          isDailyIncomeAndExpenseReport:
+              statement['isDailyIncomeAndExpenseReport'] == true,
+          isExpensesWithVatReport: statement['isExpensesWithVatReport'] == true,
+          isSalesWithVatReport: statement['isSalesWithVatReport'] == true,
+          isPurchasesWithVatReport:
+              statement['isPurchasesWithVatReport'] == true,
+          isLedgerReport: statement['isLedgerReport'] == true,
+          isAccountStatementReport:
+              statement['isAccountStatementReport'] == true,
+          isTrialBalanceByCategoriesReport:
+              statement['isTrialBalanceByCategoriesReport'] == true,
+          isFinancialStatementsReport:
+              statement['isFinancialStatementsReport'] == true,
+          isCostCentersReport: statement['isCostCentersReport'] == true,
+          isCostCentersProjectsReport:
+              statement['isCostCentersProjectsReport'] == true,
+          isMonthlyAccountComparisonReport:
+              statement['isMonthlyAccountComparisonReport'] == true,
+          isMonthlyCostCentersComparisonReport:
+              statement['isMonthlyCostCentersComparisonReport'] == true,
+        );
+
+        return FadeInUp(
+          delay: Duration(milliseconds: 40 * index.clamp(0, 5)),
+          child: ReportsTableItemWidget(
             title: title,
             description: description,
             amount: amount,
             date: date,
             status: status,
-            exportType: exportType,
-            reportName: st['reportName'] as String?,
-            isApiReport: st['isApiReport'] == true,
-            isIncomeAndExpenseSituationReport:
-                st['isIncomeAndExpenseSituationReport'] == true,
-            isDailyIncomeAndExpenseReport:
-                st['isDailyIncomeAndExpenseReport'] == true,
-            isExpensesWithVatReport: st['isExpensesWithVatReport'] == true,
-            isSalesWithVatReport: st['isSalesWithVatReport'] == true,
-            isPurchasesWithVatReport: st['isPurchasesWithVatReport'] == true,
-            isLedgerReport: st['isLedgerReport'] == true,
-            isAccountStatementReport: st['isAccountStatementReport'] == true,
-            isTrialBalanceByCategoriesReport:
-                st['isTrialBalanceByCategoriesReport'] == true,
-            isFinancialStatementsReport:
-                st['isFinancialStatementsReport'] == true,
-            isCostCentersReport: st['isCostCentersReport'] == true,
-            isCostCentersProjectsReport:
-                st['isCostCentersProjectsReport'] == true,
-            isMonthlyAccountComparisonReport:
-                st['isMonthlyAccountComparisonReport'] == true,
-            isMonthlyCostCentersComparisonReport:
-                st['isMonthlyCostCentersComparisonReport'] == true,
-          );
-          return FadeInUp(
-            delay: Duration(milliseconds: 60 * index),
-            child: ReportsTableItemWidget(
-              title: title,
-              description: description,
-              amount: amount,
-              date: date,
-              status: status,
-              icon: st['icon'] as IconData,
-              iconColor: st['iconColor'] as Color,
-              reportCode: code.isEmpty ? null : code,
-              categoryLabel: category,
-              searchQuery: _searchQuery,
-              // ── ربط المعاينة داخل الصفحة نفسها ──
-              onExportPdf: () => exportReport('pdf'),
-              onExportFormat: exportReport,
-            ),
-          );
-        },
-      ),
+            icon: statement['icon'] as IconData,
+            iconColor: statement['iconColor'] as Color,
+            reportCode: code.isEmpty ? null : code,
+            categoryLabel: category,
+            searchQuery: _searchQuery,
+            onExportPdf: () => exportReport('pdf'),
+            onExportFormat: exportReport,
+          ),
+        );
+      },
     );
   }
 }

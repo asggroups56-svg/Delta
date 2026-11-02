@@ -1,3 +1,3 @@
 class Constants {
-  static const String baseUrl = 'https://asg-delta.com:5001/';
+  static const String baseUrl = 'https://delta-icloud.com:5001/';
 }

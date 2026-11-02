@@ -5,6 +5,7 @@ import 'package:gap/gap.dart';
 import 'package:my_template/core/cache/shared_pref/shared_pref.dart';
 import 'package:my_template/core/routes/routes_name.dart';
 import 'package:my_template/core/theme/app_colors.dart';
+import 'package:my_template/core/theme/app_text_style.dart';
 import 'package:my_template/core/utils/app_locale_key.dart';
 import 'package:my_template/core/utils/navigator_methods.dart';
 import 'package:my_template/features/home/presentation/view/widget/ai_chat_bottom_sheet_widget.dart';
@@ -209,7 +210,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     Text(
                       AppLocaleKey.mainModules.tr(),
-                      style: TextStyle(
+                      style: AppTextStyle.bodyMedium(context).copyWith(
                         fontSize: 15.sp,
                         fontWeight: FontWeight.w800,
                         color: AppColor.titleFormFiledColor(context),
@@ -229,7 +230,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       child: Text(
                         '${gridModules.length} Modules',
-                        style: TextStyle(
+                        style: AppTextStyle.bodySmall(context).copyWith(
                           fontSize: 10.sp,
                           color: AppColor.primaryColor(context),
                           fontWeight: FontWeight.w700,

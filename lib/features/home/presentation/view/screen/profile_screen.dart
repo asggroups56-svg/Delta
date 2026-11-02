@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:my_template/core/theme/app_colors.dart';
+import 'package:my_template/core/theme/app_text_style.dart';
 import 'package:my_template/core/theme/cubit/app_theme_cubit.dart';
 import 'package:my_template/core/theme/theme_enum.dart';
 import 'package:my_template/core/utils/app_locale_key.dart';
@@ -312,7 +313,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     backgroundColor: AppColor.cardSurfaceColor(context),
                     child: Text(
                       'A',
-                      style: TextStyle(
+                      style: AppTextStyle.bodyLarge(context).copyWith(
                         fontSize: 28.sp,
                         fontWeight: FontWeight.w800,
                         color: AppColor.titleFormFiledColor(context),
@@ -346,7 +347,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             duration: const Duration(milliseconds: 400),
             child: Text(
               'Ahmed Al-Rashidi',
-              style: TextStyle(
+              style: AppTextStyle.bodyLarge(context).copyWith(
                 fontSize: 18.sp,
                 fontWeight: FontWeight.w800,
                 color: AppColor.titleFormFiledColor(context),
@@ -373,7 +374,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Gap(5.w),
                 Text(
                   'System Administrator · Delta Enterprise',
-                  style: TextStyle(
+                  style: AppTextStyle.bodySmall(context).copyWith(
                     fontSize: 11.sp,
                     color: AppColor.darkTextColor(context),
                     fontFamily: 'Tajawal',
@@ -406,7 +407,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Gap(5.w),
                   Text(
                     'Enterprise License · Active',
-                    style: TextStyle(
+                    style: AppTextStyle.text10SDark(context).copyWith(
                       fontSize: 10.sp,
                       color: AppColor.emeraldTeal,
                       fontWeight: FontWeight.w600,
@@ -453,7 +454,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [
             Text(
               value,
-              style: TextStyle(
+              style: AppTextStyle.bodyLarge(context).copyWith(
                 fontSize: 16.sp,
                 fontWeight: FontWeight.w800,
                 color: color,
@@ -464,7 +465,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Gap(2.h),
             Text(
               label,
-              style: TextStyle(
+              style: AppTextStyle.bodySmall(context).copyWith(
                 fontSize: 10.sp,
                 color: AppColor.darkTextColor(context),
                 fontFamily: 'Tajawal',
@@ -484,7 +485,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         Gap(6.w),
         Text(
           title,
-          style: TextStyle(
+          style: AppTextStyle.bodySmall(context).copyWith(
             fontSize: 12.sp,
             fontWeight: FontWeight.w700,
             color: AppColor.darkTextColor(context),
@@ -544,7 +545,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 Text(
                   title,
-                  style: TextStyle(
+                  style: AppTextStyle.bodySmall(context).copyWith(
                     fontSize: 13.sp,
                     fontWeight: FontWeight.w600,
                     color: AppColor.titleFormFiledColor(context),
@@ -553,7 +554,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 Text(
                   subtitle,
-                  style: TextStyle(
+                  style: AppTextStyle.bodySmall(context).copyWith(
                     fontSize: 10.5.sp,
                     color: AppColor.darkTextColor(context),
                     fontFamily: 'Tajawal',
@@ -596,7 +597,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 Text(
                   title,
-                  style: TextStyle(
+                  style: AppTextStyle.bodySmall(context).copyWith(
                     fontSize: 13.sp,
                     fontWeight: FontWeight.w600,
                     color: AppColor.titleFormFiledColor(context),
@@ -605,7 +606,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 Text(
                   subtitle,
-                  style: TextStyle(
+                  style: AppTextStyle.bodySmall(context).copyWith(
                     fontSize: 10.5.sp,
                     color: AppColor.darkTextColor(context),
                     fontFamily: 'Tajawal',
@@ -660,7 +661,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 children: [
                   Text(
                     title,
-                    style: TextStyle(
+                    style: AppTextStyle.bodySmall(context).copyWith(
                       fontSize: 13.sp,
                       fontWeight: FontWeight.w600,
                       color: AppColor.titleFormFiledColor(context),
@@ -669,7 +670,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   Text(
                     subtitle,
-                    style: TextStyle(
+                    style: AppTextStyle.bodySmall(context).copyWith(
                       fontSize: 10.5.sp,
                       color: AppColor.darkTextColor(context),
                       fontFamily: 'Tajawal',
@@ -699,7 +700,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       child: Text(
         label,
-        style: TextStyle(
+        style: AppTextStyle.bodySmall(context).copyWith(
           fontSize: 9.5.sp,
           fontWeight: FontWeight.w700,
           color: color,
@@ -759,7 +760,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 children: [
                   Text(
                     'AI Executive Assistant',
-                    style: TextStyle(
+                    style: AppTextStyle.bodyMedium(context).copyWith(
                       fontSize: 13.sp,
                       fontWeight: FontWeight.w700,
                       color: AppColor.titleFormFiledColor(context),
@@ -768,7 +769,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   Text(
                     'Ask anything about your business data',
-                    style: TextStyle(
+                    style: AppTextStyle.bodySmall(context).copyWith(
                       fontSize: 10.5.sp,
                       color: AppColor.darkTextColor(context),
                       fontFamily: 'Tajawal',
@@ -788,7 +789,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               child: Text(
                 'Open',
-                style: TextStyle(
+                style: AppTextStyle.bodySmall(context).copyWith(
                   fontSize: 11.sp,
                   fontWeight: FontWeight.w700,
                   color: AppColor.purpleAccent,
@@ -827,7 +828,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Gap(8.w),
             Text(
               AppLocaleKey.logout.tr(),
-              style: TextStyle(
+              style: AppTextStyle.bodySmall(context).copyWith(
                 fontSize: 14.sp,
                 fontWeight: FontWeight.w700,
                 color: const Color(0xFFFF7675),
