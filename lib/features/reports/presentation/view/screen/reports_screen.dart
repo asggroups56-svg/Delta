@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:animate_do/animate_do.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -50,8 +49,6 @@ class ReportsScreen extends StatefulWidget {
 
 class _ReportsScreenState extends State<ReportsScreen> {
   // ── State ────────────────────────────────────────────────────────────────
-  int _selectedCategoryTab = 0;
-
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
   Timer? _searchDebounce;
@@ -87,9 +84,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
 
   void _onSearchChanged(String value) {
     _searchDebounce?.cancel();
-    if (value.trim().isNotEmpty && _selectedCategoryTab != 0) {
-      setState(() => _selectedCategoryTab = 0);
-    }
     _searchDebounce = Timer(const Duration(milliseconds: 180), () {
       if (!mounted) return;
       setState(() => _searchQuery = value.trim());
@@ -103,7 +97,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
       ..selection = TextSelection.collapsed(offset: value.length);
     setState(() {
       _searchQuery = value.trim();
-      _selectedCategoryTab = 0;
     });
   }
 
@@ -1396,8 +1389,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
     final normalizedQuery = _normalizeSearchText(_searchQuery);
     final filteredStatements = statements.where((item) {
       if (normalizedQuery.isEmpty) {
-        return _selectedCategoryTab == 0 ||
-            item['category'] == _selectedCategoryTab;
+        return true;
       }
 
       final title = _normalizeSearchText(item['title'] as String);
@@ -1412,11 +1404,9 @@ class _ReportsScreenState extends State<ReportsScreen> {
           category.contains(normalizedQuery);
     }).toList();
 
-    final categoryCounts = List<int>.generate(
-      categoryTabs.length,
-      (index) => statements
-          .where((item) => index == 0 || item['category'] == index)
-          .length,
+    final visibleSections = _buildCategorySections(
+      filteredStatements,
+      categoryTabs,
     );
 
     return Scaffold(
@@ -1427,7 +1417,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
           slivers: [
             SliverToBoxAdapter(
               child: ReportsPageHeaderWidget(
-                reportCount: statements.length,
                 onExport: _showExportModal,
                 onToggleLanguage: _toggleLanguage,
               ),
@@ -1439,6 +1428,9 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 controller: _searchController,
                 focusNode: _searchFocusNode,
                 isFocused: _searchFocusNode.hasFocus,
+                hintText: context.locale.languageCode == 'ar'
+                    ? 'ابحث في ${statements.length} تقرير...'
+                    : 'Search ${statements.length} reports...',
                 onChanged: _onSearchChanged,
                 onSubmitted: _applySearch,
                 onClear: _clearSearch,
@@ -1450,19 +1442,21 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 resultCount: filteredStatements.length,
               ),
             ),
-            SliverToBoxAdapter(child: Gap(12.h)),
-            SliverToBoxAdapter(
-              child: ReportsCategoryFiltersWidget(
-                categories: categoryTabs,
-                counts: categoryCounts,
-                selectedIndex: _selectedCategoryTab,
-                onSelected: (index) {
-                  setState(() => _selectedCategoryTab = index);
-                },
+            SliverToBoxAdapter(child: Gap(8.h)),
+            if (visibleSections.isEmpty)
+              SliverToBoxAdapter(
+                child: ReportsEmptyStateWidget(
+                  query: _searchQuery,
+                  onClearSearch: _clearSearch,
+                  onShowAllReports: _clearSearch,
+                ),
+              )
+            else
+              ReportsCategoryAccordionListWidget(
+                sections: visibleSections,
+                searchQuery: _searchQuery,
+                reportBuilder: _buildReportItem,
               ),
-            ),
-            SliverToBoxAdapter(child: Gap(16.h)),
-            _buildStatementsList(filteredStatements, categoryTabs),
             SliverToBoxAdapter(child: Gap(100.h)),
           ],
         ),
@@ -1566,85 +1560,96 @@ class _ReportsScreenState extends State<ReportsScreen> {
   // ─────────────────────────────────────────────────────────────────────────
   // Statements List
   // ─────────────────────────────────────────────────────────────────────────
-  Widget _buildStatementsList(
+  List<ReportsCategorySectionData> _buildCategorySections(
     List<Map<String, dynamic>> filteredStatements,
     List<String> categoryTabs,
   ) {
-    if (filteredStatements.isEmpty) {
-      return SliverToBoxAdapter(
-        child: ReportsEmptyStateWidget(
-          query: _searchQuery,
-          onClearSearch: _clearSearch,
-          onShowAllReports: () {
-            setState(() => _selectedCategoryTab = 0);
-          },
+    final sections = <ReportsCategorySectionData>[];
+
+    for (
+      var categoryIndex = 1;
+      categoryIndex < categoryTabs.length;
+      categoryIndex++
+    ) {
+      final categoryReports = filteredStatements
+          .where((statement) => statement['category'] == categoryIndex)
+          .toList();
+      if (categoryReports.isEmpty) continue;
+
+      sections.add(
+        ReportsCategorySectionData(
+          id: categoryIndex,
+          title: categoryTabs[categoryIndex],
+          icon: _categoryIcon(categoryIndex),
+          accentColor: _categoryColor(categoryIndex),
+          reports: categoryReports,
         ),
       );
     }
 
-    return ReportsStatementsSliverWidget(
-      itemCount: filteredStatements.length,
-      itemBuilder: (context, index) {
-        final statement = filteredStatements[index];
-        final title = statement['title'] as String;
-        final description = statement['desc'] as String;
-        final amount = statement['amount'] as String? ?? '';
-        final date = statement['date'] as String? ?? '';
-        final status = statement['status'] as String;
-        final code = statement['reportName'] as String? ?? '';
-        final category = categoryTabs[statement['category'] as int];
+    return sections;
+  }
 
-        Future<void> exportReport(String exportType) => _handleExportReport(
-          title: title,
-          description: description,
-          amount: amount,
-          date: date,
-          status: status,
-          exportType: exportType,
-          reportName: statement['reportName'] as String?,
-          isApiReport: statement['isApiReport'] == true,
-          isIncomeAndExpenseSituationReport:
-              statement['isIncomeAndExpenseSituationReport'] == true,
-          isDailyIncomeAndExpenseReport:
-              statement['isDailyIncomeAndExpenseReport'] == true,
-          isExpensesWithVatReport: statement['isExpensesWithVatReport'] == true,
-          isSalesWithVatReport: statement['isSalesWithVatReport'] == true,
-          isPurchasesWithVatReport:
-              statement['isPurchasesWithVatReport'] == true,
-          isLedgerReport: statement['isLedgerReport'] == true,
-          isAccountStatementReport:
-              statement['isAccountStatementReport'] == true,
-          isTrialBalanceByCategoriesReport:
-              statement['isTrialBalanceByCategoriesReport'] == true,
-          isFinancialStatementsReport:
-              statement['isFinancialStatementsReport'] == true,
-          isCostCentersReport: statement['isCostCentersReport'] == true,
-          isCostCentersProjectsReport:
-              statement['isCostCentersProjectsReport'] == true,
-          isMonthlyAccountComparisonReport:
-              statement['isMonthlyAccountComparisonReport'] == true,
-          isMonthlyCostCentersComparisonReport:
-              statement['isMonthlyCostCentersComparisonReport'] == true,
-        );
+  IconData _categoryIcon(int categoryIndex) => switch (categoryIndex) {
+    1 => Icons.account_balance_rounded,
+    2 => Icons.storefront_rounded,
+    3 => Icons.inventory_2_rounded,
+    4 => Icons.receipt_long_rounded,
+    _ => Icons.folder_outlined,
+  };
 
-        return FadeInUp(
-          delay: Duration(milliseconds: 40 * index.clamp(0, 5)),
-          child: ReportsTableItemWidget(
-            title: title,
-            description: description,
-            amount: amount,
-            date: date,
-            status: status,
-            icon: statement['icon'] as IconData,
-            iconColor: statement['iconColor'] as Color,
-            reportCode: code.isEmpty ? null : code,
-            categoryLabel: category,
-            searchQuery: _searchQuery,
-            onExportPdf: () => exportReport('pdf'),
-            onExportFormat: exportReport,
-          ),
-        );
-      },
+  Color _categoryColor(int categoryIndex) => switch (categoryIndex) {
+    1 => AppColor.oceanBlue,
+    2 => AppColor.emeraldTeal,
+    3 => AppColor.purpleAccent,
+    4 => AppColor.warningOrange,
+    _ => AppColor.primaryColor(context),
+  };
+
+  Widget _buildReportItem(Map<String, dynamic> statement) {
+    final title = statement['title'] as String;
+    final description = statement['desc'] as String;
+    final amount = statement['amount'] as String? ?? '';
+    final date = statement['date'] as String? ?? '';
+    final status = statement['status'] as String;
+    final code = statement['reportName'] as String? ?? '';
+    Future<void> exportReport(String exportType) => _handleExportReport(
+      title: title,
+      description: description,
+      amount: amount,
+      date: date,
+      status: status,
+      exportType: exportType,
+      reportName: statement['reportName'] as String?,
+      isApiReport: statement['isApiReport'] == true,
+      isIncomeAndExpenseSituationReport:
+          statement['isIncomeAndExpenseSituationReport'] == true,
+      isDailyIncomeAndExpenseReport:
+          statement['isDailyIncomeAndExpenseReport'] == true,
+      isExpensesWithVatReport: statement['isExpensesWithVatReport'] == true,
+      isSalesWithVatReport: statement['isSalesWithVatReport'] == true,
+      isPurchasesWithVatReport: statement['isPurchasesWithVatReport'] == true,
+      isLedgerReport: statement['isLedgerReport'] == true,
+      isAccountStatementReport: statement['isAccountStatementReport'] == true,
+      isTrialBalanceByCategoriesReport:
+          statement['isTrialBalanceByCategoriesReport'] == true,
+      isFinancialStatementsReport:
+          statement['isFinancialStatementsReport'] == true,
+      isCostCentersReport: statement['isCostCentersReport'] == true,
+      isCostCentersProjectsReport:
+          statement['isCostCentersProjectsReport'] == true,
+      isMonthlyAccountComparisonReport:
+          statement['isMonthlyAccountComparisonReport'] == true,
+      isMonthlyCostCentersComparisonReport:
+          statement['isMonthlyCostCentersComparisonReport'] == true,
+    );
+
+    return ReportsTableItemWidget(
+      title: title,
+      reportCode: code.isEmpty ? null : code,
+      searchQuery: _searchQuery,
+      onExportPdf: () => exportReport('pdf'),
+      onExportFormat: exportReport,
     );
   }
 }
