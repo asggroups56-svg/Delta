@@ -17,8 +17,16 @@ class EndPoints {
   static const String trialBalanceByCategoriesReport =
       'Report/TrialBalanceByCategoriesReport';
   static const String costCentersReport = 'Report/CostCentersReport';
+  static const String centersMonthlyBalanceReport =
+      'Report/CentersMonthlyBalanceReport';
+  static const String costCentersTransactionReport =
+      'Report/CostCentersTransactionReport';
+  static const String costCentersTransactionAnnualReport =
+      'Report/CostCentersTransactionAnnualReport';
   static const String costCentersProjectsReport =
       'Report/CostCentersProjectsReport';
+  static const String accountCentersSummaryForMainAccountsReport =
+      'Report/AccountCentersSummaryForMainAccountsReport';
   static const String accountStatementReport = 'Report/AccountStatementReport';
   static const String salesWithVatReport = 'Report/SalesWithVatReport';
   static const String purchasesWithVatReport = 'Report/PurchasesWithVatReport';

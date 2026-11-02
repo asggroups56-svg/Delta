@@ -21,8 +21,8 @@ class CostCentersProjectsReportRequestModel {
     return {
       'FromCostCenterNo': fromCostCenterNo,
       'ToCostCenterNo': toCostCenterNo,
-      'FromDate': fromDate != null ? formatReportDate(fromDate!) : null,
-      'ToDate': toDate != null ? formatReportDate(toDate!) : null,
+      'FromDate': fromDate != null ? formatReportDateTime(fromDate!) : null,
+      'ToDate': toDate != null ? formatReportDateTime(toDate!) : null,
       'ReportName': reportName,
       'ExportType': exportType,
     };

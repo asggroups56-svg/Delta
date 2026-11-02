@@ -9,10 +9,14 @@ import '../../../../core/error/failures.dart';
 import '../../../../core/network/api_consumer.dart';
 import '../../../../core/network/end_points.dart';
 import '../models/account_statement_report_request_model.dart';
+import '../models/account_centers_summary_for_main_accounts_report_request_model.dart';
 import '../models/chart_of_account_report_request_model.dart';
 import '../models/chart_of_account_monthly_balances_report_request_model.dart';
+import '../models/centers_monthly_balance_report_request_model.dart';
 import '../models/cost_centers_projects_report_request_model.dart';
 import '../models/cost_centers_report_request_model.dart';
+import '../models/cost_centers_transaction_report_request_model.dart';
+import '../models/cost_centers_transaction_annual_report_request_model.dart';
 import '../models/daily_income_and_expense_situation_report_request_model.dart';
 import '../models/expenses_with_vat_report_request_model.dart';
 import '../models/financial_statement_report_request_model.dart';
@@ -119,7 +123,50 @@ abstract interface class ReportsRepo {
   });
 
   Future<Either<Failure, File>> getCostCentersReport({
+    num? fromCostCenterNo,
+    num? toCostCenterNo,
+    int? fromCenterLevel,
+    int? toCenterLevel,
+    DateTime? fromDate,
+    DateTime? toDate,
     required int costCenterType,
+    required String reportName,
+    required String languageCode,
+    String exportType = 'pdf',
+  });
+
+  Future<Either<Failure, File>> getCentersMonthlyBalanceReport({
+    num? fromCostCenterNo,
+    num? toCostCenterNo,
+    int? fromCenterLevel,
+    int? toCenterLevel,
+    int costCenterType = 2,
+    String reportName = 'AGL008A',
+    required String languageCode,
+    String exportType = 'pdf',
+  });
+
+  Future<Either<Failure, File>> getCostCentersTransactionReport({
+    num? fromAccountNo,
+    num? toAccountNo,
+    num? fromCostCenterNo,
+    num? toCostCenterNo,
+    DateTime? fromDate,
+    DateTime? toDate,
+    bool prepareCostCentersTree = false,
+    String reportName = 'AGL028',
+    required String languageCode,
+    String exportType = 'pdf',
+  });
+
+  Future<Either<Failure, File>> getCostCentersTransactionAnnualReport({
+    num? fromAccountNo,
+    num? toAccountNo,
+    num? fromCostCenterNo,
+    num? toCostCenterNo,
+    DateTime? fromDate,
+    DateTime? toDate,
+    String reportName = 'AGL029Y',
     required String languageCode,
     String exportType = 'pdf',
   });
@@ -130,6 +177,18 @@ abstract interface class ReportsRepo {
     DateTime? fromDate,
     DateTime? toDate,
     required String reportName,
+    required String languageCode,
+    String exportType = 'pdf',
+  });
+
+  Future<Either<Failure, File>> getAccountCentersSummaryForMainAccountsReport({
+    num? fromAccountNo,
+    num? toAccountNo,
+    num? fromCostCenterNo,
+    num? toCostCenterNo,
+    DateTime? fromDate,
+    DateTime? toDate,
+    int accountLevel = 1,
     required String languageCode,
     String exportType = 'pdf',
   });
@@ -477,20 +536,139 @@ class ReportsRepoImpl implements ReportsRepo {
 
   @override
   Future<Either<Failure, File>> getCostCentersReport({
+    num? fromCostCenterNo,
+    num? toCostCenterNo,
+    int? fromCenterLevel,
+    int? toCenterLevel,
+    DateTime? fromDate,
+    DateTime? toDate,
     required int costCenterType,
+    required String reportName,
     required String languageCode,
     String exportType = 'pdf',
   }) {
     return handleDioRequest(
       request: () async {
         final requestModel = CostCentersReportRequestModel(
+          fromCostCenterNo: fromCostCenterNo,
+          toCostCenterNo: toCostCenterNo,
+          fromCenterLevel: fromCenterLevel,
+          toCenterLevel: toCenterLevel,
+          fromDate: fromDate,
+          toDate: toDate,
           costCenterType: costCenterType,
+          reportName: reportName,
           exportType: exportType,
         );
         return _downloadReport(
           endpoint: EndPoints.costCentersReport,
           body: requestModel.toJson(),
           fileNamePrefix: 'cost_centers',
+          exportType: requestModel.exportType,
+          headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+        );
+      },
+    );
+  }
+
+  @override
+  Future<Either<Failure, File>> getCentersMonthlyBalanceReport({
+    num? fromCostCenterNo,
+    num? toCostCenterNo,
+    int? fromCenterLevel,
+    int? toCenterLevel,
+    int costCenterType = 2,
+    String reportName = 'AGL008A',
+    required String languageCode,
+    String exportType = 'pdf',
+  }) {
+    return handleDioRequest(
+      request: () async {
+        final requestModel = CentersMonthlyBalanceReportRequestModel(
+          fromCostCenterNo: fromCostCenterNo,
+          toCostCenterNo: toCostCenterNo,
+          fromCenterLevel: fromCenterLevel,
+          toCenterLevel: toCenterLevel,
+          costCenterType: costCenterType,
+          reportName: reportName,
+          exportType: exportType,
+        );
+        return _downloadReport(
+          endpoint: EndPoints.centersMonthlyBalanceReport,
+          body: requestModel.toJson(),
+          fileNamePrefix: 'centers_monthly_balance',
+          exportType: requestModel.exportType,
+          headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+        );
+      },
+    );
+  }
+
+  @override
+  Future<Either<Failure, File>> getCostCentersTransactionReport({
+    num? fromAccountNo,
+    num? toAccountNo,
+    num? fromCostCenterNo,
+    num? toCostCenterNo,
+    DateTime? fromDate,
+    DateTime? toDate,
+    bool prepareCostCentersTree = false,
+    String reportName = 'AGL028',
+    required String languageCode,
+    String exportType = 'pdf',
+  }) {
+    return handleDioRequest(
+      request: () async {
+        final requestModel = CostCentersTransactionReportRequestModel(
+          fromAccountNo: fromAccountNo,
+          toAccountNo: toAccountNo,
+          fromCostCenterNo: fromCostCenterNo,
+          toCostCenterNo: toCostCenterNo,
+          fromDate: fromDate,
+          toDate: toDate,
+          prepareCostCentersTree: prepareCostCentersTree,
+          reportName: reportName,
+          exportType: exportType,
+        );
+        return _downloadReport(
+          endpoint: EndPoints.costCentersTransactionReport,
+          body: requestModel.toJson(),
+          fileNamePrefix: reportName.toLowerCase(),
+          exportType: requestModel.exportType,
+          headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+        );
+      },
+    );
+  }
+
+  @override
+  Future<Either<Failure, File>> getCostCentersTransactionAnnualReport({
+    num? fromAccountNo,
+    num? toAccountNo,
+    num? fromCostCenterNo,
+    num? toCostCenterNo,
+    DateTime? fromDate,
+    DateTime? toDate,
+    String reportName = 'AGL029Y',
+    required String languageCode,
+    String exportType = 'pdf',
+  }) {
+    return handleDioRequest(
+      request: () async {
+        final requestModel = CostCentersTransactionAnnualReportRequestModel(
+          fromAccountNo: fromAccountNo,
+          toAccountNo: toAccountNo,
+          fromCostCenterNo: fromCostCenterNo,
+          toCostCenterNo: toCostCenterNo,
+          fromDate: fromDate,
+          toDate: toDate,
+          reportName: reportName,
+          exportType: exportType,
+        );
+        return _downloadReport(
+          endpoint: EndPoints.costCentersTransactionAnnualReport,
+          body: requestModel.toJson(),
+          fileNamePrefix: reportName.toLowerCase(),
           exportType: requestModel.exportType,
           headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
         );
@@ -522,6 +700,42 @@ class ReportsRepoImpl implements ReportsRepo {
           endpoint: EndPoints.costCentersProjectsReport,
           body: requestModel.toJson(),
           fileNamePrefix: reportName.toLowerCase(),
+          exportType: requestModel.exportType,
+          headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+        );
+      },
+    );
+  }
+
+  @override
+  Future<Either<Failure, File>> getAccountCentersSummaryForMainAccountsReport({
+    num? fromAccountNo,
+    num? toAccountNo,
+    num? fromCostCenterNo,
+    num? toCostCenterNo,
+    DateTime? fromDate,
+    DateTime? toDate,
+    int accountLevel = 1,
+    required String languageCode,
+    String exportType = 'pdf',
+  }) {
+    return handleDioRequest(
+      request: () async {
+        final requestModel =
+            AccountCentersSummaryForMainAccountsReportRequestModel(
+              accountLevel: accountLevel,
+              fromAccountNo: fromAccountNo,
+              toAccountNo: toAccountNo,
+              fromCostCenterNo: fromCostCenterNo,
+              toCostCenterNo: toCostCenterNo,
+              fromDate: fromDate,
+              toDate: toDate,
+              exportType: exportType,
+            );
+        return _downloadReport(
+          endpoint: EndPoints.accountCentersSummaryForMainAccountsReport,
+          body: requestModel.toJson(),
+          fileNamePrefix: 'agl0103',
           exportType: requestModel.exportType,
           headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
         );

@@ -14,9 +14,12 @@ import 'package:my_template/core/utils/common_methods.dart';
 import 'package:my_template/features/reports/data/repository/reports_repo.dart';
 import 'package:my_template/features/reports/presentation/view/widget/file_download_service.dart';
 import 'package:my_template/features/reports/presentation/view/widget/account_statement_filter_bottom_sheet_widget.dart';
+import 'package:my_template/features/reports/presentation/view/widget/account_centers_summary_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/chart_of_account_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/chart_of_account_monthly_balances_filter_bottom_sheet_widget.dart';
+import 'package:my_template/features/reports/presentation/view/widget/cost_centers_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/cost_centers_projects_report_filter_bottom_sheet_widget.dart';
+import 'package:my_template/features/reports/presentation/view/widget/cost_centers_transaction_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/fullscreen_pdf_viewer_screen.dart';
 import 'package:my_template/features/reports/presentation/view/widget/ledger_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/monthly_comparison_report_filter_bottom_sheet_widget.dart';
@@ -168,70 +171,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-
-  Future<int?> _selectCostCenterType() {
-    final options = [
-      (type: 2, label: AppLocaleKey.allCostCenters.tr()),
-      (type: 0, label: AppLocaleKey.mainCostCenters.tr()),
-      (type: 1, label: AppLocaleKey.subCostCenters.tr()),
-    ];
-
-    return showModalBottomSheet<int>(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (sheetContext) => Container(
-        padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 20.h),
-        decoration: BoxDecoration(
-          color: AppColor.cardColor(sheetContext),
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
-          border: Border.all(color: AppColor.borderColor(sheetContext)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Container(
-                width: 40.w,
-                height: 4.h,
-                decoration: BoxDecoration(
-                  color: AppColor.darkTextColor(sheetContext),
-                  borderRadius: BorderRadius.circular(4.r),
-                ),
-              ),
-            ),
-            Gap(16.h),
-            Text(
-              AppLocaleKey.selectCostCenterType.tr(),
-              style: TextStyle(
-                color: AppColor.titleFormFiledColor(sheetContext),
-                fontSize: 16.sp,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Gap(8.h),
-            ...options.map(
-              (option) => ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: Icon(
-                  Icons.account_tree_outlined,
-                  color: AppColor.emeraldTeal,
-                ),
-                title: Text(
-                  option.label,
-                  style: TextStyle(
-                    color: AppColor.titleFormFiledColor(sheetContext),
-                    fontSize: 14.sp,
-                  ),
-                ),
-                onTap: () => Navigator.pop(sheetContext, option.type),
-              ),
-            ),
-          ],
         ),
       ),
     );
@@ -494,6 +433,78 @@ class _ReportsScreenState extends State<ReportsScreen> {
               ),
               Gap(10.h),
               _buildExportOption(
+                icon: Icons.calendar_month_outlined,
+                color: AppColor.emeraldTeal,
+                title: context.locale.languageCode == 'ar'
+                    ? 'الأرصدة الشهرية لمراكز التكلفة'
+                    : 'Cost Centers Monthly Balances',
+                subtitle: 'Report/CentersMonthlyBalanceReport (AGL008A)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: context.locale.languageCode == 'ar'
+                        ? 'الأرصدة الشهرية لمراكز التكلفة'
+                        : 'Cost Centers Monthly Balances',
+                    description: '',
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AGL008A',
+                    isCentersMonthlyBalanceReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.account_tree_rounded,
+                color: AppColor.purpleAccent,
+                title: context.locale.languageCode == 'ar'
+                    ? 'حركة مراكز التكلفة'
+                    : 'Cost Centers Transactions',
+                subtitle: 'Report/CostCentersTransactionReport (AGL028)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: context.locale.languageCode == 'ar'
+                        ? 'حركة مراكز التكلفة'
+                        : 'Cost Centers Transactions',
+                    description: '',
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AGL028',
+                    isCostCentersTransactionReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.calendar_view_month_outlined,
+                color: AppColor.emeraldTeal,
+                title: context.locale.languageCode == 'ar'
+                    ? 'الحركة السنوية لمراكز التكلفة'
+                    : 'Annual Cost Centers Transactions',
+                subtitle: 'Report/CostCentersTransactionAnnualReport (AGL029Y)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: context.locale.languageCode == 'ar'
+                        ? 'الحركة السنوية لمراكز التكلفة'
+                        : 'Annual Cost Centers Transactions',
+                    description: '',
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AGL029Y',
+                    isCostCentersTransactionAnnualReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
                 icon: Icons.domain_rounded,
                 color: AppColor.oceanBlue,
                 title: AppLocaleKey.statementCostCentersProjects.tr(),
@@ -509,6 +520,31 @@ class _ReportsScreenState extends State<ReportsScreen> {
                     status: AppLocaleKey.statusAudited.tr(),
                     reportName: 'Agl026_Project2',
                     isCostCentersProjectsReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.account_tree_outlined,
+                color: AppColor.oceanBlue,
+                title: context.locale.languageCode == 'ar'
+                    ? 'ملخص مراكز الحسابات الرئيسية'
+                    : 'Main Accounts Centers Summary',
+                subtitle:
+                    'Report/AccountCentersSummaryForMainAccountsReport (AGL0103)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: context.locale.languageCode == 'ar'
+                        ? 'ملخص مراكز الحسابات الرئيسية'
+                        : 'Main Accounts Centers Summary',
+                    description: '',
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AGL0103',
+                    isAccountCentersSummaryForMainAccountsReport: true,
                     exportType: defaultExportType,
                   );
                 },
@@ -661,7 +697,11 @@ class _ReportsScreenState extends State<ReportsScreen> {
     bool isTrialBalanceByCategoriesReport = false,
     bool isFinancialStatementsReport = false,
     bool isCostCentersReport = false,
+    bool isCentersMonthlyBalanceReport = false,
+    bool isCostCentersTransactionReport = false,
+    bool isCostCentersTransactionAnnualReport = false,
     bool isCostCentersProjectsReport = false,
+    bool isAccountCentersSummaryForMainAccountsReport = false,
     bool isMonthlyAccountComparisonReport = false,
     bool isMonthlyCostCentersComparisonReport = false,
     bool isChartOfAccountMonthlyBalancesReport = false,
@@ -789,10 +829,36 @@ class _ReportsScreenState extends State<ReportsScreen> {
       );
       if (!mounted || dateRange == null) return;
     }
-    int? costCenterType;
-    if (isCostCentersReport) {
-      costCenterType = await _selectCostCenterType();
-      if (!mounted || costCenterType == null) return;
+    CostCentersReportFilterSelection? costCentersFilter;
+    if (isCostCentersReport || isCentersMonthlyBalanceReport) {
+      costCentersFilter = await CostCentersReportFilterBottomSheetWidget.show(
+        context,
+        title: title,
+        initialReportName: isCentersMonthlyBalanceReport
+            ? 'AGL008A'
+            : reportName ?? 'AGL008',
+        showReportNameSelector: !isCentersMonthlyBalanceReport,
+        showDateFilter: !isCentersMonthlyBalanceReport,
+      );
+      if (!mounted || costCentersFilter == null) return;
+      reportName = costCentersFilter.reportName;
+      exportType = costCentersFilter.exportType;
+    }
+    CostCentersTransactionReportFilterSelection? costCentersTransactionFilter;
+    if (isCostCentersTransactionReport ||
+        isCostCentersTransactionAnnualReport) {
+      costCentersTransactionFilter =
+          await CostCentersTransactionReportFilterBottomSheetWidget.show(
+            context,
+            title: title,
+            isAnnual: isCostCentersTransactionAnnualReport,
+            initialReportName: isCostCentersTransactionAnnualReport
+                ? reportName ?? 'AGL029Y'
+                : reportName ?? 'AGL028',
+          );
+      if (!mounted || costCentersTransactionFilter == null) return;
+      reportName = costCentersTransactionFilter.reportName;
+      exportType = costCentersTransactionFilter.exportType;
     }
     CostCentersProjectsReportFilterSelection? costCentersProjectsFilter;
     if (isCostCentersProjectsReport) {
@@ -803,6 +869,16 @@ class _ReportsScreenState extends State<ReportsScreen> {
             initialReportName: reportName ?? 'Agl026_Project2',
           );
       if (!mounted || costCentersProjectsFilter == null) return;
+    }
+    AccountCentersSummaryReportFilterSelection? accountCentersSummaryFilter;
+    if (isAccountCentersSummaryForMainAccountsReport) {
+      accountCentersSummaryFilter =
+          await AccountCentersSummaryReportFilterBottomSheetWidget.show(
+            context,
+            title: title,
+          );
+      if (!mounted || accountCentersSummaryFilter == null) return;
+      exportType = accountCentersSummaryFilter.exportType;
     }
     MonthlyComparisonReportFilterSelection? monthlyComparisonFilter;
     if (isMonthlyAccountComparisonReport ||
@@ -853,13 +929,71 @@ class _ReportsScreenState extends State<ReportsScreen> {
           isTrialBalanceByCategoriesReport ||
           isFinancialStatementsReport ||
           isCostCentersReport ||
+          isCentersMonthlyBalanceReport ||
+          isCostCentersTransactionReport ||
+          isCostCentersTransactionAnnualReport ||
           isCostCentersProjectsReport ||
+          isAccountCentersSummaryForMainAccountsReport ||
           isMonthlyAccountComparisonReport ||
           isMonthlyCostCentersComparisonReport ||
           isChartOfAccountMonthlyBalancesReport ||
           reportName != null) {
         final reportsRepo = sl<ReportsRepo>();
-        final result = isChartOfAccountMonthlyBalancesReport
+        final result = isCentersMonthlyBalanceReport
+            ? await reportsRepo.getCentersMonthlyBalanceReport(
+                fromCostCenterNo: costCentersFilter?.fromCostCenterNo,
+                toCostCenterNo: costCentersFilter?.toCostCenterNo,
+                fromCenterLevel: costCentersFilter?.fromCenterLevel,
+                toCenterLevel: costCentersFilter?.toCenterLevel,
+                costCenterType: costCentersFilter?.costCenterType ?? 2,
+                reportName: 'AGL008A',
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isCostCentersTransactionAnnualReport
+            ? await reportsRepo.getCostCentersTransactionAnnualReport(
+                fromAccountNo: costCentersTransactionFilter?.fromAccountNo,
+                toAccountNo: costCentersTransactionFilter?.toAccountNo,
+                fromCostCenterNo:
+                    costCentersTransactionFilter?.fromCostCenterNo,
+                toCostCenterNo: costCentersTransactionFilter?.toCostCenterNo,
+                fromDate: costCentersTransactionFilter?.fromDate,
+                toDate: costCentersTransactionFilter?.toDate,
+                reportName:
+                    costCentersTransactionFilter?.reportName ?? 'AGL029Y',
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isCostCentersTransactionReport
+            ? await reportsRepo.getCostCentersTransactionReport(
+                fromAccountNo: costCentersTransactionFilter?.fromAccountNo,
+                toAccountNo: costCentersTransactionFilter?.toAccountNo,
+                fromCostCenterNo:
+                    costCentersTransactionFilter?.fromCostCenterNo,
+                toCostCenterNo: costCentersTransactionFilter?.toCostCenterNo,
+                fromDate: costCentersTransactionFilter?.fromDate,
+                toDate: costCentersTransactionFilter?.toDate,
+                prepareCostCentersTree:
+                    costCentersTransactionFilter?.prepareCostCentersTree ??
+                    false,
+                reportName:
+                    costCentersTransactionFilter?.reportName ?? 'AGL028',
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isAccountCentersSummaryForMainAccountsReport
+            ? await reportsRepo.getAccountCentersSummaryForMainAccountsReport(
+                fromAccountNo: accountCentersSummaryFilter?.fromAccountNo,
+                toAccountNo: accountCentersSummaryFilter?.toAccountNo,
+                fromCostCenterNo: accountCentersSummaryFilter?.fromCostCenterNo,
+                toCostCenterNo: accountCentersSummaryFilter?.toCostCenterNo,
+                fromDate: accountCentersSummaryFilter?.fromDate,
+                toDate: accountCentersSummaryFilter?.toDate,
+                accountLevel: 1,
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isChartOfAccountMonthlyBalancesReport
             ? await reportsRepo.getChartOfAccountMonthlyBalancesReport(
                 fromAccountNo: monthlyBalancesFilter?.fromAccountNo,
                 toAccountNo: monthlyBalancesFilter?.toAccountNo,
@@ -942,7 +1076,14 @@ class _ReportsScreenState extends State<ReportsScreen> {
               )
             : isCostCentersReport
             ? await reportsRepo.getCostCentersReport(
-                costCenterType: costCenterType!,
+                fromCostCenterNo: costCentersFilter?.fromCostCenterNo,
+                toCostCenterNo: costCentersFilter?.toCostCenterNo,
+                fromCenterLevel: costCentersFilter?.fromCenterLevel,
+                toCenterLevel: costCentersFilter?.toCenterLevel,
+                fromDate: costCentersFilter?.fromDate,
+                toDate: costCentersFilter?.toDate,
+                costCenterType: costCentersFilter!.costCenterType,
+                reportName: costCentersFilter.reportName,
                 languageCode: languageCode,
                 exportType: exportType,
               )
@@ -1255,6 +1396,23 @@ class _ReportsScreenState extends State<ReportsScreen> {
         'treeGroup': 'accounts',
       },
       {
+        'id': 'account_centers_summary_for_main_accounts',
+        'reportName': 'AGL0103',
+        'isAccountCentersSummaryForMainAccountsReport': true,
+        'isSubmenu': true,
+        'title': context.locale.languageCode == 'ar'
+            ? 'ملخص مراكز الحسابات الرئيسية'
+            : 'Main Accounts Centers Summary',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'ملخص الحسابات الرئيسية حسب مراكز التكلفة'
+            : 'Summary of main accounts by cost centers',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.account_tree_outlined,
+        'iconColor': AppColor.oceanBlue,
+        'category': 1,
+        'treeGroup': 'costCenters',
+      },
+      {
         'title': 'القوائم المالية',
         'desc': 'اختر: الأرباح والخسائر، الميزانية، الدخل أو التدفقات النقدية',
         'status': AppLocaleKey.statusAudited.tr(),
@@ -1350,6 +1508,57 @@ class _ReportsScreenState extends State<ReportsScreen> {
         'category': 1,
         'reportName': 'AGL007',
         'isCostCentersReport': true,
+        'treeGroup': 'costCenters',
+      },
+      {
+        'id': 'centers_monthly_balance',
+        'reportName': 'AGL008A',
+        'isCentersMonthlyBalanceReport': true,
+        'isSubmenu': true,
+        'title': context.locale.languageCode == 'ar'
+            ? 'الأرصدة الشهرية لمراكز التكلفة'
+            : 'Cost Centers Monthly Balances',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'عرض أرصدة مراكز التكلفة الشهرية'
+            : 'View monthly cost center balances',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.calendar_month_outlined,
+        'iconColor': AppColor.emeraldTeal,
+        'category': 1,
+        'treeGroup': 'costCenters',
+      },
+      {
+        'id': 'cost_centers_transaction',
+        'reportName': 'AGL028',
+        'isCostCentersTransactionReport': true,
+        'isSubmenu': true,
+        'title': context.locale.languageCode == 'ar'
+            ? 'حركة مراكز التكلفة'
+            : 'Cost Centers Transactions',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'تفاصيل وإجماليات الحسابات حسب مراكز التكلفة'
+            : 'Account details and totals by cost center',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.account_tree_rounded,
+        'iconColor': AppColor.purpleAccent,
+        'category': 1,
+        'treeGroup': 'costCenters',
+      },
+      {
+        'id': 'cost_centers_transaction_annual',
+        'reportName': 'AGL029Y',
+        'isCostCentersTransactionAnnualReport': true,
+        'isSubmenu': true,
+        'title': context.locale.languageCode == 'ar'
+            ? 'الحركة السنوية لمراكز التكلفة'
+            : 'Annual Cost Centers Transactions',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'تفاصيل وإجماليات الحسابات حسب مراكز التكلفة سنوياً'
+            : 'Annual account details and totals by cost center',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.calendar_view_month_outlined,
+        'iconColor': AppColor.emeraldTeal,
+        'category': 1,
         'treeGroup': 'costCenters',
       },
       {
@@ -1659,8 +1868,16 @@ class _ReportsScreenState extends State<ReportsScreen> {
       isFinancialStatementsReport:
           statement['isFinancialStatementsReport'] == true,
       isCostCentersReport: statement['isCostCentersReport'] == true,
+      isCentersMonthlyBalanceReport:
+          statement['isCentersMonthlyBalanceReport'] == true,
+      isCostCentersTransactionReport:
+          statement['isCostCentersTransactionReport'] == true,
+      isCostCentersTransactionAnnualReport:
+          statement['isCostCentersTransactionAnnualReport'] == true,
       isCostCentersProjectsReport:
           statement['isCostCentersProjectsReport'] == true,
+      isAccountCentersSummaryForMainAccountsReport:
+          statement['isAccountCentersSummaryForMainAccountsReport'] == true,
       isMonthlyAccountComparisonReport:
           statement['isMonthlyAccountComparisonReport'] == true,
       isMonthlyCostCentersComparisonReport:

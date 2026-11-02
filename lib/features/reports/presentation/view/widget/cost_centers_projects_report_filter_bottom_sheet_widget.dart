@@ -73,28 +73,43 @@ class _CostCentersProjectsReportFilterBottomSheetWidgetState
     _selectedReportName = widget.initialReportName;
   }
 
-  Future<void> _selectDate({required bool isFromDate}) async {
+  Future<void> _selectDateTime({required bool isFromDate}) async {
     final initial = (isFromDate ? _fromDate : _toDate) ?? DateTime.now();
     final selected = await showDatePicker(
       context: context,
-      initialDate: initial,
+      initialDate: DateUtils.dateOnly(initial),
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
     );
     if (selected == null || !mounted) return;
 
+    final selectedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(initial),
+    );
+    if (selectedTime == null || !mounted) return;
+
+    final dateTime = DateTime(
+      selected.year,
+      selected.month,
+      selected.day,
+      selectedTime.hour,
+      selectedTime.minute,
+    );
     setState(() {
       if (isFromDate) {
-        _fromDate = DateUtils.dateOnly(selected);
+        _fromDate = dateTime;
       } else {
-        _toDate = DateUtils.dateOnly(selected);
+        _toDate = dateTime;
       }
       _validationMessage = null;
     });
   }
 
-  String _formatDate(DateTime date) {
-    return MaterialLocalizations.of(context).formatMediumDate(date);
+  String _formatDateTime(DateTime dateTime) {
+    final localizations = MaterialLocalizations.of(context);
+    return '${localizations.formatMediumDate(dateTime)} '
+        '${localizations.formatTimeOfDay(TimeOfDay.fromDateTime(dateTime))}';
   }
 
   void _submit() {
@@ -182,11 +197,11 @@ class _CostCentersProjectsReportFilterBottomSheetWidgetState
                         children: [
                           Text(
                             widget.title,
-                            style:
-                                AppTextStyle.formTitleStyle(context).copyWith(
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: AppTextStyle.formTitleStyle(context)
+                                .copyWith(
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.bold,
+                                ),
                           ),
                           Gap(2.h),
                           Text(
@@ -215,10 +230,9 @@ class _CostCentersProjectsReportFilterBottomSheetWidgetState
                 // Report Type Selector
                 Text(
                   isAr ? 'نوع التقرير' : 'Report Type',
-                  style: AppTextStyle.formTitleStyle(context).copyWith(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 13.sp,
-                  ),
+                  style: AppTextStyle.formTitleStyle(
+                    context,
+                  ).copyWith(fontWeight: FontWeight.w600, fontSize: 13.sp),
                 ),
                 Gap(8.h),
                 Container(
@@ -282,10 +296,9 @@ class _CostCentersProjectsReportFilterBottomSheetWidgetState
                   children: [
                     Text(
                       isAr ? 'تحديد فترة التاريخ' : 'Filter by Date Range',
-                      style: AppTextStyle.formTitleStyle(context).copyWith(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 13.sp,
-                      ),
+                      style: AppTextStyle.formTitleStyle(
+                        context,
+                      ).copyWith(fontWeight: FontWeight.w600, fontSize: 13.sp),
                     ),
                     Switch.adaptive(
                       value: _includeDates,
@@ -303,7 +316,7 @@ class _CostCentersProjectsReportFilterBottomSheetWidgetState
                         child: _datePickerField(
                           label: AppLocaleKey.fromDate.tr(),
                           date: _fromDate,
-                          onTap: () => _selectDate(isFromDate: true),
+                          onTap: () => _selectDateTime(isFromDate: true),
                           foreground: foreground,
                         ),
                       ),
@@ -312,7 +325,7 @@ class _CostCentersProjectsReportFilterBottomSheetWidgetState
                         child: _datePickerField(
                           label: AppLocaleKey.toDate.tr(),
                           date: _toDate,
-                          onTap: () => _selectDate(isFromDate: false),
+                          onTap: () => _selectDateTime(isFromDate: false),
                           foreground: foreground,
                         ),
                       ),
@@ -385,7 +398,10 @@ class _CostCentersProjectsReportFilterBottomSheetWidgetState
                       flex: 2,
                       child: ElevatedButton.icon(
                         onPressed: _submit,
-                        icon: const Icon(Icons.picture_as_pdf_rounded, size: 18),
+                        icon: const Icon(
+                          Icons.picture_as_pdf_rounded,
+                          size: 18,
+                        ),
                         label: Text(
                           isAr ? 'عرض / تصدير التقرير' : 'View / Export Report',
                           style: TextStyle(
@@ -484,9 +500,7 @@ class _CostCentersProjectsReportFilterBottomSheetWidgetState
             decoration: BoxDecoration(
               color: AppColor.textFormFillColor(context),
               borderRadius: BorderRadius.circular(12.r),
-              border: Border.all(
-                color: foreground.withValues(alpha: 0.12),
-              ),
+              border: Border.all(color: foreground.withValues(alpha: 0.12)),
             ),
             child: Row(
               children: [
@@ -498,11 +512,10 @@ class _CostCentersProjectsReportFilterBottomSheetWidgetState
                 Gap(8.w),
                 Expanded(
                   child: Text(
-                    date != null ? _formatDate(date) : '-',
-                    style: AppTextStyle.textFormStyle(context).copyWith(
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.w500,
-                    ),
+                    date != null ? _formatDateTime(date) : '-',
+                    style: AppTextStyle.textFormStyle(
+                      context,
+                    ).copyWith(fontSize: 12.sp, fontWeight: FontWeight.w500),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
