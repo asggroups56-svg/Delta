@@ -11,14 +11,32 @@ class ReportsCubit extends Cubit<ReportsState> {
   ReportsCubit(this.reportsRepo) : super(const ReportsState());
 
   Future<File?> getChartOfAccountReport({
-    String reportName = 'AGL001',
+    num? fromAccountNo,
+    num? toAccountNo,
+    String? fromCurrencyCode,
+    String? toCurrencyCode,
+    int? fromAccountLevel,
+    int? toAccountLevel,
+    int accountType = 2,
+    int finalAccount = 4,
+    String reportName = 'AGL004',
+    required String languageCode,
     String exportType = 'pdf',
   }) async {
     if (isClosed) return null;
     emit(state.copyWith(chartOfAccountStatus: const StatusState.loading()));
 
     final result = await reportsRepo.getChartOfAccountReport(
+      fromAccountNo: fromAccountNo,
+      toAccountNo: toAccountNo,
+      fromCurrencyCode: fromCurrencyCode,
+      toCurrencyCode: toCurrencyCode,
+      fromAccountLevel: fromAccountLevel,
+      toAccountLevel: toAccountLevel,
+      accountType: accountType,
+      finalAccount: finalAccount,
       reportName: reportName,
+      languageCode: languageCode,
       exportType: exportType,
     );
 

@@ -14,6 +14,8 @@ import 'package:my_template/core/utils/common_methods.dart';
 import 'package:my_template/features/reports/data/repository/reports_repo.dart';
 import 'package:my_template/features/reports/presentation/view/widget/file_download_service.dart';
 import 'package:my_template/features/reports/presentation/view/widget/account_statement_filter_bottom_sheet_widget.dart';
+import 'package:my_template/features/reports/presentation/view/widget/chart_of_account_report_filter_bottom_sheet_widget.dart';
+import 'package:my_template/features/reports/presentation/view/widget/chart_of_account_monthly_balances_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/cost_centers_projects_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/fullscreen_pdf_viewer_screen.dart';
 import 'package:my_template/features/reports/presentation/view/widget/ledger_report_filter_bottom_sheet_widget.dart';
@@ -245,390 +247,333 @@ class _ReportsScreenState extends State<ReportsScreen> {
     if (mounted) setState(() {});
   }
 
-  // ── Export Modal (اختيار نوع التصدير) ────────────────────────────────────
+  // ── Export Modal ─────────────────────────────────────────────────────────
   void _showExportModal() {
-    var selectedExportType = 'pdf';
+    const defaultExportType = 'pdf';
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setModalState) => Container(
-          constraints: BoxConstraints(
-            maxHeight: MediaQuery.sizeOf(ctx).height * 0.85,
-          ),
-          padding: EdgeInsets.all(20.r),
-          decoration: BoxDecoration(
-            color: AppColor.cardColor(context),
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
-            border: Border.all(color: AppColor.borderColor(context)),
-          ),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Container(
-                    width: 40.w,
-                    height: 4.h,
-                    decoration: BoxDecoration(
-                      color: AppColor.darkTextColor(context),
-                      borderRadius: BorderRadius.circular(4.r),
-                    ),
+      builder: (ctx) => Container(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.sizeOf(ctx).height * 0.85,
+        ),
+        padding: EdgeInsets.all(20.r),
+        decoration: BoxDecoration(
+          color: AppColor.cardColor(context),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
+          border: Border.all(color: AppColor.borderColor(context)),
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40.w,
+                  height: 4.h,
+                  decoration: BoxDecoration(
+                    color: AppColor.darkTextColor(context),
+                    borderRadius: BorderRadius.circular(4.r),
                   ),
                 ),
-                Gap(16.h),
-                Text(
-                  AppLocaleKey.exportReport.tr(),
-                  style: TextStyle(
-                    color: AppColor.titleFormFiledColor(context),
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.bold,
-                  ),
+              ),
+              Gap(16.h),
+              Text(
+                AppLocaleKey.exportReport.tr(),
+                style: TextStyle(
+                  color: AppColor.titleFormFiledColor(context),
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.bold,
                 ),
-                Gap(16.h),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _formatSelectCard(
-                        icon: Icons.picture_as_pdf_rounded,
-                        label: 'PDF',
-                        color: const Color(0xFFEF4444),
-                        isSelected: selectedExportType == 'pdf',
-                        onTap: () =>
-                            setModalState(() => selectedExportType = 'pdf'),
-                      ),
-                    ),
-                    Gap(8.w),
-                    Expanded(
-                      child: _formatSelectCard(
-                        icon: Icons.table_chart_rounded,
-                        label: 'Excel',
-                        color: const Color(0xFF10B981),
-                        isSelected: selectedExportType == 'excel',
-                        onTap: () =>
-                            setModalState(() => selectedExportType = 'excel'),
-                      ),
-                    ),
-                    Gap(8.w),
-                    Expanded(
-                      child: _formatSelectCard(
-                        icon: Icons.description_rounded,
-                        label: 'Word',
-                        color: const Color(0xFF3B82F6),
-                        isSelected: selectedExportType == 'word',
-                        onTap: () =>
-                            setModalState(() => selectedExportType = 'word'),
-                      ),
-                    ),
-                    Gap(8.w),
-                    Expanded(
-                      child: _formatSelectCard(
-                        icon: Icons.grid_on_rounded,
-                        label: 'PRO',
-                        color: const Color(0xFF8B5CF6),
-                        isSelected: selectedExportType == 'excelformatted',
-                        onTap: () => setModalState(
-                          () => selectedExportType = 'excelformatted',
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                Gap(16.h),
-                _buildExportOption(
-                  icon: Icons.account_tree_rounded,
-                  color: AppColor.oceanBlue,
-                  title: AppLocaleKey.statementChartOfAccount.tr(),
-                  subtitle: 'Report/ChartOfAccountReport (AGL001)',
-                  onTap: () {
-                    Navigator.pop(ctx);
-                    _handleExportReport(
-                      title: AppLocaleKey.statementChartOfAccount.tr(),
-                      description: AppLocaleKey.statementChartOfAccountDesc
-                          .tr(),
-                      amount: '',
-                      date: '',
-                      status: AppLocaleKey.statusAudited.tr(),
-                      reportName: 'AGL001',
-                      isApiReport: true,
-                      exportType: selectedExportType,
-                    );
-                  },
-                ),
-                Gap(10.h),
-                _buildExportOption(
-                  icon: Icons.show_chart_rounded,
-                  color: AppColor.emeraldTeal,
-                  title: AppLocaleKey.statementIncome.tr(),
-                  subtitle: 'Report/IncomeAndExpenseSituationReport (AGL300_M)',
-                  onTap: () {
-                    Navigator.pop(ctx);
-                    _handleExportReport(
-                      title: AppLocaleKey.statementIncome.tr(),
-                      description: AppLocaleKey.statementIncomeDesc.tr(),
-                      amount: '',
-                      date: '',
-                      status: AppLocaleKey.statusAudited.tr(),
-                      reportName: 'AGL300_M',
-                      isIncomeAndExpenseSituationReport: true,
-                      exportType: selectedExportType,
-                    );
-                  },
-                ),
-                Gap(10.h),
-                _buildExportOption(
-                  icon: Icons.calendar_view_day_rounded,
-                  color: AppColor.oceanBlue,
-                  title: AppLocaleKey.statementDailyIncome.tr(),
-                  subtitle: 'Report/IncomeAndExpenseSituationReport (AGL300_D)',
-                  onTap: () {
-                    Navigator.pop(ctx);
-                    _handleExportReport(
-                      title: AppLocaleKey.statementDailyIncome.tr(),
-                      description: AppLocaleKey.statementDailyIncomeDesc.tr(),
-                      amount: '',
-                      date: '',
-                      status: AppLocaleKey.statusAudited.tr(),
-                      reportName: 'AGL300_D',
-                      isDailyIncomeAndExpenseReport: true,
-                      exportType: selectedExportType,
-                    );
-                  },
-                ),
-                Gap(10.h),
-                _buildExportOption(
-                  icon: Icons.receipt_long_outlined,
-                  color: AppColor.purpleAccent,
-                  title: AppLocaleKey.statementExpensesWithVat.tr(),
-                  subtitle: 'Report/ExpensesWithVatReport (AGL1001E)',
-                  onTap: () {
-                    Navigator.pop(ctx);
-                    _handleExportReport(
-                      title: AppLocaleKey.statementExpensesWithVat.tr(),
-                      description: AppLocaleKey.statementExpensesWithVatDesc
-                          .tr(),
-                      amount: '',
-                      date: '',
-                      status: AppLocaleKey.statusAudited.tr(),
-                      reportName: 'AGL1001E',
-                      isExpensesWithVatReport: true,
-                      exportType: selectedExportType,
-                    );
-                  },
-                ),
-                Gap(10.h),
-                _buildExportOption(
-                  icon: Icons.point_of_sale_rounded,
-                  color: AppColor.emeraldTeal,
-                  title: AppLocaleKey.statementSalesWithVat.tr(),
-                  subtitle: 'Report/SalesWithVatReport (AAR1000)',
-                  onTap: () {
-                    Navigator.pop(ctx);
-                    _handleExportReport(
-                      title: AppLocaleKey.statementSalesWithVat.tr(),
-                      description: AppLocaleKey.statementSalesWithVatDesc.tr(),
-                      amount: '',
-                      date: '',
-                      status: AppLocaleKey.statusAudited.tr(),
-                      reportName: 'AAR1000',
-                      isSalesWithVatReport: true,
-                      exportType: selectedExportType,
-                    );
-                  },
-                ),
-                Gap(10.h),
-                _buildExportOption(
-                  icon: Icons.shopping_bag_rounded,
-                  color: AppColor.oceanBlue,
-                  title: AppLocaleKey.statementPurchasesWithVat.tr(),
-                  subtitle: 'Report/PurchasesWithVatReport (AAR1001)',
-                  onTap: () {
-                    Navigator.pop(ctx);
-                    _handleExportReport(
-                      title: AppLocaleKey.statementPurchasesWithVat.tr(),
-                      description: AppLocaleKey.statementPurchasesWithVatDesc
-                          .tr(),
-                      amount: '',
-                      date: '',
-                      status: AppLocaleKey.statusAudited.tr(),
-                      reportName: 'AAR1001',
-                      isPurchasesWithVatReport: true,
-                      exportType: selectedExportType,
-                    );
-                  },
-                ),
-                Gap(10.h),
-                _buildExportOption(
-                  icon: Icons.menu_book_rounded,
-                  color: AppColor.oceanBlue,
-                  title: AppLocaleKey.statementLedger.tr(),
-                  subtitle: 'Report/LedgerReportForAllAccounts (AGL025)',
-                  onTap: () {
-                    Navigator.pop(ctx);
-                    _handleExportReport(
-                      title: AppLocaleKey.statementLedger.tr(),
-                      description: AppLocaleKey.statementLedgerDesc.tr(),
-                      amount: '',
-                      date: '',
-                      status: AppLocaleKey.statusAudited.tr(),
-                      reportName: 'AGL025',
-                      isLedgerReport: true,
-                      exportType: selectedExportType,
-                    );
-                  },
-                ),
-                Gap(10.h),
-                _buildExportOption(
-                  icon: Icons.receipt_long_rounded,
-                  color: AppColor.oceanBlue,
-                  title: AppLocaleKey.statementAccountStatement.tr(),
-                  subtitle: 'Report/AccountStatementReport (AGL079)',
-                  onTap: () {
-                    Navigator.pop(ctx);
-                    _handleExportReport(
-                      title: AppLocaleKey.statementAccountStatement.tr(),
-                      description: AppLocaleKey.statementAccountStatementDesc
-                          .tr(),
-                      amount: '',
-                      date: '',
-                      status: AppLocaleKey.statusAudited.tr(),
-                      reportName: 'AGL079',
-                      isAccountStatementReport: true,
-                      exportType: selectedExportType,
-                    );
-                  },
-                ),
-                Gap(10.h),
-                _buildExportOption(
-                  icon: Icons.account_balance_wallet_outlined,
-                  color: AppColor.emeraldTeal,
-                  title: AppLocaleKey.statementTrialBalanceByCategories.tr(),
-                  subtitle: 'Report/TrialBalanceByCategoriesReport (AGL055)',
-                  onTap: () {
-                    Navigator.pop(ctx);
-                    _handleExportReport(
-                      title: AppLocaleKey.statementTrialBalanceByCategories
-                          .tr(),
-                      description: AppLocaleKey
-                          .statementTrialBalanceByCategoriesDesc
-                          .tr(),
-                      amount: '',
-                      date: '',
-                      status: AppLocaleKey.statusAudited.tr(),
-                      reportName: 'AGL055',
-                      isTrialBalanceByCategoriesReport: true,
-                      exportType: selectedExportType,
-                    );
-                  },
-                ),
-                Gap(10.h),
-                _buildExportOption(
-                  icon: Icons.business_outlined,
-                  color: AppColor.purpleAccent,
-                  title: AppLocaleKey.statementCostCenters.tr(),
-                  subtitle: 'Report/CostCentersReport (AGL007)',
-                  onTap: () {
-                    Navigator.pop(ctx);
-                    _handleExportReport(
-                      title: AppLocaleKey.statementCostCenters.tr(),
-                      description: AppLocaleKey.statementCostCentersDesc.tr(),
-                      amount: '',
-                      date: '',
-                      status: AppLocaleKey.statusAudited.tr(),
-                      reportName: 'AGL007',
-                      isCostCentersReport: true,
-                      exportType: selectedExportType,
-                    );
-                  },
-                ),
-                Gap(10.h),
-                _buildExportOption(
-                  icon: Icons.domain_rounded,
-                  color: AppColor.oceanBlue,
-                  title: AppLocaleKey.statementCostCentersProjects.tr(),
-                  subtitle: 'Report/CostCentersProjectsReport (Agl026)',
-                  onTap: () {
-                    Navigator.pop(ctx);
-                    _handleExportReport(
-                      title: AppLocaleKey.statementCostCentersProjects.tr(),
-                      description: AppLocaleKey.statementCostCentersProjectsDesc
-                          .tr(),
-                      amount: '',
-                      date: '',
-                      status: AppLocaleKey.statusAudited.tr(),
-                      reportName: 'Agl026_Project2',
-                      isCostCentersProjectsReport: true,
-                      exportType: selectedExportType,
-                    );
-                  },
-                ),
-                Gap(10.h),
-                _buildExportOption(
-                  icon: Icons.compare_arrows_rounded,
-                  color: AppColor.oceanBlue,
-                  title: AppLocaleKey.statementMonthlyAccountsComparison.tr(),
-                  subtitle: 'Report/MonthlyAccountComparsionReport (AGL003)',
-                  onTap: () {
-                    Navigator.pop(ctx);
-                    _handleExportReport(
-                      title: AppLocaleKey.statementMonthlyAccountsComparison
-                          .tr(),
-                      description: AppLocaleKey
-                          .statementMonthlyAccountsComparisonDesc
-                          .tr(),
-                      amount: '',
-                      date: '',
-                      status: AppLocaleKey.statusAudited.tr(),
-                      reportName: 'AGL003_Bar',
-                      isMonthlyAccountComparisonReport: true,
-                      exportType: selectedExportType,
-                    );
-                  },
-                ),
-                Gap(10.h),
-                _buildExportOption(
-                  icon: Icons.insights_rounded,
-                  color: AppColor.purpleAccent,
-                  title: AppLocaleKey.statementMonthlyCostCentersComparison
-                      .tr(),
-                  subtitle:
-                      'Report/MonthlyCostCentersComparsionReport (AGL008)',
-                  onTap: () {
-                    Navigator.pop(ctx);
-                    _handleExportReport(
-                      title: AppLocaleKey.statementMonthlyCostCentersComparison
-                          .tr(),
-                      description: AppLocaleKey
-                          .statementMonthlyCostCentersComparisonDesc
-                          .tr(),
-                      amount: '',
-                      date: '',
-                      status: AppLocaleKey.statusAudited.tr(),
-                      reportName: 'AGL008_Chart',
-                      isMonthlyCostCentersComparisonReport: true,
-                      exportType: selectedExportType,
-                    );
-                  },
-                ),
-                Gap(10.h),
-                _buildExportOption(
-                  icon: Icons.share_rounded,
-                  color: AppColor.purpleAccent,
-                  title: AppLocaleKey.shareReport.tr(),
-                  subtitle: 'Direct Link & Board Presentation Format',
-                  onTap: () {
-                    Navigator.pop(ctx);
-                    CommonMethods.showToast(
-                      message: AppLocaleKey.reportExportSuccess.tr(),
-                      type: ToastType.success,
-                    );
-                  },
-                ),
-                Gap(20.h),
-              ],
-            ),
+              ),
+              Gap(16.h),
+              _buildExportOption(
+                icon: Icons.account_tree_rounded,
+                color: AppColor.oceanBlue,
+                title: AppLocaleKey.statementChartOfAccount.tr(),
+                subtitle: 'Report/ChartOfAccountReport',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: AppLocaleKey.statementChartOfAccount.tr(),
+                    description: AppLocaleKey.statementChartOfAccountDesc.tr(),
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AGL004',
+                    isApiReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.show_chart_rounded,
+                color: AppColor.emeraldTeal,
+                title: AppLocaleKey.statementIncome.tr(),
+                subtitle: 'Report/IncomeAndExpenseSituationReport (AGL300_M)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: AppLocaleKey.statementIncome.tr(),
+                    description: AppLocaleKey.statementIncomeDesc.tr(),
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AGL300_M',
+                    isIncomeAndExpenseSituationReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.calendar_view_day_rounded,
+                color: AppColor.oceanBlue,
+                title: AppLocaleKey.statementDailyIncome.tr(),
+                subtitle: 'Report/IncomeAndExpenseSituationReport (AGL300_D)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: AppLocaleKey.statementDailyIncome.tr(),
+                    description: AppLocaleKey.statementDailyIncomeDesc.tr(),
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AGL300_D',
+                    isDailyIncomeAndExpenseReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.receipt_long_outlined,
+                color: AppColor.purpleAccent,
+                title: AppLocaleKey.statementExpensesWithVat.tr(),
+                subtitle: 'Report/ExpensesWithVatReport (AGL1001E)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: AppLocaleKey.statementExpensesWithVat.tr(),
+                    description: AppLocaleKey.statementExpensesWithVatDesc.tr(),
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AGL1001E',
+                    isExpensesWithVatReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.point_of_sale_rounded,
+                color: AppColor.emeraldTeal,
+                title: AppLocaleKey.statementSalesWithVat.tr(),
+                subtitle: 'Report/SalesWithVatReport (AAR1000)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: AppLocaleKey.statementSalesWithVat.tr(),
+                    description: AppLocaleKey.statementSalesWithVatDesc.tr(),
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AAR1000',
+                    isSalesWithVatReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.shopping_bag_rounded,
+                color: AppColor.oceanBlue,
+                title: AppLocaleKey.statementPurchasesWithVat.tr(),
+                subtitle: 'Report/PurchasesWithVatReport (AAR1001)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: AppLocaleKey.statementPurchasesWithVat.tr(),
+                    description: AppLocaleKey.statementPurchasesWithVatDesc
+                        .tr(),
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AAR1001',
+                    isPurchasesWithVatReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.menu_book_rounded,
+                color: AppColor.oceanBlue,
+                title: AppLocaleKey.statementLedger.tr(),
+                subtitle: 'Report/LedgerReportForAllAccounts (AGL025)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: AppLocaleKey.statementLedger.tr(),
+                    description: AppLocaleKey.statementLedgerDesc.tr(),
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AGL025',
+                    isLedgerReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.receipt_long_rounded,
+                color: AppColor.oceanBlue,
+                title: AppLocaleKey.statementAccountStatement.tr(),
+                subtitle: 'Report/AccountStatementReport (AGL079)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: AppLocaleKey.statementAccountStatement.tr(),
+                    description: AppLocaleKey.statementAccountStatementDesc
+                        .tr(),
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AGL079',
+                    isAccountStatementReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.account_balance_wallet_outlined,
+                color: AppColor.emeraldTeal,
+                title: AppLocaleKey.statementTrialBalanceByCategories.tr(),
+                subtitle: 'Report/TrialBalanceByCategoriesReport (AGL055)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: AppLocaleKey.statementTrialBalanceByCategories.tr(),
+                    description: AppLocaleKey
+                        .statementTrialBalanceByCategoriesDesc
+                        .tr(),
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AGL055',
+                    isTrialBalanceByCategoriesReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.business_outlined,
+                color: AppColor.purpleAccent,
+                title: AppLocaleKey.statementCostCenters.tr(),
+                subtitle: 'Report/CostCentersReport (AGL007)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: AppLocaleKey.statementCostCenters.tr(),
+                    description: AppLocaleKey.statementCostCentersDesc.tr(),
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AGL007',
+                    isCostCentersReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.domain_rounded,
+                color: AppColor.oceanBlue,
+                title: AppLocaleKey.statementCostCentersProjects.tr(),
+                subtitle: 'Report/CostCentersProjectsReport (Agl026)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: AppLocaleKey.statementCostCentersProjects.tr(),
+                    description: AppLocaleKey.statementCostCentersProjectsDesc
+                        .tr(),
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'Agl026_Project2',
+                    isCostCentersProjectsReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.compare_arrows_rounded,
+                color: AppColor.oceanBlue,
+                title: AppLocaleKey.statementMonthlyAccountsComparison.tr(),
+                subtitle: 'Report/MonthlyAccountComparsionReport (AGL003)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: AppLocaleKey.statementMonthlyAccountsComparison.tr(),
+                    description: AppLocaleKey
+                        .statementMonthlyAccountsComparisonDesc
+                        .tr(),
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AGL003_Bar',
+                    isMonthlyAccountComparisonReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.insights_rounded,
+                color: AppColor.purpleAccent,
+                title: AppLocaleKey.statementMonthlyCostCentersComparison.tr(),
+                subtitle: 'Report/MonthlyCostCentersComparsionReport (AGL008)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: AppLocaleKey.statementMonthlyCostCentersComparison
+                        .tr(),
+                    description: AppLocaleKey
+                        .statementMonthlyCostCentersComparisonDesc
+                        .tr(),
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AGL008_Chart',
+                    isMonthlyCostCentersComparisonReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.share_rounded,
+                color: AppColor.purpleAccent,
+                title: AppLocaleKey.shareReport.tr(),
+                subtitle: 'Direct Link & Board Presentation Format',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  CommonMethods.showToast(
+                    message: AppLocaleKey.reportExportSuccess.tr(),
+                    type: ToastType.success,
+                  );
+                },
+              ),
+              Gap(20.h),
+            ],
           ),
         ),
       ),
@@ -696,59 +641,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
     );
   }
 
-  Widget _formatSelectCard({
-    required IconData icon,
-    required String label,
-    required Color color,
-    required bool isSelected,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12.r),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: EdgeInsets.symmetric(vertical: 10.h),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? color.withValues(alpha: 0.18)
-              : AppColor.primaryColor(context).withValues(alpha: 0.04),
-          borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(
-            color: isSelected ? color : AppColor.borderColor(context),
-            width: isSelected ? 1.5 : 1,
-          ),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: color.withValues(alpha: 0.25),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ]
-              : null,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 20.r, color: color),
-            Gap(4.h),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 11.sp,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-                color: isSelected
-                    ? color
-                    : AppColor.titleFormFiledColor(context),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   // ── Report Export ────────────────────────────────────────────────────────
   Future<void> _handleExportReport({
     required String title,
@@ -772,8 +664,25 @@ class _ReportsScreenState extends State<ReportsScreen> {
     bool isCostCentersProjectsReport = false,
     bool isMonthlyAccountComparisonReport = false,
     bool isMonthlyCostCentersComparisonReport = false,
+    bool isChartOfAccountMonthlyBalancesReport = false,
+    int chartOfAccountReportPageType = 2,
+    int chartOfAccountReportAccountType = 0,
+    String chartOfAccountReportName = 'AGL015A',
   }) async {
     final languageCode = context.locale.languageCode;
+    ChartOfAccountReportFilterSelection? chartOfAccountFilter;
+    if (isApiReport) {
+      chartOfAccountFilter =
+          await ChartOfAccountReportFilterBottomSheetWidget.show(
+            context,
+            title: title,
+            initialExportType: exportType,
+          );
+      if (!mounted || chartOfAccountFilter == null) return;
+      reportName = chartOfAccountFilter.reportName;
+      exportType = chartOfAccountFilter.exportType;
+    }
+
     if (isTrialBalanceByCategoriesReport) {
       final selection = await _selectReportOption(
         title: 'اختر طريقة ترتيب ميزان المراجعة',
@@ -909,6 +818,21 @@ class _ReportsScreenState extends State<ReportsScreen> {
       if (!mounted || monthlyComparisonFilter == null) return;
       reportName = monthlyComparisonFilter.reportName;
     }
+    ChartOfAccountMonthlyBalancesFilterSelection? monthlyBalancesFilter;
+    if (isChartOfAccountMonthlyBalancesReport) {
+      monthlyBalancesFilter =
+          await ChartOfAccountMonthlyBalancesFilterBottomSheetWidget.show(
+            context,
+            title: title,
+            initialExportType: exportType,
+            initialAccountType: chartOfAccountReportAccountType,
+            reportPageType: chartOfAccountReportPageType,
+            reportName: chartOfAccountReportName,
+          );
+      if (!mounted || monthlyBalancesFilter == null) return;
+      exportType = monthlyBalancesFilter.exportType;
+      reportName = monthlyBalancesFilter.reportName;
+    }
 
     setState(() {
       _isGenerating = true;
@@ -932,9 +856,23 @@ class _ReportsScreenState extends State<ReportsScreen> {
           isCostCentersProjectsReport ||
           isMonthlyAccountComparisonReport ||
           isMonthlyCostCentersComparisonReport ||
+          isChartOfAccountMonthlyBalancesReport ||
           reportName != null) {
         final reportsRepo = sl<ReportsRepo>();
-        final result = isFinancialStatementsReport
+        final result = isChartOfAccountMonthlyBalancesReport
+            ? await reportsRepo.getChartOfAccountMonthlyBalancesReport(
+                fromAccountNo: monthlyBalancesFilter?.fromAccountNo,
+                toAccountNo: monthlyBalancesFilter?.toAccountNo,
+                fromAccountLevel: monthlyBalancesFilter?.fromAccountLevel,
+                toAccountLevel: monthlyBalancesFilter?.toAccountLevel,
+                accountType: monthlyBalancesFilter?.accountType ?? 0,
+                finalAccount: monthlyBalancesFilter?.finalAccount ?? 4,
+                reportPageType: monthlyBalancesFilter?.reportPageType ?? 2,
+                reportName: reportName ?? 'AGL015A',
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isFinancialStatementsReport
             ? await reportsRepo.getFinancialStatementsReport(
                 financialStatementReportType:
                     financialStatementSelection!.financialStatementReportType!,
@@ -946,6 +884,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
             ? await reportsRepo.getIncomeAndExpenseSituationReport(
                 fromMonth: monthRange?.fromMonth,
                 toMonth: monthRange?.toMonth,
+                languageCode: languageCode,
                 exportType: exportType,
               )
             : isDailyIncomeAndExpenseReport
@@ -1040,7 +979,16 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 exportType: exportType,
               )
             : await reportsRepo.getChartOfAccountReport(
-                reportName: reportName ?? 'AGL001',
+                fromAccountNo: chartOfAccountFilter?.fromAccountNo,
+                toAccountNo: chartOfAccountFilter?.toAccountNo,
+                fromCurrencyCode: chartOfAccountFilter?.fromCurrencyCode,
+                toCurrencyCode: chartOfAccountFilter?.toCurrencyCode,
+                fromAccountLevel: chartOfAccountFilter?.fromAccountLevel,
+                toAccountLevel: chartOfAccountFilter?.toAccountLevel,
+                accountType: chartOfAccountFilter?.accountType ?? 2,
+                finalAccount: chartOfAccountFilter?.finalAccount ?? 4,
+                reportName: reportName ?? 'AGL004',
+                languageCode: languageCode,
                 exportType: exportType,
               );
 
@@ -1256,7 +1204,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
     final List<Map<String, dynamic>> statements = [
       {
         'id': 'chart_of_account',
-        'reportName': 'AGL001',
+        'reportName': 'AGL004',
         'isApiReport': true,
         'title': AppLocaleKey.statementChartOfAccount.tr(),
         'desc': AppLocaleKey.statementChartOfAccountDesc.tr(),
@@ -1264,6 +1212,47 @@ class _ReportsScreenState extends State<ReportsScreen> {
         'icon': Icons.account_tree_rounded,
         'iconColor': AppColor.oceanBlue,
         'category': 1,
+        'treeGroup': 'accounts',
+      },
+      {
+        'id': 'chart_of_account_monthly_balances',
+        'reportName': 'AGL015A',
+        'isChartOfAccountMonthlyBalancesReport': true,
+        'isSubmenu': true,
+        'chartOfAccountReportPageType': 2,
+        'chartOfAccountReportAccountType': 0,
+        'chartOfAccountReportName': 'AGL015A',
+        'title': context.locale.languageCode == 'ar'
+            ? 'الأرصدة الشهرية / كشف الحساب'
+            : 'Monthly balances / Account statement',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'تقرير الأرصدة الشهرية أو كشف الحساب'
+            : 'Monthly balances or account statement report',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.account_tree_rounded,
+        'iconColor': AppColor.oceanBlue,
+        'category': 1,
+        'treeGroup': 'accounts',
+      },
+      {
+        'id': 'chart_of_account_monthly_movement',
+        'reportName': 'AGL003',
+        'isChartOfAccountMonthlyBalancesReport': true,
+        'isSubmenu': true,
+        'chartOfAccountReportPageType': 1,
+        'chartOfAccountReportAccountType': 2,
+        'chartOfAccountReportName': 'AGL003',
+        'title': context.locale.languageCode == 'ar'
+            ? 'الحركة الشهرية للحسابات'
+            : 'Monthly account movement',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'عرض حركة الحسابات الشهرية'
+            : 'View monthly account movements',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.account_tree_rounded,
+        'iconColor': AppColor.oceanBlue,
+        'category': 1,
+        'treeGroup': 'accounts',
       },
       {
         'title': 'القوائم المالية',
@@ -1273,6 +1262,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
         'iconColor': AppColor.emeraldTeal,
         'category': 1,
         'isFinancialStatementsReport': true,
+        'treeGroup': 'financial',
       },
       {
         'title': AppLocaleKey.statementDailyIncome.tr(),
@@ -1283,6 +1273,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
         'category': 1,
         'reportName': 'AGL300_D',
         'isDailyIncomeAndExpenseReport': true,
+        'treeGroup': 'operations',
       },
       {
         'title': AppLocaleKey.statementExpensesWithVat.tr(),
@@ -1293,6 +1284,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
         'category': 1,
         'reportName': 'AGL1001E',
         'isExpensesWithVatReport': true,
+        'treeGroup': 'tax',
       },
       {
         'title': AppLocaleKey.statementSalesWithVat.tr(),
@@ -1303,6 +1295,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
         'category': 2,
         'reportName': 'AAR1000',
         'isSalesWithVatReport': true,
+        'treeGroup': 'tax',
       },
       {
         'title': AppLocaleKey.statementPurchasesWithVat.tr(),
@@ -1313,6 +1306,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
         'category': 2,
         'reportName': 'AAR1001',
         'isPurchasesWithVatReport': true,
+        'treeGroup': 'tax',
       },
       {
         'title': AppLocaleKey.statementLedger.tr(),
@@ -1323,6 +1317,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
         'category': 1,
         'reportName': 'AGL025',
         'isLedgerReport': true,
+        'treeGroup': 'ledger',
       },
       {
         'title': AppLocaleKey.statementAccountStatement.tr(),
@@ -1333,6 +1328,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
         'category': 1,
         'reportName': 'AGL079',
         'isAccountStatementReport': true,
+        'treeGroup': 'ledger',
       },
       {
         'title': AppLocaleKey.statementTrialBalanceByCategories.tr(),
@@ -1343,6 +1339,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
         'category': 1,
         'reportName': 'AGL055',
         'isTrialBalanceByCategoriesReport': true,
+        'treeGroup': 'ledger',
       },
       {
         'title': AppLocaleKey.statementCostCenters.tr(),
@@ -1353,6 +1350,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
         'category': 1,
         'reportName': 'AGL007',
         'isCostCentersReport': true,
+        'treeGroup': 'costCenters',
       },
       {
         'title': AppLocaleKey.statementCostCentersProjects.tr(),
@@ -1363,6 +1361,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
         'category': 1,
         'reportName': 'Agl026_Project2',
         'isCostCentersProjectsReport': true,
+        'treeGroup': 'costCenters',
       },
       {
         'title': AppLocaleKey.statementMonthlyAccountsComparison.tr(),
@@ -1373,6 +1372,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
         'category': 1,
         'reportName': 'AGL003_Bar',
         'isMonthlyAccountComparisonReport': true,
+        'treeGroup': 'accountComparisons',
       },
       {
         'title': AppLocaleKey.statementMonthlyCostCentersComparison.tr(),
@@ -1383,6 +1383,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
         'category': 1,
         'reportName': 'AGL008_Chart',
         'isMonthlyCostCentersComparisonReport': true,
+        'treeGroup': 'accountComparisons',
       },
     ];
 
@@ -1404,10 +1405,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
           category.contains(normalizedQuery);
     }).toList();
 
-    final visibleSections = _buildCategorySections(
-      filteredStatements,
-      categoryTabs,
-    );
+    final visibleSections = _buildCategorySections(filteredStatements);
 
     return Scaffold(
       backgroundColor: AppColor.scaffoldColor(context),
@@ -1442,7 +1440,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 resultCount: filteredStatements.length,
               ),
             ),
-            SliverToBoxAdapter(child: Gap(8.h)),
+            SliverToBoxAdapter(child: Gap(16.h)),
             if (visibleSections.isEmpty)
               SliverToBoxAdapter(
                 child: ReportsEmptyStateWidget(
@@ -1562,26 +1560,64 @@ class _ReportsScreenState extends State<ReportsScreen> {
   // ─────────────────────────────────────────────────────────────────────────
   List<ReportsCategorySectionData> _buildCategorySections(
     List<Map<String, dynamic>> filteredStatements,
-    List<String> categoryTabs,
   ) {
     final sections = <ReportsCategorySectionData>[];
+    final isArabic = context.locale.languageCode == 'ar';
+    const groups = [
+      (
+        id: 1,
+        key: 'accounts',
+        titleAr: 'دليل الحسابات',
+        titleEn: 'Chart of accounts',
+      ),
+      (
+        id: 2,
+        key: 'costCenters',
+        titleAr: 'مراكز التكلفة',
+        titleEn: 'Cost centers',
+      ),
+      (
+        id: 3,
+        key: 'accountComparisons',
+        titleAr: 'تقارير المقارنة للحسابات',
+        titleEn: 'Account comparison reports',
+      ),
+      (
+        id: 4,
+        key: 'operations',
+        titleAr: 'تقارير العمليات',
+        titleEn: 'Operations reports',
+      ),
+      (
+        id: 5,
+        key: 'tax',
+        titleAr: 'تقارير ضريبة القيمة المضافة',
+        titleEn: 'VAT reports',
+      ),
+      (
+        id: 6,
+        key: 'ledger',
+        titleAr: 'تقارير الأستاذ والحسابات',
+        titleEn: 'Ledger and account reports',
+      ),
+      (
+        id: 7,
+        key: 'financial',
+        titleAr: 'القوائم المالية',
+        titleEn: 'Financial statements',
+      ),
+    ];
 
-    for (
-      var categoryIndex = 1;
-      categoryIndex < categoryTabs.length;
-      categoryIndex++
-    ) {
+    for (final group in groups) {
       final categoryReports = filteredStatements
-          .where((statement) => statement['category'] == categoryIndex)
+          .where((statement) => statement['treeGroup'] == group.key)
           .toList();
       if (categoryReports.isEmpty) continue;
 
       sections.add(
         ReportsCategorySectionData(
-          id: categoryIndex,
-          title: categoryTabs[categoryIndex],
-          icon: _categoryIcon(categoryIndex),
-          accentColor: _categoryColor(categoryIndex),
+          id: group.id,
+          title: isArabic ? group.titleAr : group.titleEn,
           reports: categoryReports,
         ),
       );
@@ -1590,29 +1626,16 @@ class _ReportsScreenState extends State<ReportsScreen> {
     return sections;
   }
 
-  IconData _categoryIcon(int categoryIndex) => switch (categoryIndex) {
-    1 => Icons.account_balance_rounded,
-    2 => Icons.storefront_rounded,
-    3 => Icons.inventory_2_rounded,
-    4 => Icons.receipt_long_rounded,
-    _ => Icons.folder_outlined,
-  };
-
-  Color _categoryColor(int categoryIndex) => switch (categoryIndex) {
-    1 => AppColor.oceanBlue,
-    2 => AppColor.emeraldTeal,
-    3 => AppColor.purpleAccent,
-    4 => AppColor.warningOrange,
-    _ => AppColor.primaryColor(context),
-  };
-
-  Widget _buildReportItem(Map<String, dynamic> statement) {
+  Widget _buildReportItem(
+    Map<String, dynamic> statement, {
+    required bool isSelected,
+    required VoidCallback onSelect,
+  }) {
     final title = statement['title'] as String;
     final description = statement['desc'] as String;
     final amount = statement['amount'] as String? ?? '';
     final date = statement['date'] as String? ?? '';
     final status = statement['status'] as String;
-    final code = statement['reportName'] as String? ?? '';
     Future<void> exportReport(String exportType) => _handleExportReport(
       title: title,
       description: description,
@@ -1642,12 +1665,21 @@ class _ReportsScreenState extends State<ReportsScreen> {
           statement['isMonthlyAccountComparisonReport'] == true,
       isMonthlyCostCentersComparisonReport:
           statement['isMonthlyCostCentersComparisonReport'] == true,
+      isChartOfAccountMonthlyBalancesReport:
+          statement['isChartOfAccountMonthlyBalancesReport'] == true,
+      chartOfAccountReportPageType:
+          statement['chartOfAccountReportPageType'] as int? ?? 2,
+      chartOfAccountReportAccountType:
+          statement['chartOfAccountReportAccountType'] as int? ?? 0,
+      chartOfAccountReportName:
+          statement['chartOfAccountReportName'] as String? ?? 'AGL015A',
     );
 
     return ReportsTableItemWidget(
       title: title,
-      reportCode: code.isEmpty ? null : code,
       searchQuery: _searchQuery,
+      isSelected: isSelected,
+      onSelect: onSelect,
       onExportPdf: () => exportReport('pdf'),
       onExportFormat: exportReport,
     );

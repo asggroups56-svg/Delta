@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -254,15 +256,11 @@ class ReportsSearchSummaryWidget extends StatelessWidget {
 class ReportsCategorySectionData {
   final int id;
   final String title;
-  final IconData icon;
-  final Color accentColor;
   final List<Map<String, dynamic>> reports;
 
   const ReportsCategorySectionData({
     required this.id,
     required this.title,
-    required this.icon,
-    required this.accentColor,
     required this.reports,
   });
 }
@@ -270,7 +268,12 @@ class ReportsCategorySectionData {
 class ReportsCategoryAccordionListWidget extends StatefulWidget {
   final List<ReportsCategorySectionData> sections;
   final String searchQuery;
-  final Widget Function(Map<String, dynamic> report) reportBuilder;
+  final Widget Function(
+    Map<String, dynamic> report, {
+    required bool isSelected,
+    required VoidCallback onSelect,
+  })
+  reportBuilder;
 
   const ReportsCategoryAccordionListWidget({
     super.key,
@@ -287,13 +290,15 @@ class ReportsCategoryAccordionListWidget extends StatefulWidget {
 class _ReportsCategoryAccordionListWidgetState
     extends State<ReportsCategoryAccordionListWidget> {
   final Set<int> _expandedSections = {};
+  Object? _selectedReportId;
+
+  Object? _reportId(Map<String, dynamic> report) =>
+      report['id'] ?? report['reportName'] ?? report['title'];
 
   @override
   void initState() {
     super.initState();
-    if (widget.sections.isNotEmpty) {
-      _expandedSections.add(widget.sections.first.id);
-    }
+    _restoreDefaultExpandedSection();
   }
 
   @override
@@ -305,142 +310,192 @@ class _ReportsCategoryAccordionListWidgetState
         ..addAll(
           widget.searchQuery.trim().isNotEmpty
               ? widget.sections.map((section) => section.id)
-              : widget.sections.take(1).map((section) => section.id),
+              : _defaultExpandedSectionIds(),
         );
+      if (widget.searchQuery.trim().isEmpty) {
+        _selectFirstReportInDefaultSection();
+      }
     } else if (oldWidget.sections.isEmpty && widget.sections.isNotEmpty) {
-      _expandedSections.add(widget.sections.first.id);
+      _restoreDefaultExpandedSection();
     }
+  }
+
+  Set<int> _defaultExpandedSectionIds() {
+    final costCenters = widget.sections.where((section) => section.id == 2);
+    if (costCenters.isNotEmpty) return {costCenters.first.id};
+    return widget.sections.isEmpty ? {} : {widget.sections.first.id};
+  }
+
+  void _restoreDefaultExpandedSection() {
+    _expandedSections
+      ..clear()
+      ..addAll(_defaultExpandedSectionIds());
+    _selectFirstReportInDefaultSection();
+  }
+
+  void _selectFirstReportInDefaultSection() {
+    final expanded = widget.sections.where(
+      (section) => _expandedSections.contains(section.id),
+    );
+    _selectedReportId = expanded.isEmpty || expanded.first.reports.isEmpty
+        ? null
+        : _reportId(expanded.first.reports.first);
   }
 
   @override
   Widget build(BuildContext context) {
+    final rows =
+        <
+          ({
+            ReportsCategorySectionData section,
+            Map<String, dynamic>? report,
+            bool selected,
+          })
+        >[];
+    for (final section in widget.sections) {
+      final isExpanded = _expandedSections.contains(section.id);
+      rows.add((section: section, report: null, selected: false));
+      if (isExpanded) {
+        for (final report in section.reports) {
+          rows.add((
+            section: section,
+            report: report,
+            selected: _reportId(report) == _selectedReportId,
+          ));
+        }
+      }
+    }
+
     return SliverPadding(
       padding: EdgeInsets.symmetric(horizontal: 16.w),
-      sliver: SliverList(
-        delegate: SliverChildBuilderDelegate((context, index) {
-          final section = widget.sections[index];
-          final isExpanded = _expandedSections.contains(section.id);
-          final accentColor = section.accentColor;
+      sliver: SliverList.builder(
+        itemCount: rows.length,
+        itemBuilder: (context, index) {
+          final row = rows[index];
+          final isFirst = index == 0;
+          final isLast = index == rows.length - 1;
+          final isExpanded = _expandedSections.contains(row.section.id);
+          final isGroupHeader = row.report == null;
+          final accent = AppColor.primaryColor(context);
+          final backgroundColor = isGroupHeader
+              ? (isExpanded
+                    ? accent.withValues(alpha: 0.09)
+                    : AppColor.cardColor(context))
+              : AppColor.cardSurfaceColor(context);
 
-          return Padding(
-            padding: EdgeInsets.only(bottom: 10.h),
-            child: Container(
-              decoration: BoxDecoration(
-                color: AppColor.cardColor(context),
-                border: Border.all(color: AppColor.borderColor(context)),
-                borderRadius: BorderRadius.circular(18.r),
+          return Container(
+            decoration: BoxDecoration(
+              color: backgroundColor,
+              border: Border(
+                left: BorderSide(color: AppColor.borderColor(context)),
+                right: BorderSide(color: AppColor.borderColor(context)),
+                top: isFirst
+                    ? BorderSide(color: AppColor.borderColor(context))
+                    : BorderSide.none,
+                bottom: BorderSide(color: AppColor.borderColor(context)),
               ),
-              clipBehavior: Clip.antiAlias,
-              child: Column(
-                children: [
-                  Material(
-                    color: isExpanded
-                        ? accentColor.withValues(alpha: 0.09)
-                        : AppColor.cardColor(context),
+              borderRadius: BorderRadius.vertical(
+                top: isFirst ? Radius.circular(16.r) : Radius.zero,
+                bottom: isLast ? Radius.circular(16.r) : Radius.zero,
+              ),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: isGroupHeader
+                ? Material(
+                    color: Colors.transparent,
                     child: InkWell(
                       onTap: () {
                         setState(() {
                           if (isExpanded) {
-                            _expandedSections.remove(section.id);
+                            _expandedSections.remove(row.section.id);
                           } else {
-                            _expandedSections.add(section.id);
+                            _expandedSections.add(row.section.id);
+                            if (row.section.reports.isNotEmpty) {
+                              _selectedReportId = _reportId(
+                                row.section.reports.first,
+                              );
+                            }
                           }
                         });
                       },
                       child: SizedBox(
-                        height: 58.h,
+                        height: 55.h,
                         child: Row(
                           children: [
-                            AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              width: 4.w,
-                              height: double.infinity,
-                              color: isExpanded
-                                  ? accentColor
-                                  : Colors.transparent,
-                            ),
-                            Gap(14.w),
-                            Icon(
-                              section.icon,
-                              size: 20.r,
-                              color: isExpanded
-                                  ? accentColor
-                                  : AppColor.darkTextColor(context),
-                            ),
-                            Gap(10.w),
+                            if (Directionality.of(context) ==
+                                ui.TextDirection.rtl)
+                              _buildActiveEdge(isExpanded, accent),
+                            if (Directionality.of(context) !=
+                                ui.TextDirection.rtl)
+                              _buildSectionArrow(isExpanded, accent, context),
                             Expanded(
-                              child: Text(
-                                section.title,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  color: isExpanded
-                                      ? accentColor
-                                      : AppColor.titleFormFiledColor(context),
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.w700,
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                                child: Text(
+                                  row.section.title,
+                                  textAlign: TextAlign.end,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    color: isExpanded
+                                        ? accent
+                                        : AppColor.titleFormFiledColor(context),
+                                    fontSize: 13.sp,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                               ),
                             ),
-                            Text(
-                              '${section.reports.length}',
-                              style: TextStyle(
-                                color: AppColor.darkTextColor(context),
-                                fontSize: 11.sp,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            Gap(8.w),
-                            Icon(
-                              isExpanded
-                                  ? Icons.keyboard_arrow_down_rounded
-                                  : Icons.chevron_left_rounded,
-                              color: isExpanded
-                                  ? accentColor
-                                  : AppColor.darkTextColor(context),
-                              size: 22.r,
-                            ),
-                            Gap(12.w),
+                            if (Directionality.of(context) ==
+                                ui.TextDirection.rtl)
+                              _buildSectionArrow(isExpanded, accent, context),
+                            if (Directionality.of(context) !=
+                                ui.TextDirection.rtl)
+                              _buildActiveEdge(isExpanded, accent),
                           ],
                         ),
                       ),
                     ),
+                  )
+                : widget.reportBuilder(
+                    row.report!,
+                    isSelected: row.selected,
+                    onSelect: () => setState(
+                      () => _selectedReportId = _reportId(row.report!),
+                    ),
                   ),
-                  AnimatedSize(
-                    duration: const Duration(milliseconds: 220),
-                    curve: Curves.easeInOut,
-                    child: isExpanded
-                        ? ColoredBox(
-                            color: AppColor.cardSurfaceColor(context),
-                            child: Column(
-                              children: [
-                                for (
-                                  var reportIndex = 0;
-                                  reportIndex < section.reports.length;
-                                  reportIndex++
-                                ) ...[
-                                  if (reportIndex > 0)
-                                    Divider(
-                                      height: 1,
-                                      indent: 18.w,
-                                      endIndent: 18.w,
-                                      color: AppColor.borderColor(context),
-                                    ),
-                                  widget.reportBuilder(
-                                    section.reports[reportIndex],
-                                  ),
-                                ],
-                              ],
-                            ),
-                          )
-                        : const SizedBox.shrink(),
-                  ),
-                ],
-              ),
-            ),
           );
-        }, childCount: widget.sections.length),
+        },
       ),
+    );
+  }
+
+  Widget _buildSectionArrow(
+    bool isExpanded,
+    Color accent,
+    BuildContext context,
+  ) {
+    final isRtl = Directionality.of(context) == ui.TextDirection.rtl;
+    return SizedBox(
+      width: 40.w,
+      child: Icon(
+        isExpanded
+            ? Icons.keyboard_arrow_down_rounded
+            : (isRtl
+                  ? Icons.chevron_left_rounded
+                  : Icons.chevron_right_rounded),
+        size: 21.r,
+        color: isExpanded ? accent : AppColor.darkTextColor(context),
+      ),
+    );
+  }
+
+  Widget _buildActiveEdge(bool isExpanded, Color accent) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 180),
+      width: 3.w,
+      height: double.infinity,
+      color: isExpanded ? accent : Colors.transparent,
     );
   }
 }

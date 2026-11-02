@@ -10,6 +10,7 @@ import '../../../../core/network/api_consumer.dart';
 import '../../../../core/network/end_points.dart';
 import '../models/account_statement_report_request_model.dart';
 import '../models/chart_of_account_report_request_model.dart';
+import '../models/chart_of_account_monthly_balances_report_request_model.dart';
 import '../models/cost_centers_projects_report_request_model.dart';
 import '../models/cost_centers_report_request_model.dart';
 import '../models/daily_income_and_expense_situation_report_request_model.dart';
@@ -25,13 +26,36 @@ import '../models/trial_balance_by_categories_report_request_model.dart';
 
 abstract interface class ReportsRepo {
   Future<Either<Failure, File>> getChartOfAccountReport({
-    String reportName = 'AGL001',
+    num? fromAccountNo,
+    num? toAccountNo,
+    String? fromCurrencyCode,
+    String? toCurrencyCode,
+    int? fromAccountLevel,
+    int? toAccountLevel,
+    int accountType = 2,
+    int finalAccount = 4,
+    String reportName = 'AGL004',
+    required String languageCode,
+    String exportType = 'pdf',
+  });
+
+  Future<Either<Failure, File>> getChartOfAccountMonthlyBalancesReport({
+    num? fromAccountNo,
+    num? toAccountNo,
+    int? fromAccountLevel,
+    int? toAccountLevel,
+    int accountType = 0,
+    int finalAccount = 4,
+    int reportPageType = 2,
+    String reportName = 'AGL015A',
+    required String languageCode,
     String exportType = 'pdf',
   });
 
   Future<Either<Failure, File>> getIncomeAndExpenseSituationReport({
     int? fromMonth,
     int? toMonth,
+    required String languageCode,
     String exportType = 'pdf',
   });
 
@@ -136,12 +160,29 @@ class ReportsRepoImpl implements ReportsRepo {
 
   @override
   Future<Either<Failure, File>> getChartOfAccountReport({
-    String reportName = 'AGL001',
+    num? fromAccountNo,
+    num? toAccountNo,
+    String? fromCurrencyCode,
+    String? toCurrencyCode,
+    int? fromAccountLevel,
+    int? toAccountLevel,
+    int accountType = 2,
+    int finalAccount = 4,
+    String reportName = 'AGL004',
+    required String languageCode,
     String exportType = 'pdf',
   }) {
     return handleDioRequest(
       request: () async {
         final requestModel = ChartOfAccountReportRequestModel(
+          fromAccountNo: fromAccountNo,
+          toAccountNo: toAccountNo,
+          fromCurrencyCode: fromCurrencyCode,
+          toCurrencyCode: toCurrencyCode,
+          fromAccountLevel: fromAccountLevel,
+          toAccountLevel: toAccountLevel,
+          accountType: accountType,
+          finalAccount: finalAccount,
           reportName: reportName,
           exportType: exportType,
         );
@@ -151,6 +192,45 @@ class ReportsRepoImpl implements ReportsRepo {
           body: requestModel.toJson(),
           fileNamePrefix: 'chart_of_account',
           exportType: exportType,
+          headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+        );
+      },
+    );
+  }
+
+  @override
+  Future<Either<Failure, File>> getChartOfAccountMonthlyBalancesReport({
+    num? fromAccountNo,
+    num? toAccountNo,
+    int? fromAccountLevel,
+    int? toAccountLevel,
+    int accountType = 0,
+    int finalAccount = 4,
+    int reportPageType = 2,
+    String reportName = 'AGL015A',
+    required String languageCode,
+    String exportType = 'pdf',
+  }) {
+    return handleDioRequest(
+      request: () async {
+        final requestModel = ChartOfAccountMonthlyBalancesReportRequestModel(
+          fromAccountNo: fromAccountNo,
+          toAccountNo: toAccountNo,
+          fromAccountLevel: fromAccountLevel,
+          toAccountLevel: toAccountLevel,
+          accountType: accountType,
+          finalAccount: finalAccount,
+          reportPageType: reportPageType,
+          reportName: reportName,
+          exportType: exportType,
+        );
+
+        return _downloadReport(
+          endpoint: EndPoints.chartOfAccountMonthlyBalancesOrStatementReport,
+          body: requestModel.toJson(),
+          fileNamePrefix: 'chart_of_account_monthly_balances',
+          exportType: exportType,
+          headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
         );
       },
     );
@@ -160,6 +240,7 @@ class ReportsRepoImpl implements ReportsRepo {
   Future<Either<Failure, File>> getIncomeAndExpenseSituationReport({
     int? fromMonth,
     int? toMonth,
+    required String languageCode,
     String exportType = 'pdf',
   }) {
     return handleDioRequest(
@@ -175,6 +256,7 @@ class ReportsRepoImpl implements ReportsRepo {
           body: requestModel.toJson(),
           fileNamePrefix: 'income_and_expense_situation_report',
           exportType: requestModel.exportType,
+          headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
         );
       },
     );

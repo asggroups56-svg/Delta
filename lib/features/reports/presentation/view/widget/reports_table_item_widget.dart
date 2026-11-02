@@ -1,110 +1,89 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:gap/gap.dart';
 import 'package:my_template/core/theme/app_colors.dart';
 
 class ReportsTableItemWidget extends StatelessWidget {
   final String title;
-  final String? reportCode;
   final String searchQuery;
+  final bool isSelected;
+  final VoidCallback onSelect;
   final VoidCallback onExportPdf;
   final ValueChanged<String> onExportFormat;
 
   const ReportsTableItemWidget({
     super.key,
     required this.title,
-    this.reportCode,
     this.searchQuery = '',
+    this.isSelected = false,
+    required this.onSelect,
     required this.onExportPdf,
     required this.onExportFormat,
   });
 
+  Future<void> _showExportFormats(BuildContext context) async {
+    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
+    final formats = <(String, IconData, String)>[
+      ('pdf', Icons.picture_as_pdf_rounded, 'PDF'),
+      ('excel', Icons.table_chart_rounded, isArabic ? 'إكسل' : 'Excel'),
+      ('word', Icons.description_rounded, isArabic ? 'وورد' : 'Word'),
+      (
+        'excelformatted',
+        Icons.grid_on_rounded,
+        isArabic ? 'إكسل احترافي' : 'Excel PRO',
+      ),
+    ];
+    final selectedFormat = await showModalBottomSheet<String>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (final (format, icon, label) in formats)
+              ListTile(
+                leading: Icon(icon),
+                title: Text(label),
+                onTap: () => Navigator.pop(context, format),
+              ),
+          ],
+        ),
+      ),
+    );
+    if (selectedFormat == null || !context.mounted) return;
+    if (selectedFormat == 'pdf') {
+      onExportPdf();
+    } else {
+      onExportFormat(selectedFormat);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final titleColor = AppColor.titleFormFiledColor(context);
-    final mutedColor = AppColor.darkTextColor(context);
-    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: onExportPdf,
-        child: Padding(
-          padding: EdgeInsetsDirectional.fromSTEB(16.w, 12.h, 12.w, 12.h),
+        onTap: () {
+          onSelect();
+          onExportPdf();
+        },
+        onLongPress: () => _showExportFormats(context),
+        child: SizedBox(
+          height: 48.h,
+          child: Padding(
+            padding: EdgeInsetsDirectional.only(start: 18.w, end: 27.w),
           child: Row(
             children: [
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildHighlightedTitle(context, title, titleColor),
-                    if (reportCode != null && reportCode!.isNotEmpty) ...[
-                      Gap(3.h),
-                      Text(
-                        reportCode!,
-                        style: TextStyle(
-                          color: mutedColor,
-                          fontSize: 10.sp,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ],
+                child: _buildHighlightedTitle(
+                  context,
+                  title,
+                  isSelected ? AppColor.primaryColor(context) : titleColor,
                 ),
-              ),
-              PopupMenuButton<String>(
-                tooltip: isArabic ? 'تصدير التقرير' : 'Export report',
-                icon: Icon(
-                  Icons.more_vert_rounded,
-                  color: mutedColor,
-                  size: 20.r,
-                ),
-                onSelected: (format) {
-                  if (format == 'pdf') {
-                    onExportPdf();
-                  } else {
-                    onExportFormat(format);
-                  }
-                },
-                itemBuilder: (context) => [
-                  PopupMenuItem(
-                    value: 'pdf',
-                    child: _ReportExportMenuItem(
-                      icon: Icons.picture_as_pdf_rounded,
-                      label: 'PDF',
-                    ),
-                  ),
-                  PopupMenuItem(
-                    value: 'excel',
-                    child: _ReportExportMenuItem(
-                      icon: Icons.table_chart_rounded,
-                      label: isArabic ? 'إكسل' : 'Excel',
-                    ),
-                  ),
-                  PopupMenuItem(
-                    value: 'word',
-                    child: _ReportExportMenuItem(
-                      icon: Icons.description_rounded,
-                      label: isArabic ? 'وورد' : 'Word',
-                    ),
-                  ),
-                  PopupMenuItem(
-                    value: 'excelformatted',
-                    child: _ReportExportMenuItem(
-                      icon: Icons.grid_on_rounded,
-                      label: isArabic ? 'إكسل احترافي' : 'Excel PRO',
-                    ),
-                  ),
-                ],
-              ),
-              Icon(
-                Directionality.of(context) == TextDirection.rtl
-                    ? Icons.chevron_left_rounded
-                    : Icons.chevron_right_rounded,
-                color: AppColor.primaryColor(context),
-                size: 22.r,
               ),
             ],
+          ),
           ),
         ),
       ),
@@ -119,8 +98,8 @@ class ReportsTableItemWidget extends StatelessWidget {
     final query = searchQuery.trim();
     final style = TextStyle(
       color: color,
-      fontSize: 13.sp,
-      fontWeight: FontWeight.w600,
+      fontSize: 12.5.sp,
+      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
     );
     if (query.isEmpty) {
       return Text(
@@ -163,24 +142,6 @@ class ReportsTableItemWidget extends StatelessWidget {
       ),
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
-    );
-  }
-}
-
-class _ReportExportMenuItem extends StatelessWidget {
-  final IconData icon;
-  final String label;
-
-  const _ReportExportMenuItem({required this.icon, required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Icon(icon, size: 18.r),
-        Gap(10.w),
-        Text(label),
-      ],
     );
   }
 }

@@ -5,6 +5,8 @@ class EndPoints {
       'Dashboard/IncomeAndExpensesChart';
   static const String salesAndReturnsChart = 'Dashboard/SalesAndReturnsChart';
   static const String chartOfAccountReport = 'Report/ChartOfAccountReport';
+  static const String chartOfAccountMonthlyBalancesOrStatementReport =
+      'Report/ChartOfAccountMonthlyBalancesOrStatementReport';
   static const String incomeAndExpenseSituationReport =
       'Report/IncomeAndExpenseSituationReport';
   static const String financialStatementsReport =
