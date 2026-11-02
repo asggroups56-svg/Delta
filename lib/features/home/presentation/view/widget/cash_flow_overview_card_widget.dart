@@ -539,7 +539,9 @@ class _CashFlowOverviewCardWidgetState
     required Color color,
     required bool isSelected,
   }) {
-    final targetHeight = value == 0 ? 3.h : 120.h * value / chartScale;
+    final targetHeight = value <= 0
+        ? 3.h
+        : (120.h * value / chartScale).clamp(0.0, 120.h).toDouble();
 
     return TweenAnimationBuilder<double>(
       tween: Tween<double>(begin: 0, end: targetHeight),

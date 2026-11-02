@@ -19,7 +19,6 @@ import 'package:my_template/features/home/presentation/view/widget/grid_modules_
 import 'package:my_template/features/home/presentation/view/widget/quick_shortcuts_widget.dart';
 import 'package:my_template/features/home/presentation/view/widget/recent_activities_widget.dart';
 import 'package:my_template/features/home/presentation/view/widget/side_drawer_widget.dart';
-
 class HomeScreen extends StatefulWidget {
   final bool embeddedInShell;
   final VoidCallback? onAiTap;

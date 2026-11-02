@@ -1583,12 +1583,12 @@ class _ReportsScreenState extends State<ReportsScreen> {
               Positioned(
                 top: -46.r,
                 right: -28.r,
-                child: _heroCircle(150.r, Colors.white),
+                child: _heroCircle(150.r, AppColor.whiteColor(context)),
               ),
               Positioned(
                 bottom: -72.r,
                 left: -34.r,
-                child: _heroCircle(180.r, Colors.white),
+                child: _heroCircle(180.r, AppColor.whiteColor(context)),
               ),
               Padding(
                 padding: EdgeInsets.all(18.r),
@@ -1601,15 +1601,15 @@ class _ReportsScreenState extends State<ReportsScreen> {
                           width: 46.r,
                           height: 46.r,
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.16),
+                            color: AppColor.whiteColor(context).withValues(alpha: 0.16),
                             borderRadius: BorderRadius.circular(15.r),
                             border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.22),
+                              color: AppColor.whiteColor(context).withValues(alpha: 0.22),
                             ),
                           ),
                           child: Icon(
                             Icons.analytics_rounded,
-                            color: Colors.white,
+                            color: AppColor.whiteColor(context),
                             size: 24.r,
                           ),
                         ),
@@ -1625,7 +1625,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                 style: TextStyle(
                                   fontSize: 18.sp,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                                  color: AppColor.whiteColor(context),
                                 ),
                               ),
                               Gap(3.h),
@@ -1636,7 +1636,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                 style: TextStyle(
                                   fontSize: 10.5.sp,
                                   height: 1.4,
-                                  color: Colors.white.withValues(alpha: 0.72),
+                                  color: AppColor.whiteColor(context).withValues(alpha: 0.72),
                                 ),
                               ),
                             ],
@@ -1649,7 +1649,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                     Gap(18.h),
                     Container(
                       height: 1,
-                      color: Colors.white.withValues(alpha: 0.12),
+                      color: AppColor.whiteColor(context).withValues(alpha: 0.12),
                     ),
                     Gap(14.h),
                     Wrap(
@@ -1669,7 +1669,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                               width: 1,
                               height: 24.h,
                               margin: EdgeInsets.symmetric(horizontal: 16.w),
-                              color: Colors.white.withValues(alpha: 0.16),
+                              color: AppColor.whiteColor(context).withValues(alpha: 0.16),
                             ),
                             _heroStat(
                               value: '$sectionCount',
@@ -1688,7 +1688,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                             ),
                           ),
                           style: FilledButton.styleFrom(
-                            backgroundColor: Colors.white,
+                            backgroundColor: AppColor.whiteColor(context),
                             foregroundColor: AppColor.royalNavy,
                             elevation: 0,
                             padding: EdgeInsets.symmetric(
@@ -1732,7 +1732,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
           style: TextStyle(
             fontSize: 18.sp,
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color: AppColor.whiteColor(context),
             height: 1,
           ),
         ),
@@ -1742,7 +1742,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
           style: TextStyle(
             fontSize: 10.sp,
             fontWeight: FontWeight.w500,
-            color: Colors.white.withValues(alpha: 0.68),
+            color: AppColor.whiteColor(context).withValues(alpha: 0.68),
           ),
         ),
       ],
@@ -1756,21 +1756,21 @@ class _ReportsScreenState extends State<ReportsScreen> {
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.13),
+          color: AppColor.whiteColor(context).withValues(alpha: 0.13),
           borderRadius: BorderRadius.circular(13.r),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+          border: Border.all(color: AppColor.whiteColor(context).withValues(alpha: 0.2)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.translate_rounded, size: 15.r, color: Colors.white),
+            Icon(Icons.translate_rounded, size: 15.r, color: AppColor.whiteColor(context)),
             Gap(5.w),
             Text(
               isAr ? 'EN' : 'AR',
               style: TextStyle(
                 fontSize: 11.sp,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: AppColor.whiteColor(context),
               ),
             ),
           ],
@@ -1979,7 +1979,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                     fontSize: 11.sp,
                     fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                     color: isSelected
-                        ? Colors.white
+                        ? AppColor.whiteColor(context)
                         : AppColor.titleFormFiledColor(context),
                   ),
                 ),
@@ -2413,7 +2413,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                             ? FontWeight.bold
                             : FontWeight.w500,
                         color: isSelected
-                            ? Colors.white
+                            ? AppColor.whiteColor(context)
                             : AppColor.titleFormFiledColor(context),
                       ),
                     ),
@@ -2425,7 +2425,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                       ),
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? Colors.white.withValues(alpha: 0.2)
+                            ? AppColor.whiteColor(context).withValues(alpha: 0.2)
                             : AppColor.primaryColor(
                                 context,
                               ).withValues(alpha: 0.08),
@@ -2437,7 +2437,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                           fontSize: 9.sp,
                           fontWeight: FontWeight.bold,
                           color: isSelected
-                              ? Colors.white
+                              ? AppColor.whiteColor(context)
                               : AppColor.darkTextColor(context),
                         ),
                       ),
@@ -2451,7 +2451,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
       ),
     );
   }
-
   // ─────────────────────────────────────────────────────────────────────────
   // Statements List
   // ─────────────────────────────────────────────────────────────────────────
@@ -2574,7 +2573,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
         ),
       );
     }
-
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.w),
       child: ListView.builder(
@@ -2590,7 +2588,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
           final status = st['status'] as String;
           final code = st['reportName'] as String? ?? '';
           final category = categoryTabs[st['category'] as int];
-
           Future<void> exportReport(String exportType) => _handleExportReport(
             title: title,
             description: description,
@@ -2621,7 +2618,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
             isMonthlyCostCentersComparisonReport:
                 st['isMonthlyCostCentersComparisonReport'] == true,
           );
-
           return FadeInUp(
             delay: Duration(milliseconds: 60 * index),
             child: ReportsTableItemWidget(
