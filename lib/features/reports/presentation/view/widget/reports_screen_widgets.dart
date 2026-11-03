@@ -322,7 +322,22 @@ class _ReportsCategoryAccordionListWidgetState
 
   Set<int> _defaultExpandedSectionIds() {
     final costCenters = widget.sections.where((section) => section.id == 2);
-    if (costCenters.isNotEmpty) return {costCenters.first.id};
+    final centersComparison = widget.sections.where(
+      (section) => section.id == 3,
+    );
+    final accountCentersComparison = widget.sections.where(
+      (section) => section.id == 9,
+    );
+    if (costCenters.isNotEmpty ||
+        centersComparison.isNotEmpty ||
+        accountCentersComparison.isNotEmpty) {
+      return {
+        if (costCenters.isNotEmpty) costCenters.first.id,
+        if (centersComparison.isNotEmpty) centersComparison.first.id,
+        if (accountCentersComparison.isNotEmpty)
+          accountCentersComparison.first.id,
+      };
+    }
     return widget.sections.isEmpty ? {} : {widget.sections.first.id};
   }
 

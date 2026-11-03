@@ -15,6 +15,7 @@ import 'package:my_template/features/reports/data/repository/reports_repo.dart';
 import 'package:my_template/features/reports/presentation/view/widget/file_download_service.dart';
 import 'package:my_template/features/reports/presentation/view/widget/account_statement_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/accounts_comparison_report_filter_bottom_sheet_widget.dart';
+import 'package:my_template/features/reports/presentation/view/widget/accounts_centers_comparison_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/account_centers_summary_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/chart_of_account_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/chart_of_account_monthly_balances_filter_bottom_sheet_widget.dart';
@@ -91,6 +92,25 @@ class _ReportsScreenState extends State<ReportsScreen> {
   String _centersComparisonBalancesReportName(int balance, int periodically) {
     if (balance == 0) return periodically == 0 ? 'AGL051' : 'AGL050';
     return periodically == 0 ? 'AGL048' : 'AGL047';
+  }
+
+  String _accountsCentersComparisonReportName(
+    int balance,
+    int periodically,
+    int reportGroup,
+  ) {
+    final suffix = reportGroup == 0 ? 'A' : 'B';
+    if (balance == 0)
+      return periodically == 0 ? 'AGL051$suffix' : 'AGL050$suffix';
+    return periodically == 0 ? 'AGL048$suffix' : 'AGL047$suffix';
+  }
+
+  String _accountsCentersMonthlyComparisonReportName(
+    int reportPageType,
+    int reportGroup,
+  ) {
+    final suffix = reportGroup == 0 ? 'A' : 'B';
+    return 'AGL${reportPageType == 2 ? '091' : '092'}$suffix';
   }
 
   void _onSearchChanged(String value) {
@@ -780,6 +800,9 @@ class _ReportsScreenState extends State<ReportsScreen> {
     bool isCentersComparisonByMonthsReport = false,
     bool isCentersComparisonByMonthReport = false,
     bool isCentersComparisonBalancesReport = false,
+    bool isAccountsCentersComparisonReport = false,
+    bool isAccountsCentersMonthlyComparisonReport = false,
+    bool isAccountsCentersMonthlyMovementsReport = false,
     bool isCostCentersTransactionReport = false,
     bool isCostCentersTransactionAnnualReport = false,
     bool isCostCentersProjectsReport = false,
@@ -963,6 +986,25 @@ class _ReportsScreenState extends State<ReportsScreen> {
       reportName = costCentersFilter.reportName;
       exportType = costCentersFilter.exportType;
     }
+    AccountsCentersComparisonReportFilterSelection?
+    accountsCentersComparisonFilter;
+    if (isAccountsCentersComparisonReport ||
+        isAccountsCentersMonthlyComparisonReport ||
+        isAccountsCentersMonthlyMovementsReport) {
+      accountsCentersComparisonFilter =
+          await AccountsCentersComparisonReportFilterBottomSheetWidget.show(
+            context,
+            title: title,
+            showBalanceFilter:
+                !isAccountsCentersMonthlyMovementsReport &&
+                !isAccountsCentersMonthlyComparisonReport,
+            showPeriodFilter:
+                !isAccountsCentersMonthlyMovementsReport &&
+                !isAccountsCentersMonthlyComparisonReport,
+          );
+      if (!mounted || accountsCentersComparisonFilter == null) return;
+      exportType = accountsCentersComparisonFilter.exportType;
+    }
     CostCentersTransactionReportFilterSelection? costCentersTransactionFilter;
     if (isCostCentersTransactionReport ||
         isCostCentersTransactionAnnualReport) {
@@ -1144,6 +1186,54 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 reportPageType: 1,
                 reportName: accountsComparisonFilter?.reportName ?? 'AGL006',
                 includeBalancePeriodicallyFilters: true,
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isAccountsCentersMonthlyComparisonReport ||
+                  isAccountsCentersMonthlyMovementsReport
+            ? await reportsRepo.getAccountsCentersComparisonReport(
+                fromAccountNo: accountsCentersComparisonFilter?.fromAccountNo,
+                toAccountNo: accountsCentersComparisonFilter?.toAccountNo,
+                fromCostCenterNo:
+                    accountsCentersComparisonFilter?.fromCostCenterNo,
+                toCostCenterNo:
+                    accountsCentersComparisonFilter?.toCostCenterNo,
+                fromMonth: null,
+                toMonth: null,
+                balance: 0,
+                periodically: isAccountsCentersMonthlyComparisonReport ? 1 : 0,
+                reportGroup: accountsCentersComparisonFilter?.reportGroup ?? 0,
+                reportPageType: isAccountsCentersMonthlyComparisonReport
+                    ? 2
+                    : 3,
+                reportName: _accountsCentersMonthlyComparisonReportName(
+                  isAccountsCentersMonthlyComparisonReport ? 2 : 3,
+                  accountsCentersComparisonFilter?.reportGroup ?? 0,
+                ),
+                includeBalanceAndPeriodically:
+                    isAccountsCentersMonthlyComparisonReport,
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isAccountsCentersComparisonReport
+            ? await reportsRepo.getAccountsCentersComparisonReport(
+                fromAccountNo: accountsCentersComparisonFilter?.fromAccountNo,
+                toAccountNo: accountsCentersComparisonFilter?.toAccountNo,
+                fromCostCenterNo:
+                    accountsCentersComparisonFilter?.fromCostCenterNo,
+                toCostCenterNo: accountsCentersComparisonFilter?.toCostCenterNo,
+                fromMonth: null,
+                toMonth: null,
+                balance: accountsCentersComparisonFilter?.balance ?? 0,
+                periodically:
+                    accountsCentersComparisonFilter?.periodically ?? 0,
+                reportGroup: accountsCentersComparisonFilter?.reportGroup ?? 0,
+                reportPageType: 1,
+                reportName: _accountsCentersComparisonReportName(
+                  accountsCentersComparisonFilter?.balance ?? 0,
+                  accountsCentersComparisonFilter?.periodically ?? 0,
+                  accountsCentersComparisonFilter?.reportGroup ?? 0,
+                ),
                 languageCode: languageCode,
                 exportType: exportType,
               )
@@ -1918,6 +2008,54 @@ class _ReportsScreenState extends State<ReportsScreen> {
         'treeGroup': 'centersComparison',
       },
       {
+        'id': 'accounts_centers_comparison_report',
+        'title': context.locale.languageCode == 'ar'
+            ? 'تقرير مقارنة أرصدة مراكز الحسابات'
+            : 'Account Center Balances Comparison Report',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'مقارنة أرصدة الحسابات ومراكز التكلفة'
+            : 'Compare account and cost center balances',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.compare_arrows_rounded,
+        'iconColor': AppColor.oceanBlue,
+        'category': 1,
+        'reportName': 'AGL051A',
+        'isAccountsCentersComparisonReport': true,
+        'treeGroup': 'accountCentersComparison',
+      },
+      {
+        'id': 'accounts_centers_monthly_comparison_report',
+        'title': context.locale.languageCode == 'ar'
+            ? 'تقارير مقارنة مراكز الحسابات بالشهور'
+            : 'Account Centers Balances Comparison by Month',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'مقارنة أرصدة مراكز الحسابات شهرياً'
+            : 'Compare account center balances monthly',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.calendar_month_rounded,
+        'iconColor': AppColor.oceanBlue,
+        'category': 1,
+        'reportName': 'AGL091B',
+        'isAccountsCentersMonthlyComparisonReport': true,
+        'treeGroup': 'accountCentersComparison',
+      },
+      {
+        'id': 'accounts_centers_monthly_movements_report',
+        'title': context.locale.languageCode == 'ar'
+            ? 'تقارير مقارنة حركة مراكز الحسابات الشهرية'
+            : 'Account Centers Monthly Movements Comparison',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'مقارنة حركة مراكز الحسابات شهرياً'
+            : 'Compare account center movements monthly',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.compare_arrows_rounded,
+        'iconColor': AppColor.oceanBlue,
+        'category': 1,
+        'reportName': 'AGL092A',
+        'isAccountsCentersMonthlyMovementsReport': true,
+        'treeGroup': 'accountCentersComparison',
+      },
+      {
         'id': 'accounts_comparison',
         'reportName': 'AGL052',
         'isAccountsComparisonReport': true,
@@ -2166,6 +2304,18 @@ class _ReportsScreenState extends State<ReportsScreen> {
     final isArabic = context.locale.languageCode == 'ar';
     const groups = [
       (
+        id: 3,
+        key: 'centersComparison',
+        titleAr: 'مقارنة المراكز',
+        titleEn: 'Cost Centers Comparison',
+      ),
+      (
+        id: 9,
+        key: 'accountCentersComparison',
+        titleAr: 'مقارنة مراكز الحسابات',
+        titleEn: 'Account Centers Comparison',
+      ),
+      (
         id: 1,
         key: 'accounts',
         titleAr: 'دليل الحسابات',
@@ -2176,12 +2326,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
         key: 'costCenters',
         titleAr: 'مراكز التكلفة',
         titleEn: 'Cost centers',
-      ),
-      (
-        id: 3,
-        key: 'centersComparison',
-        titleAr: 'مقارنة المراكز',
-        titleEn: 'Cost Centers Comparison',
       ),
       (
         id: 4,
@@ -2275,6 +2419,12 @@ class _ReportsScreenState extends State<ReportsScreen> {
           statement['isCentersComparisonByMonthReport'] == true,
       isCentersComparisonBalancesReport:
           statement['isCentersComparisonBalancesReport'] == true,
+      isAccountsCentersComparisonReport:
+          statement['isAccountsCentersComparisonReport'] == true,
+      isAccountsCentersMonthlyComparisonReport:
+          statement['isAccountsCentersMonthlyComparisonReport'] == true,
+      isAccountsCentersMonthlyMovementsReport:
+          statement['isAccountsCentersMonthlyMovementsReport'] == true,
       isCostCentersTransactionReport:
           statement['isCostCentersTransactionReport'] == true,
       isCostCentersTransactionAnnualReport:

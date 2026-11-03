@@ -11,6 +11,7 @@ import '../../../../core/network/end_points.dart';
 import '../models/account_statement_report_request_model.dart';
 import '../models/accounts_comparison_report_request_model.dart';
 import '../models/account_centers_summary_for_main_accounts_report_request_model.dart';
+import '../models/accounts_centers_comparison_report_request_model.dart';
 import '../models/chart_of_account_report_request_model.dart';
 import '../models/chart_of_account_monthly_balances_report_request_model.dart';
 import '../models/centers_comparison_report_request_model.dart';
@@ -250,6 +251,23 @@ abstract interface class ReportsRepo {
     String reportName = 'AGL092',
     bool includeMonthFilters = false,
     bool includeComparisonMonth = false,
+    required String languageCode,
+    String exportType = 'pdf',
+  });
+
+  Future<Either<Failure, File>> getAccountsCentersComparisonReport({
+    num? fromAccountNo,
+    num? toAccountNo,
+    num? fromCostCenterNo,
+    num? toCostCenterNo,
+    int? fromMonth,
+    int? toMonth,
+    int balance = 0,
+    int periodically = 0,
+    int reportGroup = 0,
+    int reportPageType = 1,
+    required String reportName,
+    bool includeBalanceAndPeriodically = true,
     required String languageCode,
     String exportType = 'pdf',
   });
@@ -941,6 +959,52 @@ class ReportsRepoImpl implements ReportsRepo {
 
         return _downloadReport(
           endpoint: EndPoints.centersComparisonReport,
+          body: requestModel.toJson(),
+          fileNamePrefix: reportName.toLowerCase(),
+          exportType: requestModel.exportType,
+          headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+        );
+      },
+    );
+  }
+
+  @override
+  Future<Either<Failure, File>> getAccountsCentersComparisonReport({
+    num? fromAccountNo,
+    num? toAccountNo,
+    num? fromCostCenterNo,
+    num? toCostCenterNo,
+    int? fromMonth,
+    int? toMonth,
+    int balance = 0,
+    int periodically = 0,
+    int reportGroup = 0,
+    int reportPageType = 1,
+    required String reportName,
+    bool includeBalanceAndPeriodically = true,
+    required String languageCode,
+    String exportType = 'pdf',
+  }) {
+    return handleDioRequest(
+      request: () async {
+        final requestModel = AccountsCentersComparisonReportRequestModel(
+          fromAccountNo: fromAccountNo,
+          toAccountNo: toAccountNo,
+          fromCostCenterNo: fromCostCenterNo,
+          toCostCenterNo: toCostCenterNo,
+          fromMonth: fromMonth,
+          toMonth: toMonth,
+          balance: balance,
+          periodically: periodically,
+          reportGroup: reportGroup,
+          reportPageType: reportPageType,
+          reportName: reportName,
+          exportType: exportType,
+          includeBalanceAndPeriodically: includeBalanceAndPeriodically,
+        );
+
+        return _downloadReport(
+          endpoint: EndPoints.accountsCentersComparisonReport,
           body: requestModel.toJson(),
           fileNamePrefix: reportName.toLowerCase(),
           exportType: requestModel.exportType,

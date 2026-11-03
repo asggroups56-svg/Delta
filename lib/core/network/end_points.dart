@@ -38,6 +38,8 @@ class EndPoints {
       'Report/MonthlyCostCentersComparsionReport';
   static const String centersComparisonReport =
       'Report/CentersComparsionReport';
+  static const String accountsCentersComparisonReport =
+      'Report/AccountsCentersComparisonReport';
   static const String currenciesReport = 'Report/CurrenciesReport';
   static const String chartOfAccountLight = 'ChartOfAccount/GetLight';
   static const String customerDatumLight = 'CustomerDatum/GetLight';
