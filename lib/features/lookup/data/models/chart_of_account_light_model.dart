@@ -1,9 +1,9 @@
 class ChartOfAccountLightModel {
   final int accountNo;
-  final int accountLevel;
+  final int? accountLevel;
   final String accountName;
-  final int accountParent;
-  final int cauDistributed;
+  final int? accountParent;
+  final int? cauDistributed;
   final int? currencyCode;
   final String? currencyName;
   final double? currencyExchangeRate;
@@ -21,15 +21,25 @@ class ChartOfAccountLightModel {
 
   factory ChartOfAccountLightModel.fromJson(Map<String, dynamic> json) {
     return ChartOfAccountLightModel(
-      accountNo: json['accountNo'] as int,
-      accountLevel: json['accountLevel'] as int,
-      accountName: json['accountName'] as String,
-      accountParent: json['accountParent'] as int,
-      cauDistributed: json['cauDistributed'] as int,
-      currencyCode: json['currencyCode'] as int?,
-      currencyName: json['currencyName'] as String?,
+      accountNo:
+          _parseInt(json['accountNo']) ??
+          (throw const FormatException(
+            'Chart of account response is missing accountNo.',
+          )),
+      accountLevel: _parseInt(json['accountLevel']),
+      accountName: json['accountName']?.toString() ?? '',
+      accountParent: _parseInt(json['accountParent']),
+      cauDistributed: _parseInt(json['cauDistributed']),
+      currencyCode: _parseInt(json['currencyCode']),
+      currencyName: json['currencyName']?.toString(),
       currencyExchangeRate: (json['currencyExchangeRate'] as num?)?.toDouble(),
     );
+  }
+
+  static int? _parseInt(dynamic value) {
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    return int.tryParse(value?.toString() ?? '');
   }
 }
 
@@ -51,7 +61,9 @@ class ChartOfAccountLightResponse {
   factory ChartOfAccountLightResponse.fromJson(Map<String, dynamic> json) {
     return ChartOfAccountLightResponse(
       chartOfAccounts: (json['chartOfAccounts'] as List)
-          .map((e) => ChartOfAccountLightModel.fromJson(e as Map<String, dynamic>))
+          .map(
+            (e) => ChartOfAccountLightModel.fromJson(e as Map<String, dynamic>),
+          )
           .toList(),
       hasMore: json['hasMore'] as bool,
       success: json['success'] as bool,

@@ -21,13 +21,17 @@ class AppInterceptors extends Interceptor {
     options.headers['Content-Type'] ??= 'application/json';
     options.headers['Accept'] ??= 'application/json';
     if (!options.path.endsWith(EndPoints.login)) {
-      final token = CacheHelper.sharedPreferences.getString(
-        CacheHelper.authTokenKey,
-      );
+      final token = CacheHelper.sharedPreferences
+          .getString(CacheHelper.authTokenKey)
+          ?.trim();
       if (token != null && token.isNotEmpty) {
-        options.headers['Authorization'] = token.startsWith('Bearer ')
-            ? token
-            : '$_authorizationScheme $token';
+        final tokenValue = token
+            .replaceFirst(RegExp(r'^Bearer\s+', caseSensitive: false), '')
+            .trim();
+        if (tokenValue.isNotEmpty) {
+          options.headers['Authorization'] =
+              '$_authorizationScheme $tokenValue';
+        }
       }
     }
 

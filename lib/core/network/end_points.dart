@@ -12,6 +12,9 @@ class EndPoints {
   static const String journalReport = 'Report/JournalReport';
   static const String generalJournalForLevelReport =
       'Report/GeneralJournalForLevelReport';
+  static const String cashInCashOutVoucherReport =
+      'Report/CashInCashOutVoucherReport';
+  static const String checksDataReport = 'Report/ChecksDataReport';
   static const String financialStatementsReport =
       'Report/FinancialStatementsReport';
   static const String expensesWithVatReport = 'Report/ExpensesWithVatReport';
@@ -47,5 +50,7 @@ class EndPoints {
   static const String chartOfAccountLight = 'ChartOfAccount/GetLight';
   static const String customerDatumLight = 'CustomerDatum/GetLight';
   static const String costCenterLight = 'CostCenter/GetLight';
+  static const String cashVoucherLight = 'CashVoucher/GetLight';
+  static const String banksDataLight = 'BanksData/GetLight';
   static String detailsUser(int id) => '$users/$id';
 }

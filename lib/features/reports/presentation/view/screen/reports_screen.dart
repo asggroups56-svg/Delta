@@ -13,6 +13,8 @@ import 'package:my_template/core/utils/app_locale_key.dart';
 import 'package:my_template/core/utils/common_methods.dart';
 import 'package:my_template/features/reports/data/repository/reports_repo.dart';
 import 'package:my_template/features/reports/presentation/view/widget/file_download_service.dart';
+import 'package:my_template/features/reports/presentation/view/widget/cash_in_cash_out_voucher_report_filter_bottom_sheet_widget.dart';
+import 'package:my_template/features/reports/presentation/view/widget/checks_data_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/general_journal_for_level_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/account_statement_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/accounts_comparison_report_filter_bottom_sheet_widget.dart';
@@ -792,6 +794,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
     bool isJournalReport = false,
     bool isMainAccountsJournalReport = false,
     bool isGeneralJournalForLevelReport = false,
+    bool isCashInCashOutVoucherReport = false,
+    bool isChecksDataReport = false,
     bool isExpensesWithVatReport = false,
     bool isSalesWithVatReport = false,
     bool isPurchasesWithVatReport = false,
@@ -966,6 +970,28 @@ class _ReportsScreenState extends State<ReportsScreen> {
       if (!mounted || generalJournalLevelFilter == null) return;
       exportType = generalJournalLevelFilter.exportType;
     }
+    CashInCashOutVoucherReportFilterSelection? cashVoucherReportFilter;
+    if (isCashInCashOutVoucherReport) {
+      cashVoucherReportFilter =
+          await CashInCashOutVoucherReportFilterBottomSheetWidget.show(
+            context,
+            title: title,
+            initialExportType: exportType,
+          );
+      if (!mounted || cashVoucherReportFilter == null) return;
+      exportType = cashVoucherReportFilter.exportType;
+    }
+    ChecksDataReportFilterSelection? checksDataReportFilter;
+    if (isChecksDataReport) {
+      checksDataReportFilter =
+          await ChecksDataReportFilterBottomSheetWidget.show(
+            context,
+            title: title,
+            initialExportType: exportType,
+          );
+      if (!mounted || checksDataReportFilter == null) return;
+      exportType = checksDataReportFilter.exportType;
+    }
     CostCentersReportFilterSelection? costCentersFilter;
     if (isCostCentersReport ||
         isCentersMonthlyBalanceReport ||
@@ -1129,6 +1155,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
           isJournalReport ||
           isMainAccountsJournalReport ||
           isGeneralJournalForLevelReport ||
+          isCashInCashOutVoucherReport ||
+          isChecksDataReport ||
           isExpensesWithVatReport ||
           isSalesWithVatReport ||
           isPurchasesWithVatReport ||
@@ -1151,7 +1179,34 @@ class _ReportsScreenState extends State<ReportsScreen> {
           isChartOfAccountMonthlyBalancesReport ||
           reportName != null) {
         final reportsRepo = sl<ReportsRepo>();
-        final result = isGeneralJournalForLevelReport
+        final result = isChecksDataReport
+            ? await reportsRepo.getChecksDataReport(
+                fromChqNo: checksDataReportFilter?.fromChqNo,
+                toChqNo: checksDataReportFilter?.toChqNo,
+                fromDate: checksDataReportFilter?.fromDate,
+                toDate: checksDataReportFilter?.toDate,
+                fromBankCode: checksDataReportFilter?.fromBankCode,
+                toBankCode: checksDataReportFilter?.toBankCode,
+                fromCashAccount: checksDataReportFilter?.fromCashAccount,
+                toCashAccount: checksDataReportFilter?.toCashAccount,
+                reportName: 'AGL019_1',
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isCashInCashOutVoucherReport
+            ? await reportsRepo.getCashInCashOutVoucherReport(
+                receiptType: cashVoucherReportFilter?.receiptType ?? 1,
+                fromVoucherNo: cashVoucherReportFilter?.fromVoucherNo,
+                toVoucherNo: cashVoucherReportFilter?.toVoucherNo,
+                fromBankCode: cashVoucherReportFilter?.fromBankCode,
+                toBankCode: cashVoucherReportFilter?.toBankCode,
+                fromDate: cashVoucherReportFilter?.fromDate,
+                toDate: cashVoucherReportFilter?.toDate,
+                reportName: 'AGL019',
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isGeneralJournalForLevelReport
             ? await reportsRepo.getGeneralJournalForLevelReport(
                 accountLevel: generalJournalLevelFilter?.accountLevel,
                 fromEntrySerial: generalJournalLevelFilter?.fromEntrySerial,
@@ -1886,6 +1941,36 @@ class _ReportsScreenState extends State<ReportsScreen> {
         'treeGroup': 'journalReports',
       },
       {
+        'title': context.locale.languageCode == 'ar'
+            ? 'تقرير سندات القبض والصرف'
+            : 'Cash In/Out Voucher Report',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'تقرير سندات القبض أو الصرف حسب رقم السند والبنك والتاريخ'
+            : 'Report cash-in or cash-out vouchers by voucher number, bank, and date',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.receipt_long_rounded,
+        'iconColor': AppColor.emeraldTeal,
+        'category': 1,
+        'reportName': 'AGL019',
+        'isCashInCashOutVoucherReport': true,
+        'treeGroup': 'cashVouchers',
+      },
+      {
+        'title': context.locale.languageCode == 'ar'
+            ? 'تقارير متابعة الشيكات'
+            : 'Check Follow-up Report',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'متابعة الشيكات حسب الرقم والبنك وحساب النقدية والتاريخ'
+            : 'Follow checks by number, bank, cash account, and date',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.fact_check_rounded,
+        'iconColor': AppColor.emeraldTeal,
+        'category': 1,
+        'reportName': 'AGL019_1',
+        'isChecksDataReport': true,
+        'treeGroup': 'cashVouchers',
+      },
+      {
         'title': AppLocaleKey.statementExpensesWithVat.tr(),
         'desc': AppLocaleKey.statementExpensesWithVatDesc.tr(),
         'status': AppLocaleKey.statusAudited.tr(),
@@ -2462,6 +2547,14 @@ class _ReportsScreenState extends State<ReportsScreen> {
         accent: AppColor.oceanBlue,
       ),
       (
+        id: 11,
+        key: 'cashVouchers',
+        titleAr: 'تقارير سندات القبض والدفع',
+        titleEn: 'Cash Receipt and Payment Reports',
+        icon: Icons.receipt_long_rounded,
+        accent: AppColor.emeraldTeal,
+      ),
+      (
         id: 5,
         key: 'operations',
         titleAr: 'تقارير العمليات',
@@ -2543,6 +2636,9 @@ class _ReportsScreenState extends State<ReportsScreen> {
           statement['isMainAccountsJournalReport'] == true,
       isGeneralJournalForLevelReport:
           statement['isGeneralJournalForLevelReport'] == true,
+      isCashInCashOutVoucherReport:
+          statement['isCashInCashOutVoucherReport'] == true,
+      isChecksDataReport: statement['isChecksDataReport'] == true,
       isExpensesWithVatReport: statement['isExpensesWithVatReport'] == true,
       isSalesWithVatReport: statement['isSalesWithVatReport'] == true,
       isPurchasesWithVatReport: statement['isPurchasesWithVatReport'] == true,

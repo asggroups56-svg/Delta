@@ -26,7 +26,7 @@ class ChartOfAccountDropdown extends StatefulWidget {
   final String? hintText;
   final void Function(ChartOfAccountLightModel?)? onSelected;
   final ChartOfAccountLightModel? initialValue;
-  final int accountType;
+  final int? accountType;
   final bool includeAccountsHasCostCenters;
 
   const ChartOfAccountDropdown({

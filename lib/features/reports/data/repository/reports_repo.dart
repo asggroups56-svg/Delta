@@ -13,6 +13,8 @@ import '../models/accounts_comparison_report_request_model.dart';
 import '../models/account_centers_summary_for_main_accounts_report_request_model.dart';
 import '../models/accounts_centers_comparison_report_request_model.dart';
 import '../models/chart_of_account_report_request_model.dart';
+import '../models/cash_in_cash_out_voucher_report_request_model.dart';
+import '../models/checks_data_report_request_model.dart';
 import '../models/chart_of_account_monthly_balances_report_request_model.dart';
 import '../models/centers_comparison_report_request_model.dart';
 import '../models/centers_monthly_balance_report_request_model.dart';
@@ -98,6 +100,33 @@ abstract interface class ReportsRepo {
     DateTime? fromDate,
     DateTime? toDate,
     String reportName = 'AGL0104',
+    required String languageCode,
+    String exportType = 'pdf',
+  });
+
+  Future<Either<Failure, File>> getCashInCashOutVoucherReport({
+    int receiptType = 1,
+    String? fromVoucherNo,
+    String? toVoucherNo,
+    int? fromBankCode,
+    int? toBankCode,
+    DateTime? fromDate,
+    DateTime? toDate,
+    String reportName = 'AGL019',
+    required String languageCode,
+    String exportType = 'pdf',
+  });
+
+  Future<Either<Failure, File>> getChecksDataReport({
+    String? fromChqNo,
+    String? toChqNo,
+    DateTime? fromDate,
+    DateTime? toDate,
+    int? fromBankCode,
+    int? toBankCode,
+    int? fromCashAccount,
+    int? toCashAccount,
+    String reportName = 'AGL019_1',
     required String languageCode,
     String exportType = 'pdf',
   });
@@ -506,6 +535,84 @@ class ReportsRepoImpl implements ReportsRepo {
           endpoint: EndPoints.generalJournalForLevelReport,
           body: requestModel.toJson(),
           fileNamePrefix: reportName.toLowerCase(),
+          exportType: requestModel.exportType,
+          headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+        );
+      },
+    );
+  }
+
+  @override
+  Future<Either<Failure, File>> getCashInCashOutVoucherReport({
+    int receiptType = 1,
+    String? fromVoucherNo,
+    String? toVoucherNo,
+    int? fromBankCode,
+    int? toBankCode,
+    DateTime? fromDate,
+    DateTime? toDate,
+    String reportName = 'AGL019',
+    required String languageCode,
+    String exportType = 'pdf',
+  }) {
+    return handleDioRequest(
+      request: () async {
+        final requestModel = CashInCashOutVoucherReportRequestModel(
+          receiptType: receiptType,
+          fromVoucherNo: fromVoucherNo,
+          toVoucherNo: toVoucherNo,
+          fromBankCode: fromBankCode,
+          toBankCode: toBankCode,
+          fromDate: fromDate,
+          toDate: toDate,
+          reportName: reportName,
+          exportType: exportType,
+        );
+
+        return _downloadReport(
+          endpoint: EndPoints.cashInCashOutVoucherReport,
+          body: requestModel.toJson(),
+          fileNamePrefix: 'cash_in_cash_out_voucher_report',
+          exportType: requestModel.exportType,
+          headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+        );
+      },
+    );
+  }
+
+  @override
+  Future<Either<Failure, File>> getChecksDataReport({
+    String? fromChqNo,
+    String? toChqNo,
+    DateTime? fromDate,
+    DateTime? toDate,
+    int? fromBankCode,
+    int? toBankCode,
+    int? fromCashAccount,
+    int? toCashAccount,
+    String reportName = 'AGL019_1',
+    required String languageCode,
+    String exportType = 'pdf',
+  }) {
+    return handleDioRequest(
+      request: () async {
+        final requestModel = ChecksDataReportRequestModel(
+          fromChqNo: fromChqNo,
+          toChqNo: toChqNo,
+          fromDate: fromDate,
+          toDate: toDate,
+          fromBankCode: fromBankCode,
+          toBankCode: toBankCode,
+          fromCashAccount: fromCashAccount,
+          toCashAccount: toCashAccount,
+          reportName: reportName,
+          exportType: exportType,
+        );
+
+        return _downloadReport(
+          endpoint: EndPoints.checksDataReport,
+          body: requestModel.toJson(),
+          fileNamePrefix: 'checks_data_report',
           exportType: requestModel.exportType,
           headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
         );

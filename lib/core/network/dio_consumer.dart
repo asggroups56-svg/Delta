@@ -15,7 +15,11 @@ class DioConsumer implements ApiConsumer {
     client.options
       ..baseUrl = Constants.baseUrl
       ..followRedirects = false;
-    client.interceptors.add(sl<AppInterceptors>());
+    if (!client.interceptors.any(
+      (interceptor) => interceptor is AppInterceptors,
+    )) {
+      client.interceptors.add(sl<AppInterceptors>());
+    }
     if (kDebugMode) {
       client.interceptors.addAll(
         kDebugMode
