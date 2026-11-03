@@ -9,6 +9,9 @@ class EndPoints {
       'Report/ChartOfAccountMonthlyBalancesOrStatementReport';
   static const String incomeAndExpenseSituationReport =
       'Report/IncomeAndExpenseSituationReport';
+  static const String journalReport = 'Report/JournalReport';
+  static const String generalJournalForLevelReport =
+      'Report/GeneralJournalForLevelReport';
   static const String financialStatementsReport =
       'Report/FinancialStatementsReport';
   static const String expensesWithVatReport = 'Report/ExpensesWithVatReport';

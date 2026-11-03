@@ -1,5 +1,5 @@
 String formatReportDate(DateTime date) {
-  return formatReportDateTime(DateTime(date.year, date.month, date.day));
+  return formatReportDateTime(date);
 }
 
 String formatReportDateTime(DateTime dateTime) {

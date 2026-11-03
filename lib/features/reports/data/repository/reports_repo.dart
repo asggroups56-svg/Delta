@@ -23,7 +23,9 @@ import '../models/cost_centers_transaction_annual_report_request_model.dart';
 import '../models/daily_income_and_expense_situation_report_request_model.dart';
 import '../models/expenses_with_vat_report_request_model.dart';
 import '../models/financial_statement_report_request_model.dart';
+import '../models/general_journal_for_level_report_request_model.dart';
 import '../models/income_and_expense_situation_report_request_model.dart';
+import '../models/journal_report_request_model.dart';
 import '../models/ledger_report_request_model.dart';
 import '../models/monthly_account_comparison_report_request_model.dart';
 import '../models/monthly_cost_centers_comparison_report_request_model.dart';
@@ -70,6 +72,32 @@ abstract interface class ReportsRepo {
   Future<Either<Failure, File>> getDailyIncomeAndExpenseSituationReport({
     DateTime? fromDate,
     DateTime? toDate,
+    required String languageCode,
+    String exportType = 'pdf',
+  });
+
+  Future<Either<Failure, File>> getJournalReport({
+    int? fromEntrySerial,
+    int? toEntrySerial,
+    String? fromEntryNo,
+    String? toEntryNo,
+    DateTime? fromDate,
+    DateTime? toDate,
+    int journalType = 0,
+    int journalReportType = 5,
+    int reportPageType = 1,
+    String reportName = 'AGL009',
+    required String languageCode,
+    String exportType = 'pdf',
+  });
+
+  Future<Either<Failure, File>> getGeneralJournalForLevelReport({
+    int? accountLevel,
+    int? fromEntrySerial,
+    int? toEntrySerial,
+    DateTime? fromDate,
+    DateTime? toDate,
+    String reportName = 'AGL0104',
     required String languageCode,
     String exportType = 'pdf',
   });
@@ -402,6 +430,82 @@ class ReportsRepoImpl implements ReportsRepo {
           endpoint: EndPoints.incomeAndExpenseSituationReport,
           body: requestModel.toJson(),
           fileNamePrefix: 'daily_income_and_expense_situation_report',
+          exportType: requestModel.exportType,
+          headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+        );
+      },
+    );
+  }
+
+  @override
+  Future<Either<Failure, File>> getJournalReport({
+    int? fromEntrySerial,
+    int? toEntrySerial,
+    String? fromEntryNo,
+    String? toEntryNo,
+    DateTime? fromDate,
+    DateTime? toDate,
+    int journalType = 0,
+    int journalReportType = 5,
+    int reportPageType = 1,
+    String reportName = 'AGL009',
+    required String languageCode,
+    String exportType = 'pdf',
+  }) {
+    return handleDioRequest(
+      request: () async {
+        final requestModel = JournalReportRequestModel(
+          fromEntrySerial: fromEntrySerial,
+          toEntrySerial: toEntrySerial,
+          fromEntryNo: fromEntryNo,
+          toEntryNo: toEntryNo,
+          fromDate: fromDate,
+          toDate: toDate,
+          journalType: journalType,
+          journalReportType: journalReportType,
+          reportPageType: reportPageType,
+          reportName: reportName,
+          exportType: exportType,
+        );
+
+        return _downloadReport(
+          endpoint: EndPoints.journalReport,
+          body: requestModel.toJson(),
+          fileNamePrefix: reportName.toLowerCase(),
+          exportType: requestModel.exportType,
+          headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+        );
+      },
+    );
+  }
+
+  @override
+  Future<Either<Failure, File>> getGeneralJournalForLevelReport({
+    int? accountLevel,
+    int? fromEntrySerial,
+    int? toEntrySerial,
+    DateTime? fromDate,
+    DateTime? toDate,
+    String reportName = 'AGL0104',
+    required String languageCode,
+    String exportType = 'pdf',
+  }) {
+    return handleDioRequest(
+      request: () async {
+        final requestModel = GeneralJournalForLevelReportRequestModel(
+          accountLevel: accountLevel,
+          fromEntrySerial: fromEntrySerial,
+          toEntrySerial: toEntrySerial,
+          fromDate: fromDate,
+          toDate: toDate,
+          reportName: reportName,
+          exportType: exportType,
+        );
+
+        return _downloadReport(
+          endpoint: EndPoints.generalJournalForLevelReport,
+          body: requestModel.toJson(),
+          fileNamePrefix: reportName.toLowerCase(),
           exportType: requestModel.exportType,
           headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
         );

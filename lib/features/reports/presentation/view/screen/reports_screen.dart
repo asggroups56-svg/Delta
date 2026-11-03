@@ -13,6 +13,7 @@ import 'package:my_template/core/utils/app_locale_key.dart';
 import 'package:my_template/core/utils/common_methods.dart';
 import 'package:my_template/features/reports/data/repository/reports_repo.dart';
 import 'package:my_template/features/reports/presentation/view/widget/file_download_service.dart';
+import 'package:my_template/features/reports/presentation/view/widget/general_journal_for_level_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/account_statement_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/accounts_comparison_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/accounts_centers_comparison_report_filter_bottom_sheet_widget.dart';
@@ -24,6 +25,7 @@ import 'package:my_template/features/reports/presentation/view/widget/cost_cente
 import 'package:my_template/features/reports/presentation/view/widget/cost_centers_transaction_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/fullscreen_pdf_viewer_screen.dart';
 import 'package:my_template/features/reports/presentation/view/widget/ledger_report_filter_bottom_sheet_widget.dart';
+import 'package:my_template/features/reports/presentation/view/widget/journal_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/monthly_comparison_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/party_vat_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/pdf_export_service.dart';
@@ -787,6 +789,9 @@ class _ReportsScreenState extends State<ReportsScreen> {
     bool isApiReport = false,
     bool isIncomeAndExpenseSituationReport = false,
     bool isDailyIncomeAndExpenseReport = false,
+    bool isJournalReport = false,
+    bool isMainAccountsJournalReport = false,
+    bool isGeneralJournalForLevelReport = false,
     bool isExpensesWithVatReport = false,
     bool isSalesWithVatReport = false,
     bool isPurchasesWithVatReport = false,
@@ -937,6 +942,29 @@ class _ReportsScreenState extends State<ReportsScreen> {
         allowAllDates: isExpensesWithVatReport,
       );
       if (!mounted || dateRange == null) return;
+    }
+    JournalReportFilterSelection? journalReportFilter;
+    if (isJournalReport || isMainAccountsJournalReport) {
+      journalReportFilter = await JournalReportFilterBottomSheetWidget.show(
+        context,
+        title: title,
+        initialExportType: exportType,
+        isMainAccountsReport: isMainAccountsJournalReport,
+      );
+      if (!mounted || journalReportFilter == null) return;
+      exportType = journalReportFilter.exportType;
+      reportName = journalReportFilter.reportName;
+    }
+    GeneralJournalForLevelReportFilterSelection? generalJournalLevelFilter;
+    if (isGeneralJournalForLevelReport) {
+      generalJournalLevelFilter =
+          await GeneralJournalForLevelReportFilterBottomSheetWidget.show(
+            context,
+            title: title,
+            initialExportType: exportType,
+          );
+      if (!mounted || generalJournalLevelFilter == null) return;
+      exportType = generalJournalLevelFilter.exportType;
     }
     CostCentersReportFilterSelection? costCentersFilter;
     if (isCostCentersReport ||
@@ -1098,6 +1126,9 @@ class _ReportsScreenState extends State<ReportsScreen> {
       if (isApiReport ||
           isIncomeAndExpenseSituationReport ||
           isDailyIncomeAndExpenseReport ||
+          isJournalReport ||
+          isMainAccountsJournalReport ||
+          isGeneralJournalForLevelReport ||
           isExpensesWithVatReport ||
           isSalesWithVatReport ||
           isPurchasesWithVatReport ||
@@ -1120,7 +1151,35 @@ class _ReportsScreenState extends State<ReportsScreen> {
           isChartOfAccountMonthlyBalancesReport ||
           reportName != null) {
         final reportsRepo = sl<ReportsRepo>();
-        final result = isAccountsComparisonReport
+        final result = isGeneralJournalForLevelReport
+            ? await reportsRepo.getGeneralJournalForLevelReport(
+                accountLevel: generalJournalLevelFilter?.accountLevel,
+                fromEntrySerial: generalJournalLevelFilter?.fromEntrySerial,
+                toEntrySerial: generalJournalLevelFilter?.toEntrySerial,
+                fromDate: generalJournalLevelFilter?.fromDate,
+                toDate: generalJournalLevelFilter?.toDate,
+                reportName: 'AGL0104',
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isJournalReport || isMainAccountsJournalReport
+            ? await reportsRepo.getJournalReport(
+                fromEntrySerial: journalReportFilter?.fromEntrySerial,
+                toEntrySerial: journalReportFilter?.toEntrySerial,
+                fromEntryNo: journalReportFilter?.fromEntryNo,
+                toEntryNo: journalReportFilter?.toEntryNo,
+                fromDate: journalReportFilter?.fromDate,
+                toDate: journalReportFilter?.toDate,
+                journalType: journalReportFilter?.journalType ?? 0,
+                journalReportType: journalReportFilter?.journalReportType ?? 5,
+                reportPageType: isMainAccountsJournalReport ? 2 : 1,
+                reportName:
+                    journalReportFilter?.reportName ??
+                    (isMainAccountsJournalReport ? 'AGL0101C' : 'AGL009'),
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isAccountsComparisonReport
             ? await reportsRepo.getAccountsComparsionReport(
                 fromAccountNo: accountsComparisonFilter?.fromAccountNo,
                 toAccountNo: accountsComparisonFilter?.toAccountNo,
@@ -1782,6 +1841,51 @@ class _ReportsScreenState extends State<ReportsScreen> {
         'treeGroup': 'operations',
       },
       {
+        'title': context.locale.languageCode == 'ar'
+            ? 'تقارير اليومية العامة'
+            : 'General Journal Reports',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'تقارير اليومية التفصيلية والإجمالية مع خيارات القيود والتاريخ'
+            : 'Detailed and summary journal reports with entry and date filters',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.receipt_long_rounded,
+        'iconColor': AppColor.oceanBlue,
+        'category': 1,
+        'reportName': 'AGL009',
+        'isJournalReport': true,
+        'treeGroup': 'journalReports',
+      },
+      {
+        'title': context.locale.languageCode == 'ar'
+            ? 'قيد اليومية للحسابات الرئيسية'
+            : 'Main Accounts Journal Entry',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'عرض قيد اليومية للحسابات الرئيسية بالتفصيل أو الإجمالي'
+            : 'View main accounts journal entries in detail or summary',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.account_balance_rounded,
+        'iconColor': AppColor.oceanBlue,
+        'category': 1,
+        'reportName': 'AGL0101C',
+        'isMainAccountsJournalReport': true,
+        'treeGroup': 'journalReports',
+      },
+      {
+        'title': context.locale.languageCode == 'ar'
+            ? 'تقرير اليومية مع تحديد المستويات'
+            : 'Journal Report by Account Level',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'عرض قيود اليومية حسب مستوى الحساب وفترة التقرير'
+            : 'View journal entries by account level and report period',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.format_list_numbered_rounded,
+        'iconColor': AppColor.oceanBlue,
+        'category': 1,
+        'reportName': 'AGL0104',
+        'isGeneralJournalForLevelReport': true,
+        'treeGroup': 'journalReports',
+      },
+      {
         'title': AppLocaleKey.statementExpensesWithVat.tr(),
         'desc': AppLocaleKey.statementExpensesWithVatDesc.tr(),
         'status': AppLocaleKey.statusAudited.tr(),
@@ -2350,6 +2454,14 @@ class _ReportsScreenState extends State<ReportsScreen> {
         accent: AppColor.emeraldTeal,
       ),
       (
+        id: 10,
+        key: 'journalReports',
+        titleAr: 'تقارير اليومية العامة',
+        titleEn: 'General Journal Reports',
+        icon: Icons.receipt_long_rounded,
+        accent: AppColor.oceanBlue,
+      ),
+      (
         id: 5,
         key: 'operations',
         titleAr: 'تقارير العمليات',
@@ -2426,6 +2538,11 @@ class _ReportsScreenState extends State<ReportsScreen> {
           statement['isIncomeAndExpenseSituationReport'] == true,
       isDailyIncomeAndExpenseReport:
           statement['isDailyIncomeAndExpenseReport'] == true,
+      isJournalReport: statement['isJournalReport'] == true,
+      isMainAccountsJournalReport:
+          statement['isMainAccountsJournalReport'] == true,
+      isGeneralJournalForLevelReport:
+          statement['isGeneralJournalForLevelReport'] == true,
       isExpensesWithVatReport: statement['isExpensesWithVatReport'] == true,
       isSalesWithVatReport: statement['isSalesWithVatReport'] == true,
       isPurchasesWithVatReport: statement['isPurchasesWithVatReport'] == true,
