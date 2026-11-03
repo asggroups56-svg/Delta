@@ -15,6 +15,8 @@ import 'package:my_template/features/reports/data/repository/reports_repo.dart';
 import 'package:my_template/features/reports/presentation/view/widget/file_download_service.dart';
 import 'package:my_template/features/reports/presentation/view/widget/cash_in_cash_out_voucher_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/checks_data_report_filter_bottom_sheet_widget.dart';
+import 'package:my_template/features/reports/presentation/view/widget/center_on_center_analysis_report_filter_bottom_sheet_widget.dart';
+import 'package:my_template/features/reports/presentation/view/widget/master_accounts_or_centers_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/general_journal_for_level_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/account_statement_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/accounts_comparison_report_filter_bottom_sheet_widget.dart';
@@ -796,6 +798,12 @@ class _ReportsScreenState extends State<ReportsScreen> {
     bool isGeneralJournalForLevelReport = false,
     bool isCashInCashOutVoucherReport = false,
     bool isChecksDataReport = false,
+    bool isMasterAccountsOrCentersReport = false,
+    int masterAccountsOrCentersReportPageType = 1,
+    String masterAccountsOrCentersSummarizedReportName = 'AGL076',
+    String masterAccountsOrCentersDetailedReportName = 'AGL077A',
+    bool isMasterCentersReport = false,
+    bool isCenterOnCenterAnalysisReport = false,
     bool isExpensesWithVatReport = false,
     bool isSalesWithVatReport = false,
     bool isPurchasesWithVatReport = false,
@@ -992,6 +1000,31 @@ class _ReportsScreenState extends State<ReportsScreen> {
       if (!mounted || checksDataReportFilter == null) return;
       exportType = checksDataReportFilter.exportType;
     }
+    MasterAccountsOrCentersReportFilterSelection? masterAccountsOrCentersFilter;
+    if (isMasterAccountsOrCentersReport) {
+      masterAccountsOrCentersFilter =
+          await MasterAccountsOrCentersReportFilterBottomSheetWidget.show(
+            context,
+            title: title,
+            initialExportType: exportType,
+            summarizedReportName: masterAccountsOrCentersSummarizedReportName,
+            detailedReportName: masterAccountsOrCentersDetailedReportName,
+            isCentersReport: isMasterCentersReport,
+          );
+      if (!mounted || masterAccountsOrCentersFilter == null) return;
+      exportType = masterAccountsOrCentersFilter.exportType;
+    }
+    CenterOnCenterAnalysisReportFilterSelection? centerOnCenterAnalysisFilter;
+    if (isCenterOnCenterAnalysisReport) {
+      centerOnCenterAnalysisFilter =
+          await CenterOnCenterAnalysisReportFilterBottomSheetWidget.show(
+            context,
+            title: title,
+            initialExportType: exportType,
+          );
+      if (!mounted || centerOnCenterAnalysisFilter == null) return;
+      exportType = centerOnCenterAnalysisFilter.exportType;
+    }
     CostCentersReportFilterSelection? costCentersFilter;
     if (isCostCentersReport ||
         isCentersMonthlyBalanceReport ||
@@ -1157,6 +1190,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
           isGeneralJournalForLevelReport ||
           isCashInCashOutVoucherReport ||
           isChecksDataReport ||
+          isMasterAccountsOrCentersReport ||
+          isCenterOnCenterAnalysisReport ||
           isExpensesWithVatReport ||
           isSalesWithVatReport ||
           isPurchasesWithVatReport ||
@@ -1179,7 +1214,34 @@ class _ReportsScreenState extends State<ReportsScreen> {
           isChartOfAccountMonthlyBalancesReport ||
           reportName != null) {
         final reportsRepo = sl<ReportsRepo>();
-        final result = isChecksDataReport
+        final result = isCenterOnCenterAnalysisReport
+            ? await reportsRepo.getCenterOnCenterAnalysisReport(
+                fromCostCenterNo:
+                    centerOnCenterAnalysisFilter?.fromCostCenterNo,
+                toCostCenterNo: centerOnCenterAnalysisFilter?.toCostCenterNo,
+                fromDate: centerOnCenterAnalysisFilter?.fromDate,
+                toDate: centerOnCenterAnalysisFilter?.toDate,
+                reportName:
+                    centerOnCenterAnalysisFilter?.reportName ?? 'AGL025A',
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isMasterAccountsOrCentersReport
+            ? await reportsRepo.getMasterAccountsOrCentersReport(
+                fromCategoryNo: masterAccountsOrCentersFilter?.fromCategoryNo,
+                toCategoryNo: masterAccountsOrCentersFilter?.toCategoryNo,
+                fromDate: masterAccountsOrCentersFilter?.fromDate,
+                toDate: masterAccountsOrCentersFilter?.toDate,
+                masterReportType:
+                    masterAccountsOrCentersFilter?.masterReportType ?? 1,
+                reportPageType: masterAccountsOrCentersReportPageType,
+                reportName:
+                    masterAccountsOrCentersFilter?.reportName ??
+                    masterAccountsOrCentersDetailedReportName,
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isChecksDataReport
             ? await reportsRepo.getChecksDataReport(
                 fromChqNo: checksDataReportFilter?.fromChqNo,
                 toChqNo: checksDataReportFilter?.toChqNo,
@@ -1816,6 +1878,58 @@ class _ReportsScreenState extends State<ReportsScreen> {
         'iconColor': AppColor.oceanBlue,
         'category': 1,
         'treeGroup': 'accounts',
+      },
+      {
+        'id': 'master_accounts_or_centers',
+        'title': context.locale.languageCode == 'ar'
+            ? 'تقرير أرصدة أبواب الحسابات'
+            : 'Account Category Balances Report',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'عرض أرصدة أبواب الحسابات حسب النطاق والتاريخ'
+            : 'View account category balances by range and date',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.account_balance_wallet_outlined,
+        'iconColor': AppColor.oceanBlue,
+        'category': 1,
+        'reportName': 'AGL076',
+        'isMasterAccountsOrCentersReport': true,
+        'treeGroup': 'masterAccountsOrCenters',
+      },
+      {
+        'id': 'master_centers_balances',
+        'title': context.locale.languageCode == 'ar'
+            ? 'تقرير أرصدة أبواب المراكز'
+            : 'Center Category Balances Report',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'عرض أرصدة أبواب المراكز حسب النطاق والتاريخ'
+            : 'View center category balances by range and date',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.account_tree_outlined,
+        'iconColor': AppColor.purpleAccent,
+        'category': 1,
+        'reportName': 'AGL077B',
+        'isMasterAccountsOrCentersReport': true,
+        'masterAccountsOrCentersReportPageType': 2,
+        'masterAccountsOrCentersSummarizedReportName': 'AGL077C',
+        'masterAccountsOrCentersDetailedReportName': 'AGL077B',
+        'isMasterCentersReport': true,
+        'treeGroup': 'masterAccountsOrCenters',
+      },
+      {
+        'id': 'center_on_center_analysis',
+        'title': context.locale.languageCode == 'ar'
+            ? 'تحليل مركز على مركز'
+            : 'Center on Center Analysis',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'تحليل مراكز التكلفة حسب نطاق المركز والتاريخ'
+            : 'Analyze cost centers by center range and date',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.compare_arrows_rounded,
+        'iconColor': AppColor.purpleAccent,
+        'category': 1,
+        'reportName': 'AGL025A',
+        'isCenterOnCenterAnalysisReport': true,
+        'treeGroup': 'masterAccountsOrCenters',
       },
       {
         'id': 'chart_of_account_monthly_balances',
@@ -2515,6 +2629,14 @@ class _ReportsScreenState extends State<ReportsScreen> {
         accent: AppColor.oceanBlue,
       ),
       (
+        id: 12,
+        key: 'masterAccountsOrCenters',
+        titleAr: 'الحسابات الرئيسية أو المراكز',
+        titleEn: 'Main Accounts or Centers',
+        icon: Icons.account_balance_wallet_outlined,
+        accent: AppColor.oceanBlue,
+      ),
+      (
         id: 1,
         key: 'accounts',
         titleAr: 'دليل الحسابات',
@@ -2639,6 +2761,19 @@ class _ReportsScreenState extends State<ReportsScreen> {
       isCashInCashOutVoucherReport:
           statement['isCashInCashOutVoucherReport'] == true,
       isChecksDataReport: statement['isChecksDataReport'] == true,
+      isMasterAccountsOrCentersReport:
+          statement['isMasterAccountsOrCentersReport'] == true,
+      masterAccountsOrCentersReportPageType:
+          statement['masterAccountsOrCentersReportPageType'] as int? ?? 1,
+      masterAccountsOrCentersSummarizedReportName:
+          statement['masterAccountsOrCentersSummarizedReportName'] as String? ??
+          'AGL076',
+      masterAccountsOrCentersDetailedReportName:
+          statement['masterAccountsOrCentersDetailedReportName'] as String? ??
+          'AGL077A',
+      isMasterCentersReport: statement['isMasterCentersReport'] == true,
+      isCenterOnCenterAnalysisReport:
+          statement['isCenterOnCenterAnalysisReport'] == true,
       isExpensesWithVatReport: statement['isExpensesWithVatReport'] == true,
       isSalesWithVatReport: statement['isSalesWithVatReport'] == true,
       isPurchasesWithVatReport: statement['isPurchasesWithVatReport'] == true,

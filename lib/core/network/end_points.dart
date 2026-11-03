@@ -15,6 +15,10 @@ class EndPoints {
   static const String cashInCashOutVoucherReport =
       'Report/CashInCashOutVoucherReport';
   static const String checksDataReport = 'Report/ChecksDataReport';
+  static const String masterAccountsOrCentersReport =
+      'Report/MasterAccountsOrCentersReport';
+  static const String centerOnCenterAnalysisReport =
+      'Report/CenterOnCenterAnalysisReport';
   static const String financialStatementsReport =
       'Report/FinancialStatementsReport';
   static const String expensesWithVatReport = 'Report/ExpensesWithVatReport';

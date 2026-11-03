@@ -14,6 +14,7 @@ import '../models/account_centers_summary_for_main_accounts_report_request_model
 import '../models/accounts_centers_comparison_report_request_model.dart';
 import '../models/chart_of_account_report_request_model.dart';
 import '../models/cash_in_cash_out_voucher_report_request_model.dart';
+import '../models/center_on_center_analysis_report_request_model.dart';
 import '../models/checks_data_report_request_model.dart';
 import '../models/chart_of_account_monthly_balances_report_request_model.dart';
 import '../models/centers_comparison_report_request_model.dart';
@@ -29,6 +30,7 @@ import '../models/general_journal_for_level_report_request_model.dart';
 import '../models/income_and_expense_situation_report_request_model.dart';
 import '../models/journal_report_request_model.dart';
 import '../models/ledger_report_request_model.dart';
+import '../models/master_accounts_or_centers_report_request_model.dart';
 import '../models/monthly_account_comparison_report_request_model.dart';
 import '../models/monthly_cost_centers_comparison_report_request_model.dart';
 import '../models/purchases_with_vat_report_request_model.dart';
@@ -172,6 +174,28 @@ abstract interface class ReportsRepo {
 
   Future<Either<Failure, File>> getTrialBalanceByCategoriesReport({
     String reportName = 'AGL055',
+    required String languageCode,
+    String exportType = 'pdf',
+  });
+
+  Future<Either<Failure, File>> getMasterAccountsOrCentersReport({
+    int? fromCategoryNo,
+    int? toCategoryNo,
+    DateTime? fromDate,
+    DateTime? toDate,
+    int masterReportType = 1,
+    int reportPageType = 1,
+    String reportName = 'AGL077A',
+    required String languageCode,
+    String exportType = 'pdf',
+  });
+
+  Future<Either<Failure, File>> getCenterOnCenterAnalysisReport({
+    num? fromCostCenterNo,
+    num? toCostCenterNo,
+    DateTime? fromDate,
+    DateTime? toDate,
+    String reportName = 'AGL025A',
     required String languageCode,
     String exportType = 'pdf',
   });
@@ -774,6 +798,72 @@ class ReportsRepoImpl implements ReportsRepo {
           endpoint: EndPoints.trialBalanceByCategoriesReport,
           body: requestModel.toJson(),
           fileNamePrefix: 'trial_balance_by_categories',
+          exportType: requestModel.exportType,
+          headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+        );
+      },
+    );
+  }
+
+  @override
+  Future<Either<Failure, File>> getMasterAccountsOrCentersReport({
+    int? fromCategoryNo,
+    int? toCategoryNo,
+    DateTime? fromDate,
+    DateTime? toDate,
+    int masterReportType = 1,
+    int reportPageType = 1,
+    String reportName = 'AGL077A',
+    required String languageCode,
+    String exportType = 'pdf',
+  }) {
+    return handleDioRequest(
+      request: () async {
+        final requestModel = MasterAccountsOrCentersReportRequestModel(
+          fromCategoryNo: fromCategoryNo,
+          toCategoryNo: toCategoryNo,
+          fromDate: fromDate,
+          toDate: toDate,
+          masterReportType: masterReportType,
+          reportPageType: reportPageType,
+          reportName: reportName,
+          exportType: exportType,
+        );
+        return _downloadReport(
+          endpoint: EndPoints.masterAccountsOrCentersReport,
+          body: requestModel.toJson(),
+          fileNamePrefix: 'master_accounts_or_centers_report',
+          exportType: requestModel.exportType,
+          headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+        );
+      },
+    );
+  }
+
+  @override
+  Future<Either<Failure, File>> getCenterOnCenterAnalysisReport({
+    num? fromCostCenterNo,
+    num? toCostCenterNo,
+    DateTime? fromDate,
+    DateTime? toDate,
+    String reportName = 'AGL025A',
+    required String languageCode,
+    String exportType = 'pdf',
+  }) {
+    return handleDioRequest(
+      request: () async {
+        final requestModel = CenterOnCenterAnalysisReportRequestModel(
+          fromCostCenterNo: fromCostCenterNo,
+          toCostCenterNo: toCostCenterNo,
+          fromDate: fromDate,
+          toDate: toDate,
+          reportName: reportName,
+          exportType: exportType,
+        );
+        return _downloadReport(
+          endpoint: EndPoints.centerOnCenterAnalysisReport,
+          body: requestModel.toJson(),
+          fileNamePrefix: 'center_on_center_analysis',
           exportType: requestModel.exportType,
           headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
         );
