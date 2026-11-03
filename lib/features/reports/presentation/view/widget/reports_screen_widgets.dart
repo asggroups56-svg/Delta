@@ -257,13 +257,11 @@ class ReportsCategorySectionData {
   final int id;
   final String title;
   final List<Map<String, dynamic>> reports;
-  final bool isProminent;
 
   const ReportsCategorySectionData({
     required this.id,
     required this.title,
     required this.reports,
-    this.isProminent = false,
   });
 }
 
@@ -442,12 +440,8 @@ class _ReportsCategoryAccordionListWidgetState
                                     color: isExpanded
                                         ? accent
                                         : AppColor.titleFormFiledColor(context),
-                                    fontSize: row.section.isProminent
-                                        ? 18.sp
-                                        : 13.sp,
-                                    fontWeight: row.section.isProminent
-                                        ? FontWeight.w800
-                                        : FontWeight.w600,
+                                    fontSize: 13.sp,
+                                    fontWeight: FontWeight.w600,
                                   ),
                                 ),
                               ),

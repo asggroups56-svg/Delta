@@ -12,6 +12,11 @@ class CostCentersReportFilterSelection {
   final num? toCostCenterNo;
   final int? fromCenterLevel;
   final int? toCenterLevel;
+  final int? fromMonth;
+  final int? toMonth;
+  final int? comparisonMonth;
+  final int? balance;
+  final int? periodically;
   final DateTime? fromDate;
   final DateTime? toDate;
   final int costCenterType;
@@ -23,6 +28,11 @@ class CostCentersReportFilterSelection {
     this.toCostCenterNo,
     this.fromCenterLevel,
     this.toCenterLevel,
+    this.fromMonth,
+    this.toMonth,
+    this.comparisonMonth,
+    this.balance,
+    this.periodically,
     this.fromDate,
     this.toDate,
     required this.costCenterType,
@@ -33,24 +43,36 @@ class CostCentersReportFilterSelection {
 
 class CostCentersReportFilterBottomSheetWidget extends StatefulWidget {
   final String title;
+  final String? endpointPath;
   final String initialReportName;
   final bool showReportNameSelector;
   final bool showDateFilter;
+  final bool showMonthFilters;
+  final bool showComparisonMonth;
+  final bool showBalancePeriodicallyFilters;
 
   const CostCentersReportFilterBottomSheetWidget({
     super.key,
     required this.title,
+    this.endpointPath,
     this.initialReportName = 'AGL008',
     this.showReportNameSelector = true,
     this.showDateFilter = true,
+    this.showMonthFilters = false,
+    this.showComparisonMonth = false,
+    this.showBalancePeriodicallyFilters = false,
   });
 
   static Future<CostCentersReportFilterSelection?> show(
     BuildContext context, {
     required String title,
+    String? endpointPath,
     String initialReportName = 'AGL008',
     bool showReportNameSelector = true,
     bool showDateFilter = true,
+    bool showMonthFilters = false,
+    bool showComparisonMonth = false,
+    bool showBalancePeriodicallyFilters = false,
   }) {
     return showModalBottomSheet<CostCentersReportFilterSelection>(
       context: context,
@@ -59,9 +81,13 @@ class CostCentersReportFilterBottomSheetWidget extends StatefulWidget {
       backgroundColor: Colors.transparent,
       builder: (_) => CostCentersReportFilterBottomSheetWidget(
         title: title,
+        endpointPath: endpointPath,
         initialReportName: initialReportName,
         showReportNameSelector: showReportNameSelector,
         showDateFilter: showDateFilter,
+        showMonthFilters: showMonthFilters,
+        showComparisonMonth: showComparisonMonth,
+        showBalancePeriodicallyFilters: showBalancePeriodicallyFilters,
       ),
     );
   }
@@ -79,6 +105,11 @@ class _CostCentersReportFilterBottomSheetWidgetState
   CostCenterLightModel? _toCostCenter;
   DateTime? _fromDate;
   DateTime? _toDate;
+  int? _fromMonth;
+  int? _toMonth;
+  int _comparisonMonth = 1;
+  int _balance = 0;
+  int _periodically = 0;
   int _costCenterType = 2;
   late String _reportName;
   String _exportType = 'pdf';
@@ -164,6 +195,17 @@ class _CostCentersReportFilterBottomSheetWidgetState
       });
       return;
     }
+    if (widget.showMonthFilters &&
+        _fromMonth != null &&
+        _toMonth != null &&
+        _fromMonth! > _toMonth!) {
+      setState(() {
+        _validationMessage = _isArabic
+            ? 'شهر البداية يجب أن يسبق أو يساوي شهر النهاية'
+            : 'From month must be before or equal to To month';
+      });
+      return;
+    }
     if (widget.showDateFilter &&
         _fromDate != null &&
         _toDate != null &&
@@ -183,6 +225,18 @@ class _CostCentersReportFilterBottomSheetWidgetState
         toCostCenterNo: toNo,
         fromCenterLevel: fromLevel,
         toCenterLevel: toLevel,
+        fromMonth: widget.showMonthFilters ? _fromMonth : null,
+        toMonth: widget.showMonthFilters ? _toMonth : null,
+        comparisonMonth: widget.showComparisonMonth
+            ? _comparisonMonth
+            : null,
+        balance:
+            widget.showMonthFilters || widget.showBalancePeriodicallyFilters
+            ? _balance
+            : null,
+        periodically: widget.showBalancePeriodicallyFilters
+            ? _periodically
+            : null,
         fromDate: widget.showDateFilter ? _fromDate : null,
         toDate: widget.showDateFilter ? _toDate : null,
         costCenterType: _costCenterType,
@@ -236,9 +290,10 @@ class _CostCentersReportFilterBottomSheetWidgetState
                 ),
                 Gap(4.h),
                 Text(
-                  widget.showReportNameSelector
-                      ? 'Report/CostCentersReport'
-                      : 'Report/CentersMonthlyBalanceReport',
+                  widget.endpointPath ??
+                      (widget.showReportNameSelector
+                          ? 'Report/CostCentersReport'
+                          : 'Report/CentersMonthlyBalanceReport'),
                   style: TextStyle(
                     color: foreground.withValues(alpha: 0.55),
                     fontSize: 11.sp,
@@ -366,6 +421,75 @@ class _CostCentersReportFilterBottomSheetWidgetState
                           ),
                         ),
                       ],
+                    ),
+                  ],
+                  if (widget.showMonthFilters) ...[
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _monthDropdown(
+                            label: _isArabic ? 'من شهر' : 'From month',
+                            value: _fromMonth,
+                            onChanged: (value) => setState(() {
+                              _fromMonth = value;
+                              _validationMessage = null;
+                            }),
+                          ),
+                        ),
+                        Gap(10.w),
+                        Expanded(
+                          child: _monthDropdown(
+                            label: _isArabic ? 'إلى شهر' : 'To month',
+                            value: _toMonth,
+                            onChanged: (value) => setState(() {
+                              _toMonth = value;
+                              _validationMessage = null;
+                            }),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                  if (widget.showComparisonMonth) ...[
+                    _monthDropdown(
+                      label: _isArabic ? 'شهر المقارنة' : 'Comparison month',
+                      value: _comparisonMonth,
+                      allowAllMonths: false,
+                      onChanged: (value) {
+                        if (value != null) {
+                          setState(() {
+                            _comparisonMonth = value;
+                            _validationMessage = null;
+                          });
+                        }
+                      },
+                    ),
+                    Gap(12.h),
+                  ],
+                  if (widget.showMonthFilters ||
+                      widget.showBalancePeriodicallyFilters) ...[
+                    Gap(12.h),
+                    _dropdown<int>(
+                      label: _isArabic ? 'نوع الرصيد' : 'Balance type',
+                      value: _balance,
+                      options: [
+                        (0, _isArabic ? 'السابق' : 'Previous'),
+                        (1, _isArabic ? 'التقديري' : 'Estimated'),
+                      ],
+                      onChanged: (value) => setState(() => _balance = value),
+                    ),
+                  ],
+                  if (widget.showBalancePeriodicallyFilters) ...[
+                    Gap(12.h),
+                    _dropdown<int>(
+                      label: _isArabic ? 'نوع الفترة' : 'Period type',
+                      value: _periodically,
+                      options: [
+                        (0, _isArabic ? 'إجمالي' : 'Summary'),
+                        (1, _isArabic ? 'شهري' : 'Monthly'),
+                      ],
+                      onChanged: (value) =>
+                          setState(() => _periodically = value),
                     ),
                   ],
                   Gap(12.h),
@@ -544,6 +668,48 @@ class _CostCentersReportFilterBottomSheetWidgetState
       onChanged: (selected) {
         if (selected != null) onChanged(selected);
       },
+    );
+  }
+
+  Widget _monthDropdown({
+    required String label,
+    required int? value,
+    bool allowAllMonths = true,
+    required ValueChanged<int?> onChanged,
+  }) {
+    final foreground = AppColor.titleFormFiledColor(context);
+    return DropdownButtonFormField<int>(
+      initialValue: value ?? (allowAllMonths ? 0 : 1),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(color: foreground.withValues(alpha: 0.65)),
+        filled: true,
+        fillColor: AppColor.textFormFillColor(context),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.r),
+          borderSide: BorderSide(color: foreground.withValues(alpha: 0.12)),
+        ),
+        contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
+      ),
+      dropdownColor: AppColor.cardColor(context),
+      style: TextStyle(color: foreground, fontSize: 13.sp),
+      items: [
+        if (allowAllMonths)
+          DropdownMenuItem<int>(
+            value: 0,
+            child: Text(_isArabic ? 'كل الشهور' : 'All months'),
+          ),
+        ...List.generate(
+          12,
+          (index) => DropdownMenuItem<int>(
+            value: index + 1,
+            child: Text('${_isArabic ? 'شهر' : 'Month'} ${index + 1}'),
+          ),
+        ),
+      ],
+      onChanged: (selected) =>
+          onChanged(selected == null || selected == 0 ? null : selected),
     );
   }
 }
