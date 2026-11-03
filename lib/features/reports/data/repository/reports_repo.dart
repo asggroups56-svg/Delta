@@ -9,6 +9,7 @@ import '../../../../core/error/failures.dart';
 import '../../../../core/network/api_consumer.dart';
 import '../../../../core/network/end_points.dart';
 import '../models/account_statement_report_request_model.dart';
+import '../models/accounts_comparison_report_request_model.dart';
 import '../models/account_centers_summary_for_main_accounts_report_request_model.dart';
 import '../models/chart_of_account_report_request_model.dart';
 import '../models/chart_of_account_monthly_balances_report_request_model.dart';
@@ -198,6 +199,27 @@ abstract interface class ReportsRepo {
     num? toAccountNo,
     int accountType = 3,
     String reportName = 'AGL003_Bar',
+    required String languageCode,
+    String exportType = 'pdf',
+  });
+
+  Future<Either<Failure, File>> getAccountsComparsionReport({
+    num? fromAccountNo,
+    num? toAccountNo,
+    int? fromAccountLevel,
+    int? toAccountLevel,
+    int? fromMonth,
+    int? toMonth,
+    int? comparisonMonth,
+    int accountType = 2,
+    int financialStatementType = 4,
+    int? balance = 0,
+    int? periodically,
+    int reportPageType = 4,
+    String reportName = 'AGL052',
+    bool includeMonthlyFilters = false,
+    bool includeComparisonMonthFilters = false,
+    bool includeBalancePeriodicallyFilters = false,
     required String languageCode,
     String exportType = 'pdf',
   });
@@ -764,6 +786,59 @@ class ReportsRepoImpl implements ReportsRepo {
 
         return _downloadReport(
           endpoint: EndPoints.monthlyAccountComparisonReport,
+          body: requestModel.toJson(),
+          fileNamePrefix: reportName.toLowerCase(),
+          exportType: requestModel.exportType,
+          headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+        );
+      },
+    );
+  }
+
+  @override
+  Future<Either<Failure, File>> getAccountsComparsionReport({
+    num? fromAccountNo,
+    num? toAccountNo,
+    int? fromAccountLevel,
+    int? toAccountLevel,
+    int? fromMonth,
+    int? toMonth,
+    int? comparisonMonth,
+    int accountType = 2,
+    int financialStatementType = 4,
+    int? balance = 0,
+    int? periodically,
+    int reportPageType = 4,
+    String reportName = 'AGL052',
+    bool includeMonthlyFilters = false,
+    bool includeComparisonMonthFilters = false,
+    bool includeBalancePeriodicallyFilters = false,
+    required String languageCode,
+    String exportType = 'pdf',
+  }) {
+    return handleDioRequest(
+      request: () async {
+        final requestModel = AccountsComparisonReportRequestModel(
+          fromAccountNo: fromAccountNo,
+          toAccountNo: toAccountNo,
+          fromAccountLevel: fromAccountLevel,
+          toAccountLevel: toAccountLevel,
+          fromMonth: fromMonth,
+          toMonth: toMonth,
+          comparisonMonth: comparisonMonth,
+          accountType: accountType,
+          financialStatementType: financialStatementType,
+          balance: balance,
+          periodically: periodically,
+          reportPageType: reportPageType,
+          reportName: reportName,
+          exportType: exportType,
+          includeMonthlyFilters: includeMonthlyFilters,
+          includeComparisonMonthFilters: includeComparisonMonthFilters,
+          includeBalancePeriodicallyFilters: includeBalancePeriodicallyFilters,
+        );
+        return _downloadReport(
+          endpoint: EndPoints.accountsComparsionReport,
           body: requestModel.toJson(),
           fileNamePrefix: reportName.toLowerCase(),
           exportType: requestModel.exportType,

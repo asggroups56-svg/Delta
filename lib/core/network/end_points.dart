@@ -32,6 +32,8 @@ class EndPoints {
   static const String purchasesWithVatReport = 'Report/PurchasesWithVatReport';
   static const String monthlyAccountComparisonReport =
       'Report/MonthlyAccountComparsionReport';
+  static const String accountsComparsionReport =
+      'Report/AccountsComparsionReport';
   static const String monthlyCostCentersComparisonReport =
       'Report/MonthlyCostCentersComparsionReport';
   static const String currenciesReport = 'Report/CurrenciesReport';

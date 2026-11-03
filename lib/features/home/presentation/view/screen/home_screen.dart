@@ -20,6 +20,7 @@ import 'package:my_template/features/home/presentation/view/widget/grid_modules_
 import 'package:my_template/features/home/presentation/view/widget/quick_shortcuts_widget.dart';
 import 'package:my_template/features/home/presentation/view/widget/recent_activities_widget.dart';
 import 'package:my_template/features/home/presentation/view/widget/side_drawer_widget.dart';
+
 class HomeScreen extends StatefulWidget {
   final bool embeddedInShell;
   final VoidCallback? onAiTap;
@@ -176,6 +177,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 onOpenDrawer: () => _scaffoldKey.currentState?.openDrawer(),
               ),
 
+             
+
               Gap(16.h),
 
               // 2. Delta ASG Welcome Banner
@@ -268,7 +271,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               Gap(14.h),
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                 padding: EdgeInsets.symmetric(horizontal: 16.w),
                 child: FolderListWidget(folders: documentFolders),
               ),
 

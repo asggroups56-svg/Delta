@@ -14,6 +14,7 @@ import 'package:my_template/core/utils/common_methods.dart';
 import 'package:my_template/features/reports/data/repository/reports_repo.dart';
 import 'package:my_template/features/reports/presentation/view/widget/file_download_service.dart';
 import 'package:my_template/features/reports/presentation/view/widget/account_statement_filter_bottom_sheet_widget.dart';
+import 'package:my_template/features/reports/presentation/view/widget/accounts_comparison_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/account_centers_summary_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/chart_of_account_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/chart_of_account_monthly_balances_filter_bottom_sheet_widget.dart';
@@ -596,6 +597,78 @@ class _ReportsScreenState extends State<ReportsScreen> {
               ),
               Gap(10.h),
               _buildExportOption(
+                icon: Icons.calendar_month_rounded,
+                color: AppColor.emeraldTeal,
+                title: context.locale.languageCode == 'ar'
+                    ? 'مقارنة الحسابات بالشهور'
+                    : 'Accounts Comparison by Months',
+                subtitle: 'Report/AccountsComparsionReport (AGL053)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: context.locale.languageCode == 'ar'
+                        ? 'مقارنة الحسابات بالشهور'
+                        : 'Accounts Comparison by Months',
+                    description: '',
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AGL053',
+                    isAccountsMonthlyComparisonReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.event_repeat_rounded,
+                color: AppColor.oceanBlue,
+                title: context.locale.languageCode == 'ar'
+                    ? 'تقارير مقارنة شهر - الحسابات'
+                    : 'Account Month Comparison',
+                subtitle: 'Report/AccountsComparsionReport (AGL054)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: context.locale.languageCode == 'ar'
+                        ? 'تقارير مقارنة شهر - الحسابات'
+                        : 'Account Month Comparison',
+                    description: '',
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AGL054',
+                    isAccountsComparisonByMonthReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.assessment_outlined,
+                color: AppColor.emeraldTeal,
+                title: context.locale.languageCode == 'ar'
+                    ? 'مقارنة دليل الحسابات'
+                    : 'Chart of Accounts Comparison',
+                subtitle: 'Report/AccountsComparsionReport (AGL006)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: context.locale.languageCode == 'ar'
+                        ? 'مقارنة دليل الحسابات'
+                        : 'Chart of Accounts Comparison',
+                    description: '',
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AGL006',
+                    isAccountsBalancePeriodicallyReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
                 icon: Icons.share_rounded,
                 color: AppColor.purpleAccent,
                 title: AppLocaleKey.shareReport.tr(),
@@ -704,6 +777,10 @@ class _ReportsScreenState extends State<ReportsScreen> {
     bool isAccountCentersSummaryForMainAccountsReport = false,
     bool isMonthlyAccountComparisonReport = false,
     bool isMonthlyCostCentersComparisonReport = false,
+    bool isAccountsComparisonReport = false,
+    bool isAccountsMonthlyComparisonReport = false,
+    bool isAccountsComparisonByMonthReport = false,
+    bool isAccountsBalancePeriodicallyReport = false,
     bool isChartOfAccountMonthlyBalancesReport = false,
     int chartOfAccountReportPageType = 2,
     int chartOfAccountReportAccountType = 0,
@@ -894,6 +971,22 @@ class _ReportsScreenState extends State<ReportsScreen> {
       if (!mounted || monthlyComparisonFilter == null) return;
       reportName = monthlyComparisonFilter.reportName;
     }
+    AccountsComparisonReportFilterSelection? accountsComparisonFilter;
+    if (isAccountsComparisonReport ||
+        isAccountsMonthlyComparisonReport ||
+        isAccountsComparisonByMonthReport ||
+        isAccountsBalancePeriodicallyReport) {
+      accountsComparisonFilter =
+          await AccountsComparisonReportFilterBottomSheetWidget.show(
+            context,
+            title: title,
+            isMonthly: isAccountsMonthlyComparisonReport,
+            isComparisonMonth: isAccountsComparisonByMonthReport,
+            isBalancePeriodically: isAccountsBalancePeriodicallyReport,
+          );
+      if (!mounted || accountsComparisonFilter == null) return;
+      exportType = accountsComparisonFilter.exportType;
+    }
     ChartOfAccountMonthlyBalancesFilterSelection? monthlyBalancesFilter;
     if (isChartOfAccountMonthlyBalancesReport) {
       monthlyBalancesFilter =
@@ -936,10 +1029,83 @@ class _ReportsScreenState extends State<ReportsScreen> {
           isAccountCentersSummaryForMainAccountsReport ||
           isMonthlyAccountComparisonReport ||
           isMonthlyCostCentersComparisonReport ||
+          isAccountsComparisonReport ||
+          isAccountsMonthlyComparisonReport ||
+          isAccountsComparisonByMonthReport ||
+          isAccountsBalancePeriodicallyReport ||
           isChartOfAccountMonthlyBalancesReport ||
           reportName != null) {
         final reportsRepo = sl<ReportsRepo>();
-        final result = isCentersMonthlyBalanceReport
+        final result = isAccountsComparisonReport
+            ? await reportsRepo.getAccountsComparsionReport(
+                fromAccountNo: accountsComparisonFilter?.fromAccountNo,
+                toAccountNo: accountsComparisonFilter?.toAccountNo,
+                fromAccountLevel: accountsComparisonFilter?.fromAccountLevel,
+                toAccountLevel: accountsComparisonFilter?.toAccountLevel,
+                accountType: accountsComparisonFilter?.accountType ?? 2,
+                financialStatementType:
+                    accountsComparisonFilter?.financialStatementType ?? 4,
+                reportPageType: 4,
+                reportName: 'AGL052',
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isAccountsMonthlyComparisonReport
+            ? await reportsRepo.getAccountsComparsionReport(
+                fromAccountNo: accountsComparisonFilter?.fromAccountNo,
+                toAccountNo: accountsComparisonFilter?.toAccountNo,
+                fromAccountLevel: accountsComparisonFilter?.fromAccountLevel,
+                toAccountLevel: accountsComparisonFilter?.toAccountLevel,
+                fromMonth: accountsComparisonFilter?.fromMonth,
+                toMonth: accountsComparisonFilter?.toMonth,
+                accountType: accountsComparisonFilter?.accountType ?? 2,
+                financialStatementType:
+                    accountsComparisonFilter?.financialStatementType ?? 4,
+                balance: accountsComparisonFilter?.balance ?? 0,
+                reportPageType: 3,
+                reportName: 'AGL053',
+                includeMonthlyFilters: true,
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isAccountsComparisonByMonthReport
+            ? await reportsRepo.getAccountsComparsionReport(
+                fromAccountNo: accountsComparisonFilter?.fromAccountNo,
+                toAccountNo: accountsComparisonFilter?.toAccountNo,
+                fromAccountLevel: accountsComparisonFilter?.fromAccountLevel,
+                toAccountLevel: accountsComparisonFilter?.toAccountLevel,
+                comparisonMonth: accountsComparisonFilter?.comparisonMonth ?? 1,
+                accountType: accountsComparisonFilter?.accountType ?? 2,
+                financialStatementType:
+                    accountsComparisonFilter?.financialStatementType ?? 4,
+                balance: null,
+                periodically: null,
+                reportPageType: 2,
+                reportName: 'AGL054',
+                includeComparisonMonthFilters: true,
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isAccountsBalancePeriodicallyReport
+            ? await reportsRepo.getAccountsComparsionReport(
+                fromAccountNo: accountsComparisonFilter?.fromAccountNo,
+                toAccountNo: accountsComparisonFilter?.toAccountNo,
+                fromAccountLevel: accountsComparisonFilter?.fromAccountLevel,
+                toAccountLevel: accountsComparisonFilter?.toAccountLevel,
+                fromMonth: accountsComparisonFilter?.fromMonth,
+                toMonth: accountsComparisonFilter?.toMonth,
+                accountType: accountsComparisonFilter?.accountType ?? 2,
+                financialStatementType:
+                    accountsComparisonFilter?.financialStatementType ?? 4,
+                balance: accountsComparisonFilter?.balance ?? 1,
+                periodically: accountsComparisonFilter?.periodically ?? 0,
+                reportPageType: 1,
+                reportName: accountsComparisonFilter?.reportName ?? 'AGL006',
+                includeBalancePeriodicallyFilters: true,
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isCentersMonthlyBalanceReport
             ? await reportsRepo.getCentersMonthlyBalanceReport(
                 fromCostCenterNo: costCentersFilter?.fromCostCenterNo,
                 toCostCenterNo: costCentersFilter?.toCostCenterNo,
@@ -1592,6 +1758,74 @@ class _ReportsScreenState extends State<ReportsScreen> {
         'category': 1,
         'reportName': 'AGL008_Chart',
         'isMonthlyCostCentersComparisonReport': true,
+        'treeGroup': 'centersComparison',
+      },
+      {
+        'id': 'accounts_comparison',
+        'reportName': 'AGL052',
+        'isAccountsComparisonReport': true,
+        'isSubmenu': true,
+        'title': context.locale.languageCode == 'ar'
+            ? 'مقارنة حركة الحسابات الشهرية'
+            : 'Monthly Account Movements Comparison',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'مقارنة حركة الحسابات الشهرية حسب القوائم المالية'
+            : 'Compare monthly account movements by financial statement type',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.compare_arrows_rounded,
+        'iconColor': AppColor.oceanBlue,
+        'category': 1,
+        'treeGroup': 'accountComparisons',
+      },
+      {
+        'id': 'accounts_monthly_comparison',
+        'reportName': 'AGL053',
+        'isAccountsMonthlyComparisonReport': true,
+        'isSubmenu': true,
+        'title': context.locale.languageCode == 'ar'
+            ? 'مقارنة الحسابات بالشهور'
+            : 'Accounts Comparison by Months',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'مقارنة الحسابات بين الشهور مع تحديد نوع الرصيد'
+            : 'Compare accounts across months by balance type',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.calendar_month_rounded,
+        'iconColor': AppColor.emeraldTeal,
+        'category': 1,
+        'treeGroup': 'accountComparisons',
+      },
+      {
+        'id': 'accounts_comparison_by_month',
+        'reportName': 'AGL054',
+        'isAccountsComparisonByMonthReport': true,
+        'isSubmenu': true,
+        'title': context.locale.languageCode == 'ar'
+            ? 'تقارير مقارنة شهر - الحسابات'
+            : 'Account Month Comparison',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'مقارنة الحسابات في شهر محدد'
+            : 'Compare accounts for a selected month',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.event_repeat_rounded,
+        'iconColor': AppColor.oceanBlue,
+        'category': 1,
+        'treeGroup': 'accountComparisons',
+      },
+      {
+        'id': 'accounts_balance_periodically',
+        'reportName': 'AGL006',
+        'isAccountsBalancePeriodicallyReport': true,
+        'isSubmenu': true,
+        'title': context.locale.languageCode == 'ar'
+            ? 'مقارنة دليل الحسابات'
+            : 'Chart of Accounts Comparison',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'مقارنة دليل الحسابات حسب الرصيد والفترة'
+            : 'Compare chart of accounts by balance and period',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.assessment_outlined,
+        'iconColor': AppColor.emeraldTeal,
+        'category': 1,
         'treeGroup': 'accountComparisons',
       },
     ];
@@ -1628,6 +1862,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 onToggleLanguage: _toggleLanguage,
               ),
             ),
+
             SliverToBoxAdapter(child: _buildPreviewArea()),
             SliverToBoxAdapter(child: Gap(14.h)),
             SliverToBoxAdapter(
@@ -1787,30 +2022,36 @@ class _ReportsScreenState extends State<ReportsScreen> {
       ),
       (
         id: 3,
+        key: 'centersComparison',
+        titleAr: 'مقارنة المراكز',
+        titleEn: 'Cost Centers Comparison',
+      ),
+      (
+        id: 4,
         key: 'accountComparisons',
         titleAr: 'تقارير المقارنة للحسابات',
         titleEn: 'Account comparison reports',
       ),
       (
-        id: 4,
+        id: 5,
         key: 'operations',
         titleAr: 'تقارير العمليات',
         titleEn: 'Operations reports',
       ),
       (
-        id: 5,
+        id: 6,
         key: 'tax',
         titleAr: 'تقارير ضريبة القيمة المضافة',
         titleEn: 'VAT reports',
       ),
       (
-        id: 6,
+        id: 7,
         key: 'ledger',
         titleAr: 'تقارير الأستاذ والحسابات',
         titleEn: 'Ledger and account reports',
       ),
       (
-        id: 7,
+        id: 8,
         key: 'financial',
         titleAr: 'القوائم المالية',
         titleEn: 'Financial statements',
@@ -1828,6 +2069,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
           id: group.id,
           title: isArabic ? group.titleAr : group.titleEn,
           reports: categoryReports,
+          isProminent: group.key == 'centersComparison',
         ),
       );
     }
@@ -1882,6 +2124,14 @@ class _ReportsScreenState extends State<ReportsScreen> {
           statement['isMonthlyAccountComparisonReport'] == true,
       isMonthlyCostCentersComparisonReport:
           statement['isMonthlyCostCentersComparisonReport'] == true,
+      isAccountsComparisonReport:
+          statement['isAccountsComparisonReport'] == true,
+      isAccountsMonthlyComparisonReport:
+          statement['isAccountsMonthlyComparisonReport'] == true,
+      isAccountsComparisonByMonthReport:
+          statement['isAccountsComparisonByMonthReport'] == true,
+      isAccountsBalancePeriodicallyReport:
+          statement['isAccountsBalancePeriodicallyReport'] == true,
       isChartOfAccountMonthlyBalancesReport:
           statement['isChartOfAccountMonthlyBalancesReport'] == true,
       chartOfAccountReportPageType:
