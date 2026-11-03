@@ -1,7 +1,10 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:my_template/core/custom_widgets/month_range_bottom_sheet_widget.dart';
 import 'package:my_template/core/theme/app_colors.dart';
+import 'package:my_template/core/utils/app_locale_key.dart';
 import 'package:my_template/features/lookup/data/models/chart_of_account_light_model.dart';
 import 'package:my_template/features/lookup/data/models/cost_center_light_model.dart';
 import 'package:my_template/features/lookup/presentation/widgets/chart_of_account_dropdown.dart';
@@ -12,6 +15,8 @@ class AccountsCentersComparisonReportFilterSelection {
   final num? toAccountNo;
   final num? fromCostCenterNo;
   final num? toCostCenterNo;
+  final int? fromMonth;
+  final int? toMonth;
   final int balance;
   final int periodically;
   final int reportGroup;
@@ -22,6 +27,8 @@ class AccountsCentersComparisonReportFilterSelection {
     this.toAccountNo,
     this.fromCostCenterNo,
     this.toCostCenterNo,
+    this.fromMonth,
+    this.toMonth,
     required this.balance,
     required this.periodically,
     required this.reportGroup,
@@ -79,10 +86,43 @@ class _AccountsCentersComparisonReportFilterBottomSheetWidgetState
   int _balance = 0;
   int _periodically = 0;
   int _reportGroup = 0;
+  int? _fromMonth;
+  int? _toMonth;
   String _exportType = 'pdf';
   String? _validationMessage;
 
   bool get _isArabic => Localizations.localeOf(context).languageCode == 'ar';
+
+  static const _months = [
+    AppLocaleKey.monthJanuary,
+    AppLocaleKey.monthFebruary,
+    AppLocaleKey.monthMarch,
+    AppLocaleKey.monthApril,
+    AppLocaleKey.monthMay,
+    AppLocaleKey.monthJune,
+    AppLocaleKey.monthJuly,
+    AppLocaleKey.monthAugust,
+    AppLocaleKey.monthSeptember,
+    AppLocaleKey.monthOctober,
+    AppLocaleKey.monthNovember,
+    AppLocaleKey.monthDecember,
+  ];
+
+  String _monthName(int month) => _months[month - 1].tr();
+
+  Future<void> _selectMonthRange() async {
+    final selection = await MonthRangeBottomSheetWidget.show(
+      context,
+      title: AppLocaleKey.selectMonthRange.tr(),
+      initialFromMonth: _fromMonth,
+      initialToMonth: _toMonth,
+    );
+    if (!mounted || selection == null) return;
+    setState(() {
+      _fromMonth = selection.fromMonth;
+      _toMonth = selection.toMonth;
+    });
+  }
 
   void _submit() {
     final fromAccountNo = _fromAccount?.accountNo;
@@ -118,6 +158,8 @@ class _AccountsCentersComparisonReportFilterBottomSheetWidgetState
         toAccountNo: toAccountNo,
         fromCostCenterNo: fromCostCenterNo,
         toCostCenterNo: toCostCenterNo,
+        fromMonth: _fromMonth,
+        toMonth: _toMonth,
         balance: _balance,
         periodically: _periodically,
         reportGroup: _reportGroup,
@@ -239,6 +281,35 @@ class _AccountsCentersComparisonReportFilterBottomSheetWidgetState
                       _toCostCenter = value;
                       _validationMessage = null;
                     }),
+                  ),
+                  Gap(16.h),
+                  Text(
+                    AppLocaleKey.selectMonthRange.tr(),
+                    style: TextStyle(
+                      color: foreground,
+                      fontSize: 13.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  Gap(8.h),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: _selectMonthRange,
+                      icon: const Icon(Icons.date_range_rounded),
+                      label: Text(
+                        _fromMonth == null
+                            ? AppLocaleKey.allMonths.tr()
+                            : '${_monthName(_fromMonth!)} - ${_monthName(_toMonth!)}',
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColor.oceanBlue,
+                        padding: EdgeInsets.symmetric(vertical: 12.h),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                      ),
+                    ),
                   ),
                   Gap(12.h),
                   if (widget.showBalanceFilter) ...[

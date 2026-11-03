@@ -1,50 +1,94 @@
-import 'dart:ui' as ui;
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:my_template/core/custom_widgets/custom_form_field/custom_form_field.dart';
 import 'package:my_template/core/theme/app_colors.dart';
 import 'package:my_template/core/utils/app_locale_key.dart';
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Page header
+// ─────────────────────────────────────────────────────────────────────────────
 class ReportsPageHeaderWidget extends StatelessWidget {
   final VoidCallback onExport;
   final VoidCallback onToggleLanguage;
+  final int reportCount;
+  final int categoryCount;
 
   const ReportsPageHeaderWidget({
     super.key,
     required this.onExport,
     required this.onToggleLanguage,
+    this.reportCount = 0,
+    this.categoryCount = 0,
   });
 
   @override
   Widget build(BuildContext context) {
     final isArabic = context.locale.languageCode == 'ar';
+    final subtitle = isArabic
+        ? '$reportCount تقرير · $categoryCount أقسام'
+        : '$reportCount reports · $categoryCount sections';
 
     return Padding(
-      padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 12.h),
+      padding: EdgeInsets.fromLTRB(16.w, 10.h, 16.w, 4.h),
       child: Row(
         children: [
           Expanded(
-            child: Text(
-              isArabic ? 'التقارير' : 'Reports',
-              style: TextStyle(
-                color: AppColor.royalNavy,
-                fontSize: 22.sp,
-                fontWeight: FontWeight.w800,
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  isArabic ? 'التقارير' : 'Reports',
+                  style: TextStyle(
+                    color: AppColor.titleFormFiledColor(context),
+                    fontSize: 24.sp,
+                    fontWeight: FontWeight.w800,
+                    height: 1.1,
+                  ),
+                ),
+                Gap(5.h),
+                Row(
+                  children: [
+                    Container(
+                      width: 6.r,
+                      height: 6.r,
+                      decoration: const BoxDecoration(
+                        color: AppColor.emeraldTeal,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    Gap(6.w),
+                    Flexible(
+                      child: Text(
+                        subtitle,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: AppColor.darkTextColor(context),
+                          fontSize: 11.5.sp,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
+          Gap(10.w),
           _HeaderActionButton(
-            icon: Icons.download_outlined,
+            icon: Icons.download_rounded,
+            label: isArabic ? 'تصدير' : 'Export',
             tooltip: AppLocaleKey.exportReport.tr(),
             onPressed: onExport,
+            filled: true,
           ),
           Gap(8.w),
           _HeaderActionButton(
             icon: Icons.translate_rounded,
             tooltip: isArabic ? 'English' : 'العربية',
-            label: isArabic ? 'EN' : 'AR',
             onPressed: onToggleLanguage,
           ),
         ],
@@ -58,43 +102,50 @@ class _HeaderActionButton extends StatelessWidget {
   final String tooltip;
   final String? label;
   final VoidCallback onPressed;
+  final bool filled;
 
   const _HeaderActionButton({
     required this.icon,
     required this.tooltip,
     required this.onPressed,
     this.label,
+    this.filled = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    final accent = AppColor.primaryColor(context);
+    final foreground = filled ? Colors.white : accent;
+
     return Tooltip(
       message: tooltip,
       child: Material(
-        color: AppColor.cardColor(context),
+        color: filled ? accent : AppColor.cardColor(context),
         shape: RoundedRectangleBorder(
-          side: BorderSide(color: AppColor.borderColor(context)),
+          side: BorderSide(
+            color: filled ? accent : AppColor.borderColor(context),
+          ),
           borderRadius: BorderRadius.circular(12.r),
         ),
         child: InkWell(
           onTap: onPressed,
           borderRadius: BorderRadius.circular(12.r),
           child: SizedBox(
-            height: 42.r,
+            height: 40.r,
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10.w),
+              padding: EdgeInsets.symmetric(horizontal: filled ? 14.w : 11.w),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(icon, size: 19.r, color: AppColor.royalNavy),
+                  Icon(icon, size: 18.r, color: foreground),
                   if (label != null) ...[
                     Gap(5.w),
                     Text(
                       label!,
                       style: TextStyle(
-                        color: AppColor.royalNavy,
+                        color: foreground,
                         fontSize: 11.sp,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ],
@@ -108,6 +159,9 @@ class _HeaderActionButton extends StatelessWidget {
   }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Search
+// ─────────────────────────────────────────────────────────────────────────────
 class ReportsSearchFieldWidget extends StatelessWidget {
   final TextEditingController controller;
   final FocusNode focusNode;
@@ -134,72 +188,20 @@ class ReportsSearchFieldWidget extends StatelessWidget {
     final accent = AppColor.primaryColor(context);
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 2.h),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        decoration: BoxDecoration(
-          color: AppColor.cardSurfaceColor(context),
-          borderRadius: BorderRadius.circular(16.r),
-          border: Border.all(
-            color: hasSearchText || isFocused
-                ? accent.withValues(alpha: 0.65)
-                : AppColor.borderColor(context),
-            width: isFocused ? 1.5 : 1,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: accent.withValues(alpha: isFocused ? 0.09 : 0.025),
-              blurRadius: isFocused ? 14 : 8,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        child: TextField(
-          controller: controller,
-          focusNode: focusNode,
-          onChanged: onChanged,
-          onSubmitted: onSubmitted,
-          textInputAction: TextInputAction.search,
-          textAlignVertical: TextAlignVertical.center,
-          style: TextStyle(
-            color: AppColor.titleFormFiledColor(context),
-            fontSize: 14.sp,
-            fontWeight: FontWeight.w500,
-          ),
-          decoration: InputDecoration(
-            hintText: hintText ?? AppLocaleKey.searchReports.tr(),
-            hintStyle: TextStyle(
-              color: AppColor.darkTextColor(context),
-              fontSize: 13.sp,
-            ),
-            prefixIcon: Container(
-              margin: EdgeInsetsDirectional.fromSTEB(10.w, 8.h, 8.w, 8.h),
-              decoration: BoxDecoration(
-                color: accent.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(11.r),
+      padding: EdgeInsets.fromLTRB(16.w, 10.h, 16.w, 2.h),
+      child:  CustomFormField(
+                radius: 12.r,
+                controller: controller,
+                onChanged: onChanged,
+                hintText: hintText ?? AppLocaleKey.searchReports.tr(),
+                  hintStyle: TextStyle(
+                    color: AppColor.darkTextColor(
+                      context,
+                    ).withValues(alpha: 0.65),
+                    fontSize: 12.5.sp,
+                    fontWeight: FontWeight.w400,
+                  ),            
               ),
-              child: Icon(Icons.search_rounded, color: accent, size: 20.r),
-            ),
-            suffixIcon: hasSearchText
-                ? IconButton(
-                    tooltip: AppLocaleKey.clearSearch.tr(),
-                    icon: Icon(
-                      Icons.close_rounded,
-                      color: AppColor.darkTextColor(context),
-                      size: 18.r,
-                    ),
-                    onPressed: onClear,
-                  )
-                : null,
-            border: InputBorder.none,
-            isDense: true,
-            contentPadding: EdgeInsets.symmetric(
-              horizontal: 12.w,
-              vertical: 13.h,
-            ),
-          ),
-        ),
-      ),
     );
   }
 }
@@ -217,14 +219,15 @@ class ReportsSearchSummaryWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (query.trim().isEmpty) return const SizedBox.shrink();
+    final accent = AppColor.primaryColor(context);
 
     return Padding(
-      padding: EdgeInsetsDirectional.fromSTEB(18.w, 8.h, 18.w, 0),
+      padding: EdgeInsetsDirectional.fromSTEB(18.w, 10.h, 18.w, 0),
       child: Row(
         children: [
           Icon(
             Icons.search_rounded,
-            size: 14.r,
+            size: 13.r,
             color: AppColor.darkTextColor(context),
           ),
           Gap(6.w),
@@ -234,17 +237,24 @@ class ReportsSearchSummaryWidget extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontSize: 11.sp,
+                fontSize: 10.5.sp,
                 color: AppColor.darkTextColor(context),
               ),
             ),
           ),
-          Text(
-            '$resultCount',
-            style: TextStyle(
-              fontSize: 11.sp,
-              fontWeight: FontWeight.bold,
-              color: AppColor.primaryColor(context),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
+            decoration: BoxDecoration(
+              color: accent.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(20.r),
+            ),
+            child: Text(
+              '$resultCount',
+              style: TextStyle(
+                fontSize: 10.sp,
+                fontWeight: FontWeight.w700,
+                color: accent,
+              ),
             ),
           ),
         ],
@@ -253,14 +263,21 @@ class ReportsSearchSummaryWidget extends StatelessWidget {
   }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Category sections
+// ─────────────────────────────────────────────────────────────────────────────
 class ReportsCategorySectionData {
   final int id;
   final String title;
+  final IconData icon;
+  final Color accent;
   final List<Map<String, dynamic>> reports;
 
   const ReportsCategorySectionData({
     required this.id,
     required this.title,
+    required this.icon,
+    required this.accent,
     required this.reports,
   });
 }
@@ -359,162 +376,198 @@ class _ReportsCategoryAccordionListWidgetState
 
   @override
   Widget build(BuildContext context) {
-    final rows =
-        <
-          ({
-            ReportsCategorySectionData section,
-            Map<String, dynamic>? report,
-            bool selected,
-          })
-        >[];
-    for (final section in widget.sections) {
-      final isExpanded = _expandedSections.contains(section.id);
-      rows.add((section: section, report: null, selected: false));
-      if (isExpanded) {
-        for (final report in section.reports) {
-          rows.add((
-            section: section,
-            report: report,
-            selected: _reportId(report) == _selectedReportId,
-          ));
-        }
-      }
-    }
-
     return SliverPadding(
       padding: EdgeInsets.symmetric(horizontal: 16.w),
       sliver: SliverList.builder(
-        itemCount: rows.length,
+        itemCount: widget.sections.length,
         itemBuilder: (context, index) {
-          final row = rows[index];
-          final isFirst = index == 0;
-          final isLast = index == rows.length - 1;
-          final isExpanded = _expandedSections.contains(row.section.id);
-          final isGroupHeader = row.report == null;
-          final accent = AppColor.primaryColor(context);
-          final backgroundColor = isGroupHeader
-              ? (isExpanded
-                    ? accent.withValues(alpha: 0.09)
-                    : AppColor.cardColor(context))
-              : AppColor.cardSurfaceColor(context);
-
-          return Container(
-            decoration: BoxDecoration(
-              color: backgroundColor,
-              border: Border(
-                left: BorderSide(color: AppColor.borderColor(context)),
-                right: BorderSide(color: AppColor.borderColor(context)),
-                top: isFirst
-                    ? BorderSide(color: AppColor.borderColor(context))
-                    : BorderSide.none,
-                bottom: BorderSide(color: AppColor.borderColor(context)),
-              ),
-              borderRadius: BorderRadius.vertical(
-                top: isFirst ? Radius.circular(16.r) : Radius.zero,
-                bottom: isLast ? Radius.circular(16.r) : Radius.zero,
-              ),
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: isGroupHeader
-                ? Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: () {
-                        setState(() {
-                          if (isExpanded) {
-                            _expandedSections.remove(row.section.id);
-                          } else {
-                            _expandedSections.add(row.section.id);
-                            if (row.section.reports.isNotEmpty) {
-                              _selectedReportId = _reportId(
-                                row.section.reports.first,
-                              );
-                            }
-                          }
-                        });
-                      },
-                      child: SizedBox(
-                        height: 55.h,
-                        child: Row(
-                          children: [
-                            if (Directionality.of(context) ==
-                                ui.TextDirection.rtl)
-                              _buildActiveEdge(isExpanded, accent),
-                            if (Directionality.of(context) !=
-                                ui.TextDirection.rtl)
-                              _buildSectionArrow(isExpanded, accent, context),
-                            Expanded(
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 16.w),
-                                child: Text(
-                                  row.section.title,
-                                  textAlign: TextAlign.end,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    color: isExpanded
-                                        ? accent
-                                        : AppColor.titleFormFiledColor(context),
-                                    fontSize: 13.sp,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            if (Directionality.of(context) ==
-                                ui.TextDirection.rtl)
-                              _buildSectionArrow(isExpanded, accent, context),
-                            if (Directionality.of(context) !=
-                                ui.TextDirection.rtl)
-                              _buildActiveEdge(isExpanded, accent),
-                          ],
-                        ),
-                      ),
-                    ),
-                  )
-                : widget.reportBuilder(
-                    row.report!,
-                    isSelected: row.selected,
-                    onSelect: () => setState(
-                      () => _selectedReportId = _reportId(row.report!),
-                    ),
-                  ),
+          final section = widget.sections[index];
+          final isExpanded = _expandedSections.contains(section.id);
+          return Padding(
+            padding: EdgeInsets.only(bottom: 12.h),
+            child: _buildSectionCard(context, section, isExpanded),
           );
         },
       ),
     );
   }
 
-  Widget _buildSectionArrow(
-    bool isExpanded,
-    Color accent,
+  Widget _buildSectionCard(
     BuildContext context,
+    ReportsCategorySectionData section,
+    bool isExpanded,
   ) {
-    final isRtl = Directionality.of(context) == ui.TextDirection.rtl;
-    return SizedBox(
-      width: 40.w,
-      child: Icon(
-        isExpanded
-            ? Icons.keyboard_arrow_down_rounded
-            : (isRtl
-                  ? Icons.chevron_left_rounded
-                  : Icons.chevron_right_rounded),
-        size: 21.r,
-        color: isExpanded ? accent : AppColor.darkTextColor(context),
+    final accent = section.accent;
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: AppColor.cardColor(context),
+        borderRadius: BorderRadius.circular(20.r),
+        border: Border.all(
+          color: isExpanded
+              ? accent.withValues(alpha: 0.28)
+              : AppColor.borderColor(context),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0F172A).withValues(alpha: 0.035),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20.r),
+        child: Material(
+          color: Colors.transparent,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildSectionHeader(context, section, isExpanded),
+              ClipRect(
+                child: AnimatedSize(
+                  duration: const Duration(milliseconds: 240),
+                  curve: Curves.easeOutCubic,
+                  alignment: Alignment.topCenter,
+                  child: isExpanded
+                      ? _buildReportList(context, section)
+                      : const SizedBox(width: double.infinity, height: 0),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 
-  Widget _buildActiveEdge(bool isExpanded, Color accent) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 180),
-      width: 3.w,
-      height: double.infinity,
-      color: isExpanded ? accent : Colors.transparent,
+  Widget _buildSectionHeader(
+    BuildContext context,
+    ReportsCategorySectionData section,
+    bool isExpanded,
+  ) {
+    final isArabic = context.locale.languageCode == 'ar';
+    final accent = section.accent;
+
+    return InkWell(
+      onTap: () {
+        setState(() {
+          if (isExpanded) {
+            _expandedSections.remove(section.id);
+          } else {
+            _expandedSections.add(section.id);
+            if (section.reports.isNotEmpty) {
+              _selectedReportId = _reportId(section.reports.first);
+            }
+          }
+        });
+      },
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+        child: Row(
+          children: [
+            Container(
+              width: 44.r,
+              height: 44.r,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    accent.withValues(alpha: 0.18),
+                    accent.withValues(alpha: 0.07),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(14.r),
+                border: Border.all(color: accent.withValues(alpha: 0.18)),
+              ),
+              child: Icon(section.icon, color: accent, size: 21.r),
+            ),
+            Gap(12.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    section.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: isExpanded
+                          ? accent
+                          : AppColor.titleFormFiledColor(context),
+                      fontSize: 14.5.sp,
+                      fontWeight: FontWeight.w700,
+                      height: 1.25,
+                    ),
+                  ),
+                  Gap(3.h),
+                  Text(
+                    '${section.reports.length} ${isArabic ? 'تقارير' : 'reports'}',
+                    style: TextStyle(
+                      color: AppColor.darkTextColor(context),
+                      fontSize: 11.sp,
+                      height: 1.3,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Gap(8.w),
+            AnimatedRotation(
+              turns: isExpanded ? 0.5 : 0,
+              duration: const Duration(milliseconds: 220),
+              curve: Curves.easeOutCubic,
+              child: Icon(
+                Icons.keyboard_arrow_down_rounded,
+                size: 22.r,
+                color: isExpanded ? accent : AppColor.darkTextColor(context),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildReportList(
+    BuildContext context,
+    ReportsCategorySectionData section,
+  ) {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(top: BorderSide(color: AppColor.borderColor(context))),
+      ),
+      child: Column(
+        children: [
+          for (var i = 0; i < section.reports.length; i++) ...[
+            if (i > 0)
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 14.w),
+                child: Divider(
+                  height: 1,
+                  thickness: 1,
+                  color: AppColor.borderColor(context).withValues(alpha: 0.6),
+                ),
+              ),
+            widget.reportBuilder(
+              section.reports[i],
+              isSelected: _reportId(section.reports[i]) == _selectedReportId,
+              onSelect: () => setState(
+                () => _selectedReportId = _reportId(section.reports[i]),
+              ),
+            ),
+          ],
+        ],
+      ),
     );
   }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Empty state
+// ─────────────────────────────────────────────────────────────────────────────
 class ReportsEmptyStateWidget extends StatelessWidget {
   final String query;
   final VoidCallback onClearSearch;
@@ -531,21 +584,22 @@ class ReportsEmptyStateWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final isArabic = context.locale.languageCode == 'ar';
     final hasSearch = query.trim().isNotEmpty;
+    final accent = AppColor.primaryColor(context);
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 28.h),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 24.h),
       child: Container(
         width: double.infinity,
         padding: EdgeInsets.all(28.r),
         decoration: BoxDecoration(
           color: AppColor.cardColor(context),
-          borderRadius: BorderRadius.circular(20.r),
+          borderRadius: BorderRadius.circular(22.r),
           border: Border.all(color: AppColor.borderColor(context)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.03),
-              blurRadius: 14,
-              offset: const Offset(0, 5),
+              color: const Color(0xFF0F172A).withValues(alpha: 0.04),
+              blurRadius: 18,
+              offset: const Offset(0, 8),
             ),
           ],
         ),
@@ -553,21 +607,23 @@ class ReportsEmptyStateWidget extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              padding: EdgeInsets.all(16.r),
+              width: 68.r,
+              height: 68.r,
               decoration: BoxDecoration(
-                color: AppColor.primaryColor(context).withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: AppColor.primaryColor(context).withValues(alpha: 0.16),
+                gradient: LinearGradient(
+                  colors: [
+                    accent.withValues(alpha: 0.16),
+                    accent.withValues(alpha: 0.05),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
+                shape: BoxShape.circle,
+                border: Border.all(color: accent.withValues(alpha: 0.18)),
               ),
-              child: Icon(
-                Icons.search_off_rounded,
-                size: 32.r,
-                color: AppColor.primaryColor(context),
-              ),
+              child: Icon(Icons.search_off_rounded, size: 30.r, color: accent),
             ),
-            Gap(14.h),
+            Gap(16.h),
             Text(
               hasSearch
                   ? (isArabic
@@ -579,7 +635,7 @@ class ReportsEmptyStateWidget extends StatelessWidget {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 13.5.sp,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w700,
                 color: AppColor.titleFormFiledColor(context),
               ),
             ),
@@ -595,33 +651,31 @@ class ReportsEmptyStateWidget extends StatelessWidget {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 11.sp,
-                height: 1.5,
+                height: 1.55,
                 color: AppColor.darkTextColor(context),
               ),
             ),
-            Gap(14.h),
-            InkWell(
-              onTap: hasSearch ? onClearSearch : onShowAllReports,
+            Gap(18.h),
+            Material(
+              color: accent,
               borderRadius: BorderRadius.circular(12.r),
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-                decoration: BoxDecoration(
-                  color: AppColor.primaryColor(context).withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12.r),
-                  border: Border.all(
-                    color: AppColor.primaryColor(
-                      context,
-                    ).withValues(alpha: 0.2),
+              child: InkWell(
+                onTap: hasSearch ? onClearSearch : onShowAllReports,
+                borderRadius: BorderRadius.circular(12.r),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 18.w,
+                    vertical: 10.h,
                   ),
-                ),
-                child: Text(
-                  hasSearch
-                      ? AppLocaleKey.clearSearch.tr()
-                      : AppLocaleKey.allReports.tr(),
-                  style: TextStyle(
-                    fontSize: 11.5.sp,
-                    fontWeight: FontWeight.bold,
-                    color: AppColor.primaryColor(context),
+                  child: Text(
+                    hasSearch
+                        ? AppLocaleKey.clearSearch.tr()
+                        : AppLocaleKey.allReports.tr(),
+                    style: TextStyle(
+                      fontSize: 11.5.sp,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),

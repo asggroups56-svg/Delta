@@ -19,17 +19,23 @@ class MonthRangeSelection {
 class MonthRangeBottomSheetWidget extends StatefulWidget {
   final String title;
   final String? confirmLabel;
+  final int? initialFromMonth;
+  final int? initialToMonth;
 
   const MonthRangeBottomSheetWidget({
     super.key,
     required this.title,
     this.confirmLabel,
+    this.initialFromMonth,
+    this.initialToMonth,
   });
 
   static Future<MonthRangeSelection?> show(
     BuildContext context, {
     required String title,
     String? confirmLabel,
+    int? initialFromMonth,
+    int? initialToMonth,
   }) {
     return showModalBottomSheet<MonthRangeSelection>(
       context: context,
@@ -38,6 +44,8 @@ class MonthRangeBottomSheetWidget extends StatefulWidget {
       builder: (_) => MonthRangeBottomSheetWidget(
         title: title,
         confirmLabel: confirmLabel,
+        initialFromMonth: initialFromMonth,
+        initialToMonth: initialToMonth,
       ),
     );
   }
@@ -68,6 +76,13 @@ class _MonthRangeBottomSheetWidgetState
   int? _toMonth;
   bool _selectingFromMonth = true;
   String? _validationMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _fromMonth = widget.initialFromMonth;
+    _toMonth = widget.initialToMonth;
+  }
 
   int? get _activeMonth => _selectingFromMonth ? _fromMonth : _toMonth;
 

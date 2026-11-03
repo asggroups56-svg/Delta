@@ -12,13 +12,11 @@ import 'package:my_template/core/utils/app_locale_key.dart';
 import 'package:my_template/core/utils/navigator_methods.dart';
 import 'package:my_template/features/splash/presentation/view/widget/bottom_progress_indicator_footer_widget.dart';
 import 'package:my_template/features/splash/presentation/view/widget/chip_badge_widget.dart';
-
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
   @override
   State<SplashScreen> createState() => _SplashScreenState();
 }
-
 class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {

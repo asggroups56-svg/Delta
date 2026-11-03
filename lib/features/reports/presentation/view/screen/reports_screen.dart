@@ -1196,10 +1196,9 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 toAccountNo: accountsCentersComparisonFilter?.toAccountNo,
                 fromCostCenterNo:
                     accountsCentersComparisonFilter?.fromCostCenterNo,
-                toCostCenterNo:
-                    accountsCentersComparisonFilter?.toCostCenterNo,
-                fromMonth: null,
-                toMonth: null,
+                toCostCenterNo: accountsCentersComparisonFilter?.toCostCenterNo,
+                fromMonth: accountsCentersComparisonFilter?.fromMonth,
+                toMonth: accountsCentersComparisonFilter?.toMonth,
                 balance: 0,
                 periodically: isAccountsCentersMonthlyComparisonReport ? 1 : 0,
                 reportGroup: accountsCentersComparisonFilter?.reportGroup ?? 0,
@@ -1222,8 +1221,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 fromCostCenterNo:
                     accountsCentersComparisonFilter?.fromCostCenterNo,
                 toCostCenterNo: accountsCentersComparisonFilter?.toCostCenterNo,
-                fromMonth: null,
-                toMonth: null,
+                fromMonth: accountsCentersComparisonFilter?.fromMonth,
+                toMonth: accountsCentersComparisonFilter?.toMonth,
                 balance: accountsCentersComparisonFilter?.balance ?? 0,
                 periodically:
                     accountsCentersComparisonFilter?.periodically ?? 0,
@@ -2144,6 +2143,11 @@ class _ReportsScreenState extends State<ReportsScreen> {
     }).toList();
 
     final visibleSections = _buildCategorySections(filteredStatements);
+    final totalCategories = statements
+        .map((statement) => statement['treeGroup'])
+        .whereType<String>()
+        .toSet()
+        .length;
 
     return Scaffold(
       backgroundColor: AppColor.scaffoldColor(context),
@@ -2155,6 +2159,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
               child: ReportsPageHeaderWidget(
                 onExport: _showExportModal,
                 onToggleLanguage: _toggleLanguage,
+                reportCount: statements.length,
+                categoryCount: totalCategories,
               ),
             ),
 
@@ -2308,54 +2314,72 @@ class _ReportsScreenState extends State<ReportsScreen> {
         key: 'centersComparison',
         titleAr: 'مقارنة المراكز',
         titleEn: 'Cost Centers Comparison',
+        icon: Icons.compare_arrows_rounded,
+        accent: AppColor.purpleAccent,
       ),
       (
         id: 9,
         key: 'accountCentersComparison',
         titleAr: 'مقارنة مراكز الحسابات',
         titleEn: 'Account Centers Comparison',
+        icon: Icons.account_tree_outlined,
+        accent: AppColor.oceanBlue,
       ),
       (
         id: 1,
         key: 'accounts',
         titleAr: 'دليل الحسابات',
         titleEn: 'Chart of accounts',
+        icon: Icons.account_tree_rounded,
+        accent: AppColor.oceanBlue,
       ),
       (
         id: 2,
         key: 'costCenters',
         titleAr: 'مراكز التكلفة',
         titleEn: 'Cost centers',
+        icon: Icons.business_rounded,
+        accent: AppColor.purpleAccent,
       ),
       (
         id: 4,
         key: 'accountComparisons',
         titleAr: 'تقارير المقارنة للحسابات',
         titleEn: 'Account comparison reports',
+        icon: Icons.insights_rounded,
+        accent: AppColor.emeraldTeal,
       ),
       (
         id: 5,
         key: 'operations',
         titleAr: 'تقارير العمليات',
         titleEn: 'Operations reports',
+        icon: Icons.receipt_long_rounded,
+        accent: AppColor.warningOrange,
       ),
       (
         id: 6,
         key: 'tax',
         titleAr: 'تقارير ضريبة القيمة المضافة',
         titleEn: 'VAT reports',
+        icon: Icons.percent_rounded,
+        accent: AppColor.emeraldTeal,
       ),
       (
         id: 7,
         key: 'ledger',
         titleAr: 'تقارير الأستاذ والحسابات',
         titleEn: 'Ledger and account reports',
+        icon: Icons.menu_book_rounded,
+        accent: AppColor.oceanBlue,
       ),
       (
         id: 8,
         key: 'financial',
         titleAr: 'القوائم المالية',
         titleEn: 'Financial statements',
+        icon: Icons.account_balance_rounded,
+        accent: AppColor.emeraldTeal,
       ),
     ];
 
@@ -2369,6 +2393,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
         ReportsCategorySectionData(
           id: group.id,
           title: isArabic ? group.titleAr : group.titleEn,
+          icon: group.icon,
+          accent: group.accent,
           reports: categoryReports,
         ),
       );
@@ -2457,6 +2483,10 @@ class _ReportsScreenState extends State<ReportsScreen> {
 
     return ReportsTableItemWidget(
       title: title,
+      description: description,
+      reportCode: statement['reportName'] as String?,
+      icon: statement['icon'] as IconData?,
+      accent: statement['iconColor'] as Color?,
       searchQuery: _searchQuery,
       isSelected: isSelected,
       onSelect: onSelect,
