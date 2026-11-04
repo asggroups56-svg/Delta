@@ -222,7 +222,7 @@ class _GeneralLedgerPayableAgingReportFilterBottomSheetWidgetState
                             children: [
                               Text(
                                 widget.title,
-                                style: TextStyle(
+                                style: AppTextStyle.bodyMedium(context).copyWith(
                                   color: foreground,
                                   fontSize: 17.sp,
                                   fontWeight: FontWeight.bold,
@@ -231,7 +231,7 @@ class _GeneralLedgerPayableAgingReportFilterBottomSheetWidgetState
                               Gap(2.h),
                               Text(
                                 _reportName,
-                                style: TextStyle(
+                                style: AppTextStyle.bodySmall(context).copyWith(
                                   color: foreground.withValues(alpha: 0.55),
                                   fontSize: 11.sp,
                                   fontWeight: FontWeight.w600,
@@ -402,7 +402,7 @@ class _GeneralLedgerPayableAgingReportFilterBottomSheetWidgetState
                             Expanded(
                               child: Text(
                                 _validationMessage!,
-                                style: TextStyle(
+                                style: AppTextStyle.formTitleStyle(context).copyWith(
                                   color: AppColor.roseDanger,
                                   fontSize: 12.sp,
                                   fontWeight: FontWeight.w500,
@@ -433,7 +433,7 @@ class _GeneralLedgerPayableAgingReportFilterBottomSheetWidgetState
                     ),
                     child: Text(
                       isAr ? 'عرض التقرير' : 'Show report',
-                      style: TextStyle(
+                      style: AppTextStyle.formTitleStyle(context).copyWith(
                         fontSize: 15.sp,
                         fontWeight: FontWeight.bold,
                       ),
