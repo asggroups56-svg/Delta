@@ -27,8 +27,19 @@ import 'package:my_template/features/reports/presentation/view/widget/chart_of_a
 import 'package:my_template/features/reports/presentation/view/widget/cost_centers_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/cost_centers_projects_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/cost_centers_transaction_report_filter_bottom_sheet_widget.dart';
+import 'package:my_template/features/reports/presentation/view/widget/consolidated_general_ledger_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/fullscreen_pdf_viewer_screen.dart';
+import 'package:my_template/features/reports/presentation/view/widget/annual_ledger_report_filter_bottom_sheet_widget.dart';
+import 'package:my_template/features/reports/presentation/view/widget/general_ledger_report_filter_bottom_sheet_widget.dart';
+import 'package:my_template/features/reports/presentation/view/widget/general_ledger_audit_report_filter_bottom_sheet_widget.dart';
+import 'package:my_template/features/reports/presentation/view/widget/general_ledger_payable_aging_report_filter_bottom_sheet_widget.dart';
+import 'package:my_template/features/reports/presentation/view/widget/general_ledger_posting_report_filter_bottom_sheet_widget.dart';
+import 'package:my_template/features/reports/presentation/view/widget/subsidiary_ledger_account_report_filter_bottom_sheet_widget.dart';
+import 'package:my_template/features/reports/presentation/view/widget/integration_general_ledger_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/ledger_report_filter_bottom_sheet_widget.dart';
+import 'package:my_template/features/reports/presentation/view/widget/ledger_report_for_assistant_accounts_filter_bottom_sheet_widget.dart';
+import 'package:my_template/features/reports/presentation/view/widget/ledger_report_for_main_accounts_filter_bottom_sheet_widget.dart';
+import 'package:my_template/features/reports/presentation/view/widget/ledger_report_per_users_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/journal_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/monthly_comparison_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/party_vat_report_filter_bottom_sheet_widget.dart';
@@ -385,7 +396,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 icon: Icons.menu_book_rounded,
                 color: AppColor.oceanBlue,
                 title: AppLocaleKey.statementLedger.tr(),
-                subtitle: 'Report/LedgerReportForAllAccounts (AGL025)',
+                subtitle: 'Report/LedgerReportForAllAccounts (AGL021C)',
                 onTap: () {
                   Navigator.pop(ctx);
                   _handleExportReport(
@@ -394,8 +405,217 @@ class _ReportsScreenState extends State<ReportsScreen> {
                     amount: '',
                     date: '',
                     status: AppLocaleKey.statusAudited.tr(),
-                    reportName: 'AGL025',
+                    reportName: 'AGL021C',
                     isLedgerReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.menu_book_rounded,
+                color: AppColor.oceanBlue,
+                title: context.locale.languageCode == 'ar'
+                    ? 'حساب الأستاذ العام'
+                    : 'General Ledger Account Report',
+                subtitle: 'Report/LedgerReport (AGL100)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: context.locale.languageCode == 'ar'
+                        ? 'حساب الأستاذ العام'
+                        : 'General Ledger Account Report',
+                    description: context.locale.languageCode == 'ar'
+                        ? 'كشف حساب الأستاذ العام مع العملات والتحليلات'
+                        : 'General ledger with currency and analytical filters',
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AGL100',
+                    isGeneralLedgerReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.account_tree_outlined,
+                color: AppColor.oceanBlue,
+                title: context.locale.languageCode == 'ar'
+                    ? 'تقرير حساب الأستاذ المساعد'
+                    : 'Subsidiary Ledger Account Report',
+                subtitle: 'Report/LedgerReport (AGL021AS / AGL023AS)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: context.locale.languageCode == 'ar'
+                        ? 'تقرير حساب الأستاذ المساعد'
+                        : 'Subsidiary Ledger Account Report',
+                    description: context.locale.languageCode == 'ar'
+                        ? 'كشف حساب الأستاذ المساعد ملخص أو تفصيلي'
+                        : 'Subsidiary ledger summary or detailed account statement',
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AGL021AS',
+                    isSubsidiaryLedgerAccountReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.fact_check_rounded,
+                color: AppColor.purpleAccent,
+                title: context.locale.languageCode == 'ar'
+                    ? 'تقرير تدقيق الأستاذ العام'
+                    : 'General Ledger Audit Report',
+                subtitle: 'Report/LedgerReport (AGL100)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: context.locale.languageCode == 'ar'
+                        ? 'تقرير تدقيق الأستاذ العام'
+                        : 'General Ledger Audit Report',
+                    description: context.locale.languageCode == 'ar'
+                        ? 'كشف تدقيق الأستاذ العام حسب الحساب والتاريخ'
+                        : 'General ledger audit by account and date',
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AGL100',
+                    isGeneralLedgerAuditReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.post_add_rounded,
+                color: AppColor.emeraldTeal,
+                title: context.locale.languageCode == 'ar'
+                    ? 'تقرير ترحيل الأستاذ العام'
+                    : 'General Ledger Posting Report',
+                subtitle:
+                    'Report/LedgerReport (AGL021CLP / AGL023CLP / AGL025LP)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: context.locale.languageCode == 'ar'
+                        ? 'تقرير ترحيل الأستاذ العام'
+                        : 'General Ledger Posting Report',
+                    description: context.locale.languageCode == 'ar'
+                        ? 'كشف ترحيل الأستاذ العام ملخص أو تفصيلي'
+                        : 'General ledger posting summary or detailed',
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AGL021CLP',
+                    isGeneralLedgerPostingReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.elderly_rounded,
+                color: AppColor.warningOrange,
+                title: context.locale.languageCode == 'ar'
+                    ? 'تقرير الأستاذ العام مع تحليل أعمار الذمم الدائنة'
+                    : 'General Ledger Report with Accounts Payable Aging Analysis (Creditors)',
+                subtitle: 'Report/LedgerReport (AGL041C / AGL040C)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: context.locale.languageCode == 'ar'
+                        ? 'تقرير الأستاذ العام مع تحليل أعمار الذمم الدائنة'
+                        : 'General Ledger Report with Accounts Payable Aging Analysis (Creditors)',
+                    description: context.locale.languageCode == 'ar'
+                        ? 'كشف الأستاذ العام مع تحليل أعمار الذمم الدائنة ملخص أو تفصيلي'
+                        : 'General ledger with accounts payable aging analysis summary or detailed',
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AGL041C',
+                    isGeneralLedgerPayableAgingReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.menu_book_rounded,
+                color: AppColor.emeraldTeal,
+                title: context.locale.languageCode == 'ar'
+                    ? 'تقرير الأستاذ العام السنوي'
+                    : 'Annual General Ledger Report',
+                subtitle: 'Report/LedgerReport (AGL021Y / AGL023Y)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: context.locale.languageCode == 'ar'
+                        ? 'تقرير الأستاذ العام السنوي'
+                        : 'Annual General Ledger Report',
+                    description: context.locale.languageCode == 'ar'
+                        ? 'كشف الأستاذ السنوي ملخص أو تفصيلي'
+                        : 'Annual ledger summary or detailed',
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AGL021Y',
+                    isAnnualLedgerReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.menu_book_rounded,
+                color: AppColor.oceanBlue,
+                title: context.locale.languageCode == 'ar'
+                    ? 'تقرير الأستاذ العام للتكامل'
+                    : 'Integration General Ledger Report',
+                subtitle: 'Report/LedgerReport (AGLT26C / AGLT26)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: context.locale.languageCode == 'ar'
+                        ? 'تقرير الأستاذ العام للتكامل'
+                        : 'Integration General Ledger Report',
+                    description: context.locale.languageCode == 'ar'
+                        ? 'كشف الأستاذ العام ملخص أو تفصيلي'
+                        : 'Summary or detailed general ledger statement',
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AGLT26C',
+                    isIntegrationGeneralLedgerReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.menu_book_rounded,
+                color: AppColor.emeraldTeal,
+                title: context.locale.languageCode == 'ar'
+                    ? 'تقرير الأستاذ العام الموحد للمنشآت'
+                    : 'Consolidated General Ledger Report for Establishments',
+                subtitle: 'Report/LedgerReport (AGL021T / AGL023T)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: context.locale.languageCode == 'ar'
+                        ? 'تقرير الأستاذ العام الموحد للمنشآت'
+                        : 'Consolidated General Ledger Report for Establishments',
+                    description: context.locale.languageCode == 'ar'
+                        ? 'كشف الأستاذ العام الموحد ملخص أو تفصيلي للمنشآت'
+                        : 'Consolidated summary or detailed general ledger for establishments',
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AGL021T',
+                    isConsolidatedGeneralLedgerReport: true,
                     exportType: defaultExportType,
                   );
                 },
@@ -808,6 +1028,17 @@ class _ReportsScreenState extends State<ReportsScreen> {
     bool isSalesWithVatReport = false,
     bool isPurchasesWithVatReport = false,
     bool isLedgerReport = false,
+    bool isGeneralLedgerReport = false,
+    bool isAnnualLedgerReport = false,
+    bool isIntegrationGeneralLedgerReport = false,
+    bool isConsolidatedGeneralLedgerReport = false,
+    bool isGeneralLedgerAuditReport = false,
+    bool isGeneralLedgerPostingReport = false,
+    bool isGeneralLedgerPayableAgingReport = false,
+    bool isSubsidiaryLedgerAccountReport = false,
+    bool isLedgerReportForAssistantAccounts = false,
+    bool isLedgerReportForMainAccounts = false,
+    bool isLedgerReportPerUsers = false,
     bool isAccountStatementReport = false,
     bool isTrialBalanceByCategoriesReport = false,
     bool isFinancialStatementsReport = false,
@@ -917,6 +1148,102 @@ class _ReportsScreenState extends State<ReportsScreen> {
       );
       if (!mounted || monthRange == null) return;
     }
+    AnnualLedgerReportFilterSelection? annualLedgerFilter;
+    if (isAnnualLedgerReport) {
+      annualLedgerFilter = await AnnualLedgerReportFilterBottomSheetWidget.show(
+        context,
+        title: title,
+        initialExportType: exportType,
+      );
+      if (!mounted || annualLedgerFilter == null) return;
+      exportType = annualLedgerFilter.exportType;
+    }
+    IntegrationGeneralLedgerReportFilterSelection?
+    integrationGeneralLedgerFilter;
+    if (isIntegrationGeneralLedgerReport) {
+      integrationGeneralLedgerFilter =
+          await IntegrationGeneralLedgerReportFilterBottomSheetWidget.show(
+            context,
+            title: title,
+            initialExportType: exportType,
+          );
+      if (!mounted || integrationGeneralLedgerFilter == null) return;
+      exportType = integrationGeneralLedgerFilter.exportType;
+      reportName = integrationGeneralLedgerFilter.reportName;
+    }
+    ConsolidatedGeneralLedgerReportFilterSelection?
+    consolidatedGeneralLedgerFilter;
+    if (isConsolidatedGeneralLedgerReport) {
+      consolidatedGeneralLedgerFilter =
+          await ConsolidatedGeneralLedgerReportFilterBottomSheetWidget.show(
+            context,
+            title: title,
+            initialExportType: exportType,
+          );
+      if (!mounted || consolidatedGeneralLedgerFilter == null) return;
+      exportType = consolidatedGeneralLedgerFilter.exportType;
+      reportName = consolidatedGeneralLedgerFilter.reportName;
+    }
+    GeneralLedgerAuditReportFilterSelection? generalLedgerAuditFilter;
+    if (isGeneralLedgerAuditReport) {
+      generalLedgerAuditFilter =
+          await GeneralLedgerAuditReportFilterBottomSheetWidget.show(
+            context,
+            title: title,
+            initialExportType: exportType,
+          );
+      if (!mounted || generalLedgerAuditFilter == null) return;
+      exportType = generalLedgerAuditFilter.exportType;
+      reportName = generalLedgerAuditFilter.reportName;
+    }
+    GeneralLedgerPostingReportFilterSelection? generalLedgerPostingFilter;
+    if (isGeneralLedgerPostingReport) {
+      generalLedgerPostingFilter =
+          await GeneralLedgerPostingReportFilterBottomSheetWidget.show(
+            context,
+            title: title,
+            initialExportType: exportType,
+          );
+      if (!mounted || generalLedgerPostingFilter == null) return;
+      exportType = generalLedgerPostingFilter.exportType;
+      reportName = generalLedgerPostingFilter.reportName;
+    }
+    GeneralLedgerPayableAgingReportFilterSelection?
+    generalLedgerPayableAgingFilter;
+    if (isGeneralLedgerPayableAgingReport) {
+      generalLedgerPayableAgingFilter =
+          await GeneralLedgerPayableAgingReportFilterBottomSheetWidget.show(
+            context,
+            title: title,
+            initialExportType: exportType,
+          );
+      if (!mounted || generalLedgerPayableAgingFilter == null) return;
+      exportType = generalLedgerPayableAgingFilter.exportType;
+      reportName = generalLedgerPayableAgingFilter.reportName;
+    }
+    SubsidiaryLedgerAccountReportFilterSelection? subsidiaryLedgerFilter;
+    if (isSubsidiaryLedgerAccountReport) {
+      subsidiaryLedgerFilter =
+          await SubsidiaryLedgerAccountReportFilterBottomSheetWidget.show(
+            context,
+            title: title,
+            initialExportType: exportType,
+          );
+      if (!mounted || subsidiaryLedgerFilter == null) return;
+      exportType = subsidiaryLedgerFilter.exportType;
+      reportName = subsidiaryLedgerFilter.reportName;
+    }
+    GeneralLedgerReportFilterSelection? generalLedgerFilter;
+    if (isGeneralLedgerReport) {
+      generalLedgerFilter =
+          await GeneralLedgerReportFilterBottomSheetWidget.show(
+            context,
+            title: title,
+            initialExportType: exportType,
+          );
+      if (!mounted || generalLedgerFilter == null) return;
+      exportType = generalLedgerFilter.exportType;
+    }
     LedgerReportFilterSelection? ledgerFilter;
     if (isLedgerReport) {
       ledgerFilter = await LedgerReportFilterBottomSheetWidget.show(
@@ -924,6 +1251,41 @@ class _ReportsScreenState extends State<ReportsScreen> {
         title: title,
       );
       if (!mounted || ledgerFilter == null) return;
+    }
+    LedgerReportForAssistantAccountsFilterSelection?
+    assistantAccountsLedgerFilter;
+    if (isLedgerReportForAssistantAccounts) {
+      assistantAccountsLedgerFilter =
+          await LedgerReportForAssistantAccountsFilterBottomSheetWidget.show(
+            context,
+            title: title,
+            initialExportType: exportType,
+          );
+      if (!mounted || assistantAccountsLedgerFilter == null) return;
+      exportType = assistantAccountsLedgerFilter.exportType;
+    }
+    LedgerReportForMainAccountsFilterSelection? mainAccountsLedgerFilter;
+    if (isLedgerReportForMainAccounts) {
+      mainAccountsLedgerFilter =
+          await LedgerReportForMainAccountsFilterBottomSheetWidget.show(
+            context,
+            title: title,
+            initialExportType: exportType,
+          );
+      if (!mounted || mainAccountsLedgerFilter == null) return;
+      exportType = mainAccountsLedgerFilter.exportType;
+    }
+    LedgerReportPerUsersFilterSelection? perUsersLedgerFilter;
+    if (isLedgerReportPerUsers) {
+      perUsersLedgerFilter =
+          await LedgerReportPerUsersFilterBottomSheetWidget.show(
+            context,
+            title: title,
+            initialExportType: exportType,
+          );
+      if (!mounted || perUsersLedgerFilter == null) return;
+      exportType = perUsersLedgerFilter.exportType;
+      reportName = perUsersLedgerFilter.reportName;
     }
     AccountStatementFilterSelection? accountStatementFilter;
     if (isAccountStatementReport) {
@@ -1195,7 +1557,18 @@ class _ReportsScreenState extends State<ReportsScreen> {
           isExpensesWithVatReport ||
           isSalesWithVatReport ||
           isPurchasesWithVatReport ||
+          isGeneralLedgerReport ||
+          isAnnualLedgerReport ||
+          isIntegrationGeneralLedgerReport ||
+          isConsolidatedGeneralLedgerReport ||
+          isGeneralLedgerAuditReport ||
+          isGeneralLedgerPostingReport ||
+          isGeneralLedgerPayableAgingReport ||
+          isSubsidiaryLedgerAccountReport ||
           isLedgerReport ||
+          isLedgerReportForAssistantAccounts ||
+          isLedgerReportForMainAccounts ||
+          isLedgerReportPerUsers ||
           isAccountStatementReport ||
           isTrialBalanceByCategoriesReport ||
           isFinancialStatementsReport ||
@@ -1577,10 +1950,211 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 languageCode: languageCode,
                 exportType: exportType,
               )
+            : isAnnualLedgerReport
+            ? await reportsRepo.getAnnualLedgerReport(
+                fromAccountNo: annualLedgerFilter?.fromAccountNo,
+                toAccountNo: annualLedgerFilter?.toAccountNo,
+                fromCurrencyCode: annualLedgerFilter?.fromCurrencyCode,
+                toCurrencyCode: annualLedgerFilter?.toCurrencyCode,
+                fromAnalytical: annualLedgerFilter?.fromAnalytical,
+                toAnalytical: annualLedgerFilter?.toAnalytical,
+                fromAnalytical1: annualLedgerFilter?.fromAnalytical1,
+                toAnalytical1: annualLedgerFilter?.toAnalytical1,
+                fromSubVoucher: annualLedgerFilter?.fromSubVoucher,
+                toSubVoucher: annualLedgerFilter?.toSubVoucher,
+                fromSubDescId: annualLedgerFilter?.fromSubDescId,
+                toSubDescId: annualLedgerFilter?.toSubDescId,
+                fromDate: annualLedgerFilter?.fromDate,
+                toDate: annualLedgerFilter?.toDate,
+                accountsWithZeroBalances:
+                    annualLedgerFilter?.accountsWithZeroBalances,
+                prepareWithAccountRange:
+                    annualLedgerFilter?.prepareWithAccountRange,
+                ledgerReportType: annualLedgerFilter?.ledgerReportType ?? 1,
+                reportPageType: 2,
+                reportName: annualLedgerFilter?.reportName,
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isIntegrationGeneralLedgerReport
+            ? await reportsRepo.getIntegrationGeneralLedgerReport(
+                fromAccountNo: integrationGeneralLedgerFilter?.fromAccountNo,
+                toAccountNo: integrationGeneralLedgerFilter?.toAccountNo,
+                fromDate: integrationGeneralLedgerFilter?.fromDate,
+                toDate: integrationGeneralLedgerFilter?.toDate,
+                accountsWithZeroBalances:
+                    integrationGeneralLedgerFilter?.accountsWithZeroBalances ??
+                    false,
+                ledgerReportType:
+                    integrationGeneralLedgerFilter?.ledgerReportType ?? 1,
+                reportPageType: 3,
+                reportName: integrationGeneralLedgerFilter?.reportName,
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isConsolidatedGeneralLedgerReport
+            ? await reportsRepo.getConsolidatedGeneralLedgerReport(
+                fromAccountNo: consolidatedGeneralLedgerFilter?.fromAccountNo,
+                toAccountNo: consolidatedGeneralLedgerFilter?.toAccountNo,
+                fromDate: consolidatedGeneralLedgerFilter?.fromDate,
+                toDate: consolidatedGeneralLedgerFilter?.toDate,
+                accountsWithZeroBalances:
+                    consolidatedGeneralLedgerFilter?.accountsWithZeroBalances ??
+                    false,
+                prepareWithAccountRange:
+                    consolidatedGeneralLedgerFilter?.prepareWithAccountRange ??
+                    false,
+                ledgerReportType:
+                    consolidatedGeneralLedgerFilter?.ledgerReportType ?? 1,
+                reportPageType: 4,
+                reportName: consolidatedGeneralLedgerFilter?.reportName,
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isGeneralLedgerAuditReport
+            ? await reportsRepo.getGeneralLedgerAuditReport(
+                fromAccountNo: generalLedgerAuditFilter?.fromAccountNo,
+                toAccountNo: generalLedgerAuditFilter?.toAccountNo,
+                fromDate: generalLedgerAuditFilter?.fromDate,
+                toDate: generalLedgerAuditFilter?.toDate,
+                accountsWithZeroBalances:
+                    generalLedgerAuditFilter?.accountsWithZeroBalances ?? false,
+                reportPageType: 1,
+                reportName: generalLedgerAuditFilter?.reportName ?? 'AGL100',
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isGeneralLedgerPostingReport
+            ? await reportsRepo.getGeneralLedgerPostingReport(
+                fromAccountNo: generalLedgerPostingFilter?.fromAccountNo,
+                toAccountNo: generalLedgerPostingFilter?.toAccountNo,
+                searchGroup: generalLedgerPostingFilter?.searchGroup,
+                fromDate: generalLedgerPostingFilter?.fromDate,
+                toDate: generalLedgerPostingFilter?.toDate,
+                accountsWithZeroBalances:
+                    generalLedgerPostingFilter?.accountsWithZeroBalances ??
+                    false,
+                ledgerReportType:
+                    generalLedgerPostingFilter?.ledgerReportType ?? 1,
+                reportPageType: 5,
+                reportName: generalLedgerPostingFilter?.reportName,
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isGeneralLedgerPayableAgingReport
+            ? await reportsRepo.getGeneralLedgerPayableAgingReport(
+                fromAccountNo: generalLedgerPayableAgingFilter?.fromAccountNo,
+                toAccountNo: generalLedgerPayableAgingFilter?.toAccountNo,
+                fromDate: generalLedgerPayableAgingFilter?.fromDate,
+                toDate: generalLedgerPayableAgingFilter?.toDate,
+                accountsWithZeroBalances:
+                    generalLedgerPayableAgingFilter?.accountsWithZeroBalances ??
+                    false,
+                ledgerReportType:
+                    generalLedgerPayableAgingFilter?.ledgerReportType ?? 1,
+                reportPageType: 7,
+                reportName: generalLedgerPayableAgingFilter?.reportName,
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isSubsidiaryLedgerAccountReport
+            ? await reportsRepo.getSubsidiaryLedgerAccountReport(
+                fromAccountNo: subsidiaryLedgerFilter?.fromAccountNo,
+                toAccountNo: subsidiaryLedgerFilter?.toAccountNo,
+                fromMainAccountNo: subsidiaryLedgerFilter?.fromMainAccountNo,
+                toMainAccountNo: subsidiaryLedgerFilter?.toMainAccountNo,
+                fromDate: subsidiaryLedgerFilter?.fromDate,
+                toDate: subsidiaryLedgerFilter?.toDate,
+                accountsWithZeroBalances:
+                    subsidiaryLedgerFilter?.accountsWithZeroBalances ?? false,
+                ledgerReportType: subsidiaryLedgerFilter?.ledgerReportType ?? 1,
+                reportPageType: 6,
+                reportName: subsidiaryLedgerFilter?.reportName,
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isGeneralLedgerReport
+            ? await reportsRepo.getGeneralLedgerReport(
+                fromAccountNo: generalLedgerFilter?.fromAccountNo,
+                toAccountNo: generalLedgerFilter?.toAccountNo,
+                fromCurrencyCode: generalLedgerFilter?.fromCurrencyCode,
+                toCurrencyCode: generalLedgerFilter?.toCurrencyCode,
+                fromAnalytical: generalLedgerFilter?.fromAnalytical,
+                toAnalytical: generalLedgerFilter?.toAnalytical,
+                fromAnalytical1: generalLedgerFilter?.fromAnalytical1,
+                toAnalytical1: generalLedgerFilter?.toAnalytical1,
+                fromSubVoucher: generalLedgerFilter?.fromSubVoucher,
+                toSubVoucher: generalLedgerFilter?.toSubVoucher,
+                fromSubDescId: generalLedgerFilter?.fromSubDescId,
+                toSubDescId: generalLedgerFilter?.toSubDescId,
+                fromDate: generalLedgerFilter?.fromDate,
+                toDate: generalLedgerFilter?.toDate,
+                accountsWithZeroBalances:
+                    generalLedgerFilter?.accountsWithZeroBalances,
+                reportPageType: 1,
+                reportName: 'AGL100',
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isLedgerReportPerUsers
+            ? await reportsRepo.getLedgerReportPerUsers(
+                fromAccountNo: perUsersLedgerFilter?.fromAccountNo,
+                toAccountNo: perUsersLedgerFilter?.toAccountNo,
+                fromDate: perUsersLedgerFilter?.fromDate,
+                toDate: perUsersLedgerFilter?.toDate,
+                reportName: perUsersLedgerFilter?.reportName ?? 'AGL021',
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isLedgerReportForMainAccounts
+            ? await reportsRepo.getLedgerReportForMainAccounts(
+                accountLevel: mainAccountsLedgerFilter?.accountLevel,
+                fromAccountNo: mainAccountsLedgerFilter?.fromAccountNo,
+                toAccountNo: mainAccountsLedgerFilter?.toAccountNo,
+                fromAnalytical: mainAccountsLedgerFilter?.fromAnalytical,
+                toAnalytical: mainAccountsLedgerFilter?.toAnalytical,
+                fromDate: mainAccountsLedgerFilter?.fromDate,
+                toDate: mainAccountsLedgerFilter?.toDate,
+                fromAnalytical1: mainAccountsLedgerFilter?.fromAnalytical1,
+                toAnalytical1: mainAccountsLedgerFilter?.toAnalytical1,
+                fromSubVoucher: mainAccountsLedgerFilter?.fromSubVoucher,
+                toSubVoucher: mainAccountsLedgerFilter?.toSubVoucher,
+                reportName: mainAccountsLedgerFilter?.reportName ?? 'AGL021N',
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isLedgerReportForAssistantAccounts
+            ? await reportsRepo.getLedgerReportForAssistantAccounts(
+                fromAccountNo: assistantAccountsLedgerFilter?.fromAccountNo,
+                toAccountNo: assistantAccountsLedgerFilter?.toAccountNo,
+                centerLevel: assistantAccountsLedgerFilter?.centerLevel,
+                fromCostCenterNo:
+                    assistantAccountsLedgerFilter?.fromCostCenterNo,
+                toCostCenterNo: assistantAccountsLedgerFilter?.toCostCenterNo,
+                fromAccAnal: assistantAccountsLedgerFilter?.fromAccAnal,
+                toAccAnal: assistantAccountsLedgerFilter?.toAccAnal,
+                fromDate: assistantAccountsLedgerFilter?.fromDate,
+                toDate: assistantAccountsLedgerFilter?.toDate,
+                fromCentAnal: assistantAccountsLedgerFilter?.fromCentAnal,
+                toCentAnal: assistantAccountsLedgerFilter?.toCentAnal,
+                fromAnalytical: assistantAccountsLedgerFilter?.fromAnalytical,
+                toAnalytical: assistantAccountsLedgerFilter?.toAnalytical,
+                sideType: assistantAccountsLedgerFilter?.sideType ?? 2,
+                reportName:
+                    assistantAccountsLedgerFilter?.reportName ?? 'AGL094',
+                languageCode: languageCode,
+                exportType: exportType,
+              )
             : isLedgerReport
             ? await reportsRepo.getLedgerReportForAllAccounts(
+                fromAccountNo: ledgerFilter?.fromAccountNo,
+                toAccountNo: ledgerFilter?.toAccountNo,
+                searchGroup: ledgerFilter?.searchGroup,
                 fromDate: ledgerFilter?.fromDate,
                 toDate: ledgerFilter?.toDate,
+                accountsWithZeroBalances:
+                    ledgerFilter?.accountsWithZeroBalances ?? false,
+                reportName: ledgerFilter?.reportName ?? 'AGL021C',
                 languageCode: languageCode,
                 exportType: exportType,
               )
@@ -2124,8 +2698,184 @@ class _ReportsScreenState extends State<ReportsScreen> {
         'icon': Icons.menu_book_rounded,
         'iconColor': AppColor.oceanBlue,
         'category': 1,
-        'reportName': 'AGL025',
+        'reportName': 'AGL021C',
         'isLedgerReport': true,
+        'treeGroup': 'ledger',
+      },
+      {
+        'id': 'general_ledger_report',
+        'title': context.locale.languageCode == 'ar'
+            ? 'حساب الأستاذ العام'
+            : 'General Ledger Account Report',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'كشف حساب الأستاذ العام مع العملات والتحليلات والقيود الفرعية'
+            : 'General ledger with currency, analytical, and sub-voucher filters',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.menu_book_rounded,
+        'iconColor': AppColor.oceanBlue,
+        'category': 1,
+        'reportName': 'AGL100',
+        'isGeneralLedgerReport': true,
+        'treeGroup': 'ledger',
+      },
+      {
+        'id': 'subsidiary_ledger_account_report',
+        'title': context.locale.languageCode == 'ar'
+            ? 'تقرير حساب الأستاذ المساعد'
+            : 'Subsidiary Ledger Account Report',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'كشف حساب الأستاذ المساعد ملخص أو تفصيلي'
+            : 'Subsidiary ledger summary or detailed account statement',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.account_tree_outlined,
+        'iconColor': AppColor.oceanBlue,
+        'category': 1,
+        'reportName': 'AGL021AS',
+        'isSubsidiaryLedgerAccountReport': true,
+        'treeGroup': 'ledger',
+      },
+      {
+        'id': 'general_ledger_audit_report',
+        'title': context.locale.languageCode == 'ar'
+            ? 'تقرير تدقيق الأستاذ العام'
+            : 'General Ledger Audit Report',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'كشف تدقيق الأستاذ العام حسب الحساب والتاريخ'
+            : 'General ledger audit by account and date',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.fact_check_rounded,
+        'iconColor': AppColor.purpleAccent,
+        'category': 1,
+        'reportName': 'AGL100',
+        'isGeneralLedgerAuditReport': true,
+        'treeGroup': 'ledger',
+      },
+      {
+        'id': 'general_ledger_posting_report',
+        'title': context.locale.languageCode == 'ar'
+            ? 'تقرير ترحيل الأستاذ العام'
+            : 'General Ledger Posting Report',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'كشف ترحيل الأستاذ العام ملخص أو تفصيلي'
+            : 'General ledger posting summary or detailed',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.post_add_rounded,
+        'iconColor': AppColor.emeraldTeal,
+        'category': 1,
+        'reportName': 'AGL021CLP',
+        'isGeneralLedgerPostingReport': true,
+        'treeGroup': 'ledger',
+      },
+      {
+        'id': 'general_ledger_payable_aging_report',
+        'title': context.locale.languageCode == 'ar'
+            ? 'تقرير الأستاذ العام مع تحليل أعمار الذمم الدائنة'
+            : 'General Ledger Report with Accounts Payable Aging Analysis (Creditors)',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'كشف الأستاذ العام مع تحليل أعمار الذمم الدائنة ملخص أو تفصيلي'
+            : 'General ledger with accounts payable aging analysis summary or detailed',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.elderly_rounded,
+        'iconColor': AppColor.warningOrange,
+        'category': 1,
+        'reportName': 'AGL041C',
+        'isGeneralLedgerPayableAgingReport': true,
+        'treeGroup': 'ledger',
+      },
+      {
+        'id': 'annual_ledger_report',
+        'title': context.locale.languageCode == 'ar'
+            ? 'تقرير الأستاذ العام السنوي'
+            : 'Annual General Ledger Report',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'كشف الأستاذ السنوي ملخص أو تفصيلي حسب نطاق الحسابات والتحليلات'
+            : 'Annual ledger summary or detailed by account range and analytics',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.menu_book_rounded,
+        'iconColor': AppColor.emeraldTeal,
+        'category': 1,
+        'reportName': 'AGL021Y',
+        'isAnnualLedgerReport': true,
+        'treeGroup': 'ledger',
+      },
+      {
+        'id': 'integration_general_ledger_report',
+        'title': context.locale.languageCode == 'ar'
+            ? 'تقرير الأستاذ العام للتكامل'
+            : 'Integration General Ledger Report',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'كشف الأستاذ العام ملخص أو تفصيلي حسب نطاق الحسابات والتاريخ'
+            : 'Summary or detailed general ledger by account range and date',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.menu_book_rounded,
+        'iconColor': AppColor.oceanBlue,
+        'category': 1,
+        'reportName': 'AGLT26C',
+        'isIntegrationGeneralLedgerReport': true,
+        'treeGroup': 'ledger',
+      },
+      {
+        'id': 'consolidated_general_ledger_report',
+        'title': context.locale.languageCode == 'ar'
+            ? 'تقرير الأستاذ العام الموحد للمنشآت'
+            : 'Consolidated General Ledger Report for Establishments',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'كشف الأستاذ العام الموحد ملخص أو تفصيلي للمنشآت'
+            : 'Consolidated summary or detailed general ledger for establishments',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.menu_book_rounded,
+        'iconColor': AppColor.emeraldTeal,
+        'category': 1,
+        'reportName': 'AGL021T',
+        'isConsolidatedGeneralLedgerReport': true,
+        'treeGroup': 'ledger',
+      },
+      {
+        'id': 'ledger_report_assistant_accounts',
+        'title': context.locale.languageCode == 'ar'
+            ? 'حساب الأستاذ للحسابات المساعدة'
+            : 'Assistant Accounts Ledger',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'كشف الأستاذ للحسابات المساعدة حسب الحساب والمركز والجانب'
+            : 'Assistant accounts ledger by account, center, and entry side',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.menu_book_rounded,
+        'iconColor': AppColor.oceanBlue,
+        'category': 1,
+        'reportName': 'AGL094',
+        'isLedgerReportForAssistantAccounts': true,
+        'treeGroup': 'ledger',
+      },
+      {
+        'id': 'ledger_report_main_accounts',
+        'title': context.locale.languageCode == 'ar'
+            ? 'تقارير حساب الأستاذ للحسابات الرئيسية'
+            : 'Main Accounts Ledger Reports',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'كشف الأستاذ للحسابات الرئيسية حسب الحساب والتحليلات'
+            : 'Main accounts ledger by account and analytical ranges',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.menu_book_rounded,
+        'iconColor': AppColor.oceanBlue,
+        'category': 1,
+        'reportName': 'AGL021N',
+        'isLedgerReportForMainAccounts': true,
+        'treeGroup': 'ledger',
+      },
+      {
+        'id': 'ledger_report_per_users',
+        'title': context.locale.languageCode == 'ar'
+            ? 'تقارير الأستاذ حسب المستخدمين'
+            : 'User-specific Ledger Reports',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'تقارير الأستاذ للحسابات مع إمكانية التصفية حسب الحساب والتاريخ'
+            : 'Ledger reports filtered by account and date',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.menu_book_rounded,
+        'iconColor': AppColor.oceanBlue,
+        'category': 1,
+        'reportName': 'AGL021',
+        'isLedgerReportPerUsers': true,
         'treeGroup': 'ledger',
       },
       {
@@ -2778,6 +3528,25 @@ class _ReportsScreenState extends State<ReportsScreen> {
       isSalesWithVatReport: statement['isSalesWithVatReport'] == true,
       isPurchasesWithVatReport: statement['isPurchasesWithVatReport'] == true,
       isLedgerReport: statement['isLedgerReport'] == true,
+      isGeneralLedgerReport: statement['isGeneralLedgerReport'] == true,
+      isAnnualLedgerReport: statement['isAnnualLedgerReport'] == true,
+      isIntegrationGeneralLedgerReport:
+          statement['isIntegrationGeneralLedgerReport'] == true,
+      isConsolidatedGeneralLedgerReport:
+          statement['isConsolidatedGeneralLedgerReport'] == true,
+      isGeneralLedgerAuditReport:
+          statement['isGeneralLedgerAuditReport'] == true,
+      isGeneralLedgerPostingReport:
+          statement['isGeneralLedgerPostingReport'] == true,
+      isGeneralLedgerPayableAgingReport:
+          statement['isGeneralLedgerPayableAgingReport'] == true,
+      isSubsidiaryLedgerAccountReport:
+          statement['isSubsidiaryLedgerAccountReport'] == true,
+      isLedgerReportForAssistantAccounts:
+          statement['isLedgerReportForAssistantAccounts'] == true,
+      isLedgerReportForMainAccounts:
+          statement['isLedgerReportForMainAccounts'] == true,
+      isLedgerReportPerUsers: statement['isLedgerReportPerUsers'] == true,
       isAccountStatementReport: statement['isAccountStatementReport'] == true,
       isTrialBalanceByCategoriesReport:
           statement['isTrialBalanceByCategoriesReport'] == true,

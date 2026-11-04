@@ -59,14 +59,13 @@ class ChartOfAccountMonthlyBalancesFilterBottomSheetWidget
       isScrollControlled: true,
       useSafeArea: true,
       backgroundColor: Colors.transparent,
-      builder: (_) =>
-          ChartOfAccountMonthlyBalancesFilterBottomSheetWidget(
-            title: title,
-            initialExportType: initialExportType,
-            initialAccountType: initialAccountType,
-            reportPageType: reportPageType,
-            reportName: reportName,
-          ),
+      builder: (_) => ChartOfAccountMonthlyBalancesFilterBottomSheetWidget(
+        title: title,
+        initialExportType: initialExportType,
+        initialAccountType: initialAccountType,
+        reportPageType: reportPageType,
+        reportName: reportName,
+      ),
     );
   }
 

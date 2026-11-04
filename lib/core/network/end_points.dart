@@ -22,8 +22,14 @@ class EndPoints {
   static const String financialStatementsReport =
       'Report/FinancialStatementsReport';
   static const String expensesWithVatReport = 'Report/ExpensesWithVatReport';
+  static const String ledgerReport = 'Report/LedgerReport';
   static const String ledgerReportForAllAccounts =
       'Report/LedgerReportForAllAccounts';
+  static const String ledgerReportForAssistantAccounts =
+      'Report/LedgerReportForAssistantAccounts';
+  static const String ledgerReportForMainAccounts =
+      'Report/LedgerReportForMainAccounts';
+  static const String ledgerReportPerUsers = 'Report/LedgerReportPerUsers';
   static const String trialBalanceByCategoriesReport =
       'Report/TrialBalanceByCategoriesReport';
   static const String costCentersReport = 'Report/CostCentersReport';

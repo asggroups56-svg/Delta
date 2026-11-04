@@ -26,7 +26,8 @@ class FileDownloadService {
         } else if (Platform.isIOS || Platform.isMacOS) {
           targetDir = await getApplicationDocumentsDirectory();
         } else if (Platform.isWindows || Platform.isLinux) {
-          targetDir = await getDownloadsDirectory() ??
+          targetDir =
+              await getDownloadsDirectory() ??
               await getApplicationDocumentsDirectory();
         }
       }

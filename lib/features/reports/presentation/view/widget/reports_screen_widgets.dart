@@ -184,24 +184,19 @@ class ReportsSearchFieldWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final hasSearchText = controller.text.isNotEmpty;
-    final accent = AppColor.primaryColor(context);
-
     return Padding(
       padding: EdgeInsets.fromLTRB(16.w, 10.h, 16.w, 2.h),
-      child:  CustomFormField(
-                radius: 12.r,
-                controller: controller,
-                onChanged: onChanged,
-                hintText: hintText ?? AppLocaleKey.searchReports.tr(),
-                  hintStyle: TextStyle(
-                    color: AppColor.darkTextColor(
-                      context,
-                    ).withValues(alpha: 0.65),
-                    fontSize: 12.5.sp,
-                    fontWeight: FontWeight.w400,
-                  ),            
-              ),
+      child: CustomFormField(
+        radius: 12.r,
+        controller: controller,
+        onChanged: onChanged,
+        hintText: hintText ?? AppLocaleKey.searchReports.tr(),
+        hintStyle: TextStyle(
+          color: AppColor.darkTextColor(context).withValues(alpha: 0.65),
+          fontSize: 12.5.sp,
+          fontWeight: FontWeight.w400,
+        ),
+      ),
     );
   }
 }

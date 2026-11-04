@@ -38,10 +38,7 @@ class CentersComparisonReportRequestModel {
     'ToCostCenterNo': toCostCenterNo,
     'FromCenterLevel': fromCenterLevel,
     'ToCenterLevel': toCenterLevel,
-    if (includeMonthFilters) ...{
-      'FromMonth': fromMonth,
-      'ToMonth': toMonth,
-    },
+    if (includeMonthFilters) ...{'FromMonth': fromMonth, 'ToMonth': toMonth},
     if (includeComparisonMonth) 'ComparsionMonth': comparisonMonth,
     'CenterType': centerType,
     if (!includeComparisonMonth) 'Balance': balance,

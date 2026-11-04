@@ -35,9 +35,7 @@ class AccountStatementFilterBottomSheetWidget extends StatefulWidget {
       isScrollControlled: true,
       useSafeArea: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => AccountStatementFilterBottomSheetWidget(
-        title: title,
-      ),
+      builder: (_) => AccountStatementFilterBottomSheetWidget(title: title),
     );
   }
 
@@ -223,16 +221,16 @@ class _AccountStatementFilterBottomSheetWidgetState
                             _selectedDate != null
                                 ? _formatDate(_selectedDate!)
                                 : (context.locale.languageCode == 'ar'
-                                    ? 'كل التواريخ (اختياري)'
-                                    : 'All Dates (Optional)'),
+                                      ? 'كل التواريخ (اختياري)'
+                                      : 'All Dates (Optional)'),
                             style: _selectedDate != null
                                 ? AppTextStyle.textFormStyle(context).copyWith(
                                     fontSize: 13.sp,
                                     fontWeight: FontWeight.w500,
                                   )
-                                : AppTextStyle.hintStyle(context).copyWith(
-                                    fontSize: 13.sp,
-                                  ),
+                                : AppTextStyle.hintStyle(
+                                    context,
+                                  ).copyWith(fontSize: 13.sp),
                           ),
                         ),
                         if (_selectedDate != null)

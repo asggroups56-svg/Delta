@@ -211,10 +211,9 @@ class _PartyVatReportFilterBottomSheetWidgetState
                       context.locale.languageCode == 'ar'
                           ? 'تحديد فترة التاريخ'
                           : 'Filter by Date Range',
-                      style: AppTextStyle.formTitleStyle(context).copyWith(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 13.sp,
-                      ),
+                      style: AppTextStyle.formTitleStyle(
+                        context,
+                      ).copyWith(fontWeight: FontWeight.w600, fontSize: 13.sp),
                     ),
                     Switch.adaptive(
                       value: _includeDates,
@@ -289,18 +288,18 @@ class _PartyVatReportFilterBottomSheetWidgetState
                   type: widget.type,
                   title: isCustomer
                       ? (context.locale.languageCode == 'ar'
-                          ? 'من عميل (اختياري)'
-                          : 'From Customer (Optional)')
+                            ? 'من عميل (اختياري)'
+                            : 'From Customer (Optional)')
                       : (context.locale.languageCode == 'ar'
-                          ? 'من مورد (اختياري)'
-                          : 'From Supplier (Optional)'),
+                            ? 'من مورد (اختياري)'
+                            : 'From Supplier (Optional)'),
                   hintText: isCustomer
                       ? (context.locale.languageCode == 'ar'
-                          ? 'اختر عميل البداية...'
-                          : 'Select starting customer...')
+                            ? 'اختر عميل البداية...'
+                            : 'Select starting customer...')
                       : (context.locale.languageCode == 'ar'
-                          ? 'اختر مورد البداية...'
-                          : 'Select starting supplier...'),
+                            ? 'اختر مورد البداية...'
+                            : 'Select starting supplier...'),
                   initialValue: _fromParty,
                   onSelected: (party) {
                     setState(() => _fromParty = party);
@@ -311,18 +310,18 @@ class _PartyVatReportFilterBottomSheetWidgetState
                   type: widget.type,
                   title: isCustomer
                       ? (context.locale.languageCode == 'ar'
-                          ? 'إلى عميل (اختياري)'
-                          : 'To Customer (Optional)')
+                            ? 'إلى عميل (اختياري)'
+                            : 'To Customer (Optional)')
                       : (context.locale.languageCode == 'ar'
-                          ? 'إلى مورد (اختياري)'
-                          : 'To Supplier (Optional)'),
+                            ? 'إلى مورد (اختياري)'
+                            : 'To Supplier (Optional)'),
                   hintText: isCustomer
                       ? (context.locale.languageCode == 'ar'
-                          ? 'اختر عميل النهاية...'
-                          : 'Select ending customer...')
+                            ? 'اختر عميل النهاية...'
+                            : 'Select ending customer...')
                       : (context.locale.languageCode == 'ar'
-                          ? 'اختر مورد النهاية...'
-                          : 'Select ending supplier...'),
+                            ? 'اختر مورد النهاية...'
+                            : 'Select ending supplier...'),
                   initialValue: _toParty,
                   onSelected: (party) {
                     setState(() => _toParty = party);
@@ -416,13 +415,10 @@ class _PartyVatReportFilterBottomSheetWidgetState
               child: Text(
                 date != null ? _formatDate(date) : hint,
                 style: date != null
-                    ? AppTextStyle.textFormStyle(context).copyWith(
-                        fontSize: 13.sp,
-                        fontWeight: FontWeight.w500,
-                      )
-                    : AppTextStyle.hintStyle(context).copyWith(
-                        fontSize: 13.sp,
-                      ),
+                    ? AppTextStyle.textFormStyle(
+                        context,
+                      ).copyWith(fontSize: 13.sp, fontWeight: FontWeight.w500)
+                    : AppTextStyle.hintStyle(context).copyWith(fontSize: 13.sp),
                 overflow: TextOverflow.ellipsis,
               ),
             ),

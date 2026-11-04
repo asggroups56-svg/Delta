@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:my_template/core/theme/app_colors.dart';
@@ -13,22 +14,25 @@ class LedgerReportFilterSelection {
   final DateTime? toDate;
   final int? fromAccountNo;
   final int? toAccountNo;
+  final int? searchGroup;
+  final bool accountsWithZeroBalances;
+  final String reportName;
 
   const LedgerReportFilterSelection({
     this.fromDate,
     this.toDate,
     this.fromAccountNo,
     this.toAccountNo,
+    this.searchGroup,
+    this.accountsWithZeroBalances = false,
+    this.reportName = 'AGL021C',
   });
 }
 
 class LedgerReportFilterBottomSheetWidget extends StatefulWidget {
   final String title;
 
-  const LedgerReportFilterBottomSheetWidget({
-    super.key,
-    required this.title,
-  });
+  const LedgerReportFilterBottomSheetWidget({super.key, required this.title});
 
   static Future<LedgerReportFilterSelection?> show(
     BuildContext context, {
@@ -39,9 +43,7 @@ class LedgerReportFilterBottomSheetWidget extends StatefulWidget {
       isScrollControlled: true,
       useSafeArea: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => LedgerReportFilterBottomSheetWidget(
-        title: title,
-      ),
+      builder: (_) => LedgerReportFilterBottomSheetWidget(title: title),
     );
   }
 
@@ -52,16 +54,27 @@ class LedgerReportFilterBottomSheetWidget extends StatefulWidget {
 
 class _LedgerReportFilterBottomSheetWidgetState
     extends State<LedgerReportFilterBottomSheetWidget> {
+  static const _reportOptions = <String, (String, String)>{
+    'AGL021C': ('ح/ الأستاذ إجمالي', 'Ledger summary'),
+    'AGL023C': ('ح/ الأستاذ تفصيلي', 'Detailed ledger'),
+    'AGL025': ('كشف حساب تفصيلي', 'Detailed account statement'),
+  };
+
   DateTime? _fromDate;
   DateTime? _toDate;
   bool _includeDates = false;
+  bool _accountsWithZeroBalances = false;
+  final _searchGroupController = TextEditingController();
+  String _reportName = 'AGL021C';
   ChartOfAccountLightModel? _fromAccount;
   ChartOfAccountLightModel? _toAccount;
   String? _validationMessage;
+  bool get _isArabic => context.locale.languageCode == 'ar';
 
   @override
-  void initState() {
-    super.initState();
+  void dispose() {
+    _searchGroupController.dispose();
+    super.dispose();
   }
 
   Future<void> _selectDate({required bool isFromDate}) async {
@@ -89,6 +102,19 @@ class _LedgerReportFilterBottomSheetWidgetState
   }
 
   void _submit() {
+    final searchGroupText = _searchGroupController.text.trim();
+    final searchGroup = searchGroupText.isEmpty
+        ? null
+        : int.tryParse(searchGroupText);
+    if (searchGroupText.isNotEmpty && searchGroup == null) {
+      setState(() {
+        _validationMessage = _isArabic
+            ? 'أدخل رقم مجموعة بحث صحيح'
+            : 'Enter a valid search group number';
+      });
+      return;
+    }
+
     if (_includeDates &&
         _fromDate != null &&
         _toDate != null &&
@@ -106,6 +132,9 @@ class _LedgerReportFilterBottomSheetWidgetState
         toDate: _includeDates ? _toDate : null,
         fromAccountNo: _fromAccount?.accountNo,
         toAccountNo: _toAccount?.accountNo,
+        searchGroup: searchGroup,
+        accountsWithZeroBalances: _accountsWithZeroBalances,
+        reportName: _reportName,
       ),
     );
   }
@@ -185,16 +214,42 @@ class _LedgerReportFilterBottomSheetWidgetState
                   ],
                 ),
                 Gap(16.h),
+                DropdownButtonFormField<String>(
+                  initialValue: _reportName,
+                  isExpanded: true,
+                  decoration: InputDecoration(
+                    labelText: isAr ? 'نوع التقرير' : 'Report type',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                  ),
+                  items: _reportOptions.entries
+                      .map(
+                        (entry) => DropdownMenuItem(
+                          value: entry.key,
+                          child: Text(
+                            isAr ? entry.value.$1 : entry.value.$2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() => _reportName = value);
+                    }
+                  },
+                ),
+                Gap(12.h),
                 // ── Date Range Toggle Switch ──
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       isAr ? 'تحديد فترة التاريخ' : 'Filter by Date Range',
-                      style: AppTextStyle.formTitleStyle(context).copyWith(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 13.sp,
-                      ),
+                      style: AppTextStyle.formTitleStyle(
+                        context,
+                      ).copyWith(fontWeight: FontWeight.w600, fontSize: 13.sp),
                     ),
                     Switch.adaptive(
                       value: _includeDates,
@@ -284,6 +339,40 @@ class _LedgerReportFilterBottomSheetWidgetState
                   initialValue: _toAccount,
                   onSelected: (account) {
                     setState(() => _toAccount = account);
+                  },
+                ),
+                Gap(12.h),
+                TextField(
+                  controller: _searchGroupController,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  decoration: InputDecoration(
+                    labelText: isAr
+                        ? 'مجموعة البحث (اختياري)'
+                        : 'Search group (optional)',
+                    hintText: isAr
+                        ? 'أدخل رقم مجموعة البحث'
+                        : 'Enter search group number',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                  ),
+                ),
+                Gap(8.h),
+                SwitchListTile.adaptive(
+                  contentPadding: EdgeInsets.zero,
+                  value: _accountsWithZeroBalances,
+                  activeThumbColor: accent,
+                  title: Text(
+                    isAr
+                        ? 'عرض الحسابات ذات الأرصدة الصفرية'
+                        : 'Include accounts with zero balances',
+                    style: AppTextStyle.formTitleStyle(
+                      context,
+                    ).copyWith(fontSize: 13.sp, fontWeight: FontWeight.w600),
+                  ),
+                  onChanged: (value) {
+                    setState(() => _accountsWithZeroBalances = value);
                   },
                 ),
                 if (_validationMessage != null) ...[
@@ -376,13 +465,10 @@ class _LedgerReportFilterBottomSheetWidgetState
               child: Text(
                 hasValue ? _formatDate(date) : hint,
                 style: hasValue
-                    ? AppTextStyle.textFormStyle(context).copyWith(
-                        fontSize: 13.sp,
-                        fontWeight: FontWeight.w500,
-                      )
-                    : AppTextStyle.hintStyle(context).copyWith(
-                        fontSize: 13.sp,
-                      ),
+                    ? AppTextStyle.textFormStyle(
+                        context,
+                      ).copyWith(fontSize: 13.sp, fontWeight: FontWeight.w500)
+                    : AppTextStyle.hintStyle(context).copyWith(fontSize: 13.sp),
                 overflow: TextOverflow.ellipsis,
               ),
             ),

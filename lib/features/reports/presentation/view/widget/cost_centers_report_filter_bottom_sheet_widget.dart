@@ -227,9 +227,7 @@ class _CostCentersReportFilterBottomSheetWidgetState
         toCenterLevel: toLevel,
         fromMonth: widget.showMonthFilters ? _fromMonth : null,
         toMonth: widget.showMonthFilters ? _toMonth : null,
-        comparisonMonth: widget.showComparisonMonth
-            ? _comparisonMonth
-            : null,
+        comparisonMonth: widget.showComparisonMonth ? _comparisonMonth : null,
         balance:
             widget.showMonthFilters || widget.showBalancePeriodicallyFilters
             ? _balance

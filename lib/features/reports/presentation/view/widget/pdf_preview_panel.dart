@@ -95,7 +95,8 @@ class _PdfPreviewPanelState extends State<PdfPreviewPanel> {
 
       if (savedFile != null) {
         CommonMethods.showToast(
-          message: 'تم حفظ الملف بنجاح في مجلد التنزيلات:\n${savedFile.path.split('/').last}',
+          message:
+              'تم حفظ الملف بنجاح في مجلد التنزيلات:\n${savedFile.path.split('/').last}',
           type: ToastType.success,
         );
       } else {
@@ -135,10 +136,8 @@ class _PdfPreviewPanelState extends State<PdfPreviewPanel> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => FullscreenPdfViewerScreen(
-          file: widget.file,
-          title: widget.title,
-        ),
+        builder: (_) =>
+            FullscreenPdfViewerScreen(file: widget.file, title: widget.title),
       ),
     );
   }
@@ -180,9 +179,7 @@ class _PdfPreviewPanelState extends State<PdfPreviewPanel> {
               ),
               borderRadius: BorderRadius.vertical(top: Radius.circular(18.r)),
               border: Border(
-                bottom: BorderSide(
-                  color: Colors.white.withValues(alpha: 0.08),
-                ),
+                bottom: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
               ),
             ),
             child: Row(
@@ -232,7 +229,9 @@ class _PdfPreviewPanelState extends State<PdfPreviewPanel> {
                                 vertical: 1.5.h,
                               ),
                               decoration: BoxDecoration(
-                                color: AppColor.emeraldTeal.withValues(alpha: 0.2),
+                                color: AppColor.emeraldTeal.withValues(
+                                  alpha: 0.2,
+                                ),
                                 borderRadius: BorderRadius.circular(6.r),
                               ),
                               child: Row(
@@ -329,10 +328,14 @@ class _PdfPreviewPanelState extends State<PdfPreviewPanel> {
                   builders: pdfx.PdfViewBuilders<pdfx.DefaultBuilderOptions>(
                     options: const pdfx.DefaultBuilderOptions(),
                     documentLoaderBuilder: (_) => const Center(
-                      child: CircularProgressIndicator(color: AppColor.emeraldTeal),
+                      child: CircularProgressIndicator(
+                        color: AppColor.emeraldTeal,
+                      ),
                     ),
                     pageLoaderBuilder: (_) => const Center(
-                      child: CircularProgressIndicator(color: AppColor.oceanBlue),
+                      child: CircularProgressIndicator(
+                        color: AppColor.oceanBlue,
+                      ),
                     ),
                     errorBuilder: (_, error) => Center(
                       child: Text(
@@ -351,11 +354,11 @@ class _PdfPreviewPanelState extends State<PdfPreviewPanel> {
             padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
             decoration: BoxDecoration(
               color: const Color(0xFF1E293B),
-              borderRadius: BorderRadius.vertical(bottom: Radius.circular(18.r)),
+              borderRadius: BorderRadius.vertical(
+                bottom: Radius.circular(18.r),
+              ),
               border: Border(
-                top: BorderSide(
-                  color: Colors.white.withValues(alpha: 0.08),
-                ),
+                top: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
               ),
             ),
             child: Row(
@@ -367,9 +370,9 @@ class _PdfPreviewPanelState extends State<PdfPreviewPanel> {
                     InkWell(
                       onTap: _currentPage > 1
                           ? () => _controller.previousPage(
-                                curve: Curves.easeInOut,
-                                duration: const Duration(milliseconds: 250),
-                              )
+                              curve: Curves.easeInOut,
+                              duration: const Duration(milliseconds: 250),
+                            )
                           : null,
                       borderRadius: BorderRadius.circular(8.r),
                       child: Container(
@@ -383,7 +386,9 @@ class _PdfPreviewPanelState extends State<PdfPreviewPanel> {
                         child: Icon(
                           Icons.chevron_right_rounded,
                           size: 16.r,
-                          color: _currentPage > 1 ? Colors.white : Colors.white24,
+                          color: _currentPage > 1
+                              ? Colors.white
+                              : Colors.white24,
                         ),
                       ),
                     ),
@@ -400,9 +405,9 @@ class _PdfPreviewPanelState extends State<PdfPreviewPanel> {
                     InkWell(
                       onTap: _currentPage < _totalPages
                           ? () => _controller.nextPage(
-                                curve: Curves.easeInOut,
-                                duration: const Duration(milliseconds: 250),
-                              )
+                              curve: Curves.easeInOut,
+                              duration: const Duration(milliseconds: 250),
+                            )
                           : null,
                       borderRadius: BorderRadius.circular(8.r),
                       child: Container(
@@ -416,8 +421,9 @@ class _PdfPreviewPanelState extends State<PdfPreviewPanel> {
                         child: Icon(
                           Icons.chevron_left_rounded,
                           size: 16.r,
-                          color:
-                              _currentPage < _totalPages ? Colors.white : Colors.white24,
+                          color: _currentPage < _totalPages
+                              ? Colors.white
+                              : Colors.white24,
                         ),
                       ),
                     ),
@@ -430,7 +436,10 @@ class _PdfPreviewPanelState extends State<PdfPreviewPanel> {
                     onTap: _downloadFile,
                     borderRadius: BorderRadius.circular(12.r),
                     child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 7.h),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 12.w,
+                        vertical: 7.h,
+                      ),
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(
                           colors: [Color(0xFF0D9488), Color(0xFF10B981)],
@@ -438,7 +447,9 @@ class _PdfPreviewPanelState extends State<PdfPreviewPanel> {
                         borderRadius: BorderRadius.circular(12.r),
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0xFF10B981).withValues(alpha: 0.35),
+                            color: const Color(
+                              0xFF10B981,
+                            ).withValues(alpha: 0.35),
                             blurRadius: 10,
                             offset: const Offset(0, 2),
                           ),
@@ -465,7 +476,9 @@ class _PdfPreviewPanelState extends State<PdfPreviewPanel> {
                           Gap(6.w),
                           Flexible(
                             child: Text(
-                              _isDownloading ? 'جاري التنزيل...' : 'تنزيل التقرير (PDF)',
+                              _isDownloading
+                                  ? 'جاري التنزيل...'
+                                  : 'تنزيل التقرير (PDF)',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
@@ -504,9 +517,7 @@ class _PdfPreviewPanelState extends State<PdfPreviewPanel> {
           decoration: BoxDecoration(
             color: color.withValues(alpha: 0.15),
             borderRadius: BorderRadius.circular(10.r),
-            border: Border.all(
-              color: color.withValues(alpha: 0.25),
-            ),
+            border: Border.all(color: color.withValues(alpha: 0.25)),
           ),
           child: Icon(icon, color: color, size: 16.r),
         ),

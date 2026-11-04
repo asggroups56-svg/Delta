@@ -75,16 +75,22 @@ class _FullscreenPdfViewerScreenState extends State<FullscreenPdfViewerScreen> {
   void _zoomIn() {
     setState(() {
       _currentScale = (_currentScale + 0.35).clamp(1.0, 4.5);
-      _transformController.value =
-          Matrix4.diagonal3Values(_currentScale, _currentScale, 1.0);
+      _transformController.value = Matrix4.diagonal3Values(
+        _currentScale,
+        _currentScale,
+        1.0,
+      );
     });
   }
 
   void _zoomOut() {
     setState(() {
       _currentScale = (_currentScale - 0.35).clamp(1.0, 4.5);
-      _transformController.value =
-          Matrix4.diagonal3Values(_currentScale, _currentScale, 1.0);
+      _transformController.value = Matrix4.diagonal3Values(
+        _currentScale,
+        _currentScale,
+        1.0,
+      );
     });
   }
 
@@ -101,7 +107,8 @@ class _FullscreenPdfViewerScreenState extends State<FullscreenPdfViewerScreen> {
     setState(() => _isDownloading = true);
 
     try {
-      final baseName = widget.reportName != null && widget.reportName!.isNotEmpty
+      final baseName =
+          widget.reportName != null && widget.reportName!.isNotEmpty
           ? widget.reportName!
           : widget.title;
       final fileName =
@@ -117,7 +124,8 @@ class _FullscreenPdfViewerScreenState extends State<FullscreenPdfViewerScreen> {
 
       if (savedFile != null) {
         CommonMethods.showToast(
-          message: 'تم حفظ الملف بنجاح في مجلد التنزيلات:\n${savedFile.path.split('/').last}',
+          message:
+              'تم حفظ الملف بنجاح في مجلد التنزيلات:\n${savedFile.path.split('/').last}',
           type: ToastType.success,
         );
       } else {
@@ -178,7 +186,8 @@ class _FullscreenPdfViewerScreenState extends State<FullscreenPdfViewerScreen> {
                   panEnabled: true,
                   scaleEnabled: true,
                   onInteractionEnd: (_) {
-                    final scale = _transformController.value.getMaxScaleOnAxis();
+                    final scale = _transformController.value
+                        .getMaxScaleOnAxis();
                     if (_currentScale != scale) {
                       setState(() {
                         _currentScale = scale;
@@ -217,41 +226,41 @@ class _FullscreenPdfViewerScreenState extends State<FullscreenPdfViewerScreen> {
                           },
                           builders:
                               pdfx.PdfViewBuilders<pdfx.DefaultBuilderOptions>(
-                            options: const pdfx.DefaultBuilderOptions(),
-                            documentLoaderBuilder: (_) => const Center(
-                              child: CircularProgressIndicator(
-                                color: AppColor.emeraldTeal,
-                              ),
-                            ),
-                            pageLoaderBuilder: (_) => const Center(
-                              child: CircularProgressIndicator(
-                                color: AppColor.oceanBlue,
-                              ),
-                            ),
-                            errorBuilder: (_, error) => Center(
-                              child: Padding(
-                                padding: EdgeInsets.all(20.r),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    const Icon(
-                                      Icons.error_outline_rounded,
-                                      color: Colors.redAccent,
-                                      size: 40,
+                                options: const pdfx.DefaultBuilderOptions(),
+                                documentLoaderBuilder: (_) => const Center(
+                                  child: CircularProgressIndicator(
+                                    color: AppColor.emeraldTeal,
+                                  ),
+                                ),
+                                pageLoaderBuilder: (_) => const Center(
+                                  child: CircularProgressIndicator(
+                                    color: AppColor.oceanBlue,
+                                  ),
+                                ),
+                                errorBuilder: (_, error) => Center(
+                                  child: Padding(
+                                    padding: EdgeInsets.all(20.r),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Icon(
+                                          Icons.error_outline_rounded,
+                                          color: Colors.redAccent,
+                                          size: 40,
+                                        ),
+                                        Gap(10.h),
+                                        Text(
+                                          'خطأ في عرض المستند: $error',
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                            color: Colors.redAccent,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    Gap(10.h),
-                                    Text(
-                                      'خطأ في عرض المستند: $error',
-                                      textAlign: TextAlign.center,
-                                      style: const TextStyle(
-                                        color: Colors.redAccent,
-                                      ),
-                                    ),
-                                  ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          ),
                         ),
                       ),
                     ),
@@ -299,9 +308,11 @@ class _FullscreenPdfViewerScreenState extends State<FullscreenPdfViewerScreen> {
               decoration: BoxDecoration(
                 color: AppColor.whiteColor(context).withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(10.r),
-                border: Border.all(color: AppColor.whiteColor(context).withValues(alpha: 0.15)),
+                border: Border.all(
+                  color: AppColor.whiteColor(context).withValues(alpha: 0.15),
+                ),
               ),
-              child:  Icon(
+              child: Icon(
                 Icons.arrow_back_ios_new_rounded,
                 color: Colors.white,
                 size: 16,
@@ -369,7 +380,9 @@ class _FullscreenPdfViewerScreenState extends State<FullscreenPdfViewerScreen> {
                         Text(
                           '•  $_fileSizeStr',
                           style: TextStyle(
-                            color: AppColor.whiteColor(context).withValues(alpha: 0.5),
+                            color: AppColor.whiteColor(
+                              context,
+                            ).withValues(alpha: 0.5),
                             fontSize: 9.5.sp,
                           ),
                         ),
@@ -568,14 +581,16 @@ class _FullscreenPdfViewerScreenState extends State<FullscreenPdfViewerScreen> {
               InkWell(
                 onTap: _currentPage > 1
                     ? () => _controller.previousPage(
-                          curve: Curves.easeInOut,
-                          duration: const Duration(milliseconds: 250),
-                        )
+                        curve: Curves.easeInOut,
+                        duration: const Duration(milliseconds: 250),
+                      )
                     : null,
                 borderRadius: BorderRadius.circular(10.r),
                 child: Container(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 10.w,
+                    vertical: 6.h,
+                  ),
                   decoration: BoxDecoration(
                     color: _currentPage > 1
                         ? AppColor.whiteColor(context).withValues(alpha: 0.12)
@@ -586,15 +601,18 @@ class _FullscreenPdfViewerScreenState extends State<FullscreenPdfViewerScreen> {
                     children: [
                       Icon(
                         Icons.chevron_right_rounded,
-                        color: _currentPage > 1 ? AppColor.whiteColor(context) : Colors.white24,
+                        color: _currentPage > 1
+                            ? AppColor.whiteColor(context)
+                            : Colors.white24,
                         size: 16.r,
                       ),
                       Gap(2.w),
                       Text(
                         'السابقة',
                         style: TextStyle(
-                          color:
-                              _currentPage > 1 ? AppColor.whiteColor(context) : Colors.white24,
+                          color: _currentPage > 1
+                              ? AppColor.whiteColor(context)
+                              : Colors.white24,
                           fontSize: 10.5.sp,
                         ),
                       ),
@@ -606,14 +624,16 @@ class _FullscreenPdfViewerScreenState extends State<FullscreenPdfViewerScreen> {
               InkWell(
                 onTap: _currentPage < _totalPages
                     ? () => _controller.nextPage(
-                          curve: Curves.easeInOut,
-                          duration: const Duration(milliseconds: 250),
-                        )
+                        curve: Curves.easeInOut,
+                        duration: const Duration(milliseconds: 250),
+                      )
                     : null,
                 borderRadius: BorderRadius.circular(10.r),
                 child: Container(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 10.w,
+                    vertical: 6.h,
+                  ),
                   decoration: BoxDecoration(
                     color: _currentPage < _totalPages
                         ? AppColor.whiteColor(context).withValues(alpha: 0.12)
@@ -671,7 +691,7 @@ class _FullscreenPdfViewerScreenState extends State<FullscreenPdfViewerScreen> {
                     SizedBox(
                       width: 14.r,
                       height: 14.r,
-                      child:  CircularProgressIndicator(
+                      child: CircularProgressIndicator(
                         strokeWidth: 2,
                         color: AppColor.whiteColor(context),
                       ),

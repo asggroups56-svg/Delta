@@ -116,9 +116,7 @@ class _GeneralJournalForLevelReportFilterBottomSheetWidgetState
             fromEntrySerial == null) ||
         (_toEntrySerialController.text.trim().isNotEmpty &&
             toEntrySerial == null)) {
-      _showValidation(
-        _isArabic ? 'أدخل أرقامًا صحيحة' : 'Enter valid numbers',
-      );
+      _showValidation(_isArabic ? 'أدخل أرقامًا صحيحة' : 'Enter valid numbers');
       return;
     }
     if (fromEntrySerial != null &&
@@ -260,8 +258,9 @@ class _GeneralJournalForLevelReportFilterBottomSheetWidgetState
                       DropdownButtonFormField<String>(
                         initialValue: _exportType,
                         decoration: InputDecoration(
-                          labelText:
-                              _isArabic ? 'صيغة التصدير' : 'Export format',
+                          labelText: _isArabic
+                              ? 'صيغة التصدير'
+                              : 'Export format',
                           filled: true,
                           fillColor: AppColor.textFormFillColor(context),
                           border: OutlineInputBorder(
@@ -358,7 +357,9 @@ class _GeneralJournalForLevelReportFilterBottomSheetWidgetState
       style: OutlinedButton.styleFrom(
         foregroundColor: AppColor.oceanBlue,
         padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 12.h),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.r),
+        ),
       ),
       child: Row(
         children: [
@@ -373,13 +374,12 @@ class _GeneralJournalForLevelReportFilterBottomSheetWidgetState
                 Text(
                   date == null
                       ? (_isArabic ? 'الكل' : 'All dates')
-                      : MaterialLocalizations.of(context).formatMediumDate(date),
+                      : MaterialLocalizations.of(
+                          context,
+                        ).formatMediumDate(date),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: foreground,
-                    fontSize: 12.sp,
-                  ),
+                  style: TextStyle(color: foreground, fontSize: 12.sp),
                 ),
               ],
             ),

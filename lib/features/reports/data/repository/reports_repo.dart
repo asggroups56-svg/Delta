@@ -9,6 +9,7 @@ import '../../../../core/error/failures.dart';
 import '../../../../core/network/api_consumer.dart';
 import '../../../../core/network/end_points.dart';
 import '../models/account_statement_report_request_model.dart';
+import '../models/annual_ledger_report_request_model.dart';
 import '../models/accounts_comparison_report_request_model.dart';
 import '../models/account_centers_summary_for_main_accounts_report_request_model.dart';
 import '../models/accounts_centers_comparison_report_request_model.dart';
@@ -19,6 +20,7 @@ import '../models/checks_data_report_request_model.dart';
 import '../models/chart_of_account_monthly_balances_report_request_model.dart';
 import '../models/centers_comparison_report_request_model.dart';
 import '../models/centers_monthly_balance_report_request_model.dart';
+import '../models/consolidated_general_ledger_report_request_model.dart';
 import '../models/cost_centers_projects_report_request_model.dart';
 import '../models/cost_centers_report_request_model.dart';
 import '../models/cost_centers_transaction_report_request_model.dart';
@@ -27,14 +29,23 @@ import '../models/daily_income_and_expense_situation_report_request_model.dart';
 import '../models/expenses_with_vat_report_request_model.dart';
 import '../models/financial_statement_report_request_model.dart';
 import '../models/general_journal_for_level_report_request_model.dart';
+import '../models/general_ledger_audit_report_request_model.dart';
+import '../models/general_ledger_payable_aging_report_request_model.dart';
+import '../models/general_ledger_posting_report_request_model.dart';
+import '../models/general_ledger_report_request_model.dart';
 import '../models/income_and_expense_situation_report_request_model.dart';
+import '../models/integration_general_ledger_report_request_model.dart';
 import '../models/journal_report_request_model.dart';
 import '../models/ledger_report_request_model.dart';
+import '../models/ledger_report_for_assistant_accounts_request_model.dart';
+import '../models/ledger_report_for_main_accounts_request_model.dart';
+import '../models/ledger_report_per_users_request_model.dart';
 import '../models/master_accounts_or_centers_report_request_model.dart';
 import '../models/monthly_account_comparison_report_request_model.dart';
 import '../models/monthly_cost_centers_comparison_report_request_model.dart';
 import '../models/purchases_with_vat_report_request_model.dart';
 import '../models/sales_with_vat_report_request_model.dart';
+import '../models/subsidiary_ledger_account_report_request_model.dart';
 import '../models/trial_balance_by_categories_report_request_model.dart';
 
 abstract interface class ReportsRepo {
@@ -158,9 +169,188 @@ abstract interface class ReportsRepo {
     String exportType = 'pdf',
   });
 
-  Future<Either<Failure, File>> getLedgerReportForAllAccounts({
+  Future<Either<Failure, File>> getGeneralLedgerReport({
+    int? fromAccountNo,
+    int? toAccountNo,
+    String? fromCurrencyCode,
+    String? toCurrencyCode,
+    int? fromAnalytical,
+    int? toAnalytical,
+    int? fromAnalytical1,
+    int? toAnalytical1,
+    int? fromSubVoucher,
+    int? toSubVoucher,
+    int? fromSubDescId,
+    int? toSubDescId,
     DateTime? fromDate,
     DateTime? toDate,
+    bool? accountsWithZeroBalances,
+    int reportPageType = 1,
+    String reportName = 'AGL100',
+    required String languageCode,
+    String exportType = 'pdf',
+  });
+
+  Future<Either<Failure, File>> getAnnualLedgerReport({
+    int? fromAccountNo,
+    int? toAccountNo,
+    String? fromCurrencyCode,
+    String? toCurrencyCode,
+    int? fromAnalytical,
+    int? toAnalytical,
+    int? fromAnalytical1,
+    int? toAnalytical1,
+    int? fromSubVoucher,
+    int? toSubVoucher,
+    int? fromSubDescId,
+    int? toSubDescId,
+    DateTime? fromDate,
+    DateTime? toDate,
+    bool? accountsWithZeroBalances,
+    bool? prepareWithAccountRange,
+    int ledgerReportType = 1,
+    int reportPageType = 2,
+    String? reportName,
+    required String languageCode,
+    String exportType = 'pdf',
+  });
+
+  Future<Either<Failure, File>> getLedgerReportForAllAccounts({
+    int? fromAccountNo,
+    int? toAccountNo,
+    int? searchGroup,
+    DateTime? fromDate,
+    DateTime? toDate,
+    bool accountsWithZeroBalances = false,
+    String reportName = 'AGL021C',
+    required String languageCode,
+    String exportType = 'pdf',
+  });
+
+  Future<Either<Failure, File>> getIntegrationGeneralLedgerReport({
+    int? fromAccountNo,
+    int? toAccountNo,
+    DateTime? fromDate,
+    DateTime? toDate,
+    bool accountsWithZeroBalances = false,
+    int ledgerReportType = 1,
+    int reportPageType = 3,
+    String? reportName,
+    required String languageCode,
+    String exportType = 'pdf',
+  });
+
+  Future<Either<Failure, File>> getConsolidatedGeneralLedgerReport({
+    int? fromAccountNo,
+    int? toAccountNo,
+    DateTime? fromDate,
+    DateTime? toDate,
+    bool accountsWithZeroBalances = false,
+    bool prepareWithAccountRange = false,
+    int ledgerReportType = 1,
+    int reportPageType = 4,
+    String? reportName,
+    required String languageCode,
+    String exportType = 'pdf',
+  });
+
+  Future<Either<Failure, File>> getGeneralLedgerAuditReport({
+    int? fromAccountNo,
+    int? toAccountNo,
+    DateTime? fromDate,
+    DateTime? toDate,
+    bool accountsWithZeroBalances = false,
+    int reportPageType = 1,
+    String reportName = 'AGL100',
+    required String languageCode,
+    String exportType = 'pdf',
+  });
+
+  Future<Either<Failure, File>> getGeneralLedgerPostingReport({
+    int? fromAccountNo,
+    int? toAccountNo,
+    int? searchGroup,
+    DateTime? fromDate,
+    DateTime? toDate,
+    bool accountsWithZeroBalances = false,
+    int ledgerReportType = 1,
+    int reportPageType = 5,
+    String? reportName,
+    required String languageCode,
+    String exportType = 'pdf',
+  });
+
+  Future<Either<Failure, File>> getSubsidiaryLedgerAccountReport({
+    int? fromAccountNo,
+    int? toAccountNo,
+    int? fromMainAccountNo,
+    int? toMainAccountNo,
+    DateTime? fromDate,
+    DateTime? toDate,
+    bool accountsWithZeroBalances = false,
+    int ledgerReportType = 1,
+    int reportPageType = 6,
+    String? reportName,
+    required String languageCode,
+    String exportType = 'pdf',
+  });
+
+  Future<Either<Failure, File>> getGeneralLedgerPayableAgingReport({
+    int? fromAccountNo,
+    int? toAccountNo,
+    DateTime? fromDate,
+    DateTime? toDate,
+    bool accountsWithZeroBalances = false,
+    int ledgerReportType = 1,
+    int reportPageType = 7,
+    String? reportName,
+    required String languageCode,
+    String exportType = 'pdf',
+  });
+
+  Future<Either<Failure, File>> getLedgerReportForAssistantAccounts({
+    num? fromAccountNo,
+    num? toAccountNo,
+    int? centerLevel,
+    num? fromCostCenterNo,
+    num? toCostCenterNo,
+    int? fromAccAnal,
+    int? toAccAnal,
+    DateTime? fromDate,
+    DateTime? toDate,
+    int? fromCentAnal,
+    int? toCentAnal,
+    int? fromAnalytical,
+    int? toAnalytical,
+    int sideType = 2,
+    String reportName = 'AGL094',
+    required String languageCode,
+    String exportType = 'pdf',
+  });
+
+  Future<Either<Failure, File>> getLedgerReportForMainAccounts({
+    int? accountLevel,
+    num? fromAccountNo,
+    num? toAccountNo,
+    int? fromAnalytical,
+    int? toAnalytical,
+    DateTime? fromDate,
+    DateTime? toDate,
+    int? fromAnalytical1,
+    int? toAnalytical1,
+    int? fromSubVoucher,
+    int? toSubVoucher,
+    String reportName = 'AGL021N',
+    required String languageCode,
+    String exportType = 'pdf',
+  });
+
+  Future<Either<Failure, File>> getLedgerReportPerUsers({
+    num? fromAccountNo,
+    num? toAccountNo,
+    DateTime? fromDate,
+    DateTime? toDate,
+    String reportName = 'AGL021',
     required String languageCode,
     String exportType = 'pdf',
   });
@@ -731,17 +921,378 @@ class ReportsRepoImpl implements ReportsRepo {
   }
 
   @override
-  Future<Either<Failure, File>> getLedgerReportForAllAccounts({
+  Future<Either<Failure, File>> getGeneralLedgerReport({
+    int? fromAccountNo,
+    int? toAccountNo,
+    String? fromCurrencyCode,
+    String? toCurrencyCode,
+    int? fromAnalytical,
+    int? toAnalytical,
+    int? fromAnalytical1,
+    int? toAnalytical1,
+    int? fromSubVoucher,
+    int? toSubVoucher,
+    int? fromSubDescId,
+    int? toSubDescId,
     DateTime? fromDate,
     DateTime? toDate,
+    bool? accountsWithZeroBalances,
+    int reportPageType = 1,
+    String reportName = 'AGL100',
+    required String languageCode,
+    String exportType = 'pdf',
+  }) {
+    return handleDioRequest(
+      request: () async {
+        final requestModel = GeneralLedgerReportRequestModel(
+          fromAccountNo: fromAccountNo,
+          toAccountNo: toAccountNo,
+          fromCurrencyCode: fromCurrencyCode,
+          toCurrencyCode: toCurrencyCode,
+          fromAnalytical: fromAnalytical,
+          toAnalytical: toAnalytical,
+          fromAnalytical1: fromAnalytical1,
+          toAnalytical1: toAnalytical1,
+          fromSubVoucher: fromSubVoucher,
+          toSubVoucher: toSubVoucher,
+          fromSubDescId: fromSubDescId,
+          toSubDescId: toSubDescId,
+          fromDate: fromDate,
+          toDate: toDate,
+          accountsWithZeroBalances: accountsWithZeroBalances,
+          reportPageType: reportPageType,
+          reportName: reportName,
+          exportType: exportType,
+        );
+
+        return _downloadReport(
+          endpoint: EndPoints.ledgerReport,
+          body: requestModel.toJson(),
+          fileNamePrefix: 'general_ledger_report',
+          exportType: requestModel.exportType,
+          headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+        );
+      },
+    );
+  }
+
+  @override
+  Future<Either<Failure, File>> getAnnualLedgerReport({
+    int? fromAccountNo,
+    int? toAccountNo,
+    String? fromCurrencyCode,
+    String? toCurrencyCode,
+    int? fromAnalytical,
+    int? toAnalytical,
+    int? fromAnalytical1,
+    int? toAnalytical1,
+    int? fromSubVoucher,
+    int? toSubVoucher,
+    int? fromSubDescId,
+    int? toSubDescId,
+    DateTime? fromDate,
+    DateTime? toDate,
+    bool? accountsWithZeroBalances,
+    bool? prepareWithAccountRange,
+    int ledgerReportType = 1,
+    int reportPageType = 2,
+    String? reportName,
+    required String languageCode,
+    String exportType = 'pdf',
+  }) {
+    return handleDioRequest(
+      request: () async {
+        final requestModel = AnnualLedgerReportRequestModel(
+          fromAccountNo: fromAccountNo,
+          toAccountNo: toAccountNo,
+          fromCurrencyCode: fromCurrencyCode,
+          toCurrencyCode: toCurrencyCode,
+          fromAnalytical: fromAnalytical,
+          toAnalytical: toAnalytical,
+          fromAnalytical1: fromAnalytical1,
+          toAnalytical1: toAnalytical1,
+          fromSubVoucher: fromSubVoucher,
+          toSubVoucher: toSubVoucher,
+          fromSubDescId: fromSubDescId,
+          toSubDescId: toSubDescId,
+          fromDate: fromDate,
+          toDate: toDate,
+          accountsWithZeroBalances: accountsWithZeroBalances,
+          prepareWithAccountRange: prepareWithAccountRange,
+          ledgerReportType: ledgerReportType,
+          reportPageType: reportPageType,
+          reportName:
+              reportName ?? (ledgerReportType == 2 ? 'AGL023Y' : 'AGL021Y'),
+          exportType: exportType,
+        );
+
+        return _downloadReport(
+          endpoint: EndPoints.ledgerReport,
+          body: requestModel.toJson(),
+          fileNamePrefix: 'annual_ledger_report',
+          exportType: requestModel.exportType,
+          headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+        );
+      },
+    );
+  }
+
+  @override
+  Future<Either<Failure, File>> getIntegrationGeneralLedgerReport({
+    int? fromAccountNo,
+    int? toAccountNo,
+    DateTime? fromDate,
+    DateTime? toDate,
+    bool accountsWithZeroBalances = false,
+    int ledgerReportType = 1,
+    int reportPageType = 3,
+    String? reportName,
+    required String languageCode,
+    String exportType = 'pdf',
+  }) {
+    return handleDioRequest(
+      request: () async {
+        final requestModel = IntegrationGeneralLedgerReportRequestModel(
+          fromAccountNo: fromAccountNo,
+          toAccountNo: toAccountNo,
+          fromDate: fromDate,
+          toDate: toDate,
+          accountsWithZeroBalances: accountsWithZeroBalances,
+          ledgerReportType: ledgerReportType,
+          reportPageType: reportPageType,
+          reportName: reportName,
+          exportType: exportType,
+        );
+
+        return _downloadReport(
+          endpoint: EndPoints.ledgerReport,
+          body: requestModel.toJson(),
+          fileNamePrefix: 'integration_general_ledger_report',
+          exportType: requestModel.exportType,
+          headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+        );
+      },
+    );
+  }
+
+  @override
+  Future<Either<Failure, File>> getConsolidatedGeneralLedgerReport({
+    int? fromAccountNo,
+    int? toAccountNo,
+    DateTime? fromDate,
+    DateTime? toDate,
+    bool accountsWithZeroBalances = false,
+    bool prepareWithAccountRange = false,
+    int ledgerReportType = 1,
+    int reportPageType = 4,
+    String? reportName,
+    required String languageCode,
+    String exportType = 'pdf',
+  }) {
+    return handleDioRequest(
+      request: () async {
+        final requestModel = ConsolidatedGeneralLedgerReportRequestModel(
+          fromAccountNo: fromAccountNo,
+          toAccountNo: toAccountNo,
+          fromDate: fromDate,
+          toDate: toDate,
+          accountsWithZeroBalances: accountsWithZeroBalances,
+          prepareWithAccountRange: prepareWithAccountRange,
+          ledgerReportType: ledgerReportType,
+          reportPageType: reportPageType,
+          reportName: reportName,
+          exportType: exportType,
+        );
+
+        return _downloadReport(
+          endpoint: EndPoints.ledgerReport,
+          body: requestModel.toJson(),
+          fileNamePrefix: 'consolidated_general_ledger_report',
+          exportType: requestModel.exportType,
+          headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+        );
+      },
+    );
+  }
+
+  @override
+  Future<Either<Failure, File>> getGeneralLedgerAuditReport({
+    int? fromAccountNo,
+    int? toAccountNo,
+    DateTime? fromDate,
+    DateTime? toDate,
+    bool accountsWithZeroBalances = false,
+    int reportPageType = 1,
+    String reportName = 'AGL100',
+    required String languageCode,
+    String exportType = 'pdf',
+  }) {
+    return handleDioRequest(
+      request: () async {
+        final requestModel = GeneralLedgerAuditReportRequestModel(
+          fromAccountNo: fromAccountNo,
+          toAccountNo: toAccountNo,
+          fromDate: fromDate,
+          toDate: toDate,
+          accountsWithZeroBalances: accountsWithZeroBalances,
+          reportPageType: reportPageType,
+          reportName: reportName,
+          exportType: exportType,
+        );
+
+        return _downloadReport(
+          endpoint: EndPoints.ledgerReport,
+          body: requestModel.toJson(),
+          fileNamePrefix: 'general_ledger_audit_report',
+          exportType: requestModel.exportType,
+          headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+        );
+      },
+    );
+  }
+
+  @override
+  Future<Either<Failure, File>> getGeneralLedgerPostingReport({
+    int? fromAccountNo,
+    int? toAccountNo,
+    int? searchGroup,
+    DateTime? fromDate,
+    DateTime? toDate,
+    bool accountsWithZeroBalances = false,
+    int ledgerReportType = 1,
+    int reportPageType = 5,
+    String? reportName,
+    required String languageCode,
+    String exportType = 'pdf',
+  }) {
+    return handleDioRequest(
+      request: () async {
+        final requestModel = GeneralLedgerPostingReportRequestModel(
+          fromAccountNo: fromAccountNo,
+          toAccountNo: toAccountNo,
+          searchGroup: searchGroup,
+          fromDate: fromDate,
+          toDate: toDate,
+          accountsWithZeroBalances: accountsWithZeroBalances,
+          ledgerReportType: ledgerReportType,
+          reportPageType: reportPageType,
+          reportName: reportName,
+          exportType: exportType,
+        );
+
+        return _downloadReport(
+          endpoint: EndPoints.ledgerReport,
+          body: requestModel.toJson(),
+          fileNamePrefix: 'general_ledger_posting_report',
+          exportType: requestModel.exportType,
+          headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+        );
+      },
+    );
+  }
+
+  @override
+  Future<Either<Failure, File>> getSubsidiaryLedgerAccountReport({
+    int? fromAccountNo,
+    int? toAccountNo,
+    int? fromMainAccountNo,
+    int? toMainAccountNo,
+    DateTime? fromDate,
+    DateTime? toDate,
+    bool accountsWithZeroBalances = false,
+    int ledgerReportType = 1,
+    int reportPageType = 6,
+    String? reportName,
+    required String languageCode,
+    String exportType = 'pdf',
+  }) {
+    return handleDioRequest(
+      request: () async {
+        final requestModel = SubsidiaryLedgerAccountReportRequestModel(
+          fromAccountNo: fromAccountNo,
+          toAccountNo: toAccountNo,
+          fromMainAccountNo: fromMainAccountNo,
+          toMainAccountNo: toMainAccountNo,
+          fromDate: fromDate,
+          toDate: toDate,
+          accountsWithZeroBalances: accountsWithZeroBalances,
+          ledgerReportType: ledgerReportType,
+          reportPageType: reportPageType,
+          reportName: reportName,
+          exportType: exportType,
+        );
+
+        return _downloadReport(
+          endpoint: EndPoints.ledgerReport,
+          body: requestModel.toJson(),
+          fileNamePrefix: 'subsidiary_ledger_account_report',
+          exportType: requestModel.exportType,
+          headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+        );
+      },
+    );
+  }
+
+  @override
+  Future<Either<Failure, File>> getGeneralLedgerPayableAgingReport({
+    int? fromAccountNo,
+    int? toAccountNo,
+    DateTime? fromDate,
+    DateTime? toDate,
+    bool accountsWithZeroBalances = false,
+    int ledgerReportType = 1,
+    int reportPageType = 7,
+    String? reportName,
+    required String languageCode,
+    String exportType = 'pdf',
+  }) {
+    return handleDioRequest(
+      request: () async {
+        final requestModel = GeneralLedgerPayableAgingReportRequestModel(
+          fromAccountNo: fromAccountNo,
+          toAccountNo: toAccountNo,
+          fromDate: fromDate,
+          toDate: toDate,
+          accountsWithZeroBalances: accountsWithZeroBalances,
+          ledgerReportType: ledgerReportType,
+          reportPageType: reportPageType,
+          reportName: reportName,
+          exportType: exportType,
+        );
+
+        return _downloadReport(
+          endpoint: EndPoints.ledgerReport,
+          body: requestModel.toJson(),
+          fileNamePrefix: 'general_ledger_payable_aging_report',
+          exportType: requestModel.exportType,
+          headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+        );
+      },
+    );
+  }
+
+  @override
+  Future<Either<Failure, File>> getLedgerReportForAllAccounts({
+    int? fromAccountNo,
+    int? toAccountNo,
+    int? searchGroup,
+    DateTime? fromDate,
+    DateTime? toDate,
+    bool accountsWithZeroBalances = false,
+    String reportName = 'AGL021C',
     required String languageCode,
     String exportType = 'pdf',
   }) {
     return handleDioRequest(
       request: () async {
         final requestModel = LedgerReportRequestModel(
+          fromAccountNo: fromAccountNo,
+          toAccountNo: toAccountNo,
+          searchGroup: searchGroup,
           fromDate: fromDate,
           toDate: toDate,
+          accountsWithZeroBalances: accountsWithZeroBalances,
+          reportName: reportName,
           exportType: exportType,
         );
 
@@ -749,6 +1300,133 @@ class ReportsRepoImpl implements ReportsRepo {
           endpoint: EndPoints.ledgerReportForAllAccounts,
           body: requestModel.toJson(),
           fileNamePrefix: 'ledger_report_all_accounts',
+          exportType: requestModel.exportType,
+          headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+        );
+      },
+    );
+  }
+
+  @override
+  Future<Either<Failure, File>> getLedgerReportForAssistantAccounts({
+    num? fromAccountNo,
+    num? toAccountNo,
+    int? centerLevel,
+    num? fromCostCenterNo,
+    num? toCostCenterNo,
+    int? fromAccAnal,
+    int? toAccAnal,
+    DateTime? fromDate,
+    DateTime? toDate,
+    int? fromCentAnal,
+    int? toCentAnal,
+    int? fromAnalytical,
+    int? toAnalytical,
+    int sideType = 2,
+    String reportName = 'AGL094',
+    required String languageCode,
+    String exportType = 'pdf',
+  }) {
+    return handleDioRequest(
+      request: () async {
+        final requestModel = LedgerReportForAssistantAccountsRequestModel(
+          fromAccountNo: fromAccountNo,
+          toAccountNo: toAccountNo,
+          centerLevel: centerLevel,
+          fromCostCenterNo: fromCostCenterNo,
+          toCostCenterNo: toCostCenterNo,
+          fromAccAnal: fromAccAnal,
+          toAccAnal: toAccAnal,
+          fromDate: fromDate,
+          toDate: toDate,
+          fromCentAnal: fromCentAnal,
+          toCentAnal: toCentAnal,
+          fromAnalytical: fromAnalytical,
+          toAnalytical: toAnalytical,
+          sideType: sideType,
+          reportName: reportName,
+          exportType: exportType,
+        );
+        return _downloadReport(
+          endpoint: EndPoints.ledgerReportForAssistantAccounts,
+          body: requestModel.toJson(),
+          fileNamePrefix: 'ledger_report_assistant_accounts',
+          exportType: requestModel.exportType,
+          headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+        );
+      },
+    );
+  }
+
+  @override
+  Future<Either<Failure, File>> getLedgerReportForMainAccounts({
+    int? accountLevel,
+    num? fromAccountNo,
+    num? toAccountNo,
+    int? fromAnalytical,
+    int? toAnalytical,
+    DateTime? fromDate,
+    DateTime? toDate,
+    int? fromAnalytical1,
+    int? toAnalytical1,
+    int? fromSubVoucher,
+    int? toSubVoucher,
+    String reportName = 'AGL021N',
+    required String languageCode,
+    String exportType = 'pdf',
+  }) {
+    return handleDioRequest(
+      request: () async {
+        final requestModel = LedgerReportForMainAccountsRequestModel(
+          accountLevel: accountLevel,
+          fromAccountNo: fromAccountNo,
+          toAccountNo: toAccountNo,
+          fromAnalytical: fromAnalytical,
+          toAnalytical: toAnalytical,
+          fromDate: fromDate,
+          toDate: toDate,
+          fromAnalytical1: fromAnalytical1,
+          toAnalytical1: toAnalytical1,
+          fromSubVoucher: fromSubVoucher,
+          toSubVoucher: toSubVoucher,
+          reportName: reportName,
+          exportType: exportType,
+        );
+        return _downloadReport(
+          endpoint: EndPoints.ledgerReportForMainAccounts,
+          body: requestModel.toJson(),
+          fileNamePrefix: 'ledger_report_main_accounts',
+          exportType: requestModel.exportType,
+          headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+        );
+      },
+    );
+  }
+
+  @override
+  Future<Either<Failure, File>> getLedgerReportPerUsers({
+    num? fromAccountNo,
+    num? toAccountNo,
+    DateTime? fromDate,
+    DateTime? toDate,
+    String reportName = 'AGL021',
+    required String languageCode,
+    String exportType = 'pdf',
+  }) {
+    return handleDioRequest(
+      request: () async {
+        final requestModel = LedgerReportPerUsersRequestModel(
+          fromAccountNo: fromAccountNo,
+          toAccountNo: toAccountNo,
+          fromDate: fromDate,
+          toDate: toDate,
+          reportName: reportName,
+          exportType: exportType,
+        );
+        return _downloadReport(
+          endpoint: EndPoints.ledgerReportPerUsers,
+          body: requestModel.toJson(),
+          fileNamePrefix: 'ledger_report_per_users',
           exportType: requestModel.exportType,
           headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
         );
