@@ -26,7 +26,9 @@ class ChartOfAccountDropdown extends StatefulWidget {
   final void Function(ChartOfAccountLightModel?)? onSelected;
   final ChartOfAccountLightModel? initialValue;
   final int? accountType;
-  final bool includeAccountsHasCostCenters;
+  final int? accountLevel;
+  final bool includeAccountRangeFields;
+  final bool? includeAccountsHasCostCenters;
 
   const ChartOfAccountDropdown({
     super.key,
@@ -35,6 +37,8 @@ class ChartOfAccountDropdown extends StatefulWidget {
     this.onSelected,
     this.initialValue,
     this.accountType = 1,
+    this.accountLevel,
+    this.includeAccountRangeFields = true,
     this.includeAccountsHasCostCenters = true,
   });
 
@@ -80,6 +84,8 @@ class _ChartOfAccountDropdownState extends State<ChartOfAccountDropdown> {
               repo.getChartOfAccountLight(
                 languageCode: languageCode,
                 accountType: widget.accountType,
+                accountLevel: widget.accountLevel,
+                includeAccountRangeFields: widget.includeAccountRangeFields,
                 includeAccountsHasCostCenters:
                     widget.includeAccountsHasCostCenters,
                 searchWord: searchWord.isEmpty ? null : searchWord,

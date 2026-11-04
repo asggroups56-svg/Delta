@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
-import 'package:my_template/core/custom_widgets/custom_form_field/custom_form_field.dart';
+import 'package:dartz/dartz.dart' show Either;
+import 'package:my_template/core/error/failures.dart';
+import 'package:my_template/core/services/services_locator.dart';
 import 'package:my_template/core/theme/app_colors.dart';
+import 'package:my_template/features/lookup/data/models/category_light_model.dart';
+import 'package:my_template/features/lookup/data/repository/lookup_repo.dart';
 
 class MasterAccountsOrCentersReportFilterSelection {
   final int? fromCategoryNo;
@@ -72,8 +75,9 @@ class MasterAccountsOrCentersReportFilterBottomSheetWidget
 
 class _MasterAccountsOrCentersReportFilterBottomSheetWidgetState
     extends State<MasterAccountsOrCentersReportFilterBottomSheetWidget> {
-  final _fromCategoryController = TextEditingController();
-  final _toCategoryController = TextEditingController();
+  CategoryLightModel? _fromCategory;
+  CategoryLightModel? _toCategory;
+  Future<Either<Failure, CategoryLightResponse>>? _categoriesFuture;
   DateTime? _fromDate;
   DateTime? _toDate;
   int _masterReportType = 1;
@@ -83,16 +87,21 @@ class _MasterAccountsOrCentersReportFilterBottomSheetWidgetState
   bool get _isArabic => Localizations.localeOf(context).languageCode == 'ar';
 
   @override
-  void initState() {
-    super.initState();
-    _exportType = widget.initialExportType;
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _categoriesFuture ??= widget.isCentersReport
+        ? sl<LookupRepo>().getCenterCategories(
+            languageCode: Localizations.localeOf(context).languageCode,
+          )
+        : sl<LookupRepo>().getAccountCategoriesLight(
+            languageCode: Localizations.localeOf(context).languageCode,
+          );
   }
 
   @override
-  void dispose() {
-    _fromCategoryController.dispose();
-    _toCategoryController.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
+    _exportType = widget.initialExportType;
   }
 
   Future<void> _selectDate({required bool isFromDate}) async {
@@ -115,22 +124,9 @@ class _MasterAccountsOrCentersReportFilterBottomSheetWidgetState
     });
   }
 
-  int? _parseCategory(TextEditingController controller) {
-    final value = controller.text.trim();
-    return value.isEmpty ? null : int.tryParse(value);
-  }
-
   void _submit() {
-    final fromCategory = _parseCategory(_fromCategoryController);
-    final toCategory = _parseCategory(_toCategoryController);
-    if ((_fromCategoryController.text.trim().isNotEmpty &&
-            fromCategory == null) ||
-        (_toCategoryController.text.trim().isNotEmpty && toCategory == null)) {
-      _showValidation(
-        _isArabic ? 'أدخل رقم باب حساب صحيح' : 'Enter a valid account category',
-      );
-      return;
-    }
+    final fromCategory = _fromCategory?.categoryNo;
+    final toCategory = _toCategory?.categoryNo;
     if (fromCategory != null &&
         toCategory != null &&
         fromCategory > toCategory) {
@@ -241,16 +237,20 @@ class _MasterAccountsOrCentersReportFilterBottomSheetWidgetState
                       Row(
                         children: [
                           Expanded(
-                            child: _numberField(
+                            child: _categoryDropdown(
                               _isArabic ? 'من رقم الباب' : 'From category',
-                              _fromCategoryController,
+                              _fromCategory,
+                              (category) =>
+                                  setState(() => _fromCategory = category),
                             ),
                           ),
                           Gap(10.w),
                           Expanded(
-                            child: _numberField(
+                            child: _categoryDropdown(
                               _isArabic ? 'إلى رقم الباب' : 'To category',
-                              _toCategoryController,
+                              _toCategory,
+                              (category) =>
+                                  setState(() => _toCategory = category),
                             ),
                           ),
                         ],
@@ -374,14 +374,77 @@ class _MasterAccountsOrCentersReportFilterBottomSheetWidgetState
     );
   }
 
-  Widget _numberField(String label, TextEditingController controller) {
-    return CustomFormField(
-      width: double.infinity,
-      radius: 12.r,
-      controller: controller,
-      title: label,
-      keyboardType: TextInputType.number,
-      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+  Widget _categoryDropdown(
+    String label,
+    CategoryLightModel? selected,
+    ValueChanged<CategoryLightModel?> onChanged,
+  ) {
+    return FutureBuilder<Either<Failure, CategoryLightResponse>>(
+      future: _categoriesFuture,
+      builder: (context, snapshot) {
+        final isLoading = snapshot.connectionState == ConnectionState.waiting;
+        var categories = <CategoryLightModel>[];
+        String? errorMessage;
+        if (snapshot.hasError) {
+          errorMessage = snapshot.error.toString();
+        } else if (snapshot.hasData) {
+          snapshot.data!.fold(
+            (failure) => errorMessage = failure.errMessage,
+            (response) => categories = response.categories,
+          );
+        } else if (!isLoading) {
+          errorMessage = _isArabic
+              ? 'تعذر تحميل الأبواب'
+              : 'Unable to load categories';
+        }
+
+        final hasSelected = categories.any(
+          (category) => category.categoryNo == selected?.categoryNo,
+        );
+        return DropdownButtonFormField<int>(
+          initialValue: hasSelected ? selected!.categoryNo : null,
+          isExpanded: true,
+          decoration: InputDecoration(
+            labelText: label,
+            filled: true,
+            fillColor: AppColor.textFormFillColor(context),
+            suffixIcon: isLoading
+                ? Padding(
+                    padding: EdgeInsets.all(14.r),
+                    child: SizedBox(
+                      width: 18.r,
+                      height: 18.r,
+                      child: CircularProgressIndicator(strokeWidth: 2.r),
+                    ),
+                  )
+                : null,
+            errorText: errorMessage,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.r),
+            ),
+          ),
+          items: categories
+              .map(
+                (category) => DropdownMenuItem(
+                  value: category.categoryNo,
+                  child: Text(
+                    '${category.categoryName} (${category.categoryNo})',
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              )
+              .toList(),
+          onChanged: isLoading || errorMessage != null || categories.isEmpty
+              ? null
+              : (value) => onChanged(
+                  value == null
+                      ? null
+                      : categories.firstWhere(
+                          (category) => category.categoryNo == value,
+                        ),
+                ),
+        );
+      },
     );
   }
 

@@ -58,6 +58,10 @@ class EndPoints {
       'Report/AccountsCentersComparisonReport';
   static const String currenciesReport = 'Report/CurrenciesReport';
   static const String chartOfAccountLight = 'ChartOfAccount/GetLight';
+  static const String accountCategoryLight = 'AccCat/GetLight';
+  static const String centerCategory = 'CenterCat/Get';
+  static const String assistantCode = 'AssistantCode/Get';
+  static const String currencyDataLight = 'CurrencyData/GetLight';
   static const String customerDatumLight = 'CustomerDatum/GetLight';
   static const String costCenterLight = 'CostCenter/GetLight';
   static const String cashVoucherLight = 'CashVoucher/GetLight';

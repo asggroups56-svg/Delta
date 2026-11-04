@@ -12,7 +12,7 @@ import 'package:my_template/features/lookup/presentation/widgets/cost_center_dro
 class LedgerReportForAssistantAccountsFilterSelection {
   final num? fromAccountNo;
   final num? toAccountNo;
-  final int? centerLevel;
+  final int centerLevel;
   final num? fromCostCenterNo;
   final num? toCostCenterNo;
   final int? fromAccAnal;
@@ -89,7 +89,7 @@ class _LedgerReportForAssistantAccountsFilterBottomSheetWidgetState
   ChartOfAccountLightModel? _toAccount;
   CostCenterLightModel? _fromCostCenter;
   CostCenterLightModel? _toCostCenter;
-  final _centerLevelController = TextEditingController();
+  final _centerLevelController = TextEditingController(text: '1');
   final _fromAccAnalController = TextEditingController();
   final _toAccAnalController = TextEditingController();
   final _fromCentAnalController = TextEditingController();
@@ -177,6 +177,12 @@ class _LedgerReportForAssistantAccountsFilterBottomSheetWidgetState
     )) {
       _showValidation(
         _isArabic ? 'أدخل أرقامًا صحيحة في الحقول' : 'Enter valid numbers',
+      );
+      return;
+    }
+    if (centerLevel == null) {
+      _showValidation(
+        _isArabic ? 'مستوى المركز مطلوب' : 'Center level is required',
       );
       return;
     }
@@ -378,7 +384,9 @@ class _LedgerReportForAssistantAccountsFilterBottomSheetWidgetState
                       Gap(8.h),
                       ChartOfAccountDropdown(
                         title: _isArabic ? 'من حساب' : 'From account',
-                        accountType: null,
+                        accountType: 1,
+                        includeAccountRangeFields: false,
+                        includeAccountsHasCostCenters: null,
                         initialValue: _fromAccount,
                         onSelected: (account) {
                           setState(() => _fromAccount = account);
@@ -387,7 +395,9 @@ class _LedgerReportForAssistantAccountsFilterBottomSheetWidgetState
                       Gap(8.h),
                       ChartOfAccountDropdown(
                         title: _isArabic ? 'إلى حساب' : 'To account',
-                        accountType: null,
+                        accountType: 1,
+                        includeAccountRangeFields: false,
+                        includeAccountsHasCostCenters: null,
                         initialValue: _toAccount,
                         onSelected: (account) {
                           setState(() => _toAccount = account);
@@ -397,6 +407,7 @@ class _LedgerReportForAssistantAccountsFilterBottomSheetWidgetState
                       _numberField(
                         _isArabic ? 'مستوى المركز' : 'Center level',
                         _centerLevelController,
+                        onChanged: (_) => setState(() {}),
                       ),
                       Gap(12.h),
                       _rangeTitle(
@@ -406,6 +417,12 @@ class _LedgerReportForAssistantAccountsFilterBottomSheetWidgetState
                       Gap(8.h),
                       CostCenterDropdown(
                         title: _isArabic ? 'من مركز' : 'From center',
+                        centerType: null,
+                        centerKind: null,
+                        centerLevel:
+                            _parseOptionalInt(_centerLevelController) ?? 1,
+                        accountType: 1,
+                        pageSize: 10,
                         initialValue: _fromCostCenter,
                         onSelected: (center) {
                           setState(() => _fromCostCenter = center);
@@ -414,6 +431,12 @@ class _LedgerReportForAssistantAccountsFilterBottomSheetWidgetState
                       Gap(8.h),
                       CostCenterDropdown(
                         title: _isArabic ? 'إلى مركز' : 'To center',
+                        centerType: null,
+                        centerKind: null,
+                        centerLevel:
+                            _parseOptionalInt(_centerLevelController) ?? 1,
+                        accountType: 1,
+                        pageSize: 10,
                         initialValue: _toCostCenter,
                         onSelected: (center) {
                           setState(() => _toCostCenter = center);
@@ -549,15 +572,19 @@ class _LedgerReportForAssistantAccountsFilterBottomSheetWidgetState
     ),
   );
 
-  Widget _numberField(String label, TextEditingController controller) =>
-      CustomFormField(
-        width: double.infinity,
-        radius: 12.r,
-        controller: controller,
-        title: label,
-        keyboardType: TextInputType.number,
-        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-      );
+  Widget _numberField(
+    String label,
+    TextEditingController controller, {
+    void Function(String)? onChanged,
+  }) => CustomFormField(
+    width: double.infinity,
+    radius: 12.r,
+    controller: controller,
+    onChanged: onChanged,
+    title: label,
+    keyboardType: TextInputType.number,
+    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+  );
 
   Widget _numberRange(
     String fromLabel,

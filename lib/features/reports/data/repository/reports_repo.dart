@@ -218,6 +218,8 @@ abstract interface class ReportsRepo {
   Future<Either<Failure, File>> getLedgerReportForAllAccounts({
     int? fromAccountNo,
     int? toAccountNo,
+    String? fromCurrencyCode,
+    String? toCurrencyCode,
     int? searchGroup,
     DateTime? fromDate,
     DateTime? toDate,
@@ -311,7 +313,7 @@ abstract interface class ReportsRepo {
   Future<Either<Failure, File>> getLedgerReportForAssistantAccounts({
     num? fromAccountNo,
     num? toAccountNo,
-    int? centerLevel,
+    required int centerLevel,
     num? fromCostCenterNo,
     num? toCostCenterNo,
     int? fromAccAnal,
@@ -1275,6 +1277,8 @@ class ReportsRepoImpl implements ReportsRepo {
   Future<Either<Failure, File>> getLedgerReportForAllAccounts({
     int? fromAccountNo,
     int? toAccountNo,
+    String? fromCurrencyCode,
+    String? toCurrencyCode,
     int? searchGroup,
     DateTime? fromDate,
     DateTime? toDate,
@@ -1288,6 +1292,8 @@ class ReportsRepoImpl implements ReportsRepo {
         final requestModel = LedgerReportRequestModel(
           fromAccountNo: fromAccountNo,
           toAccountNo: toAccountNo,
+          fromCurrencyCode: fromCurrencyCode,
+          toCurrencyCode: toCurrencyCode,
           searchGroup: searchGroup,
           fromDate: fromDate,
           toDate: toDate,
@@ -1311,7 +1317,7 @@ class ReportsRepoImpl implements ReportsRepo {
   Future<Either<Failure, File>> getLedgerReportForAssistantAccounts({
     num? fromAccountNo,
     num? toAccountNo,
-    int? centerLevel,
+    required int centerLevel,
     num? fromCostCenterNo,
     num? toCostCenterNo,
     int? fromAccAnal,

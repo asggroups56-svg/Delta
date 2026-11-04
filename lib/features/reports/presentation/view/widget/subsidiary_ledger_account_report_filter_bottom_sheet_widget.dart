@@ -1,9 +1,14 @@
+import 'package:dartz/dartz.dart' show Either;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:my_template/core/error/failures.dart';
+import 'package:my_template/core/services/services_locator.dart';
 import 'package:my_template/core/theme/app_colors.dart';
 import 'package:my_template/core/theme/app_text_style.dart';
+import 'package:my_template/features/lookup/data/models/assistant_code_light_model.dart';
 import 'package:my_template/features/lookup/data/models/chart_of_account_light_model.dart';
+import 'package:my_template/features/lookup/data/repository/lookup_repo.dart';
 import 'package:my_template/features/lookup/presentation/widgets/chart_of_account_dropdown.dart';
 
 class SubsidiaryLedgerAccountReportFilterSelection {
@@ -67,10 +72,11 @@ class SubsidiaryLedgerAccountReportFilterBottomSheetWidget
 
 class _SubsidiaryLedgerAccountReportFilterBottomSheetWidgetState
     extends State<SubsidiaryLedgerAccountReportFilterBottomSheetWidget> {
-  ChartOfAccountLightModel? _fromAccount;
-  ChartOfAccountLightModel? _toAccount;
   ChartOfAccountLightModel? _fromMainAccount;
   ChartOfAccountLightModel? _toMainAccount;
+  AssistantCodeLightModel? _fromAssistantCode;
+  AssistantCodeLightModel? _toAssistantCode;
+  Future<Either<Failure, AssistantCodeLightResponse>>? _assistantCodesFuture;
   DateTime? _fromDate;
   DateTime? _toDate;
   bool _accountsWithZeroBalances = false;
@@ -81,6 +87,16 @@ class _SubsidiaryLedgerAccountReportFilterBottomSheetWidgetState
   bool get _isArabic => Localizations.localeOf(context).languageCode == 'ar';
 
   String get _reportName => _ledgerReportType == 2 ? 'AGL023AS' : 'AGL021AS';
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _assistantCodesFuture ??= sl<LookupRepo>().getAssistantCode(
+      languageCode: Localizations.localeOf(context).languageCode,
+      page: 1,
+      pageSize: 100,
+    );
+  }
 
   @override
   void initState() {
@@ -108,8 +124,8 @@ class _SubsidiaryLedgerAccountReportFilterBottomSheetWidgetState
   }
 
   void _submit() {
-    final fromAccountNo = _fromAccount?.accountNo;
-    final toAccountNo = _toAccount?.accountNo;
+    final fromAccountNo = _fromAssistantCode?.assistantCode;
+    final toAccountNo = _toAssistantCode?.assistantCode;
     final fromMainAccountNo = _fromMainAccount?.accountNo;
     final toMainAccountNo = _toMainAccount?.accountNo;
 
@@ -294,7 +310,9 @@ class _SubsidiaryLedgerAccountReportFilterBottomSheetWidgetState
                       Gap(12.h),
                       ChartOfAccountDropdown(
                         title: isAr ? 'من الحساب الرئيسي' : 'From main account',
-                        accountType: null,
+                        accountType: 1,
+                        includeAccountRangeFields: false,
+                        includeAccountsHasCostCenters: null,
                         initialValue: _fromMainAccount,
                         onSelected: (account) {
                           setState(() => _fromMainAccount = account);
@@ -303,29 +321,27 @@ class _SubsidiaryLedgerAccountReportFilterBottomSheetWidgetState
                       Gap(12.h),
                       ChartOfAccountDropdown(
                         title: isAr ? 'إلى الحساب الرئيسي' : 'To main account',
-                        accountType: null,
+                        accountType: 1,
+                        includeAccountRangeFields: false,
+                        includeAccountsHasCostCenters: null,
                         initialValue: _toMainAccount,
                         onSelected: (account) {
                           setState(() => _toMainAccount = account);
                         },
                       ),
                       Gap(12.h),
-                      ChartOfAccountDropdown(
+                      _buildAssistantCodeDropdown(
                         title: isAr ? 'من الحساب الفرعي' : 'From account',
-                        accountType: null,
-                        initialValue: _fromAccount,
-                        onSelected: (account) {
-                          setState(() => _fromAccount = account);
-                        },
+                        selectedCode: _fromAssistantCode,
+                        onChanged: (code) =>
+                            setState(() => _fromAssistantCode = code),
                       ),
                       Gap(12.h),
-                      ChartOfAccountDropdown(
+                      _buildAssistantCodeDropdown(
                         title: isAr ? 'إلى الحساب الفرعي' : 'To account',
-                        accountType: null,
-                        initialValue: _toAccount,
-                        onSelected: (account) {
-                          setState(() => _toAccount = account);
-                        },
+                        selectedCode: _toAssistantCode,
+                        onChanged: (code) =>
+                            setState(() => _toAssistantCode = code),
                       ),
                       Gap(12.h),
                       Row(
@@ -448,6 +464,86 @@ class _SubsidiaryLedgerAccountReportFilterBottomSheetWidgetState
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildAssistantCodeDropdown({
+    required String title,
+    required AssistantCodeLightModel? selectedCode,
+    required ValueChanged<AssistantCodeLightModel?> onChanged,
+  }) {
+    return FutureBuilder<Either<Failure, AssistantCodeLightResponse>>(
+      future: _assistantCodesFuture,
+      builder: (context, snapshot) {
+        final isLoading = snapshot.connectionState == ConnectionState.waiting;
+        List<AssistantCodeLightModel> codes = [];
+        String? errorMessage;
+
+        if (snapshot.hasError) {
+          errorMessage = snapshot.error.toString();
+        } else if (snapshot.hasData) {
+          snapshot.data!.fold(
+            (failure) => errorMessage = failure.errMessage,
+            (response) => codes = response.assistantCodes,
+          );
+        } else if (!isLoading) {
+          errorMessage = _isArabic
+              ? 'تعذر تحميل الحسابات المساعدة'
+              : 'Unable to load assistant accounts';
+        }
+
+        final hasSelectedCode = codes.any(
+          (code) => code.assistantCode == selectedCode?.assistantCode,
+        );
+        return DropdownButtonFormField<int>(
+          initialValue: hasSelectedCode ? selectedCode!.assistantCode : null,
+          isExpanded: true,
+          decoration: InputDecoration(
+            labelText: title,
+            filled: true,
+            fillColor: AppColor.textFormFillColor(context),
+            prefixIcon: const Icon(Icons.account_tree_outlined),
+            suffixIcon: isLoading
+                ? Padding(
+                    padding: EdgeInsets.all(14.r),
+                    child: SizedBox(
+                      width: 18.r,
+                      height: 18.r,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.r,
+                        color: AppColor.primaryColor(context),
+                      ),
+                    ),
+                  )
+                : null,
+            errorText: errorMessage,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.r),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.r),
+            ),
+          ),
+          items: codes
+              .map(
+                (code) => DropdownMenuItem(
+                  value: code.assistantCode,
+                  child: Text(
+                    '${code.assistantName} (${code.assistantCode})',
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              )
+              .toList(),
+          onChanged: isLoading || errorMessage != null || codes.isEmpty
+              ? null
+              : (value) => onChanged(
+                  value == null
+                      ? null
+                      : codes.firstWhere((code) => code.assistantCode == value),
+                ),
+        );
+      },
     );
   }
 

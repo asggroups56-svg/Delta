@@ -9,6 +9,7 @@ import 'package:my_template/core/custom_widgets/date_range_bottom_sheet_widget.d
 import 'package:my_template/core/custom_widgets/month_range_bottom_sheet_widget.dart';
 import 'package:my_template/core/services/services_locator.dart';
 import 'package:my_template/core/theme/app_colors.dart';
+import 'package:my_template/core/theme/app_text_style.dart';
 import 'package:my_template/core/utils/app_locale_key.dart';
 import 'package:my_template/core/utils/common_methods.dart';
 import 'package:my_template/features/reports/data/repository/reports_repo.dart';
@@ -191,7 +192,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
               Gap(18.h),
               Text(
                 title,
-                style: TextStyle(
+                style: AppTextStyle.bodyLarge(context).copyWith(
                   color: AppColor.titleFormFiledColor(sheetContext),
                   fontSize: 18.sp,
                   fontWeight: FontWeight.bold,
@@ -265,7 +266,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
               Gap(16.h),
               Text(
                 AppLocaleKey.exportReport.tr(),
-                style: TextStyle(
+                style: AppTextStyle.bodyLarge(context).copyWith(
                   color: AppColor.titleFormFiledColor(context),
                   fontSize: 16.sp,
                   fontWeight: FontWeight.bold,
@@ -975,7 +976,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 children: [
                   Text(
                     title,
-                    style: TextStyle(
+                    style: AppTextStyle.bodyMedium(context).copyWith(
                       fontSize: 13.sp,
                       fontWeight: FontWeight.bold,
                       color: AppColor.titleFormFiledColor(context),
@@ -983,7 +984,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   ),
                   Text(
                     subtitle,
-                    style: TextStyle(
+                    style: AppTextStyle.bodySmall(context).copyWith(
                       fontSize: 10.sp,
                       color: AppColor.darkTextColor(context),
                     ),
@@ -2126,23 +2127,22 @@ class _ReportsScreenState extends State<ReportsScreen> {
               )
             : isLedgerReportForAssistantAccounts
             ? await reportsRepo.getLedgerReportForAssistantAccounts(
-                fromAccountNo: assistantAccountsLedgerFilter?.fromAccountNo,
-                toAccountNo: assistantAccountsLedgerFilter?.toAccountNo,
-                centerLevel: assistantAccountsLedgerFilter?.centerLevel,
+                fromAccountNo: assistantAccountsLedgerFilter!.fromAccountNo,
+                toAccountNo: assistantAccountsLedgerFilter.toAccountNo,
+                centerLevel: assistantAccountsLedgerFilter.centerLevel,
                 fromCostCenterNo:
-                    assistantAccountsLedgerFilter?.fromCostCenterNo,
-                toCostCenterNo: assistantAccountsLedgerFilter?.toCostCenterNo,
-                fromAccAnal: assistantAccountsLedgerFilter?.fromAccAnal,
-                toAccAnal: assistantAccountsLedgerFilter?.toAccAnal,
-                fromDate: assistantAccountsLedgerFilter?.fromDate,
-                toDate: assistantAccountsLedgerFilter?.toDate,
-                fromCentAnal: assistantAccountsLedgerFilter?.fromCentAnal,
-                toCentAnal: assistantAccountsLedgerFilter?.toCentAnal,
-                fromAnalytical: assistantAccountsLedgerFilter?.fromAnalytical,
-                toAnalytical: assistantAccountsLedgerFilter?.toAnalytical,
-                sideType: assistantAccountsLedgerFilter?.sideType ?? 2,
-                reportName:
-                    assistantAccountsLedgerFilter?.reportName ?? 'AGL094',
+                    assistantAccountsLedgerFilter.fromCostCenterNo,
+                toCostCenterNo: assistantAccountsLedgerFilter.toCostCenterNo,
+                fromAccAnal: assistantAccountsLedgerFilter.fromAccAnal,
+                toAccAnal: assistantAccountsLedgerFilter.toAccAnal,
+                fromDate: assistantAccountsLedgerFilter.fromDate,
+                toDate: assistantAccountsLedgerFilter.toDate,
+                fromCentAnal: assistantAccountsLedgerFilter.fromCentAnal,
+                toCentAnal: assistantAccountsLedgerFilter.toCentAnal,
+                fromAnalytical: assistantAccountsLedgerFilter.fromAnalytical,
+                toAnalytical: assistantAccountsLedgerFilter.toAnalytical,
+                sideType: assistantAccountsLedgerFilter.sideType,
+                reportName: assistantAccountsLedgerFilter.reportName,
                 languageCode: languageCode,
                 exportType: exportType,
               )
@@ -2150,6 +2150,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
             ? await reportsRepo.getLedgerReportForAllAccounts(
                 fromAccountNo: ledgerFilter?.fromAccountNo,
                 toAccountNo: ledgerFilter?.toAccountNo,
+                fromCurrencyCode: ledgerFilter?.fromCurrencyCode,
+                toCurrencyCode: ledgerFilter?.toCurrencyCode,
                 searchGroup: ledgerFilter?.searchGroup,
                 fromDate: ledgerFilter?.fromDate,
                 toDate: ledgerFilter?.toDate,
@@ -2360,7 +2362,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 Text(
                   'جاري تحضير التقرير...',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: AppTextStyle.bodyLarge(context).copyWith(
                     color: AppColor.titleFormFiledColor(dialogContext),
                     fontSize: 22.sp,
                     fontWeight: FontWeight.bold,
@@ -2370,7 +2372,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 Text(
                   'قد يستغرق هذا بعض الوقت للتقارير الكبيرة',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: AppTextStyle.bodySmall(context).copyWith(
                     color: AppColor.darkTextColor(dialogContext),
                     fontSize: 14.sp,
                   ),
@@ -3320,7 +3322,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
               Gap(16.h),
               Text(
                 'جاري جلب وإنشاء التقرير المالي...',
-                style: TextStyle(
+                style: AppTextStyle.bodyLarge(context).copyWith(
                   color: AppColor.titleFormFiledColor(context),
                   fontWeight: FontWeight.bold,
                   fontSize: 13.sp,
@@ -3329,7 +3331,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
               Gap(6.h),
               Text(
                 'Report API • $_previewTitle',
-                style: TextStyle(
+                style: AppTextStyle.bodySmall(context).copyWith(
                   color: AppColor.mintTeal.withValues(alpha: 0.8),
                   fontSize: 11.sp,
                 ),
@@ -3382,8 +3384,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
       (
         id: 12,
         key: 'masterAccountsOrCenters',
-        titleAr: 'الحسابات الرئيسية أو المراكز',
-        titleEn: 'Main Accounts or Centers',
+        titleAr: 'أرصدة وأبواب',
+        titleEn: 'Balances and Categories',
         icon: Icons.account_balance_wallet_outlined,
         accent: AppColor.oceanBlue,
       ),

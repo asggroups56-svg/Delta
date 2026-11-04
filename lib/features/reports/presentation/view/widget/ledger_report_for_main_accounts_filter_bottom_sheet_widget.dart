@@ -266,11 +266,15 @@ class _LedgerReportForMainAccountsFilterBottomSheetWidgetState
                       _numberField(
                         _isArabic ? 'مستوى الحساب' : 'Account level',
                         _accountLevelController,
+                        onChanged: (_) => setState(() {}),
                       ),
                       Gap(12.h),
                       ChartOfAccountDropdown(
                         title: _isArabic ? 'من حساب' : 'From account',
                         accountType: null,
+                        accountLevel: _parseOptionalInt(
+                          _accountLevelController,
+                        ),
                         initialValue: _fromAccount,
                         onSelected: (account) {
                           setState(() => _fromAccount = account);
@@ -280,6 +284,9 @@ class _LedgerReportForMainAccountsFilterBottomSheetWidgetState
                       ChartOfAccountDropdown(
                         title: _isArabic ? 'إلى حساب' : 'To account',
                         accountType: null,
+                        accountLevel: _parseOptionalInt(
+                          _accountLevelController,
+                        ),
                         initialValue: _toAccount,
                         onSelected: (account) {
                           setState(() => _toAccount = account);
@@ -391,15 +398,19 @@ class _LedgerReportForMainAccountsFilterBottomSheetWidgetState
     );
   }
 
-  Widget _numberField(String label, TextEditingController controller) =>
-      CustomFormField(
-        width: double.infinity,
-        radius: 12.r,
-        controller: controller,
-        title: label,
-        keyboardType: TextInputType.number,
-        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-      );
+  Widget _numberField(
+    String label,
+    TextEditingController controller, {
+    void Function(String)? onChanged,
+  }) => CustomFormField(
+    width: double.infinity,
+    radius: 12.r,
+    controller: controller,
+    onChanged: onChanged,
+    title: label,
+    keyboardType: TextInputType.number,
+    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+  );
 
   Widget _numberRange(
     String fromLabel,

@@ -1,13 +1,18 @@
+import 'package:dartz/dartz.dart' show Either;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:my_template/core/custom_widgets/custom_form_field/custom_form_field.dart';
+import 'package:my_template/core/error/failures.dart';
+import 'package:my_template/core/services/services_locator.dart';
 import 'package:my_template/core/theme/app_colors.dart';
 import 'package:my_template/core/theme/app_text_style.dart';
 import 'package:my_template/core/utils/app_locale_key.dart';
 import 'package:my_template/features/lookup/data/models/chart_of_account_light_model.dart';
+import 'package:my_template/features/lookup/data/models/currency_data_light_model.dart';
+import 'package:my_template/features/lookup/data/repository/lookup_repo.dart';
 import 'package:my_template/features/lookup/presentation/widgets/chart_of_account_dropdown.dart';
 
 class LedgerReportFilterSelection {
@@ -15,6 +20,8 @@ class LedgerReportFilterSelection {
   final DateTime? toDate;
   final int? fromAccountNo;
   final int? toAccountNo;
+  final String? fromCurrencyCode;
+  final String? toCurrencyCode;
   final int? searchGroup;
   final bool accountsWithZeroBalances;
   final String reportName;
@@ -24,6 +31,8 @@ class LedgerReportFilterSelection {
     this.toDate,
     this.fromAccountNo,
     this.toAccountNo,
+    this.fromCurrencyCode,
+    this.toCurrencyCode,
     this.searchGroup,
     this.accountsWithZeroBalances = false,
     this.reportName = 'AGL021C',
@@ -69,8 +78,19 @@ class _LedgerReportFilterBottomSheetWidgetState
   String _reportName = 'AGL021C';
   ChartOfAccountLightModel? _fromAccount;
   ChartOfAccountLightModel? _toAccount;
+  Future<Either<Failure, CurrencyDataLightResponse>>? _currencyDataFuture;
+  String? _fromCurrencyCode;
+  String? _toCurrencyCode;
   String? _validationMessage;
   bool get _isArabic => context.locale.languageCode == 'ar';
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _currencyDataFuture ??= sl<LookupRepo>().getCurrencyDataLight(
+      languageCode: context.locale.languageCode,
+    );
+  }
 
   @override
   void dispose() {
@@ -133,6 +153,8 @@ class _LedgerReportFilterBottomSheetWidgetState
         toDate: _includeDates ? _toDate : null,
         fromAccountNo: _fromAccount?.accountNo,
         toAccountNo: _toAccount?.accountNo,
+        fromCurrencyCode: _fromCurrencyCode,
+        toCurrencyCode: _toCurrencyCode,
         searchGroup: searchGroup,
         accountsWithZeroBalances: _accountsWithZeroBalances,
         reportName: _reportName,
@@ -343,6 +365,8 @@ class _LedgerReportFilterBottomSheetWidgetState
                   },
                 ),
                 Gap(12.h),
+                _buildCurrencyFields(),
+                Gap(12.h),
                 CustomFormField(
                   width: double.infinity,
                   radius: 12.r,
@@ -426,6 +450,96 @@ class _LedgerReportFilterBottomSheetWidgetState
       ),
     );
   }
+
+  Widget _buildCurrencyFields() {
+    return FutureBuilder<Either<Failure, CurrencyDataLightResponse>>(
+      future: _currencyDataFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (snapshot.hasError) {
+          return _currencyError(snapshot.error.toString());
+        }
+        final result = snapshot.data;
+        if (result == null) {
+          return _currencyError(
+            _isArabic ? 'تعذر تحميل العملات' : 'Unable to load currency data',
+          );
+        }
+        return result.fold((failure) => _currencyError(failure.errMessage), (
+          response,
+        ) {
+          final currencies = response.currencies;
+          if (currencies.isEmpty) {
+            return _currencyError(
+              _isArabic ? 'لا توجد عملات' : 'No currencies available',
+            );
+          }
+          return Column(
+            children: [
+              DropdownButtonFormField<String>(
+                initialValue: _fromCurrencyCode,
+                isExpanded: true,
+                decoration: InputDecoration(
+                  labelText: _isArabic ? 'من عملة' : 'From currency',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                ),
+                items: currencies
+                    .map(
+                      (currency) => DropdownMenuItem(
+                        value: currency.currencyCode,
+                        child: Text(
+                          '${currency.currencyName} (${currency.currencyCode})',
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    )
+                    .toList(),
+                onChanged: (value) => setState(() => _fromCurrencyCode = value),
+              ),
+              Gap(8.h),
+              DropdownButtonFormField<String>(
+                initialValue: _toCurrencyCode,
+                isExpanded: true,
+                decoration: InputDecoration(
+                  labelText: _isArabic ? 'إلى عملة' : 'To currency',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                ),
+                items: currencies
+                    .map(
+                      (currency) => DropdownMenuItem(
+                        value: currency.currencyCode,
+                        child: Text(
+                          '${currency.currencyName} (${currency.currencyCode})',
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    )
+                    .toList(),
+                onChanged: (value) => setState(() => _toCurrencyCode = value),
+              ),
+            ],
+          );
+        });
+      },
+    );
+  }
+
+  Widget _currencyError(String message) => Padding(
+    padding: EdgeInsets.symmetric(vertical: 8.h),
+    child: Align(
+      alignment: AlignmentDirectional.centerStart,
+      child: Text(
+        message,
+        style: TextStyle(color: Colors.red, fontSize: 12.sp),
+      ),
+    ),
+  );
 
   Widget _buildDateTile({
     required DateTime? date,

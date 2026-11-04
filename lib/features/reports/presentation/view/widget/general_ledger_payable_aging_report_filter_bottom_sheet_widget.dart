@@ -222,11 +222,12 @@ class _GeneralLedgerPayableAgingReportFilterBottomSheetWidgetState
                             children: [
                               Text(
                                 widget.title,
-                                style: AppTextStyle.bodyMedium(context).copyWith(
-                                  color: foreground,
-                                  fontSize: 17.sp,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                style: AppTextStyle.bodyMedium(context)
+                                    .copyWith(
+                                      color: foreground,
+                                      fontSize: 17.sp,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                               ),
                               Gap(2.h),
                               Text(
@@ -291,7 +292,9 @@ class _GeneralLedgerPayableAgingReportFilterBottomSheetWidgetState
                       Gap(12.h),
                       ChartOfAccountDropdown(
                         title: isAr ? 'من حساب' : 'From account',
-                        accountType: null,
+                        accountType: 1,
+                        includeAccountRangeFields: false,
+                        includeAccountsHasCostCenters: null,
                         initialValue: _fromAccount,
                         onSelected: (account) {
                           setState(() => _fromAccount = account);
@@ -300,7 +303,9 @@ class _GeneralLedgerPayableAgingReportFilterBottomSheetWidgetState
                       Gap(12.h),
                       ChartOfAccountDropdown(
                         title: isAr ? 'إلى حساب' : 'To account',
-                        accountType: null,
+                        accountType: 1,
+                        includeAccountRangeFields: false,
+                        includeAccountsHasCostCenters: null,
                         initialValue: _toAccount,
                         onSelected: (account) {
                           setState(() => _toAccount = account);
@@ -402,11 +407,12 @@ class _GeneralLedgerPayableAgingReportFilterBottomSheetWidgetState
                             Expanded(
                               child: Text(
                                 _validationMessage!,
-                                style: AppTextStyle.formTitleStyle(context).copyWith(
-                                  color: AppColor.roseDanger,
-                                  fontSize: 12.sp,
-                                  fontWeight: FontWeight.w500,
-                                ),
+                                style: AppTextStyle.formTitleStyle(context)
+                                    .copyWith(
+                                      color: AppColor.roseDanger,
+                                      fontSize: 12.sp,
+                                      fontWeight: FontWeight.w500,
+                                    ),
                               ),
                             ),
                           ],
@@ -433,10 +439,9 @@ class _GeneralLedgerPayableAgingReportFilterBottomSheetWidgetState
                     ),
                     child: Text(
                       isAr ? 'عرض التقرير' : 'Show report',
-                      style: AppTextStyle.formTitleStyle(context).copyWith(
-                        fontSize: 15.sp,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: AppTextStyle.formTitleStyle(
+                        context,
+                      ).copyWith(fontSize: 15.sp, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),

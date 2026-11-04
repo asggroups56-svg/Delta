@@ -19,8 +19,10 @@ class CostCenterDropdown extends StatefulWidget {
   final String? hintText;
   final void Function(CostCenterLightModel?)? onSelected;
   final CostCenterLightModel? initialValue;
-  final int centerType;
-  final int centerKind;
+  final int? centerType;
+  final int? centerKind;
+  final int? centerLevel;
+  final int? accountType;
   final int pageSize;
 
   const CostCenterDropdown({
@@ -31,6 +33,8 @@ class CostCenterDropdown extends StatefulWidget {
     this.initialValue,
     this.centerType = 1,
     this.centerKind = 0,
+    this.centerLevel,
+    this.accountType,
     this.pageSize = 20,
   });
 
@@ -67,6 +71,8 @@ class _CostCenterDropdownState extends State<CostCenterDropdown> {
       builder: (ctx) => _CostCenterPickerModal(
         centerType: widget.centerType,
         centerKind: widget.centerKind,
+        centerLevel: widget.centerLevel,
+        accountType: widget.accountType,
         selectedItem: _selected,
         pageSize: widget.pageSize,
         title: widget.title ?? defaultTitle,
@@ -221,8 +227,10 @@ class _CostCenterDropdownState extends State<CostCenterDropdown> {
 // ─────────────────────────────────────────────────────────────────────────────
 
 class _CostCenterPickerModal extends StatefulWidget {
-  final int centerType;
-  final int centerKind;
+  final int? centerType;
+  final int? centerKind;
+  final int? centerLevel;
+  final int? accountType;
   final CostCenterLightModel? selectedItem;
   final int pageSize;
   final String title;
@@ -230,6 +238,8 @@ class _CostCenterPickerModal extends StatefulWidget {
   const _CostCenterPickerModal({
     required this.centerType,
     required this.centerKind,
+    this.centerLevel,
+    this.accountType,
     required this.selectedItem,
     required this.pageSize,
     required this.title,
@@ -305,6 +315,8 @@ class _CostCenterPickerModalState extends State<_CostCenterPickerModal> {
       languageCode: lang,
       centerType: widget.centerType,
       centerKind: widget.centerKind,
+      centerLevel: widget.centerLevel,
+      accountType: widget.accountType,
       searchWord: query.isEmpty ? null : query,
       page: page,
       pageSize: widget.pageSize,

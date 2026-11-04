@@ -204,7 +204,7 @@ class _LedgerReportPerUsersFilterBottomSheetWidgetState
                       Gap(12.h),
                       ChartOfAccountDropdown(
                         title: _isArabic ? 'من حساب' : 'From account',
-                        accountType: null,
+                        accountType: 1,
                         initialValue: _fromAccount,
                         onSelected: (account) {
                           setState(() => _fromAccount = account);
@@ -213,7 +213,7 @@ class _LedgerReportPerUsersFilterBottomSheetWidgetState
                       Gap(8.h),
                       ChartOfAccountDropdown(
                         title: _isArabic ? 'إلى حساب' : 'To account',
-                        accountType: null,
+                        accountType: 1,
                         initialValue: _toAccount,
                         onSelected: (account) {
                           setState(() => _toAccount = account);

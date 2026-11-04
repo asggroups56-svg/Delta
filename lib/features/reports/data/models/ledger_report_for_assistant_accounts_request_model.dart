@@ -1,7 +1,7 @@
 class LedgerReportForAssistantAccountsRequestModel {
   final num? fromAccountNo;
   final num? toAccountNo;
-  final int? centerLevel;
+  final int centerLevel;
   final num? fromCostCenterNo;
   final num? toCostCenterNo;
   final int? fromAccAnal;
@@ -19,7 +19,7 @@ class LedgerReportForAssistantAccountsRequestModel {
   const LedgerReportForAssistantAccountsRequestModel({
     this.fromAccountNo,
     this.toAccountNo,
-    this.centerLevel,
+    required this.centerLevel,
     this.fromCostCenterNo,
     this.toCostCenterNo,
     this.fromAccAnal,

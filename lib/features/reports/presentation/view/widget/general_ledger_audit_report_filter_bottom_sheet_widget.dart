@@ -236,7 +236,9 @@ class _GeneralLedgerAuditReportFilterBottomSheetWidgetState
                     children: [
                       ChartOfAccountDropdown(
                         title: isAr ? 'من حساب' : 'From account',
-                        accountType: null,
+                        accountType: 1,
+                        includeAccountRangeFields: false,
+                        includeAccountsHasCostCenters: null,
                         initialValue: _fromAccount,
                         onSelected: (account) {
                           setState(() => _fromAccount = account);
@@ -245,7 +247,9 @@ class _GeneralLedgerAuditReportFilterBottomSheetWidgetState
                       Gap(12.h),
                       ChartOfAccountDropdown(
                         title: isAr ? 'إلى حساب' : 'To account',
-                        accountType: null,
+                        accountType: 1,
+                        includeAccountRangeFields: false,
+                        includeAccountsHasCostCenters: null,
                         initialValue: _toAccount,
                         onSelected: (account) {
                           setState(() => _toAccount = account);
