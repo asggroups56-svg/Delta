@@ -1,5 +1,3 @@
-
-
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 
@@ -75,6 +73,8 @@ class LookupRepoImpl implements LookupRepo {
   }) {
     return handleDioRequest(
       request: () async {
+        // Single source of truth for account-to-account selection across every
+        // report: always `ChartOfAccount/GetLight`, never a report endpoint.
         final response = await apiConsumer.post(
           EndPoints.chartOfAccountLight,
           body: {
@@ -216,5 +216,4 @@ class LookupRepoImpl implements LookupRepo {
       },
     );
   }
-
 }

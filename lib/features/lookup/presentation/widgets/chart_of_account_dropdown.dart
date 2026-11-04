@@ -7,7 +7,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 
 import '../../../../core/error/failures.dart';
-import '../../../../core/network/api_consumer.dart';
 import '../../../../core/services/services_locator.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_style.dart';
@@ -67,7 +66,11 @@ class _ChartOfAccountDropdownState extends State<ChartOfAccountDropdown> {
       backgroundColor: Colors.transparent,
       builder: (ctx) {
         final languageCode = ctx.locale.languageCode;
-        final repo = LookupRepoImpl(sl<ApiConsumer>());
+        // Every account picker (and therefore every report filter) must go
+        // through the shared lookup repository, which always posts to
+        // `ChartOfAccount/GetLight`. Never load accounts from a report
+        // endpoint here.
+        final repo = sl<LookupRepo>();
         return _ChartOfAccountPickerModal(
           selectedItem: _selected,
           title:

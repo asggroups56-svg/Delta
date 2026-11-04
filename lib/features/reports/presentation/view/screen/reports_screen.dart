@@ -117,8 +117,9 @@ class _ReportsScreenState extends State<ReportsScreen> {
     int reportGroup,
   ) {
     final suffix = reportGroup == 0 ? 'A' : 'B';
-    if (balance == 0)
+    if (balance == 0) {
       return periodically == 0 ? 'AGL051$suffix' : 'AGL050$suffix';
+    }
     return periodically == 0 ? 'AGL048$suffix' : 'AGL047$suffix';
   }
 
