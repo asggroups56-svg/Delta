@@ -17,6 +17,7 @@ class CustomFormField extends StatefulWidget {
   final void Function(String)? onChanged;
   final String? Function(String?)? validator;
   final TextInputType? keyboardType;
+  final TextCapitalization textCapitalization;
   final bool isPassword;
   final String? hintText;
   final int? maxLines;
@@ -48,6 +49,7 @@ class CustomFormField extends StatefulWidget {
     this.onChanged,
     this.validator,
     this.keyboardType,
+    this.textCapitalization = TextCapitalization.none,
     this.isPassword = false,
     this.hintText,
     this.maxLines = 1,
@@ -129,6 +131,7 @@ class _CustomFormFieldState extends State<CustomFormField> {
               onTap: widget.onTap,
               readOnly: widget.readOnly,
               keyboardType: widget.keyboardType,
+              textCapitalization: widget.textCapitalization,
               obscureText: widget.isPassword ? _obscureText : false,
               style: widget.textStyle ?? AppTextStyle.textFormStyle(context),
               autovalidateMode:

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:my_template/core/custom_widgets/custom_form_field/custom_form_field.dart';
 import 'package:my_template/core/theme/app_colors.dart';
 import 'package:my_template/core/theme/app_text_style.dart';
 import 'package:my_template/features/lookup/data/models/cost_center_light_model.dart';
@@ -548,22 +549,13 @@ class _CostCentersReportFilterBottomSheetWidgetState
     String label,
     Color foreground,
   ) {
-    return TextField(
+    return CustomFormField(
+      width: double.infinity,
+      radius: 12.r,
       controller: controller,
+      title: label,
       keyboardType: TextInputType.number,
       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: TextStyle(color: foreground.withValues(alpha: 0.65)),
-        filled: true,
-        fillColor: AppColor.textFormFillColor(context),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: foreground.withValues(alpha: 0.12)),
-        ),
-        contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
-      ),
       onChanged: (_) => setState(() => _validationMessage = null),
     );
   }

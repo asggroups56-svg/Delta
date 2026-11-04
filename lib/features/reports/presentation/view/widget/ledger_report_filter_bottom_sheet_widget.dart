@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:my_template/core/custom_widgets/custom_form_field/custom_form_field.dart';
 import 'package:my_template/core/theme/app_colors.dart';
 import 'package:my_template/core/theme/app_text_style.dart';
 import 'package:my_template/core/utils/app_locale_key.dart';
@@ -342,21 +343,18 @@ class _LedgerReportFilterBottomSheetWidgetState
                   },
                 ),
                 Gap(12.h),
-                TextField(
+                CustomFormField(
+                  width: double.infinity,
+                  radius: 12.r,
                   controller: _searchGroupController,
+                  title: isAr
+                      ? 'مجموعة البحث (اختياري)'
+                      : 'Search group (optional)',
+                  hintText: isAr
+                      ? 'أدخل رقم مجموعة البحث'
+                      : 'Enter search group number',
                   keyboardType: TextInputType.number,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  decoration: InputDecoration(
-                    labelText: isAr
-                        ? 'مجموعة البحث (اختياري)'
-                        : 'Search group (optional)',
-                    hintText: isAr
-                        ? 'أدخل رقم مجموعة البحث'
-                        : 'Enter search group number',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12.r),
-                    ),
-                  ),
                 ),
                 Gap(8.h),
                 SwitchListTile.adaptive(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:my_template/core/custom_widgets/custom_form_field/custom_form_field.dart';
 import 'package:my_template/core/theme/app_colors.dart';
 
 class MasterAccountsOrCentersReportFilterSelection {
@@ -374,15 +375,13 @@ class _MasterAccountsOrCentersReportFilterBottomSheetWidgetState
   }
 
   Widget _numberField(String label, TextEditingController controller) {
-    return TextField(
+    return CustomFormField(
+      width: double.infinity,
+      radius: 12.r,
       controller: controller,
+      title: label,
       keyboardType: TextInputType.number,
       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-      decoration: InputDecoration(
-        labelText: label,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)),
-        contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
-      ),
     );
   }
 

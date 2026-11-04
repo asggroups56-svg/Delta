@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:my_template/core/custom_widgets/custom_form_field/custom_form_field.dart';
 import 'package:my_template/core/theme/app_colors.dart';
 import 'package:my_template/core/theme/app_text_style.dart';
 import 'package:my_template/features/lookup/data/models/chart_of_account_light_model.dart';
@@ -68,6 +69,8 @@ class _GeneralLedgerPostingReportFilterBottomSheetWidgetState
   ChartOfAccountLightModel? _fromAccount;
   ChartOfAccountLightModel? _toAccount;
   final _searchGroupController = TextEditingController();
+  final _fromDateController = TextEditingController();
+  final _toDateController = TextEditingController();
   DateTime? _fromDate;
   DateTime? _toDate;
   bool _accountsWithZeroBalances = false;
@@ -92,6 +95,8 @@ class _GeneralLedgerPostingReportFilterBottomSheetWidgetState
   @override
   void dispose() {
     _searchGroupController.dispose();
+    _fromDateController.dispose();
+    _toDateController.dispose();
     super.dispose();
   }
 
@@ -104,11 +109,18 @@ class _GeneralLedgerPostingReportFilterBottomSheetWidgetState
       lastDate: DateTime(2100),
     );
     if (selected == null || !mounted) return;
+    final date = DateUtils.dateOnly(selected);
     setState(() {
       if (isFromDate) {
-        _fromDate = DateUtils.dateOnly(selected);
+        _fromDate = date;
+        _fromDateController.text = MaterialLocalizations.of(
+          context,
+        ).formatMediumDate(date);
       } else {
-        _toDate = DateUtils.dateOnly(selected);
+        _toDate = date;
+        _toDateController.text = MaterialLocalizations.of(
+          context,
+        ).formatMediumDate(date);
       }
       _validationMessage = null;
     });
@@ -320,35 +332,53 @@ class _GeneralLedgerPostingReportFilterBottomSheetWidgetState
                         },
                       ),
                       Gap(12.h),
-                      TextField(
+                      CustomFormField(
+                        width: double.infinity,
+                        radius: 12.r,
                         controller: _searchGroupController,
+                        title: isAr ? 'مجموعة البحث' : 'Search group',
+                        hintText: isAr
+                            ? 'أدخل مجموعة البحث'
+                            : 'Enter search group',
                         keyboardType: TextInputType.number,
                         inputFormatters: [
                           FilteringTextInputFormatter.digitsOnly,
                         ],
-                        decoration: InputDecoration(
-                          labelText: isAr ? 'مجموعة البحث' : 'Search group',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12.r),
-                          ),
-                        ),
                       ),
                       Gap(12.h),
                       Row(
                         children: [
                           Expanded(
-                            child: _dateButton(
-                              label: isAr ? 'من تاريخ' : 'From date',
-                              date: _fromDate,
-                              onPressed: () => _selectDate(isFromDate: true),
+                            child: CustomFormField(
+                              width: double.infinity,
+                              radius: 12.r,
+                              controller: _fromDateController,
+                              readOnly: true,
+                              title: isAr ? 'من تاريخ' : 'From date',
+                              hintText: isAr ? 'الكل' : 'All dates',
+                              onTap: () => _selectDate(isFromDate: true),
+                              suffixIcon: Icon(
+                                Icons.calendar_today_rounded,
+                                size: 18.sp,
+                                color: foreground.withValues(alpha: 0.5),
+                              ),
                             ),
                           ),
                           Gap(10.w),
                           Expanded(
-                            child: _dateButton(
-                              label: isAr ? 'إلى تاريخ' : 'To date',
-                              date: _toDate,
-                              onPressed: () => _selectDate(isFromDate: false),
+                            child: CustomFormField(
+                              width: double.infinity,
+                              radius: 12.r,
+                              controller: _toDateController,
+                              readOnly: true,
+                              title: isAr ? 'إلى تاريخ' : 'To date',
+                              hintText: isAr ? 'الكل' : 'All dates',
+                              onTap: () => _selectDate(isFromDate: false),
+                              suffixIcon: Icon(
+                                Icons.calendar_today_rounded,
+                                size: 18.sp,
+                                color: foreground.withValues(alpha: 0.5),
+                              ),
                             ),
                           ),
                         ],
@@ -452,75 +482,6 @@ class _GeneralLedgerPostingReportFilterBottomSheetWidgetState
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _dateButton({
-    required String label,
-    required DateTime? date,
-    required VoidCallback onPressed,
-  }) {
-    final foreground = AppColor.titleFormFiledColor(context);
-    final accent = AppColor.primaryColor(context);
-    final hasValue = date != null;
-
-    return InkWell(
-      onTap: onPressed,
-      borderRadius: BorderRadius.circular(12.r),
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 11.h),
-        decoration: BoxDecoration(
-          color: AppColor.textFormFillColor(context),
-          borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(
-            color: hasValue
-                ? accent.withValues(alpha: 0.5)
-                : foreground.withValues(alpha: 0.12),
-          ),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              Icons.calendar_today_rounded,
-              size: 16.sp,
-              color: hasValue ? accent : foreground.withValues(alpha: 0.5),
-            ),
-            Gap(8.w),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(label, style: TextStyle(fontSize: 10.sp)),
-                  Gap(2.h),
-                  Text(
-                    hasValue
-                        ? MaterialLocalizations.of(
-                            context,
-                          ).formatMediumDate(date)
-                        : (Localizations.localeOf(context).languageCode == 'ar'
-                              ? 'الكل'
-                              : 'All dates'),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 12.sp,
-                      color: hasValue
-                          ? foreground
-                          : foreground.withValues(alpha: 0.55),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            if (hasValue)
-              Icon(
-                Icons.close_rounded,
-                size: 14.sp,
-                color: foreground.withValues(alpha: 0.5),
-              ),
-          ],
         ),
       ),
     );

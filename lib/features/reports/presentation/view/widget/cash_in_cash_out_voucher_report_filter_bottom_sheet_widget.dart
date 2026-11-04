@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:my_template/core/custom_widgets/custom_form_field/custom_form_field.dart';
 import 'package:my_template/core/services/services_locator.dart';
 import 'package:my_template/core/theme/app_colors.dart';
 import 'package:my_template/features/home/data/models/banks_data_model.dart';
@@ -598,15 +599,12 @@ class _CashVoucherPickerState extends State<_CashVoucherPicker> {
           ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 16.w),
-            child: TextField(
+            child: CustomFormField(
+              width: double.infinity,
+              radius: 12.r,
               controller: _searchController,
-              decoration: InputDecoration(
-                prefixIcon: const Icon(Icons.search_rounded),
-                hintText: isArabic ? 'بحث برقم الإيصال' : 'Search voucher no.',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
-              ),
+              prefixIcon: const Icon(Icons.search_rounded),
+              hintText: isArabic ? 'بحث برقم الإيصال' : 'Search voucher no.',
               onChanged: (_) {
                 _debounce?.cancel();
                 _debounce = Timer(
@@ -756,15 +754,12 @@ class _BankPickerState extends State<_BankPicker> {
           ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 16.w),
-            child: TextField(
+            child: CustomFormField(
+              width: double.infinity,
+              radius: 12.r,
               controller: _searchController,
-              decoration: InputDecoration(
-                prefixIcon: const Icon(Icons.search_rounded),
-                hintText: _isArabic ? 'بحث عن بنك' : 'Search banks',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
-              ),
+              prefixIcon: const Icon(Icons.search_rounded),
+              hintText: _isArabic ? 'بحث عن بنك' : 'Search banks',
               onChanged: (_) {
                 _debounce?.cancel();
                 _debounce = Timer(const Duration(milliseconds: 350), _load);
