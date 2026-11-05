@@ -236,7 +236,7 @@
   "statementSalesWithVatDesc": "تقرير مبيعات العملاء وضريبة القيمة المضافة (AAR1000)",
   "statementPurchasesWithVat": "المشتريات مع ضريبة القيمة المضافة (AAR1001)",
   "statementPurchasesWithVatDesc": "تقرير مشتريات الموردين وضريبة القيمة المضافة (AAR1001)",
-  "statementTrialBalanceByCategories": "ميزان المراجعة حسب الفئات (AGL055)",
+  "statementTrialBalanceByCategories": "تقرير ميزان المراجعة حسب الفئات",
   "statementTrialBalanceByCategoriesDesc": "عرض أرصدة الحسابات مجمعة حسب الفئات",
   "statementCostCenters": "مراكز التكلفة (AGL007)",
   "statementCostCentersDesc": "تقرير مراكز التكلفة الرئيسية والفرعية",

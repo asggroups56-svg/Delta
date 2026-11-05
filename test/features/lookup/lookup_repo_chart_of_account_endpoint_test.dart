@@ -330,6 +330,33 @@ void main() {
         });
       },
     );
+
+    test(
+      'supports the period trial balance account-level lookup request shape',
+      () async {
+        final api = _RecordingApiConsumer();
+        final repo = LookupRepoImpl(api);
+
+        final result = await repo.getChartOfAccountLight(
+          languageCode: 'en',
+          accountType: null,
+          accountLevel: 1,
+          includeAccountRangeFields: false,
+          includeAccountsHasCostCenters: null,
+          pageSize: 100,
+        );
+
+        expect(result.isRight(), isTrue);
+        expect(api.lastPath, 'ChartOfAccount/GetLight');
+        expect(api.lastBody, <String, dynamic>{
+          'idAsString': null,
+          'SearchWord': null,
+          'page': '1',
+          'pageSize': '100',
+          'AccountLevel': 1,
+        });
+      },
+    );
   });
 
   group('LookupRepoImpl.getCostCenterLight', () {

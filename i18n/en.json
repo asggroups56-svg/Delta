@@ -236,7 +236,7 @@
   "statementSalesWithVatDesc": "Customer sales and tax details report (AAR1000)",
   "statementPurchasesWithVat": "Purchases with VAT (AAR1001)",
   "statementPurchasesWithVatDesc": "Supplier purchases and tax details report (AAR1001)",
-  "statementTrialBalanceByCategories": "Trial Balance by Categories (AGL055)",
+  "statementTrialBalanceByCategories": "Trial Balance Report by Categories",
   "statementTrialBalanceByCategoriesDesc": "Account balances grouped by category",
   "statementCostCenters": "Cost Centers (AGL007)",
   "statementCostCentersDesc": "Report of main and sub cost centers",

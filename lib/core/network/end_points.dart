@@ -32,6 +32,11 @@ class EndPoints {
   static const String ledgerReportPerUsers = 'Report/LedgerReportPerUsers';
   static const String trialBalanceByCategoriesReport =
       'Report/TrialBalanceByCategoriesReport';
+  static const String trialBalanceReport = 'Report/TrialBalanceReport';
+  static const String trialBalancesReportForPeriod =
+      'Report/TrialBalancesReportForPeriod';
+  static const String accountCentersTrialBalancesReport =
+      'Report/AccountCentersTrialBalancesReport';
   static const String costCentersReport = 'Report/CostCentersReport';
   static const String centersMonthlyBalanceReport =
       'Report/CentersMonthlyBalanceReport';

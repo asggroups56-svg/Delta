@@ -8,6 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../core/network/api_consumer.dart';
 import '../../../../core/network/end_points.dart';
+import '../models/account_centers_trial_balances_report_request_model.dart';
 import '../models/account_statement_report_request_model.dart';
 import '../models/annual_ledger_report_request_model.dart';
 import '../models/accounts_comparison_report_request_model.dart';
@@ -47,6 +48,8 @@ import '../models/purchases_with_vat_report_request_model.dart';
 import '../models/sales_with_vat_report_request_model.dart';
 import '../models/subsidiary_ledger_account_report_request_model.dart';
 import '../models/trial_balance_by_categories_report_request_model.dart';
+import '../models/trial_balance_report_request_model.dart';
+import '../models/trial_balances_report_for_period_request_model.dart';
 
 abstract interface class ReportsRepo {
   Future<Either<Failure, File>> getChartOfAccountReport({
@@ -366,6 +369,44 @@ abstract interface class ReportsRepo {
 
   Future<Either<Failure, File>> getTrialBalanceByCategoriesReport({
     String reportName = 'AGL055',
+    required String languageCode,
+    String exportType = 'pdf',
+  });
+
+  Future<Either<Failure, File>> getTrialBalanceReport({
+    int? accountLevel,
+    bool? doNotDisplayAccountsWithZeroBalances,
+    int? balanceType,
+    int? fromMonth,
+    int? toMonth,
+    bool? isGeneral,
+    int reportPageType = 1,
+    String reportName = 'AGL030',
+    required String languageCode,
+    String exportType = 'pdf',
+  });
+
+  Future<Either<Failure, File>> getTrialBalancesReportForPeriod({
+    int? fromAccountNo,
+    int? toAccountNo,
+    DateTime? fromDate,
+    DateTime? toDate,
+    bool doNotDisplayAccountsWithZeroBalances = false,
+    bool prepareTree = false,
+    String reportName = 'AGL078',
+    required String languageCode,
+    String exportType = 'pdf',
+  });
+
+  Future<Either<Failure, File>> getAccountCentersTrialBalancesReport({
+    required int accountLevel,
+    num? fromAccountNo,
+    num? toAccountNo,
+    num? fromCostCenterNo,
+    num? toCostCenterNo,
+    DateTime? fromDate,
+    DateTime? toDate,
+    String reportName = 'AGL026C',
     required String languageCode,
     String exportType = 'pdf',
   });
@@ -1482,6 +1523,117 @@ class ReportsRepoImpl implements ReportsRepo {
           endpoint: EndPoints.trialBalanceByCategoriesReport,
           body: requestModel.toJson(),
           fileNamePrefix: 'trial_balance_by_categories',
+          exportType: requestModel.exportType,
+          headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+        );
+      },
+    );
+  }
+
+  @override
+  Future<Either<Failure, File>> getTrialBalanceReport({
+    int? accountLevel,
+    bool? doNotDisplayAccountsWithZeroBalances,
+    int? balanceType,
+    int? fromMonth,
+    int? toMonth,
+    bool? isGeneral,
+    int reportPageType = 1,
+    String reportName = 'AGL030',
+    required String languageCode,
+    String exportType = 'pdf',
+  }) {
+    return handleDioRequest(
+      request: () async {
+        final requestModel = TrialBalanceReportRequestModel(
+          accountLevel: accountLevel,
+          doNotDisplayAccountsWithZeroBalances:
+              doNotDisplayAccountsWithZeroBalances,
+          balanceType: balanceType,
+          fromMonth: fromMonth,
+          toMonth: toMonth,
+          isGeneral: isGeneral,
+          reportPageType: reportPageType,
+          reportName: reportName,
+          exportType: exportType,
+        );
+        return _downloadReport(
+          endpoint: EndPoints.trialBalanceReport,
+          body: requestModel.toJson(),
+          fileNamePrefix: 'trial_balance_report',
+          exportType: requestModel.exportType,
+          headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+        );
+      },
+    );
+  }
+
+  @override
+  Future<Either<Failure, File>> getTrialBalancesReportForPeriod({
+    int? fromAccountNo,
+    int? toAccountNo,
+    DateTime? fromDate,
+    DateTime? toDate,
+    bool doNotDisplayAccountsWithZeroBalances = false,
+    bool prepareTree = false,
+    String reportName = 'AGL078',
+    required String languageCode,
+    String exportType = 'pdf',
+  }) {
+    return handleDioRequest(
+      request: () async {
+        final requestModel = TrialBalancesReportForPeriodRequestModel(
+          fromAccountNo: fromAccountNo,
+          toAccountNo: toAccountNo,
+          fromDate: fromDate,
+          toDate: toDate,
+          doNotDisplayAccountsWithZeroBalances:
+              doNotDisplayAccountsWithZeroBalances,
+          prepareTree: prepareTree,
+          reportName: reportName,
+          exportType: exportType,
+        );
+        return _downloadReport(
+          endpoint: EndPoints.trialBalancesReportForPeriod,
+          body: requestModel.toJson(),
+          fileNamePrefix: 'trial_balances_report_for_period',
+          exportType: requestModel.exportType,
+          headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+        );
+      },
+    );
+  }
+
+  @override
+  Future<Either<Failure, File>> getAccountCentersTrialBalancesReport({
+    required int accountLevel,
+    num? fromAccountNo,
+    num? toAccountNo,
+    num? fromCostCenterNo,
+    num? toCostCenterNo,
+    DateTime? fromDate,
+    DateTime? toDate,
+    String reportName = 'AGL026C',
+    required String languageCode,
+    String exportType = 'pdf',
+  }) {
+    return handleDioRequest(
+      request: () async {
+        final requestModel = AccountCentersTrialBalancesReportRequestModel(
+          accountLevel: accountLevel,
+          fromAccountNo: fromAccountNo,
+          toAccountNo: toAccountNo,
+          fromCostCenterNo: fromCostCenterNo,
+          toCostCenterNo: toCostCenterNo,
+          fromDate: fromDate,
+          toDate: toDate,
+          reportName: reportName,
+          exportType: exportType,
+        );
+        return _downloadReport(
+          endpoint: EndPoints.accountCentersTrialBalancesReport,
+          body: requestModel.toJson(),
+          fileNamePrefix: 'account_centers_trial_balances_report',
           exportType: requestModel.exportType,
           headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
         );

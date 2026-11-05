@@ -23,6 +23,7 @@ import 'package:my_template/features/reports/presentation/view/widget/account_st
 import 'package:my_template/features/reports/presentation/view/widget/accounts_comparison_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/accounts_centers_comparison_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/account_centers_summary_report_filter_bottom_sheet_widget.dart';
+import 'package:my_template/features/reports/presentation/view/widget/account_centers_trial_balances_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/chart_of_account_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/chart_of_account_monthly_balances_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/cost_centers_report_filter_bottom_sheet_widget.dart';
@@ -36,6 +37,9 @@ import 'package:my_template/features/reports/presentation/view/widget/general_le
 import 'package:my_template/features/reports/presentation/view/widget/general_ledger_payable_aging_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/general_ledger_posting_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/subsidiary_ledger_account_report_filter_bottom_sheet_widget.dart';
+import 'package:my_template/features/reports/presentation/view/widget/trial_balance_by_categories_report_filter_bottom_sheet_widget.dart';
+import 'package:my_template/features/reports/presentation/view/widget/trial_balance_report_filter_bottom_sheet_widget.dart';
+import 'package:my_template/features/reports/presentation/view/widget/trial_balances_report_for_period_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/integration_general_ledger_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/ledger_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/ledger_report_for_assistant_accounts_filter_bottom_sheet_widget.dart';
@@ -667,6 +671,150 @@ class _ReportsScreenState extends State<ReportsScreen> {
               ),
               Gap(10.h),
               _buildExportOption(
+                icon: Icons.account_balance_rounded,
+                color: AppColor.oceanBlue,
+                title: context.locale.languageCode == 'ar'
+                    ? 'تقرير ميزان المراجعة'
+                    : 'Trial Balance Report',
+                subtitle: 'Report/TrialBalanceReport (AGL030)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: context.locale.languageCode == 'ar'
+                        ? 'تقرير ميزان المراجعة'
+                        : 'Trial Balance Report',
+                    description: '',
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AGL030',
+                    isTrialBalanceByLevelReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.calendar_month_rounded,
+                color: AppColor.emeraldTeal,
+                title: context.locale.languageCode == 'ar'
+                    ? 'تقرير ميزان المراجعة الشهري'
+                    : 'Monthly Trial Balance Report',
+                subtitle: 'Report/TrialBalanceReport (AGL060 / AGL060A)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: context.locale.languageCode == 'ar'
+                        ? 'تقرير ميزان المراجعة الشهري'
+                        : 'Monthly Trial Balance Report',
+                    description: '',
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AGL060',
+                    isMonthlyTrialBalanceReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.calendar_view_month_rounded,
+                color: AppColor.purpleAccent,
+                title: context.locale.languageCode == 'ar'
+                    ? 'تقرير ميزان المراجعة الشهري حسب المجموعات'
+                    : 'Monthly Trial Balance Report by Groups',
+                subtitle: 'Report/TrialBalanceReport (AGL060H)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: context.locale.languageCode == 'ar'
+                        ? 'تقرير ميزان المراجعة الشهري حسب المجموعات'
+                        : 'Monthly Trial Balance Report by Groups',
+                    description: '',
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AGL060H',
+                    isMonthlyTrialBalanceWithoutAccountLevelReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.account_balance_wallet_rounded,
+                color: AppColor.oceanBlue,
+                title: context.locale.languageCode == 'ar'
+                    ? 'تقرير ميزان المراجعة حسب المراكز'
+                    : 'Trial Balance Report by Centers',
+                subtitle: 'Report/TrialBalanceReport (AGL031)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: context.locale.languageCode == 'ar'
+                        ? 'تقرير ميزان المراجعة حسب المراكز'
+                        : 'Trial Balance Report by Centers',
+                    description: '',
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AGL031',
+                    isTrialBalanceOptionalAccountLevelReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.account_balance_rounded,
+                color: AppColor.oceanBlue,
+                title: context.locale.languageCode == 'ar'
+                    ? 'تقرير ميزان المراجعة لفترة'
+                    : 'Trial Balance Report for a Period',
+                subtitle: 'Report/TrialBalancesReportForPeriod (AGL078)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: context.locale.languageCode == 'ar'
+                        ? 'تقرير ميزان المراجعة لفترة'
+                        : 'Trial Balance Report for a Period',
+                    description: '',
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AGL078',
+                    isTrialBalancesReportForPeriod: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.domain_disabled_outlined,
+                color: AppColor.oceanBlue,
+                title: context.locale.languageCode == 'ar'
+                    ? 'تقارير ميزان المراجعة حسب المراكز'
+                    : 'Trial Balance Reports by Centers',
+                subtitle: 'Report/AccountCentersTrialBalancesReport (AGL026C)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: context.locale.languageCode == 'ar'
+                        ? 'تقارير ميزان المراجعة حسب المراكز'
+                        : 'Trial Balance Reports by Centers',
+                    description: '',
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AGL026C',
+                    isAccountCentersTrialBalancesReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
                 icon: Icons.business_outlined,
                 color: AppColor.purpleAccent,
                 title: AppLocaleKey.statementCostCenters.tr(),
@@ -1043,6 +1191,12 @@ class _ReportsScreenState extends State<ReportsScreen> {
     bool isLedgerReportPerUsers = false,
     bool isAccountStatementReport = false,
     bool isTrialBalanceByCategoriesReport = false,
+    bool isTrialBalanceByLevelReport = false,
+    bool isMonthlyTrialBalanceReport = false,
+    bool isMonthlyTrialBalanceWithoutAccountLevelReport = false,
+    bool isTrialBalanceOptionalAccountLevelReport = false,
+    bool isTrialBalancesReportForPeriod = false,
+    bool isAccountCentersTrialBalancesReport = false,
     bool isFinancialStatementsReport = false,
     bool isCostCentersReport = false,
     bool isCentersMonthlyBalanceReport = false,
@@ -1082,29 +1236,77 @@ class _ReportsScreenState extends State<ReportsScreen> {
       exportType = chartOfAccountFilter.exportType;
     }
 
+    TrialBalanceByCategoriesReportFilterSelection?
+    trialBalanceByCategoriesFilter;
     if (isTrialBalanceByCategoriesReport) {
-      final selection = await _selectReportOption(
-        title: 'اختر طريقة ترتيب ميزان المراجعة',
-        options: const [
-          _ReportOption(
-            title: 'بدون ترتيب',
-            description: 'ميزان المراجعة حسب الفئات',
-            reportName: 'AGL055',
-          ),
-          _ReportOption(
-            title: 'ترتيب رقمي',
-            description: 'عرض الحسابات بترتيب رقمي',
-            reportName: 'AGL055H',
-          ),
-          _ReportOption(
-            title: 'ترتيب شجري',
-            description: 'عرض الحسابات كتسلسل شجري',
-            reportName: 'AGL055H',
-          ),
-        ],
-      );
-      if (!mounted || selection == null) return;
-      reportName = selection.reportName;
+      trialBalanceByCategoriesFilter =
+          await TrialBalanceByCategoriesReportFilterBottomSheetWidget.show(
+            context,
+            title: title,
+            initialExportType: exportType,
+          );
+      if (!mounted || trialBalanceByCategoriesFilter == null) return;
+      reportName = trialBalanceByCategoriesFilter.reportName;
+      exportType = trialBalanceByCategoriesFilter.exportType;
+    }
+
+    TrialBalanceReportFilterSelection? trialBalanceByLevelFilter;
+    if (isTrialBalanceByLevelReport) {
+      trialBalanceByLevelFilter =
+          await TrialBalanceReportFilterBottomSheetWidget.show(
+            context,
+            title: title,
+            mode: TrialBalanceReportMode.byLevel,
+            initialExportType: exportType,
+          );
+      if (!mounted || trialBalanceByLevelFilter == null) return;
+      reportName = trialBalanceByLevelFilter.reportName;
+      exportType = trialBalanceByLevelFilter.exportType;
+    }
+    TrialBalanceReportFilterSelection? monthlyTrialBalanceFilter;
+    if (isMonthlyTrialBalanceReport) {
+      monthlyTrialBalanceFilter =
+          await TrialBalanceReportFilterBottomSheetWidget.show(
+            context,
+            title: title,
+            mode: TrialBalanceReportMode.monthly,
+            initialExportType: exportType,
+            initialReportName: reportName ?? 'AGL060',
+          );
+      if (!mounted || monthlyTrialBalanceFilter == null) return;
+      reportName = monthlyTrialBalanceFilter.reportName;
+      exportType = monthlyTrialBalanceFilter.exportType;
+    }
+    TrialBalanceReportFilterSelection?
+    monthlyTrialBalanceWithoutAccountLevelFilter;
+    if (isMonthlyTrialBalanceWithoutAccountLevelReport) {
+      monthlyTrialBalanceWithoutAccountLevelFilter =
+          await TrialBalanceReportFilterBottomSheetWidget.show(
+            context,
+            title: title,
+            mode: TrialBalanceReportMode.monthlyWithoutAccountLevel,
+            initialExportType: exportType,
+            initialReportName: reportName ?? 'AGL060H',
+          );
+      if (!mounted || monthlyTrialBalanceWithoutAccountLevelFilter == null) {
+        return;
+      }
+      reportName = monthlyTrialBalanceWithoutAccountLevelFilter.reportName;
+      exportType = monthlyTrialBalanceWithoutAccountLevelFilter.exportType;
+    }
+    TrialBalanceReportFilterSelection? trialBalanceOptionalAccountLevelFilter;
+    if (isTrialBalanceOptionalAccountLevelReport) {
+      trialBalanceOptionalAccountLevelFilter =
+          await TrialBalanceReportFilterBottomSheetWidget.show(
+            context,
+            title: title,
+            mode: TrialBalanceReportMode.optionalAccountLevel,
+            initialExportType: exportType,
+            initialReportName: reportName ?? 'AGL031',
+          );
+      if (!mounted || trialBalanceOptionalAccountLevelFilter == null) return;
+      reportName = trialBalanceOptionalAccountLevelFilter.reportName;
+      exportType = trialBalanceOptionalAccountLevelFilter.exportType;
     }
 
     _ReportOption? financialStatementSelection;
@@ -1297,6 +1499,31 @@ class _ReportsScreenState extends State<ReportsScreen> {
             title: title,
           );
       if (!mounted || accountStatementFilter == null) return;
+    }
+    TrialBalancesReportForPeriodFilterSelection?
+    trialBalancesReportForPeriodFilter;
+    if (isTrialBalancesReportForPeriod) {
+      trialBalancesReportForPeriodFilter =
+          await TrialBalancesReportForPeriodFilterBottomSheetWidget.show(
+            context,
+            title: title,
+            initialExportType: exportType,
+          );
+      if (!mounted || trialBalancesReportForPeriodFilter == null) return;
+      exportType = trialBalancesReportForPeriodFilter.exportType;
+    }
+    AccountCentersTrialBalancesReportFilterSelection?
+    accountCentersTrialBalancesFilter;
+    if (isAccountCentersTrialBalancesReport) {
+      accountCentersTrialBalancesFilter =
+          await AccountCentersTrialBalancesReportFilterBottomSheetWidget.show(
+            context,
+            title: title,
+            initialExportType: exportType,
+          );
+      if (!mounted || accountCentersTrialBalancesFilter == null) return;
+      exportType = accountCentersTrialBalancesFilter.exportType;
+      reportName = 'AGL026C';
     }
     PartyVatReportFilterSelection? partyVatFilter;
     if (isSalesWithVatReport || isPurchasesWithVatReport) {
@@ -1573,6 +1800,12 @@ class _ReportsScreenState extends State<ReportsScreen> {
           isLedgerReportPerUsers ||
           isAccountStatementReport ||
           isTrialBalanceByCategoriesReport ||
+          isTrialBalanceByLevelReport ||
+          isMonthlyTrialBalanceReport ||
+          isMonthlyTrialBalanceWithoutAccountLevelReport ||
+          isTrialBalanceOptionalAccountLevelReport ||
+          isTrialBalancesReportForPeriod ||
+          isAccountCentersTrialBalancesReport ||
           isFinancialStatementsReport ||
           isCostCentersReport ||
           isCentersMonthlyBalanceReport ||
@@ -2172,6 +2405,85 @@ class _ReportsScreenState extends State<ReportsScreen> {
             : isTrialBalanceByCategoriesReport
             ? await reportsRepo.getTrialBalanceByCategoriesReport(
                 reportName: reportName ?? 'AGL055',
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isTrialBalanceByLevelReport
+            ? await reportsRepo.getTrialBalanceReport(
+                accountLevel: trialBalanceByLevelFilter?.accountLevel,
+                doNotDisplayAccountsWithZeroBalances:
+                    trialBalanceByLevelFilter
+                        ?.doNotDisplayAccountsWithZeroBalances ??
+                    false,
+                balanceType: trialBalanceByLevelFilter?.balanceType,
+                reportPageType: 1,
+                reportName: 'AGL030',
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isMonthlyTrialBalanceReport
+            ? await reportsRepo.getTrialBalanceReport(
+                accountLevel: monthlyTrialBalanceFilter?.accountLevel,
+                fromMonth: monthlyTrialBalanceFilter?.fromMonth,
+                toMonth: monthlyTrialBalanceFilter?.toMonth,
+                isGeneral: monthlyTrialBalanceFilter?.isGeneral,
+                reportPageType: 2,
+                reportName: monthlyTrialBalanceFilter?.reportName ?? 'AGL060',
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isMonthlyTrialBalanceWithoutAccountLevelReport
+            ? await reportsRepo.getTrialBalanceReport(
+                fromMonth:
+                    monthlyTrialBalanceWithoutAccountLevelFilter?.fromMonth,
+                toMonth: monthlyTrialBalanceWithoutAccountLevelFilter?.toMonth,
+                reportPageType: 3,
+                reportName:
+                    monthlyTrialBalanceWithoutAccountLevelFilter?.reportName ??
+                    'AGL060H',
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isTrialBalanceOptionalAccountLevelReport
+            ? await reportsRepo.getTrialBalanceReport(
+                accountLevel:
+                    trialBalanceOptionalAccountLevelFilter?.accountLevel,
+                reportPageType: 4,
+                reportName:
+                    trialBalanceOptionalAccountLevelFilter?.reportName ??
+                    'AGL031',
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isTrialBalancesReportForPeriod
+            ? await reportsRepo.getTrialBalancesReportForPeriod(
+                fromAccountNo:
+                    trialBalancesReportForPeriodFilter?.fromAccountNo,
+                toAccountNo: trialBalancesReportForPeriodFilter?.toAccountNo,
+                fromDate: trialBalancesReportForPeriodFilter?.fromDate,
+                toDate: trialBalancesReportForPeriodFilter?.toDate,
+                doNotDisplayAccountsWithZeroBalances:
+                    trialBalancesReportForPeriodFilter
+                        ?.doNotDisplayAccountsWithZeroBalances ??
+                    false,
+                prepareTree:
+                    trialBalancesReportForPeriodFilter?.prepareTree ?? false,
+                reportName: 'AGL078',
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isAccountCentersTrialBalancesReport
+            ? await reportsRepo.getAccountCentersTrialBalancesReport(
+                accountLevel: accountCentersTrialBalancesFilter!.accountLevel,
+                fromAccountNo: accountCentersTrialBalancesFilter.fromAccountNo,
+                toAccountNo: accountCentersTrialBalancesFilter.toAccountNo,
+                fromCostCenterNo:
+                    accountCentersTrialBalancesFilter.fromCostCenterNo,
+                toCostCenterNo:
+                    accountCentersTrialBalancesFilter.toCostCenterNo,
+                fromDate: accountCentersTrialBalancesFilter.fromDate,
+                toDate: accountCentersTrialBalancesFilter.toDate,
+                reportName: 'AGL026C',
                 languageCode: languageCode,
                 exportType: exportType,
               )
@@ -2901,7 +3213,103 @@ class _ReportsScreenState extends State<ReportsScreen> {
         'category': 1,
         'reportName': 'AGL055',
         'isTrialBalanceByCategoriesReport': true,
-        'treeGroup': 'ledger',
+        'treeGroup': 'trialBalance',
+      },
+      {
+        'id': 'trial_balance_by_level',
+        'title': context.locale.languageCode == 'ar'
+            ? 'تقرير ميزان المراجعة'
+            : 'Trial Balance Report',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'ميزان المراجعة حسب مستوى الحساب ونوع الرصيد'
+            : 'Trial balance by account level and balance type',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.account_balance_rounded,
+        'iconColor': AppColor.oceanBlue,
+        'category': 1,
+        'reportName': 'AGL030',
+        'isTrialBalanceByLevelReport': true,
+        'treeGroup': 'trialBalance',
+      },
+      {
+        'id': 'monthly_trial_balance',
+        'title': context.locale.languageCode == 'ar'
+            ? 'تقرير ميزان المراجعة الشهري'
+            : 'Monthly Trial Balance Report',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'ميزان المراجعة الشهري (AGL060 / AGL060A)'
+            : 'Monthly trial balance (AGL060 / AGL060A)',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.calendar_month_rounded,
+        'iconColor': AppColor.emeraldTeal,
+        'category': 1,
+        'reportName': 'AGL060',
+        'isMonthlyTrialBalanceReport': true,
+        'treeGroup': 'trialBalance',
+      },
+      {
+        'id': 'monthly_trial_balance_without_account_level',
+        'title': context.locale.languageCode == 'ar'
+            ? 'تقرير ميزان المراجعة الشهري حسب المجموعات'
+            : 'Monthly Trial Balance Report by Groups',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'ميزان المراجعة الشهري حسب نطاق الشهور'
+            : 'Monthly trial balance for a selected month range',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.calendar_view_month_rounded,
+        'iconColor': AppColor.purpleAccent,
+        'category': 1,
+        'reportName': 'AGL060H',
+        'isMonthlyTrialBalanceWithoutAccountLevelReport': true,
+        'treeGroup': 'trialBalance',
+      },
+      {
+        'id': 'trial_balance_optional_account_level',
+        'title': context.locale.languageCode == 'ar'
+            ? 'تقرير ميزان المراجعة حسب المراكز'
+            : 'Trial Balance Report by Centers',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'ميزان المراجعة مع مستوى حساب اختياري (AGL031)'
+            : 'Trial balance with an optional account level (AGL031)',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.account_balance_wallet_rounded,
+        'iconColor': AppColor.oceanBlue,
+        'category': 1,
+        'reportName': 'AGL031',
+        'isTrialBalanceOptionalAccountLevelReport': true,
+        'treeGroup': 'trialBalance',
+      },
+      {
+        'id': 'trial_balances_report_for_period',
+        'title': context.locale.languageCode == 'ar'
+            ? 'تقرير ميزان المراجعة لفترة'
+            : 'Trial Balance Report for a Period',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'ميزان مراجعة الحسابات خلال فترة زمنية'
+            : 'Trial balance of accounts over a selected period',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.account_balance_rounded,
+        'iconColor': AppColor.oceanBlue,
+        'category': 1,
+        'reportName': 'AGL078',
+        'isTrialBalancesReportForPeriod': true,
+        'treeGroup': 'trialBalance',
+      },
+      {
+        'id': 'account_centers_trial_balances',
+        'title': context.locale.languageCode == 'ar'
+            ? 'تقارير ميزان المراجعة حسب المراكز'
+            : 'Trial Balance Reports by Centers',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'ميزان مراجعة حسابات مراكز التكلفة حسب مستوى الحساب'
+            : 'Trial balance of cost center accounts by account level',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.domain_disabled_outlined,
+        'iconColor': AppColor.oceanBlue,
+        'category': 1,
+        'reportName': 'AGL026C',
+        'isAccountCentersTrialBalancesReport': true,
+        'treeGroup': 'trialBalance',
       },
       {
         'title': AppLocaleKey.statementCostCenters.tr(),
@@ -3461,6 +3869,14 @@ class _ReportsScreenState extends State<ReportsScreen> {
         icon: Icons.account_balance_rounded,
         accent: AppColor.emeraldTeal,
       ),
+      (
+        id: 9,
+        key: 'trialBalance',
+        titleAr: 'ميزان مراجعة',
+        titleEn: 'Trial Balance',
+        icon: Icons.account_balance_rounded,
+        accent: AppColor.oceanBlue,
+      ),
     ];
 
     for (final group in groups) {
@@ -3553,6 +3969,18 @@ class _ReportsScreenState extends State<ReportsScreen> {
       isAccountStatementReport: statement['isAccountStatementReport'] == true,
       isTrialBalanceByCategoriesReport:
           statement['isTrialBalanceByCategoriesReport'] == true,
+      isTrialBalanceByLevelReport:
+          statement['isTrialBalanceByLevelReport'] == true,
+      isMonthlyTrialBalanceReport:
+          statement['isMonthlyTrialBalanceReport'] == true,
+      isMonthlyTrialBalanceWithoutAccountLevelReport:
+          statement['isMonthlyTrialBalanceWithoutAccountLevelReport'] == true,
+      isTrialBalanceOptionalAccountLevelReport:
+          statement['isTrialBalanceOptionalAccountLevelReport'] == true,
+      isTrialBalancesReportForPeriod:
+          statement['isTrialBalancesReportForPeriod'] == true,
+      isAccountCentersTrialBalancesReport:
+          statement['isAccountCentersTrialBalancesReport'] == true,
       isFinancialStatementsReport:
           statement['isFinancialStatementsReport'] == true,
       isCostCentersReport: statement['isCostCentersReport'] == true,
