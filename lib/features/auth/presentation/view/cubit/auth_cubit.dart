@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/widgets.dart';
+import 'package:my_template/core/cache/shared_pref/shared_pref.dart';
 import 'package:my_template/core/network/status.state.dart';
 import 'package:my_template/features/auth/data/repository/auth_repo.dart';
 
@@ -10,12 +11,26 @@ part 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
   final AuthRepo authRepo;
-  AuthCubit(this.authRepo) : super(const AuthState());
+  AuthCubit(this.authRepo) : super(const AuthState()) {
+    final savedAddress = CacheHelper.sharedPreferences.getString(
+      CacheHelper.accountAddressKey,
+    );
+    if (savedAddress != null && savedAddress.isNotEmpty) {
+      connectionNameController.text = savedAddress;
+    }
+  }
 
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController connectionNameController =
       TextEditingController();
+
+  /// Module chosen on the module portal (accounting, payroll, sales, …).
+  /// Kept here so the login request can be scoped to it once the backend
+  /// exposes a module parameter.
+  String? selectedModuleId;
+
+  void selectModule(String moduleId) => selectedModuleId = moduleId;
 
   set password(String password) => passwordController.text = password;
 

@@ -13,12 +13,14 @@ import 'package:my_template/core/utils/app_locale_key.dart';
 import 'package:my_template/core/utils/common_methods.dart';
 import 'package:my_template/core/utils/navigator_methods.dart';
 import 'package:my_template/features/auth/presentation/view/cubit/auth_cubit.dart';
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
+
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   Future<void> _toggleLanguage() async {
@@ -29,6 +31,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
     if (mounted) setState(() {});
   }
+
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<AuthCubit>();
@@ -483,7 +486,52 @@ class _LoginScreenState extends State<LoginScreen> {
                                         ),
                                       ),
 
-                                      Gap(32.h),
+                                      Gap(18.h),
+
+                                      // Module portal entry
+                                      SizedBox(
+                                        width: double.infinity,
+                                        height: 46.h,
+                                        child: OutlinedButton.icon(
+                                          onPressed: () =>
+                                              NavigatorMethods.pushNamed(
+                                                context,
+                                                RoutesName.moduleLoginScreen,
+                                              ),
+                                          icon: Icon(
+                                            Icons.grid_view_rounded,
+                                            size: 16.r,
+                                            color: const Color(0xFF1E40AF),
+                                          ),
+                                          label: Text(
+                                            isArabic
+                                                ? 'بوابة الوحدات — اختر وحدة أولاً'
+                                                : 'Module portal — choose a workspace',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              fontSize: 11.5.sp,
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                          ),
+                                          style: OutlinedButton.styleFrom(
+                                            foregroundColor: const Color(
+                                              0xFF1E40AF,
+                                            ),
+                                            backgroundColor: const Color(
+                                              0xFFF0F7FF,
+                                            ),
+                                            side: const BorderSide(
+                                              color: Color(0xFFBFDBFE),
+                                            ),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(12.r),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+
+                                      Gap(18.h),
 
                                       // Version Info
                                       Center(

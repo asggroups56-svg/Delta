@@ -5,6 +5,7 @@ class CacheHelper {
   static const String authTokenKey = 'auth_token';
   static const String refreshTokenKey = 'refresh_token';
   static const String connectionNameKey = 'connection_name';
+  static const String accountAddressKey = 'account_address';
 
   //! Here The Initialize of cache .
   Future<void> init() async {

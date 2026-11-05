@@ -5,6 +5,8 @@ class RoutesName {
   static const String homeScreen = 'homeScreen';
   static const String detailsScreen = 'detailsScreen';
   static const String loginScreen = 'loginScreen';
+  static const String moduleLoginScreen = 'moduleLoginScreen';
+  static const String accountAccessScreen = 'accountAccessScreen';
   static const String forgotPasswordScreen = 'forgotPasswordScreen';
   static const String accountingDashboardScreen = 'accountingDashboardScreen';
   static const String reportsScreen = 'reportsScreen';

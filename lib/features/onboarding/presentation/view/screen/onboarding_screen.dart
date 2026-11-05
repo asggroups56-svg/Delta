@@ -55,7 +55,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void _navigateToLogin() {
-    NavigatorMethods.pushReplacementNamed(context, RoutesName.loginScreen);
+    NavigatorMethods.pushReplacementNamed(
+      context,
+      RoutesName.accountAccessScreen,
+    );
   }
 
   Future<void> _toggleLanguage() async {
