@@ -38,6 +38,8 @@ import 'package:my_template/features/reports/presentation/view/widget/general_le
 import 'package:my_template/features/reports/presentation/view/widget/general_ledger_posting_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/subsidiary_ledger_account_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/trial_balance_by_categories_report_filter_bottom_sheet_widget.dart';
+import 'package:my_template/features/reports/presentation/view/widget/final_reports_filter_bottom_sheet_widget.dart';
+import 'package:my_template/features/reports/presentation/view/widget/additional_final_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/trial_balance_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/trial_balances_report_for_period_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/integration_general_ledger_report_filter_bottom_sheet_widget.dart';
@@ -55,20 +57,6 @@ import 'package:my_template/features/reports/presentation/view/widget/reports_ta
 import 'package:my_template/features/lookup/presentation/widgets/customer_datum_dropdown.dart';
 
 enum _PreviewKind { none, pdf }
-
-class _ReportOption {
-  final String title;
-  final String description;
-  final String reportName;
-  final int? financialStatementReportType;
-
-  const _ReportOption({
-    required this.title,
-    required this.description,
-    required this.reportName,
-    this.financialStatementReportType,
-  });
-}
 
 class ReportsScreen extends StatefulWidget {
   const ReportsScreen({super.key});
@@ -158,71 +146,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
     _searchDebounce?.cancel();
     _searchController.clear();
     setState(() => _searchQuery = '');
-  }
-
-  Future<_ReportOption?> _selectReportOption({
-    required String title,
-    required List<_ReportOption> options,
-  }) {
-    return showModalBottomSheet<_ReportOption>(
-      context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
-      backgroundColor: Colors.transparent,
-      builder: (sheetContext) => Container(
-        constraints: BoxConstraints(
-          maxHeight: MediaQuery.sizeOf(sheetContext).height * 0.85,
-        ),
-        decoration: BoxDecoration(
-          color: AppColor.cardColor(sheetContext),
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
-        ),
-        child: SingleChildScrollView(
-          padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 24.h),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  width: 42.w,
-                  height: 4.h,
-                  decoration: BoxDecoration(
-                    color: AppColor.borderColor(sheetContext),
-                    borderRadius: BorderRadius.circular(4.r),
-                  ),
-                ),
-              ),
-              Gap(18.h),
-              Text(
-                title,
-                style: AppTextStyle.bodyLarge(context).copyWith(
-                  color: AppColor.titleFormFiledColor(sheetContext),
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Gap(10.h),
-              ...options.map(
-                (option) => Card(
-                  margin: EdgeInsets.only(bottom: 8.h),
-                  child: ListTile(
-                    leading: const Icon(Icons.description_outlined),
-                    title: Text(option.title),
-                    subtitle: Text(
-                      '${option.description}\n${option.reportName}',
-                    ),
-                    isThreeLine: true,
-                    trailing: const Icon(Icons.chevron_left_rounded),
-                    onTap: () => Navigator.pop(sheetContext, option),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 
   // ── Language ─────────────────────────────────────────────────────────────
@@ -643,6 +566,58 @@ class _ReportsScreenState extends State<ReportsScreen> {
                     status: AppLocaleKey.statusAudited.tr(),
                     reportName: 'AGL079',
                     isAccountStatementReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.account_balance_rounded,
+                color: AppColor.emeraldTeal,
+                title: context.locale.languageCode == 'ar'
+                    ? 'التقارير الختامية'
+                    : 'Final Reports',
+                subtitle: 'Report/FinancialStatementsReport (AGL034A - AGL044)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: context.locale.languageCode == 'ar'
+                        ? 'التقارير الختامية'
+                        : 'Final Reports',
+                    description: context.locale.languageCode == 'ar'
+                        ? 'المتاجرة والأرباح والخسائر والميزانية والدخل والتدفقات النقدية'
+                        : 'Trading, profit and loss, balance sheet, income statement and cash flow',
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AGL034A',
+                    isFinancialStatementsReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.playlist_add_check_rounded,
+                color: AppColor.emeraldTeal,
+                title: context.locale.languageCode == 'ar'
+                    ? 'تقرير ختامي إضافي'
+                    : 'Additional Final Report',
+                subtitle: 'Report/AdditionalFinalReport (AGL037A - AGL045C)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: context.locale.languageCode == 'ar'
+                        ? 'تقرير ختامي إضافي'
+                        : 'Additional Final Report',
+                    description: context.locale.languageCode == 'ar'
+                        ? 'تقرير ختامي إضافي برقم الحساب أو بدونه أو بطريقة طولية أو بالمقارنات'
+                        : 'Additional final report with or without account numbers, vertical, or comparative',
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AGL037A',
+                    isAdditionalFinalReport: true,
                     exportType: defaultExportType,
                   );
                 },
@@ -1198,6 +1173,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
     bool isTrialBalancesReportForPeriod = false,
     bool isAccountCentersTrialBalancesReport = false,
     bool isFinancialStatementsReport = false,
+    bool isAdditionalFinalReport = false,
     bool isCostCentersReport = false,
     bool isCentersMonthlyBalanceReport = false,
     bool isCentersComparisonReport = false,
@@ -1309,39 +1285,29 @@ class _ReportsScreenState extends State<ReportsScreen> {
       exportType = trialBalanceOptionalAccountLevelFilter.exportType;
     }
 
-    _ReportOption? financialStatementSelection;
+    FinalReportsFilterSelection? finalReportsFilter;
     if (isFinancialStatementsReport) {
-      financialStatementSelection = await _selectReportOption(
-        title: 'اختر نوع القائمة المالية',
-        options: const [
-          _ReportOption(
-            title: 'الأرباح والخسائر',
-            description: 'قائمة الأرباح والخسائر',
-            reportName: 'AGL035',
-            financialStatementReportType: 2,
-          ),
-          _ReportOption(
-            title: 'الميزانية العمومية',
-            description: 'بيان الأصول والخصوم وحقوق الملكية',
-            reportName: 'AGL036',
-            financialStatementReportType: 3,
-          ),
-          _ReportOption(
-            title: 'قائمة الدخل',
-            description: 'بيان الدخل والإيرادات والمصروفات',
-            reportName: 'AGL069',
-            financialStatementReportType: 4,
-          ),
-          _ReportOption(
-            title: 'التدفقات النقدية',
-            description: 'التدفقات التشغيلية والاستثمارية والتمويلية',
-            reportName: 'AGL073',
-            financialStatementReportType: 5,
-          ),
-        ],
+      finalReportsFilter = await FinalReportsFilterBottomSheetWidget.show(
+        context,
+        title: title,
+        initialExportType: exportType,
       );
-      if (!mounted || financialStatementSelection == null) return;
-      reportName = financialStatementSelection.reportName;
+      if (!mounted || finalReportsFilter == null) return;
+      reportName = finalReportsFilter.reportName;
+      exportType = finalReportsFilter.exportType;
+    }
+
+    AdditionalFinalReportFilterSelection? additionalFinalReportFilter;
+    if (isAdditionalFinalReport) {
+      additionalFinalReportFilter =
+          await AdditionalFinalReportFilterBottomSheetWidget.show(
+            context,
+            title: title,
+            initialExportType: exportType,
+          );
+      if (!mounted || additionalFinalReportFilter == null) return;
+      reportName = additionalFinalReportFilter.reportName;
+      exportType = additionalFinalReportFilter.exportType;
     }
 
     MonthRangeSelection? monthRange;
@@ -1807,6 +1773,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
           isTrialBalancesReportForPeriod ||
           isAccountCentersTrialBalancesReport ||
           isFinancialStatementsReport ||
+          isAdditionalFinalReport ||
           isCostCentersReport ||
           isCentersMonthlyBalanceReport ||
           isCostCentersTransactionReport ||
@@ -2141,8 +2108,23 @@ class _ReportsScreenState extends State<ReportsScreen> {
             : isFinancialStatementsReport
             ? await reportsRepo.getFinancialStatementsReport(
                 financialStatementReportType:
-                    financialStatementSelection!.financialStatementReportType!,
+                    finalReportsFilter!.financialStatementReportType,
+                reportType: finalReportsFilter.reportType,
+                toMonth: finalReportsFilter.toMonth,
+                costCenterNo: finalReportsFilter.costCenterNo,
                 reportName: reportName!,
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isAdditionalFinalReport
+            ? await reportsRepo.getAdditionalFinalReport(
+                reportSerial: additionalFinalReportFilter?.reportSerial,
+                costCenterNo: additionalFinalReportFilter?.costCenterNo,
+                reportTitle: additionalFinalReportFilter?.reportTitle,
+                fromLineSerial: additionalFinalReportFilter?.fromLineSerial,
+                toLineSerial: additionalFinalReportFilter?.toLineSerial,
+                reportName:
+                    additionalFinalReportFilter?.reportName ?? 'AGL037A',
                 languageCode: languageCode,
                 exportType: exportType,
               )
@@ -2878,14 +2860,34 @@ class _ReportsScreenState extends State<ReportsScreen> {
         'treeGroup': 'costCenters',
       },
       {
-        'title': 'القوائم المالية',
-        'desc': 'اختر: الأرباح والخسائر، الميزانية، الدخل أو التدفقات النقدية',
+        'title': context.locale.languageCode == 'ar'
+            ? 'التقارير الختامية'
+            : 'Final Reports',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'المتاجرة والأرباح والخسائر والميزانية والدخل والتدفقات النقدية بجميع أنواع التقارير'
+            : 'Trading, profit and loss, balance sheet, income statement and cash flow in all report variants',
         'status': AppLocaleKey.statusAudited.tr(),
         'icon': Icons.account_balance_rounded,
         'iconColor': AppColor.emeraldTeal,
         'category': 1,
         'isFinancialStatementsReport': true,
-        'treeGroup': 'financial',
+        'treeGroup': 'concluding',
+      },
+      {
+        'id': 'additional_final_report',
+        'title': context.locale.languageCode == 'ar'
+            ? 'تقرير ختامي إضافي'
+            : 'Additional Final Report',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'تقرير ختامي إضافي برقم الحساب أو بدونه أو بطريقة طولية أو بالمقارنات'
+            : 'Additional final report with or without account numbers, vertical, or comparative',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.playlist_add_check_rounded,
+        'iconColor': AppColor.emeraldTeal,
+        'category': 1,
+        'reportName': 'AGL037A',
+        'isAdditionalFinalReport': true,
+        'treeGroup': 'concluding',
       },
       {
         'title': AppLocaleKey.statementDailyIncome.tr(),
@@ -3863,9 +3865,9 @@ class _ReportsScreenState extends State<ReportsScreen> {
       ),
       (
         id: 8,
-        key: 'financial',
-        titleAr: 'القوائم المالية',
-        titleEn: 'Financial statements',
+        key: 'concluding',
+        titleAr: 'التقارير الختامية',
+        titleEn: 'Concluding Reports',
         icon: Icons.account_balance_rounded,
         accent: AppColor.emeraldTeal,
       ),
@@ -3983,6 +3985,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
           statement['isAccountCentersTrialBalancesReport'] == true,
       isFinancialStatementsReport:
           statement['isFinancialStatementsReport'] == true,
+      isAdditionalFinalReport: statement['isAdditionalFinalReport'] == true,
       isCostCentersReport: statement['isCostCentersReport'] == true,
       isCentersMonthlyBalanceReport:
           statement['isCentersMonthlyBalanceReport'] == true,

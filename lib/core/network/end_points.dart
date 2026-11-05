@@ -21,6 +21,7 @@ class EndPoints {
       'Report/CenterOnCenterAnalysisReport';
   static const String financialStatementsReport =
       'Report/FinancialStatementsReport';
+  static const String additionalFinalReport = 'Report/AdditionalFinalReport';
   static const String expensesWithVatReport = 'Report/ExpensesWithVatReport';
   static const String ledgerReport = 'Report/LedgerReport';
   static const String ledgerReportForAllAccounts =

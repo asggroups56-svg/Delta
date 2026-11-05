@@ -10,6 +10,7 @@ import '../../../../core/network/api_consumer.dart';
 import '../../../../core/network/end_points.dart';
 import '../models/account_centers_trial_balances_report_request_model.dart';
 import '../models/account_statement_report_request_model.dart';
+import '../models/additional_final_report_request_model.dart';
 import '../models/annual_ledger_report_request_model.dart';
 import '../models/accounts_comparison_report_request_model.dart';
 import '../models/account_centers_summary_for_main_accounts_report_request_model.dart';
@@ -435,7 +436,21 @@ abstract interface class ReportsRepo {
 
   Future<Either<Failure, File>> getFinancialStatementsReport({
     required int financialStatementReportType,
+    int reportType = 1,
+    int? toMonth,
+    num? costCenterNo,
     required String reportName,
+    required String languageCode,
+    String exportType = 'pdf',
+  });
+
+  Future<Either<Failure, File>> getAdditionalFinalReport({
+    int? reportSerial,
+    num? costCenterNo,
+    String? reportTitle,
+    int? fromLineSerial,
+    int? toLineSerial,
+    String reportName = 'AGL037A',
     required String languageCode,
     String exportType = 'pdf',
   });
@@ -1710,6 +1725,9 @@ class ReportsRepoImpl implements ReportsRepo {
   @override
   Future<Either<Failure, File>> getFinancialStatementsReport({
     required int financialStatementReportType,
+    int reportType = 1,
+    int? toMonth,
+    num? costCenterNo,
     required String reportName,
     required String languageCode,
     String exportType = 'pdf',
@@ -1718,12 +1736,49 @@ class ReportsRepoImpl implements ReportsRepo {
       request: () async {
         final requestModel = FinancialStatementReportRequestModel(
           financialStatementReportType: financialStatementReportType,
+          reportType: reportType,
+          toMonth: toMonth,
+          costCenterNo: costCenterNo,
           reportName: reportName,
           exportType: exportType,
         );
 
         return _downloadReport(
           endpoint: EndPoints.financialStatementsReport,
+          body: requestModel.toJson(),
+          fileNamePrefix: reportName.toLowerCase(),
+          exportType: requestModel.exportType,
+          headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+        );
+      },
+    );
+  }
+
+  @override
+  Future<Either<Failure, File>> getAdditionalFinalReport({
+    int? reportSerial,
+    num? costCenterNo,
+    String? reportTitle,
+    int? fromLineSerial,
+    int? toLineSerial,
+    String reportName = 'AGL037A',
+    required String languageCode,
+    String exportType = 'pdf',
+  }) {
+    return handleDioRequest(
+      request: () async {
+        final requestModel = AdditionalFinalReportRequestModel(
+          reportSerial: reportSerial,
+          costCenterNo: costCenterNo,
+          reportTitle: reportTitle,
+          fromLineSerial: fromLineSerial,
+          toLineSerial: toLineSerial,
+          reportName: reportName,
+          exportType: exportType,
+        );
+
+        return _downloadReport(
+          endpoint: EndPoints.additionalFinalReport,
           body: requestModel.toJson(),
           fileNamePrefix: reportName.toLowerCase(),
           exportType: requestModel.exportType,
