@@ -13,11 +13,416 @@ import 'package:my_template/core/utils/common_methods.dart';
 import 'package:my_template/core/utils/navigator_methods.dart';
 import 'package:my_template/features/auth/presentation/view/cubit/auth_cubit.dart';
 
-/// Single-page module portal: pick an ERP workspace, then sign in with the
-/// account linked to it. The selected module drives the accent, copy and the
-/// module id stored on [AuthCubit].
+/// Standalone workspace picker for the module-specific sign-in flow.
+class ModelSelectionScreen extends StatefulWidget {
+  const ModelSelectionScreen({super.key});
+
+  @override
+  State<ModelSelectionScreen> createState() => _ModelSelectionScreenState();
+}
+
+class _ModelSelectionScreenState extends State<ModelSelectionScreen>
+    with SingleTickerProviderStateMixin {
+  _ErpModule _selectedModule = _erpModules.first;
+  late AnimationController _pulseController;
+  late Animation<double> _pulseAnimation;
+
+  bool get _isArabic => context.locale.languageCode == 'ar';
+
+  @override
+  void initState() {
+    super.initState();
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1600),
+    )..repeat(reverse: true);
+    _pulseAnimation = Tween<double>(begin: 0.95, end: 1.0).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _pulseController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _toggleLanguage() async {
+    if (_isArabic) {
+      await context.setLocale(const Locale('en'));
+    } else {
+      await context.setLocale(const Locale('ar'));
+    }
+    if (mounted) setState(() {});
+  }
+
+  void _continueToLogin() {
+    NavigatorMethods.pushNamed(
+      context,
+      RoutesName.moduleLoginScreen,
+      arguments: _selectedModule.id,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColor.scaffoldColor(context),
+      body: Stack(
+        children: [
+          const Positioned.fill(child: _PortalBackground()),
+          SafeArea(
+            child: Column(
+              children: [
+                // ── Top Bar ──────────────────────────────────────────
+                Padding(
+                  padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 4.h),
+                  child: _TopBar(
+                    isArabic: _isArabic,
+                    onToggleLanguage: _toggleLanguage,
+                  ),
+                ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    padding: EdgeInsets.fromLTRB(20.w, 18.h, 20.w, 28.h),
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 760),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            // ── Hero Header ───────────────────────────
+                            FadeInDown(
+                              duration: const Duration(milliseconds: 400),
+                              child: _Hero(isArabic: _isArabic),
+                            ),
+                            Gap(24.h),
+
+                            // ── Selected Module Preview Card ──────────
+                            FadeInUp(
+                              duration: const Duration(milliseconds: 400),
+                              delay: const Duration(milliseconds: 60),
+                              child: AnimatedBuilder(
+                                animation: _pulseAnimation,
+                                builder: (context, child) => Transform.scale(
+                                  scale: _pulseAnimation.value,
+                                  child: child,
+                                ),
+                                child: _SelectedModulePreview(
+                                  module: _selectedModule,
+                                  isArabic: _isArabic,
+                                ),
+                              ),
+                            ),
+                            Gap(20.h),
+
+                            // ── Module Picker Grid ────────────────────
+                            FadeInUp(
+                              duration: const Duration(milliseconds: 420),
+                              delay: const Duration(milliseconds: 100),
+                              child: _ModulePicker(
+                                isArabic: _isArabic,
+                                selected: _selectedModule,
+                                enabled: true,
+                                onSelected: (module) {
+                                  setState(() => _selectedModule = module);
+                                },
+                              ),
+                            ),
+                            Gap(28.h),
+
+                            // ── Continue Button ───────────────────────
+                            FadeInUp(
+                              duration: const Duration(milliseconds: 420),
+                              delay: const Duration(milliseconds: 160),
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 300),
+                                height: 56.h,
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      _selectedModule.primary,
+                                      _selectedModule.secondary,
+                                    ],
+                                    begin: Alignment.centerLeft,
+                                    end: Alignment.centerRight,
+                                  ),
+                                  borderRadius: BorderRadius.circular(16.r),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: _selectedModule.primary.withValues(
+                                        alpha: 0.38,
+                                      ),
+                                      blurRadius: 22,
+                                      offset: const Offset(0, 9),
+                                    ),
+                                    BoxShadow(
+                                      color: _selectedModule.primary.withValues(
+                                        alpha: 0.15,
+                                      ),
+                                      blurRadius: 10,
+                                      offset: const Offset(0, 3),
+                                    ),
+                                  ],
+                                ),
+                                child: ElevatedButton(
+                                  key: const Key(
+                                    'continueWithSelectedModuleButton',
+                                  ),
+                                  onPressed: _continueToLogin,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.transparent,
+                                    shadowColor: Colors.transparent,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16.r),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        padding: EdgeInsets.all(6.r),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withValues(
+                                            alpha: 0.2,
+                                          ),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Icon(
+                                          _selectedModule.icon,
+                                          color: Colors.white,
+                                          size: 14.r,
+                                        ),
+                                      ),
+                                      Gap(10.w),
+                                      Text(
+                                        _isArabic
+                                            ? 'متابعة إلى ${_selectedModule.nameAr}'
+                                            : 'Continue to ${_selectedModule.nameEn}',
+                                        style: TextStyle(
+                                          fontSize: 14.sp,
+                                          fontWeight: FontWeight.w800,
+                                          color: Colors.white,
+                                          letterSpacing: 0.2,
+                                        ),
+                                      ),
+                                      Gap(10.w),
+                                      Icon(
+                                        _isArabic
+                                            ? Icons.arrow_back_rounded
+                                            : Icons.arrow_forward_rounded,
+                                        color: Colors.white,
+                                        size: 18.r,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Gap(14.h),
+
+                            // ── Back to classic login ─────────────────
+                            FadeInUp(
+                              duration: const Duration(milliseconds: 420),
+                              delay: const Duration(milliseconds: 200),
+                              child: Center(
+                                child: TextButton.icon(
+                                  onPressed: () =>
+                                      Navigator.of(context).maybePop(),
+                                  icon: Icon(
+                                    Icons.arrow_back_rounded,
+                                    size: 14.r,
+                                    color: AppColor.darkTextColor(context),
+                                  ),
+                                  label: Text(
+                                    _isArabic
+                                        ? 'العودة إلى تسجيل الدخول التقليدي'
+                                        : 'Back to classic login',
+                                    style: TextStyle(
+                                      fontSize: 11.sp,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColor.darkTextColor(context),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Gap(10.h),
+
+                            // ── Version ───────────────────────────────
+                            Center(
+                              child: Text(
+                                AppLocaleKey.versionPoweredBy.tr(),
+                                style: TextStyle(
+                                  fontSize: 10.5.sp,
+                                  fontWeight: FontWeight.w500,
+                                  color: const Color(0xFF94A3B8),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  SELECTED MODULE PREVIEW CARD
+// ═══════════════════════════════════════════════════════════════════════════
+class _SelectedModulePreview extends StatelessWidget {
+  final _ErpModule module;
+  final bool isArabic;
+
+  const _SelectedModulePreview({required this.module, required this.isArabic});
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOutCubic,
+      padding: EdgeInsets.all(16.r),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            module.primary.withValues(alpha: isDark ? 0.18 : 0.08),
+            module.secondary.withValues(alpha: isDark ? 0.08 : 0.04),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20.r),
+        border: Border.all(
+          color: module.primary.withValues(alpha: isDark ? 0.35 : 0.22),
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: module.primary.withValues(alpha: isDark ? 0.18 : 0.1),
+            blurRadius: 20,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // Module Icon with gradient
+          Container(
+            width: 54.r,
+            height: 54.r,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [module.primary, module.secondary],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(16.r),
+              boxShadow: [
+                BoxShadow(
+                  color: module.primary.withValues(alpha: 0.4),
+                  blurRadius: 14,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+            ),
+            child: Icon(module.icon, color: Colors.white, size: 26.r),
+          ),
+          Gap(14.w),
+
+          // Info
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 7.w,
+                        vertical: 3.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: module.primary.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(6.r),
+                      ),
+                      child: Text(
+                        isArabic ? 'الوحدة المختارة' : 'SELECTED',
+                        style: TextStyle(
+                          fontSize: 8.5.sp,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 1.0,
+                          color: module.primary,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Gap(5.h),
+                Text(
+                  isArabic ? module.nameAr : module.nameEn,
+                  style: TextStyle(
+                    fontSize: 17.sp,
+                    fontWeight: FontWeight.w900,
+                    color: AppColor.titleFormFiledColor(context),
+                    height: 1.1,
+                  ),
+                ),
+                Gap(3.h),
+                Text(
+                  isArabic ? module.subtitleAr : module.subtitleEn,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 10.5.sp,
+                    color: AppColor.darkTextColor(context),
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Check badge
+          Container(
+            width: 32.r,
+            height: 32.r,
+            decoration: BoxDecoration(
+              color: module.primary,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: module.primary.withValues(alpha: 0.4),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Icon(Icons.check_rounded, color: Colors.white, size: 18.r),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Sign-in form for a selected module.
+///
+/// The workspace is selected before opening this screen.
 class ModuleLoginScreen extends StatefulWidget {
-  const ModuleLoginScreen({super.key});
+  final String? initialModuleId;
+
+  const ModuleLoginScreen({super.key, this.initialModuleId});
 
   @override
   State<ModuleLoginScreen> createState() => _ModuleLoginScreenState();
@@ -26,9 +431,18 @@ class ModuleLoginScreen extends StatefulWidget {
 class _ModuleLoginScreenState extends State<ModuleLoginScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  _ErpModule _selectedModule = _erpModules.first;
+  late _ErpModule _selectedModule;
 
   bool get _isArabic => context.locale.languageCode == 'ar';
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedModule = _erpModules.firstWhere(
+      (module) => module.id == widget.initialModuleId,
+      orElse: () => _erpModules.first,
+    );
+  }
 
   @override
   void didChangeDependencies() {
@@ -43,12 +457,6 @@ class _ModuleLoginScreenState extends State<ModuleLoginScreen> {
       await context.setLocale(const Locale('ar'));
     }
     if (mounted) setState(() {});
-  }
-
-  void _selectModule(_ErpModule module) {
-    if (module.id == _selectedModule.id) return;
-    setState(() => _selectedModule = module);
-    context.read<AuthCubit>().selectModule(module.id);
   }
 
   void _submit(AuthCubit cubit) {
@@ -112,14 +520,10 @@ class _ModuleLoginScreenState extends State<ModuleLoginScreen> {
                           children: [
                             FadeInUp(
                               duration: const Duration(milliseconds: 450),
-                              child: _Hero(isArabic: _isArabic),
-                            ),
-                            Gap(28.h),
-                            _ModulePicker(
-                              isArabic: _isArabic,
-                              selected: _selectedModule,
-                              enabled: !isLoading,
-                              onSelected: _selectModule,
+                              child: _Hero(
+                                isArabic: _isArabic,
+                                selectedModule: _selectedModule,
+                              ),
                             ),
                             Gap(22.h),
                             _buildLoginCard(
@@ -595,26 +999,70 @@ class _ModulePicker extends StatelessWidget {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // ── Section Header ────────────────────────────────────
               Row(
                 children: [
-                  Icon(
-                    Icons.layers_rounded,
-                    size: 14.r,
-                    color: const Color(0xFF3B82F6),
+                  Container(
+                    padding: EdgeInsets.all(6.r),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF3B82F6).withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                    child: Icon(
+                      Icons.layers_rounded,
+                      size: 14.r,
+                      color: const Color(0xFF3B82F6),
+                    ),
                   ),
-                  Gap(7.w),
-                  Text(
-                    isArabic ? 'الوحدة المطلوبة' : 'SELECT YOUR MODULE',
-                    style: TextStyle(
-                      fontSize: 9.5.sp,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 1.3,
-                      color: AppColor.darkTextColor(context),
+                  Gap(10.w),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        isArabic ? 'الوحدة المطلوبة' : 'SELECT YOUR MODULE',
+                        style: TextStyle(
+                          fontSize: 9.5.sp,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 1.3,
+                          color: AppColor.darkTextColor(context),
+                        ),
+                      ),
+                      Text(
+                        isArabic
+                            ? 'اختر الوحدة التي تريد الدخول إليها'
+                            : 'Choose the workspace to access',
+                        style: TextStyle(
+                          fontSize: 9.sp,
+                          color: AppColor.darkTextColor(
+                            context,
+                          ).withValues(alpha: 0.7),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Spacer(),
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 8.w,
+                      vertical: 3.h,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColor.cardColor(context),
+                      borderRadius: BorderRadius.circular(8.r),
+                      border: Border.all(color: AppColor.borderColor(context)),
+                    ),
+                    child: Text(
+                      '${_erpModules.length} ${isArabic ? 'وحدات' : 'modules'}',
+                      style: TextStyle(
+                        fontSize: 9.sp,
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xFF3B82F6),
+                      ),
                     ),
                   ),
                 ],
               ),
-              Gap(12.h),
+              Gap(14.h),
               ...rows,
               Gap(16.h),
               Wrap(
@@ -985,35 +1433,60 @@ class _BrandMark extends StatelessWidget {
 
 class _Hero extends StatelessWidget {
   final bool isArabic;
+  final _ErpModule? selectedModule;
 
-  const _Hero({required this.isArabic});
+  const _Hero({required this.isArabic, this.selectedModule});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Badge pill
         Container(
-          padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
+          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 5.h),
           decoration: BoxDecoration(
-            color: const Color(0xFFDBEAFE),
-            borderRadius: BorderRadius.circular(6.r),
-          ),
-          child: Text(
-            isArabic ? 'بوابة الوحدات' : 'MODULE PORTAL',
-            style: TextStyle(
-              fontSize: 9.sp,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 1.4,
-              color: const Color(0xFF1E40AF),
+            gradient: const LinearGradient(
+              colors: [Color(0xFFDBEAFE), Color(0xFFEEF4FF)],
             ),
+            borderRadius: BorderRadius.circular(20.r),
+            border: Border.all(color: const Color(0xFFBFDBFE)),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 6.r,
+                height: 6.r,
+                decoration: const BoxDecoration(
+                  color: Color(0xFF3B82F6),
+                  shape: BoxShape.circle,
+                ),
+              ),
+              Gap(7.w),
+              Text(
+                selectedModule == null
+                    ? (isArabic ? 'بوابة الوحدات' : 'MODULE PORTAL')
+                    : (isArabic ? 'الوحدة المختارة' : 'SELECTED MODULE'),
+                style: TextStyle(
+                  fontSize: 9.sp,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.4,
+                  color: const Color(0xFF1E40AF),
+                ),
+              ),
+            ],
           ),
         ),
-        Gap(13.h),
+        Gap(16.h),
         Text(
-          isArabic
-              ? 'اختر وحدتك،\nثم سجّل الدخول'
-              : 'Choose your module,\nthen sign in',
+          selectedModule == null
+              ? (isArabic
+                    ? 'اختر وحدتك،\nثم سجّل الدخول'
+                    : 'Choose your module,\nthen sign in')
+              : (isArabic
+                    ? 'تسجيل الدخول إلى ${selectedModule!.nameAr}'
+                    : 'Sign in to ${selectedModule!.nameEn}'),
           style: TextStyle(
             fontSize: 28.sp,
             fontWeight: FontWeight.w900,
@@ -1024,9 +1497,13 @@ class _Hero extends StatelessWidget {
         ),
         Gap(10.h),
         Text(
-          isArabic
-              ? 'منصة واحدة، خمس مساحات عمل. اختر الوحدة التي تعمل عليها وسجّل الدخول بالحساب المرتبط بها.'
-              : 'One platform, five workspaces. Pick the module you work in and sign in with the account linked to it.',
+          selectedModule == null
+              ? (isArabic
+                    ? 'منصة واحدة، خمس مساحات عمل. اختر الوحدة التي تعمل عليها وسجّل الدخول بالحساب المرتبط بها.'
+                    : 'One platform, five workspaces. Pick the module you work in and sign in with the account linked to it.')
+              : (isArabic
+                    ? 'أدخل بيانات الحساب المرتبط بوحدة ${selectedModule!.nameAr}.'
+                    : 'Enter the account details linked to ${selectedModule!.nameEn}.'),
           style: TextStyle(
             fontSize: 12.5.sp,
             height: 1.55,

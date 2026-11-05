@@ -23,8 +23,14 @@ class AppRouters {
         return MaterialPageRoute(
           builder: (_) => BlocProvider(
             create: (context) => sl<AuthCubit>(),
-            child: const ModuleLoginScreen(),
+            child: ModuleLoginScreen(
+              initialModuleId: settings.arguments as String?,
+            ),
           ),
+        );
+      case RoutesName.modelSelectionScreen:
+        return MaterialPageRoute(
+          builder: (_) => const ModelSelectionScreen(),
         );
       case RoutesName.accountAccessScreen:
         return MaterialPageRoute(builder: (_) => const AccountAccessScreen());

@@ -23,19 +23,37 @@ class ReportsKpiCardWidget extends StatelessWidget {
     this.sparklineData = const [20, 35, 25, 45, 40, 60, 55, 80],
   });
 
+  /// Compute a 0–1 progress from sparklineData: last value / max value.
+  double get _progressFraction {
+    if (sparklineData.isEmpty) return 0.0;
+    final maxVal = sparklineData.reduce((a, b) => a > b ? a : b);
+    if (maxVal == 0) return 0.0;
+    return (sparklineData.last / maxVal).clamp(0.0, 1.0);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final accentColor = gradient.first;
+    final positiveColor = const Color(0xFF10B981);
+    final negativeColor = const Color(0xFFEF4444);
+    final trendColor = isPositive ? positiveColor : negativeColor;
+
     return Container(
-      padding: EdgeInsets.all(14.r),
+      padding: EdgeInsets.all(15.r),
       decoration: BoxDecoration(
         color: AppColor.cardColor(context),
-        borderRadius: BorderRadius.circular(18.r),
+        borderRadius: BorderRadius.circular(20.r),
         border: Border.all(color: AppColor.borderColor(context)),
         boxShadow: [
           BoxShadow(
-            color: gradient.first.withValues(alpha: 0.12),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
+            color: accentColor.withValues(alpha: 0.14),
+            blurRadius: 20,
+            offset: const Offset(0, 7),
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -44,41 +62,48 @@ class ReportsKpiCardWidget extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Header Row with Icon and Growth Badge
+          // ── Header: Icon + Trend Badge ───────────────────────────────────
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Gradient icon with glow
               Container(
-                width: 38.r,
-                height: 38.r,
+                width: 46.r,
+                height: 46.r,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: gradient,
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
-                  borderRadius: BorderRadius.circular(12.r),
+                  borderRadius: BorderRadius.circular(14.r),
                   boxShadow: [
                     BoxShadow(
-                      color: gradient.first.withValues(alpha: 0.4),
-                      blurRadius: 8,
-                      offset: const Offset(0, 3),
+                      color: accentColor.withValues(alpha: 0.5),
+                      blurRadius: 14,
+                      spreadRadius: 0,
+                      offset: const Offset(0, 4),
+                    ),
+                    BoxShadow(
+                      color: accentColor.withValues(alpha: 0.2),
+                      blurRadius: 24,
+                      spreadRadius: 2,
+                      offset: const Offset(0, 2),
                     ),
                   ],
                 ),
-                child: Icon(icon, size: 20.r, color: Colors.white),
+                child: Icon(icon, size: 22.r, color: Colors.white),
               ),
+
+              // Trend pill badge
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
+                padding: EdgeInsets.symmetric(horizontal: 9.w, vertical: 5.h),
                 decoration: BoxDecoration(
-                  color: isPositive
-                      ? const Color(0xFF10B981).withValues(alpha: 0.15)
-                      : const Color(0xFFEF4444).withValues(alpha: 0.15),
+                  color: trendColor.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(20.r),
                   border: Border.all(
-                    color: isPositive
-                        ? const Color(0xFF10B981).withValues(alpha: 0.3)
-                        : const Color(0xFFEF4444).withValues(alpha: 0.3),
+                    color: trendColor.withValues(alpha: 0.28),
                   ),
                 ),
                 child: Row(
@@ -89,19 +114,16 @@ class ReportsKpiCardWidget extends StatelessWidget {
                           ? Icons.trending_up_rounded
                           : Icons.trending_down_rounded,
                       size: 13.r,
-                      color: isPositive
-                          ? const Color(0xFF10B981)
-                          : const Color(0xFFEF4444),
+                      color: trendColor,
                     ),
                     Gap(3.w),
                     Text(
                       change,
                       style: TextStyle(
                         fontSize: 10.sp,
-                        fontWeight: FontWeight.bold,
-                        color: isPositive
-                            ? const Color(0xFF10B981)
-                            : const Color(0xFFEF4444),
+                        fontWeight: FontWeight.w700,
+                        color: trendColor,
+                        letterSpacing: 0.2,
                       ),
                     ),
                   ],
@@ -109,40 +131,110 @@ class ReportsKpiCardWidget extends StatelessWidget {
               ),
             ],
           ),
-          Gap(12.h),
+          Gap(13.h),
 
-          // Title & Value
+          // ── Title ────────────────────────────────────────────────────────
           Text(
             title,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 11.sp,
+              fontWeight: FontWeight.w500,
               color: AppColor.darkTextColor(context),
+              letterSpacing: 0.1,
             ),
           ),
-          Gap(4.h),
+          Gap(3.h),
+
+          // ── Value (big, bold) ────────────────────────────────────────────
           Text(
             value,
             style: TextStyle(
               color: AppColor.titleFormFiledColor(context),
-              fontWeight: FontWeight.bold,
-              fontSize: 17.sp,
+              fontWeight: FontWeight.w800,
+              fontSize: 20.sp,
+              height: 1.1,
+              letterSpacing: -0.3,
             ),
           ),
-          Gap(8.h),
+          Gap(10.h),
 
-          // Mini Sparkline Painter
+          // ── Sparkline ────────────────────────────────────────────────────
           SizedBox(
-            height: 24.h,
+            height: 28.h,
             width: double.infinity,
             child: CustomPaint(
               painter: _MiniSparklinePainter(
                 data: sparklineData,
-                lineColor: gradient.first,
-                fillColor: gradient.first.withValues(alpha: 0.15),
+                lineColor: accentColor,
+                fillColor: accentColor.withValues(alpha: 0.15),
               ),
             ),
+          ),
+          Gap(10.h),
+
+          // ── Progress bar ─────────────────────────────────────────────────
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'vs last period',
+                    style: TextStyle(
+                      fontSize: 9.sp,
+                      color: AppColor.darkTextColor(context),
+                    ),
+                  ),
+                  Text(
+                    '${(_progressFraction * 100).toStringAsFixed(0)}%',
+                    style: TextStyle(
+                      fontSize: 9.sp,
+                      fontWeight: FontWeight.w700,
+                      color: accentColor,
+                    ),
+                  ),
+                ],
+              ),
+              Gap(4.h),
+              Stack(
+                children: [
+                  // Track
+                  Container(
+                    height: 5.h,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: accentColor.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(10.r),
+                    ),
+                  ),
+                  // Fill
+                  FractionallySizedBox(
+                    widthFactor: _progressFraction,
+                    child: Container(
+                      height: 5.h,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: gradient,
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                        ),
+                        borderRadius: BorderRadius.circular(10.r),
+                        boxShadow: [
+                          BoxShadow(
+                            color: accentColor.withValues(alpha: 0.4),
+                            blurRadius: 6,
+                            offset: const Offset(0, 1),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ],
       ),
@@ -150,6 +242,7 @@ class ReportsKpiCardWidget extends StatelessWidget {
   }
 }
 
+// ── Sparkline Painter ──────────────────────────────────────────────────────────
 class _MiniSparklinePainter extends CustomPainter {
   final List<double> data;
   final Color lineColor;
@@ -214,6 +307,23 @@ class _MiniSparklinePainter extends CustomPainter {
 
     canvas.drawPath(fillPath, fillPaint);
     canvas.drawPath(path, linePaint);
+
+    // Draw endpoint dot
+    final lastX = (data.length - 1) * stepX;
+    final lastNorm = (data.last - minVal) / range;
+    final lastY = size.height - (lastNorm * (size.height - 4)) - 2;
+    canvas.drawCircle(
+      Offset(lastX, lastY),
+      3.0,
+      Paint()..color = lineColor,
+    );
+    canvas.drawCircle(
+      Offset(lastX, lastY),
+      5.0,
+      Paint()
+        ..color = lineColor.withOpacity(0.25)
+        ..style = PaintingStyle.fill,
+    );
   }
 
   @override

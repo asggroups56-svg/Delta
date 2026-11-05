@@ -13,14 +13,25 @@ class ReportsChartWidget extends StatefulWidget {
 }
 
 class _ReportsChartWidgetState extends State<ReportsChartWidget> {
-  int _selectedMonthIndex = 5; // Default selected to current month (Jun)
+  int _selectedMonthIndex = 5;
   final List<String> _months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
   final List<double> _revenues = [120, 145, 130, 180, 165, 215]; // in k SAR
   final List<double> _expenses = [80, 95, 88, 110, 105, 125];
+
+  static const double _maxVal = 250.0;
+
+  // Y-axis labels from bottom to top
+  static const List<String> _yLabels = [
+    '0',
+    '50k',
+    '100k',
+    '150k',
+    '200k',
+    '250k',
+  ];
+
   @override
   Widget build(BuildContext context) {
-    final maxVal = 250.0;
-
     return Container(
       padding: EdgeInsets.all(18.r),
       decoration: BoxDecoration(
@@ -29,7 +40,7 @@ class _ReportsChartWidgetState extends State<ReportsChartWidget> {
         border: Border.all(color: AppColor.borderColor(context)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.25),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -38,7 +49,7 @@ class _ReportsChartWidgetState extends State<ReportsChartWidget> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Title & Legends
+          // ── Title & Legends ───────────────────────────────────────────────
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -52,13 +63,14 @@ class _ReportsChartWidgetState extends State<ReportsChartWidget> {
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         color: AppColor.titleFormFiledColor(context),
-                        fontSize: 13.5.sp,
+                        fontSize: 14.sp,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     Gap(3.h),
                     Text(
-                      'SAR (${_revenues[_selectedMonthIndex].toInt()}K Rev / ${_expenses[_selectedMonthIndex].toInt()}K Exp)',
+                      'SAR (${_revenues[_selectedMonthIndex].toInt()}K Rev'
+                      ' / ${_expenses[_selectedMonthIndex].toInt()}K Exp)',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
@@ -87,149 +99,65 @@ class _ReportsChartWidgetState extends State<ReportsChartWidget> {
               ),
             ],
           ),
-          Gap(24.h),
+          Gap(20.h),
 
-          // Chart Bars & Tooltip
+          // ── Chart area: Y-axis + bars ─────────────────────────────────────
           SizedBox(
-            height: 160.h,
+            height: 182.h,
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: List.generate(_months.length, (index) {
-                final isSelected = _selectedMonthIndex == index;
-                final revHeight = (_revenues[index] / maxVal) * 120.h;
-                final expHeight = (_expenses[index] / maxVal) * 120.h;
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Y-axis labels
+                _YAxisLabels(
+                  labels: _yLabels,
+                  context: context,
+                ),
+                Gap(6.w),
 
-                return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _selectedMonthIndex = index;
-                    });
-                  },
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                // Bars with grid lines
+                Expanded(
+                  child: Stack(
                     children: [
-                      // Active Tooltip Bubble
-                      if (isSelected)
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 6.w,
-                            vertical: 2.h,
+                      // Horizontal grid lines
+                      Positioned.fill(
+                        child: CustomPaint(
+                          painter: _GridLinePainter(
+                            lineCount: _yLabels.length,
+                            lineColor:
+                                AppColor.borderColor(context),
                           ),
-                          margin: EdgeInsets.only(bottom: 4.h),
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFF4F46E5), Color(0xFF06B6D4)],
-                            ),
-                            borderRadius: BorderRadius.circular(6.r),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColor.royalIndigo.withValues(
-                                  alpha: 0.4,
-                                ),
-                                blurRadius: 6,
-                              ),
-                            ],
-                          ),
-                          child: Text(
-                            '${_revenues[index].toInt()}k',
-                            style: TextStyle(
-                              fontSize: 9.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        )
-                      else
-                        SizedBox(height: 17.h),
-
-                      // Multi-Bar Pair
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          // Revenue Bar
-                          AnimatedContainer(
-                            duration: const Duration(milliseconds: 300),
-                            width: 12.w,
-                            height: revHeight,
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: isSelected
-                                    ? [
-                                        AppColor.royalIndigo,
-                                        AppColor.electricCyan,
-                                      ]
-                                    : [
-                                        AppColor.royalIndigo.withValues(
-                                          alpha: 0.4,
-                                        ),
-                                        AppColor.electricCyan.withValues(
-                                          alpha: 0.4,
-                                        ),
-                                      ],
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                              ),
-                              borderRadius: BorderRadius.circular(6.r),
-                              boxShadow: isSelected
-                                  ? [
-                                      BoxShadow(
-                                        color: AppColor.royalIndigo.withValues(
-                                          alpha: 0.4,
-                                        ),
-                                        blurRadius: 8,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ]
-                                  : null,
-                            ),
-                          ),
-                          Gap(4.w),
-                          // Expense Bar
-                          AnimatedContainer(
-                            duration: const Duration(milliseconds: 300),
-                            width: 12.w,
-                            height: expHeight,
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: isSelected
-                                    ? [
-                                        AppColor.roseDanger,
-                                        const Color(0xFFFB7185),
-                                      ]
-                                    : [
-                                        AppColor.roseDanger.withValues(
-                                          alpha: 0.4,
-                                        ),
-                                        const Color(
-                                          0xFFFB7185,
-                                        ).withValues(alpha: 0.4),
-                                      ],
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                              ),
-                              borderRadius: BorderRadius.circular(6.r),
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
-                      Gap(8.h),
-                      Text(
-                        _months[index],
-                        style: TextStyle(
-                          fontSize: 11.sp,
-                          fontWeight: isSelected
-                              ? FontWeight.bold
-                              : FontWeight.normal,
-                          color: isSelected
-                              ? AppColor.titleFormFiledColor(context)
-                              : AppColor.darkTextColor(context),
+
+                      // Bar groups
+                      Padding(
+                        padding:
+                            EdgeInsets.only(bottom: 24.h),
+                        child: Row(
+                          mainAxisAlignment:
+                              MainAxisAlignment.spaceAround,
+                          crossAxisAlignment:
+                              CrossAxisAlignment.end,
+                          children: List.generate(
+                            _months.length,
+                            (index) => _BarGroup(
+                              isSelected:
+                                  _selectedMonthIndex == index,
+                              month: _months[index],
+                              revenue: _revenues[index],
+                              expense: _expenses[index],
+                              maxVal: _maxVal,
+                              onTap: () => setState(
+                                () => _selectedMonthIndex = index,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ],
                   ),
-                );
-              }),
+                ),
+              ],
             ),
           ),
         ],
@@ -255,6 +183,220 @@ class _ReportsChartWidgetState extends State<ReportsChartWidget> {
           ),
         ),
       ],
+    );
+  }
+}
+
+// ── Y-Axis Labels ──────────────────────────────────────────────────────────────
+class _YAxisLabels extends StatelessWidget {
+  final List<String> labels;
+  final BuildContext context;
+
+  const _YAxisLabels({required this.labels, required this.context});
+
+  @override
+  Widget build(BuildContext _) {
+    return SizedBox(
+      width: 34.w,
+      child: Padding(
+        padding: EdgeInsets.only(bottom: 24.h),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: labels.reversed
+              .map(
+                (l) => Text(
+                  l,
+                  style: TextStyle(
+                    fontSize: 8.5.sp,
+                    color: AppColor.darkTextColor(context),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              )
+              .toList(),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Grid Line Painter ─────────────────────────────────────────────────────────
+class _GridLinePainter extends CustomPainter {
+  final int lineCount;
+  final Color lineColor;
+
+  const _GridLinePainter({required this.lineCount, required this.lineColor});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final chartHeight = size.height - 24; // subtract month label area
+    final paint = Paint()
+      ..color = lineColor
+      ..strokeWidth = 0.7;
+
+    for (int i = 0; i < lineCount; i++) {
+      final y = chartHeight - (i / (lineCount - 1)) * chartHeight;
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+// ── Individual Bar Group ──────────────────────────────────────────────────────
+class _BarGroup extends StatelessWidget {
+  final bool isSelected;
+  final String month;
+  final double revenue;
+  final double expense;
+  final double maxVal;
+  final VoidCallback onTap;
+
+  const _BarGroup({
+    required this.isSelected,
+    required this.month,
+    required this.revenue,
+    required this.expense,
+    required this.maxVal,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    // Available bar height = total 182.h minus 24.h label area minus 20.h tooltip area
+    final availableBarH = 182.h - 24.h - 22.h;
+    final revHeight = (revenue / maxVal) * availableBarH;
+    final expHeight = (expense / maxVal) * availableBarH;
+
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          // Tooltip bubble
+          if (isSelected)
+            Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: 9.w,
+                vertical: 4.h,
+              ),
+              margin: EdgeInsets.only(bottom: 5.h),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF4F46E5), Color(0xFF06B6D4)],
+                ),
+                borderRadius: BorderRadius.circular(8.r),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColor.royalIndigo.withValues(alpha: 0.45),
+                    blurRadius: 10,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Text(
+                '${revenue.toInt()}k · ${expense.toInt()}k',
+                style: TextStyle(
+                  fontSize: 9.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            )
+          else
+            SizedBox(height: 22.h),
+
+          // Bar pair
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Revenue bar
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 320),
+                curve: Curves.easeOut,
+                width: 16.w,
+                height: revHeight,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: isSelected
+                        ? [
+                            AppColor.royalIndigo,
+                            AppColor.electricCyan,
+                          ]
+                        : [
+                            AppColor.royalIndigo.withValues(alpha: 0.38),
+                            AppColor.electricCyan.withValues(alpha: 0.38),
+                          ],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                  borderRadius: BorderRadius.circular(8.r),
+                  boxShadow: isSelected
+                      ? [
+                          BoxShadow(
+                            color: AppColor.royalIndigo.withValues(alpha: 0.45),
+                            blurRadius: 10,
+                            offset: const Offset(0, 2),
+                          ),
+                        ]
+                      : null,
+                ),
+              ),
+              Gap(4.w),
+              // Expense bar
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 320),
+                curve: Curves.easeOut,
+                width: 16.w,
+                height: expHeight,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: isSelected
+                        ? [
+                            AppColor.roseDanger,
+                            const Color(0xFFFB7185),
+                          ]
+                        : [
+                            AppColor.roseDanger.withValues(alpha: 0.38),
+                            const Color(0xFFFB7185).withValues(alpha: 0.38),
+                          ],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                  borderRadius: BorderRadius.circular(8.r),
+                  boxShadow: isSelected
+                      ? [
+                          BoxShadow(
+                            color: AppColor.roseDanger.withValues(alpha: 0.4),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ]
+                      : null,
+                ),
+              ),
+            ],
+          ),
+
+          Gap(6.h),
+          // Month label
+          Text(
+            month,
+            style: TextStyle(
+              fontSize: 10.5.sp,
+              fontWeight:
+                  isSelected ? FontWeight.bold : FontWeight.w400,
+              color: isSelected
+                  ? AppColor.titleFormFiledColor(context)
+                  : AppColor.darkTextColor(context),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

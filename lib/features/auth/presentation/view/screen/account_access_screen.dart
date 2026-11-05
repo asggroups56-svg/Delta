@@ -110,7 +110,7 @@ class _AccountAccessScreenState extends State<AccountAccessScreen> {
                       child: TextButton.icon(
                         onPressed: () => NavigatorMethods.pushNamed(
                           context,
-                          RoutesName.moduleLoginScreen,
+                          RoutesName.modelSelectionScreen,
                         ),
                         icon: Icon(
                           Icons.grid_view_rounded,
