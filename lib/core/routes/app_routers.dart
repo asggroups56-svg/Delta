@@ -19,19 +19,6 @@ class AppRouters {
             child: const LoginScreen(),
           ),
         );
-      case RoutesName.moduleLoginScreen:
-        return MaterialPageRoute(
-          builder: (_) => BlocProvider(
-            create: (context) => sl<AuthCubit>(),
-            child: ModuleLoginScreen(
-              initialModuleId: settings.arguments as String?,
-            ),
-          ),
-        );
-      case RoutesName.modelSelectionScreen:
-        return MaterialPageRoute(
-          builder: (_) => const ModelSelectionScreen(),
-        );
       case RoutesName.accountAccessScreen:
         return MaterialPageRoute(builder: (_) => const AccountAccessScreen());
       case RoutesName.forgotPasswordScreen:

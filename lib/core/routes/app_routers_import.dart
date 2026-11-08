@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_template/core/routes/routes_name.dart';
 import 'package:my_template/features/auth/presentation/view/screen/login_screen.dart';
-import 'package:my_template/features/auth/presentation/view/screen/module_login_screen.dart';
 import 'package:my_template/features/auth/presentation/view/screen/account_access_screen.dart';
 import 'package:my_template/features/auth/presentation/view/screen/forgot_password_screen.dart';
 import 'package:my_template/features/home/presentation/view/screen/accounting_dashboard_screen.dart';

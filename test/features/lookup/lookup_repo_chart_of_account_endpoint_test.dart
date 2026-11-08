@@ -403,6 +403,73 @@ void main() {
         expect(api.lastOptions?.headers?['Accept-Language'], 'en');
       },
     );
+
+    test(
+      'posts the center-to-center lookup shape used by CostCenter/GetLight',
+      () async {
+        final api = _RecordingApiConsumer(
+          response: <String, dynamic>{
+            'costCenters': <Map<String, dynamic>>[],
+            'hasMore': false,
+            'success': true,
+            'message': '',
+            'totalRecords': 0,
+          },
+        );
+        final repo = LookupRepoImpl(api);
+
+        await repo.getCostCenterLight(
+          languageCode: 'en',
+          centerType: 1,
+          centerKind: 0,
+          idAsString: '1',
+          page: 1,
+          pageSize: 3,
+        );
+
+        expect(api.lastBody, <String, dynamic>{
+          'idAsString': '1',
+          'SearchWord': null,
+          'page': '1',
+          'pageSize': '3',
+          'centerType': 1,
+          'centerKind': 0,
+        });
+      },
+    );
+
+    test(
+      'posts the activity center lookup shape without an id filter',
+      () async {
+        final api = _RecordingApiConsumer(
+          response: <String, dynamic>{
+            'costCenters': <Map<String, dynamic>>[],
+            'hasMore': false,
+            'success': true,
+            'message': '',
+            'totalRecords': 0,
+          },
+        );
+        final repo = LookupRepoImpl(api);
+
+        await repo.getCostCenterLight(
+          languageCode: 'en',
+          centerType: 1,
+          centerKind: 0,
+          page: 1,
+          pageSize: 3,
+        );
+
+        expect(api.lastBody, <String, dynamic>{
+          'idAsString': null,
+          'SearchWord': null,
+          'page': '1',
+          'pageSize': '3',
+          'centerType': 1,
+          'centerKind': 0,
+        });
+      },
+    );
   });
 
   group('LookupRepoImpl.getCurrencyDataLight', () {

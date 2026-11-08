@@ -2,11 +2,19 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:my_template/features/reports/data/models/additional_final_report_request_model.dart';
 
 void main() {
+  test('serializes the localized Arabic report title', () {
+    const request = AdditionalFinalReportRequestModel(
+      reportTitle: 'تقرير إضافي',
+    );
+
+    expect(request.toJson()['ReportTitle'], 'تقرير إضافي');
+  });
+
   test('serializes the default additional final report payload', () {
     const request = AdditionalFinalReportRequestModel();
 
     expect(request.toJson(), <String, dynamic>{
-      'ReportSerial': null,
+      'ReportSerial': 6,
       'CostCenterNo': null,
       'ReportTitle': null,
       'FromLineSerial': null,
@@ -18,7 +26,6 @@ void main() {
 
   test('serializes every optional filter and export type', () {
     const request = AdditionalFinalReportRequestModel(
-      reportSerial: 4,
       costCenterNo: 12,
       reportTitle: 'Additional report',
       fromLineSerial: 2,
@@ -28,7 +35,7 @@ void main() {
     );
 
     expect(request.toJson(), <String, dynamic>{
-      'ReportSerial': 4,
+      'ReportSerial': 6,
       'CostCenterNo': 12,
       'ReportTitle': 'Additional report',
       'FromLineSerial': 2,

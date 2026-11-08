@@ -22,18 +22,14 @@ String additionalFinalReportName(int variant) =>
     additionalFinalReportNames[variant] ?? 'AGL037A';
 
 class AdditionalFinalReportFilterSelection {
-  final int? reportSerial;
   final num? costCenterNo;
-  final String? reportTitle;
   final int? fromLineSerial;
   final int? toLineSerial;
   final String reportName;
   final String exportType;
 
   const AdditionalFinalReportFilterSelection({
-    required this.reportSerial,
     required this.costCenterNo,
-    required this.reportTitle,
     required this.fromLineSerial,
     required this.toLineSerial,
     required this.reportName,
@@ -77,8 +73,6 @@ class _AdditionalFinalReportFilterBottomSheetWidgetState
     extends State<AdditionalFinalReportFilterBottomSheetWidget> {
   int _variant = 1;
   CostCenterLightModel? _costCenter;
-  final _reportSerialController = TextEditingController();
-  final _reportTitleController = TextEditingController();
   final _fromLineSerialController = TextEditingController();
   final _toLineSerialController = TextEditingController();
   late String _exportType;
@@ -94,8 +88,6 @@ class _AdditionalFinalReportFilterBottomSheetWidgetState
 
   @override
   void dispose() {
-    _reportSerialController.dispose();
-    _reportTitleController.dispose();
     _fromLineSerialController.dispose();
     _toLineSerialController.dispose();
     super.dispose();
@@ -107,22 +99,11 @@ class _AdditionalFinalReportFilterBottomSheetWidgetState
   }
 
   void _submit() {
-    final reportSerialText = _reportSerialController.text.trim();
     final fromLineSerialText = _fromLineSerialController.text.trim();
     final toLineSerialText = _toLineSerialController.text.trim();
-    final reportSerial = _optionalInt(_reportSerialController);
     final fromLineSerial = _optionalInt(_fromLineSerialController);
     final toLineSerial = _optionalInt(_toLineSerialController);
-    final reportTitle = _reportTitleController.text.trim();
 
-    if (reportSerialText.isNotEmpty && reportSerial == null) {
-      setState(() {
-        _validationMessage = _isArabic
-            ? 'أدخل رقماً صحيحاً للتقرير'
-            : 'Enter a valid report serial';
-      });
-      return;
-    }
     if (fromLineSerialText.isNotEmpty && fromLineSerial == null) {
       setState(() {
         _validationMessage = _isArabic
@@ -153,9 +134,7 @@ class _AdditionalFinalReportFilterBottomSheetWidgetState
     Navigator.pop(
       context,
       AdditionalFinalReportFilterSelection(
-        reportSerial: reportSerial,
         costCenterNo: _costCenter?.costCenterNo,
-        reportTitle: reportTitle.isEmpty ? null : reportTitle,
         fromLineSerial: fromLineSerial,
         toLineSerial: toLineSerial,
         reportName: additionalFinalReportName(_variant),
@@ -274,18 +253,6 @@ class _AdditionalFinalReportFilterBottomSheetWidgetState
                         },
                       ),
                       Gap(12.h),
-                      CustomFormField(
-                        controller: _reportSerialController,
-                        title: _isArabic ? 'رقم التقرير' : 'Report serial',
-                        keyboardType: TextInputType.number,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
-                        ],
-                        onChanged: (_) {
-                          setState(() => _validationMessage = null);
-                        },
-                      ),
-                      Gap(12.h),
                       CostCenterDropdown(
                         title: _isArabic ? 'مركز التكلفة' : 'Cost center',
                         hintText: _isArabic ? 'كل المراكز' : 'All centers',
@@ -295,14 +262,6 @@ class _AdditionalFinalReportFilterBottomSheetWidgetState
                             _costCenter = center;
                             _validationMessage = null;
                           });
-                        },
-                      ),
-                      Gap(12.h),
-                      CustomFormField(
-                        controller: _reportTitleController,
-                        title: _isArabic ? 'عنوان التقرير' : 'Report title',
-                        onChanged: (_) {
-                          setState(() => _validationMessage = null);
                         },
                       ),
                       Gap(12.h),

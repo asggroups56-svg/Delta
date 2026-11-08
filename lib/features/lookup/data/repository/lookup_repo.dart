@@ -297,10 +297,10 @@ class LookupRepoImpl implements LookupRepo {
           'page': page.toString(),
           'pageSize': pageSize.toString(),
         };
-        // `CenterType`/`CenterKind` and the level/account filters are optional
+        // `centerType`/`centerKind` and the level/account filters are optional
         // and mutually independent, so only include what was requested.
-        if (centerType != null) body['CenterType'] = centerType;
-        if (centerKind != null) body['CenterKind'] = centerKind;
+        if (centerType != null) body['centerType'] = centerType;
+        if (centerKind != null) body['centerKind'] = centerKind;
         if (centerLevel != null) body['CenterLevel'] = centerLevel;
         if (accountType != null) body['AccountType'] = accountType;
 

@@ -287,6 +287,25 @@ class AppLocaleKey {
       'statementTrialBalanceByCategories';
   static const String statementTrialBalanceByCategoriesDesc =
       'statementTrialBalanceByCategoriesDesc';
+  static const String statementStandardIndicatorData =
+      'statementStandardIndicatorData';
+  static const String statementStandardIndicatorDataDesc =
+      'statementStandardIndicatorDataDesc';
+  static const String statementAdditionalIndicatorData =
+      'statementAdditionalIndicatorData';
+  static const String statementAdditionalIndicatorDataDesc =
+      'statementAdditionalIndicatorDataDesc';
+  static const String statementWithdrawalAndDeposit =
+      'statementWithdrawalAndDeposit';
+  static const String statementWithdrawalAndDepositDesc =
+      'statementWithdrawalAndDepositDesc';
+  static const String statementActivityReports = 'statementActivityReports';
+  static const String statementActivityReportsDesc =
+      'statementActivityReportsDesc';
+  static const String statementActivityCenterData =
+      'statementActivityCenterData';
+  static const String statementActivityCenterDataDesc =
+      'statementActivityCenterDataDesc';
   static const String statementCostCenters = 'statementCostCenters';
   static const String statementCostCentersDesc = 'statementCostCentersDesc';
   static const String statementCostCentersProjects =

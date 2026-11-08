@@ -1,5 +1,4 @@
 class AdditionalFinalReportRequestModel {
-  final int? reportSerial;
   final num? costCenterNo;
   final String? reportTitle;
   final int? fromLineSerial;
@@ -8,7 +7,6 @@ class AdditionalFinalReportRequestModel {
   final String exportType;
 
   const AdditionalFinalReportRequestModel({
-    this.reportSerial,
     this.costCenterNo,
     this.reportTitle,
     this.fromLineSerial,
@@ -18,7 +16,7 @@ class AdditionalFinalReportRequestModel {
   });
 
   Map<String, dynamic> toJson() => {
-    'ReportSerial': reportSerial,
+    'ReportSerial': 6,
     'CostCenterNo': costCenterNo,
     'ReportTitle': reportTitle,
     'FromLineSerial': fromLineSerial,

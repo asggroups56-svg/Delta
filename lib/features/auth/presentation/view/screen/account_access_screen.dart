@@ -9,8 +9,9 @@ import 'package:my_template/core/custom_widgets/custom_form_field/custom_form_fi
 import 'package:my_template/core/routes/routes_name.dart';
 import 'package:my_template/core/theme/app_colors.dart';
 import 'package:my_template/core/utils/navigator_methods.dart';
+import 'package:my_template/features/auth/data/model/workspace_module.dart';
 
-/// Pre-login choice between a trial account and an existing account.
+/// Pre-login page combining workspace selection, account address, and login.
 class AccountAccessScreen extends StatefulWidget {
   const AccountAccessScreen({super.key});
 
@@ -20,9 +21,24 @@ class AccountAccessScreen extends StatefulWidget {
 
 class _AccountAccessScreenState extends State<AccountAccessScreen> {
   final _addressController = TextEditingController();
-  String? _addressError;
+  String? _selectedModuleId;
+  String? _error;
 
   bool get _isArabic => context.locale.languageCode == 'ar';
+
+  @override
+  void initState() {
+    super.initState();
+    final prefs = CacheHelper.sharedPreferences;
+    final savedModule = prefs.getString(CacheHelper.selectedModuleKey);
+    if (workspaceModuleById(savedModule) != null) {
+      _selectedModuleId = savedModule;
+    }
+    final savedAddress = prefs.getString(CacheHelper.accountAddressKey);
+    if (savedAddress != null && savedAddress.isNotEmpty) {
+      _addressController.text = savedAddress;
+    }
+  }
 
   @override
   void dispose() {
@@ -39,17 +55,22 @@ class _AccountAccessScreenState extends State<AccountAccessScreen> {
     if (mounted) setState(() {});
   }
 
-  Future<void> _continueAsTrial() async {
-    await CacheHelper().saveData(key: CacheHelper.accountAddressKey, value: '');
-    if (!mounted) return;
-    NavigatorMethods.pushReplacementNamed(context, RoutesName.loginScreen);
-  }
+  WorkspaceModule? get _selectedModule =>
+      workspaceModuleById(_selectedModuleId);
 
-  Future<void> _continueWithAddress() async {
+  Future<void> _continueToLogin() async {
     final address = _addressController.text.trim();
+    if (_selectedModuleId == null) {
+      setState(() {
+        _error = _isArabic
+            ? 'اختر القسم الذي تريد البدء منه'
+            : 'Choose the section you want to start with';
+      });
+      return;
+    }
     if (address.isEmpty) {
       setState(() {
-        _addressError = _isArabic
+        _error = _isArabic
             ? 'أدخل عنوان الحساب للمتابعة'
             : 'Enter your account address to continue';
       });
@@ -57,11 +78,32 @@ class _AccountAccessScreenState extends State<AccountAccessScreen> {
     }
 
     await CacheHelper().saveData(
+      key: CacheHelper.selectedModuleKey,
+      value: _selectedModuleId!,
+    );
+    await CacheHelper().saveData(
       key: CacheHelper.accountAddressKey,
       value: address,
     );
     if (!mounted) return;
     NavigatorMethods.pushReplacementNamed(context, RoutesName.loginScreen);
+  }
+
+  Future<void> _continueAsTrial() async {
+    await CacheHelper().saveData(
+      key: CacheHelper.selectedModuleKey,
+      value: _selectedModuleId ?? '',
+    );
+    await CacheHelper().saveData(key: CacheHelper.accountAddressKey, value: '');
+    if (!mounted) return;
+    NavigatorMethods.pushReplacementNamed(context, RoutesName.loginScreen);
+  }
+
+  void _selectModule(WorkspaceModule module) {
+    setState(() {
+      _selectedModuleId = module.id;
+      _error = null;
+    });
   }
 
   @override
@@ -75,78 +117,49 @@ class _AccountAccessScreenState extends State<AccountAccessScreen> {
             padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 18.h),
             child: Center(
               child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 1040),
+                constraints: const BoxConstraints(maxWidth: 1180),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildTopBar(),
-                    Gap(32.h),
-                    _buildHero(),
-                    Gap(28.h),
+                    Gap(24.h),
                     LayoutBuilder(
                       builder: (context, constraints) {
-                        final isWide = constraints.maxWidth > 760;
+                        final isWide = constraints.maxWidth >= 900;
                         if (isWide) {
                           return Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Expanded(child: _buildTrialCard()),
-                              Gap(20.w),
-                              Expanded(child: _buildExistingAccountCard()),
+                              Expanded(flex: 4, child: _buildHero()),
+                              Gap(22.w),
+                              Expanded(flex: 5, child: _buildFormCard()),
                             ],
                           );
                         }
                         return Column(
                           children: [
-                            _buildTrialCard(),
+                            _buildHero(compact: true),
                             Gap(18.h),
-                            _buildExistingAccountCard(),
+                            _buildFormCard(),
                           ],
                         );
                       },
                     ),
-                    Gap(14.h),
-                    Center(
-                      child: TextButton.icon(
-                        onPressed: () => NavigatorMethods.pushNamed(
-                          context,
-                          RoutesName.modelSelectionScreen,
-                        ),
-                        icon: Icon(
-                          Icons.grid_view_rounded,
-                          size: 15.r,
-                          color: const Color(0xFF1E40AF),
-                        ),
-                        label: Text(
-                          _isArabic
-                              ? 'أو ادخل مباشرة إلى بوابة الوحدات'
-                              : 'Or go straight to the module portal',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 11.5.sp,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        style: TextButton.styleFrom(
-                          foregroundColor: const Color(0xFF1E40AF),
-                        ),
-                      ),
-                    ),
-                    Gap(24.h),
+                    Gap(20.h),
                     Center(
                       child: Text(
                         _isArabic
-                            ? 'اختر الطريقة المناسبة لك للبدء — يمكنك تغييرها في أي وقت.'
-                            : 'Choose how you want to get started — you can change this later.',
+                            ? '© Delta ASG — منصة إدارة موارد المؤسسة'
+                            : '© Delta ASG — Enterprise resource platform',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          fontSize: 11.5.sp,
+                          fontSize: 11.sp,
                           color: const Color(0xFF94A3B8),
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
-                    Gap(8.h),
+                    Gap(6.h),
                   ],
                 ),
               ),
@@ -161,13 +174,13 @@ class _AccountAccessScreenState extends State<AccountAccessScreen> {
     return Row(
       children: [
         Container(
-          width: 40.r,
-          height: 40.r,
+          width: 42.r,
+          height: 42.r,
           decoration: BoxDecoration(
             gradient: const LinearGradient(
               colors: [Color(0xFF1E3A8A), Color(0xFF3B82F6)],
             ),
-            borderRadius: BorderRadius.circular(11.r),
+            borderRadius: BorderRadius.circular(12.r),
             boxShadow: [
               BoxShadow(
                 color: const Color(0xFF1E40AF).withValues(alpha: 0.25),
@@ -176,7 +189,7 @@ class _AccountAccessScreenState extends State<AccountAccessScreen> {
               ),
             ],
           ),
-          child: Icon(Icons.hub_rounded, color: Colors.white, size: 21.r),
+          child: Icon(Icons.hub_rounded, color: Colors.white, size: 22.r),
         ),
         Gap(11.w),
         Column(
@@ -237,10 +250,13 @@ class _AccountAccessScreenState extends State<AccountAccessScreen> {
     );
   }
 
-  Widget _buildHero() {
+  Widget _buildHero({bool compact = false}) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 28.h),
+      padding: EdgeInsets.symmetric(
+        horizontal: compact ? 22.w : 30.w,
+        vertical: compact ? 24.h : 34.h,
+      ),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [Color(0xFF0F172A), Color(0xFF1E3A8A), Color(0xFF1E40AF)],
@@ -256,62 +272,175 @@ class _AccountAccessScreenState extends State<AccountAccessScreen> {
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
         children: [
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(30.r),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+          Positioned(
+            top: -60.r,
+            right: -50.r,
+            child: Container(
+              width: 170.r,
+              height: 170.r,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withValues(alpha: 0.04),
+              ),
             ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 6.r,
-                  height: 6.r,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF34D399),
-                    shape: BoxShape.circle,
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(30.r),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.15),
                   ),
                 ),
-                Gap(7.w),
-                Text(
-                  _isArabic ? 'بوابة الدخول' : 'ACCESS PORTAL',
-                  style: TextStyle(
-                    fontSize: 9.sp,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1.4,
-                    color: Colors.white.withValues(alpha: 0.9),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 6.r,
+                      height: 6.r,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF34D399),
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    Gap(7.w),
+                    Flexible(
+                      child: Text(
+                        _isArabic
+                            ? 'بوابة الدخول الموحدة'
+                            : 'UNIFIED ACCESS PORTAL',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 9.sp,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 1.2,
+                          color: Colors.white.withValues(alpha: 0.9),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Gap(compact ? 16.h : 24.h),
+              Text(
+                _isArabic
+                    ? 'منصة واحدة\nلكل أعمالك'
+                    : 'One platform.\nEvery business function.',
+                style: TextStyle(
+                  fontSize: compact ? 24.sp : 32.sp,
+                  fontWeight: FontWeight.w900,
+                  height: 1.15,
+                  letterSpacing: -0.6,
+                  color: Colors.white,
+                ),
+              ),
+              Gap(10.h),
+              Text(
+                _isArabic
+                    ? 'اختر القسم الذي تريد البدء منه، أدخل عنوان حسابك، ثم تابع إلى تسجيل الدخول.'
+                    : 'Pick the section you want to start with, enter your account address, then continue to sign in.',
+                style: TextStyle(
+                  fontSize: 12.sp,
+                  height: 1.6,
+                  color: Colors.white.withValues(alpha: 0.72),
+                ),
+              ),
+              Gap(compact ? 18.h : 28.h),
+              Wrap(
+                spacing: 8.w,
+                runSpacing: 8.h,
+                children: [
+                  _heroChip(
+                    Icons.account_balance_rounded,
+                    'المحاسبة',
+                    'Accounting',
+                  ),
+                  _heroChip(Icons.domain_rounded, 'الأصول', 'Assets'),
+                  _heroChip(Icons.point_of_sale_rounded, 'المبيعات', 'Sales'),
+                  _heroChip(
+                    Icons.shopping_cart_rounded,
+                    'المشتريات',
+                    'Purchases',
+                  ),
+                  _heroChip(Icons.inventory_2_rounded, 'المخزون', 'Inventory'),
+                ],
+              ),
+              if (!compact) ...[
+                Gap(30.h),
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 14.w,
+                    vertical: 12.h,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.06),
+                    borderRadius: BorderRadius.circular(14.r),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.08),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.verified_user_rounded,
+                        color: const Color(0xFF93C5FD),
+                        size: 18.r,
+                      ),
+                      Gap(10.w),
+                      Expanded(
+                        child: Text(
+                          _isArabic
+                              ? 'اتصال آمن ومشفر لبيانات مؤسستك'
+                              : 'Secure, encrypted access to your organization',
+                          style: TextStyle(
+                            fontSize: 10.5.sp,
+                            height: 1.4,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white.withValues(alpha: 0.78),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
-            ),
+            ],
           ),
-          Gap(16.h),
-          Text(
-            _isArabic
-                ? 'كيف تريد استخدام DELTA ERP؟'
-                : 'How would you like to use DELTA ERP?',
-            style: TextStyle(
-              fontSize: 26.sp,
-              fontWeight: FontWeight.w900,
-              height: 1.15,
-              letterSpacing: -0.5,
-              color: Colors.white,
-            ),
-          ),
-          Gap(8.h),
-          Text(
-            _isArabic
-                ? 'ابدأ بحساب تجريبي لتجربة النظام، أو تابع إلى حسابك الحالي باستخدام عنوان الحساب.'
-                : 'Start with a trial account to explore the system, or continue to your existing account with your account address.',
-            style: TextStyle(
-              fontSize: 12.5.sp,
-              height: 1.6,
-              color: Colors.white.withValues(alpha: 0.75),
+        ],
+      ),
+    );
+  }
+
+  Widget _heroChip(IconData icon, String labelAr, String labelEn) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 7.h),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(10.r),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 13.r, color: const Color(0xFF93C5FD)),
+          Gap(6.w),
+          Flexible(
+            child: Text(
+              _isArabic ? labelAr : labelEn,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 10.5.sp,
+                fontWeight: FontWeight.w700,
+                color: Colors.white.withValues(alpha: 0.9),
+              ),
             ),
           ),
         ],
@@ -319,35 +448,106 @@ class _AccountAccessScreenState extends State<AccountAccessScreen> {
     );
   }
 
-  Widget _buildTrialCard() {
-    return _OptionCard(
-      accent: const Color(0xFF0284C7),
-      icon: Icons.rocket_launch_rounded,
-      tag: _isArabic ? 'بداية سريعة' : 'QUICK START',
-      title: _isArabic ? 'حساب تجريبي' : 'Trial account',
-      description: _isArabic
-          ? 'استكشف جميع الميزات باستخدام حساب تجريبي جاهز، دون الحاجة إلى إعداد مسبق.'
-          : 'Explore every feature with a ready-to-use trial account. No setup required.',
-      footer: _primaryButton(
-        label: _isArabic ? 'ابدأ الحساب التجريبي' : 'Start trial account',
-        icon: Icons.arrow_forward_rounded,
-        onPressed: _continueAsTrial,
+  Widget _buildFormCard() {
+    final selected = _selectedModule;
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(22.r),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(22.r),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0F172A).withValues(alpha: 0.06),
+            blurRadius: 24,
+            offset: const Offset(0, 10),
+          ),
+        ],
       ),
-    );
-  }
-
-  Widget _buildExistingAccountCard() {
-    return _OptionCard(
-      accent: const Color(0xFF1E40AF),
-      icon: Icons.domain_rounded,
-      tag: _isArabic ? 'عميل حالي' : 'EXISTING CUSTOMER',
-      title: _isArabic ? 'حساب قائم' : 'Existing account',
-      description: _isArabic
-          ? 'أدخل عنوان حسابك للوصول إلى بيانات مؤسستك والمتابعة إلى تسجيل الدخول.'
-          : 'Enter your account address to access your organization and continue to sign in.',
-      footer: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Row(
+            children: [
+              _stepBadge('1'),
+              Gap(10.w),
+              Expanded(
+                child: Text(
+                  _isArabic ? 'اختر مساحة العمل' : 'Choose your workspace',
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w900,
+                    color: const Color(0xFF0F172A),
+                  ),
+                ),
+              ),
+              if (selected != null)
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 9.w, vertical: 4.h),
+                  decoration: BoxDecoration(
+                    color: selected.color.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(20.r),
+                  ),
+                  child: Text(
+                    _isArabic ? selected.titleAr : selected.titleEn,
+                    style: TextStyle(
+                      fontSize: 10.sp,
+                      fontWeight: FontWeight.w800,
+                      color: selected.color,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          Gap(6.h),
+          Padding(
+            padding: EdgeInsetsDirectional.only(start: 34.w),
+            child: Text(
+              _isArabic
+                  ? 'يمكنك البدء من أي قسم وتغييره لاحقاً من داخل النظام.'
+                  : 'Start anywhere — you can switch sections later inside the system.',
+              style: TextStyle(
+                fontSize: 11.sp,
+                height: 1.5,
+                color: const Color(0xFF64748B),
+              ),
+            ),
+          ),
+          Gap(16.h),
+          _buildModuleGrid(),
+          Gap(22.h),
+          Row(
+            children: [
+              _stepBadge('2'),
+              Gap(10.w),
+              Expanded(
+                child: Text(
+                  _isArabic ? 'حسابك' : 'Your account',
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w900,
+                    color: const Color(0xFF0F172A),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Gap(6.h),
+          Padding(
+            padding: EdgeInsetsDirectional.only(start: 34.w),
+            child: Text(
+              _isArabic
+                  ? 'أدخل عنوان الحساب الذي تريد الدخول إليه.'
+                  : 'Enter the address of the account you want to access.',
+              style: TextStyle(
+                fontSize: 11.sp,
+                height: 1.5,
+                color: const Color(0xFF64748B),
+              ),
+            ),
+          ),
+          Gap(14.h),
           Text(
             _isArabic ? 'عنوان الحساب' : 'Account address',
             style: TextStyle(
@@ -374,31 +574,178 @@ class _AccountAccessScreenState extends State<AccountAccessScreen> {
             unFocusColor: const Color(0xFFE2E8F0),
             focusColor: const Color(0xFF3B82F6),
             onChanged: (_) {
-              if (_addressError != null) {
-                setState(() => _addressError = null);
+              if (_error != null) {
+                setState(() => _error = null);
               }
             },
           ),
-          if (_addressError != null) ...[
-            Gap(7.h),
-            Text(
-              _addressError!,
-              style: TextStyle(
-                fontSize: 11.sp,
-                fontWeight: FontWeight.w600,
-                color: const Color(0xFFDC2626),
-              ),
+          if (_error != null) ...[
+            Gap(9.h),
+            Row(
+              children: [
+                const Icon(
+                  Icons.error_outline_rounded,
+                  size: 15,
+                  color: Color(0xFFDC2626),
+                ),
+                Gap(5.w),
+                Expanded(
+                  child: Text(
+                    _error!,
+                    style: TextStyle(
+                      fontSize: 11.sp,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFFDC2626),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
-          Gap(14.h),
+          Gap(18.h),
           _primaryButton(
             label: _isArabic
                 ? 'متابعة إلى تسجيل الدخول'
                 : 'Continue to sign in',
             icon: Icons.login_rounded,
-            onPressed: _continueWithAddress,
+            onPressed: _continueToLogin,
+          ),
+          Gap(10.h),
+          Center(
+            child: TextButton(
+              onPressed: _continueAsTrial,
+              style: TextButton.styleFrom(
+                foregroundColor: const Color(0xFF3B82F6),
+                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+              ),
+              child: Text(
+                _isArabic
+                    ? 'أو ابدأ بحساب تجريبي'
+                    : 'Or start with a trial account',
+                style: TextStyle(
+                  fontSize: 11.5.sp,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildModuleGrid() {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const spacing = 12.0;
+        final columns = constraints.maxWidth >= 420 ? 2 : 1;
+        final width = columns == 1
+            ? constraints.maxWidth
+            : (constraints.maxWidth - spacing) / 2;
+        return Wrap(
+          spacing: spacing,
+          runSpacing: spacing,
+          children: [
+            for (var i = 0; i < workspaceModules.length; i++)
+              SizedBox(
+                width: columns == 2 && i == workspaceModules.length - 1
+                    ? constraints.maxWidth
+                    : width,
+                child: _buildModuleCard(workspaceModules[i]),
+              ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildModuleCard(WorkspaceModule module) {
+    final isSelected = _selectedModuleId == module.id;
+    return InkWell(
+      onTap: () => _selectModule(module),
+      borderRadius: BorderRadius.circular(14.r),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        curve: Curves.easeOut,
+        padding: EdgeInsets.all(13.r),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? module.color.withValues(alpha: 0.07)
+              : const Color(0xFFF8FAFC),
+          borderRadius: BorderRadius.circular(14.r),
+          border: Border.all(
+            color: isSelected ? module.color : const Color(0xFFE2E8F0),
+            width: isSelected ? 1.6 : 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 40.r,
+              height: 40.r,
+              decoration: BoxDecoration(
+                color: module.color.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(11.r),
+              ),
+              child: Icon(module.icon, color: module.color, size: 20.r),
+            ),
+            Gap(11.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    _isArabic ? module.titleAr : module.titleEn,
+                    style: TextStyle(
+                      fontSize: 13.sp,
+                      fontWeight: FontWeight.w800,
+                      color: const Color(0xFF0F172A),
+                    ),
+                  ),
+                  Gap(2.h),
+                  Text(
+                    _isArabic ? module.descriptionAr : module.descriptionEn,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 10.sp,
+                      height: 1.35,
+                      color: const Color(0xFF64748B),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Gap(6.w),
+            Icon(
+              isSelected
+                  ? Icons.check_circle_rounded
+                  : Icons.radio_button_unchecked_rounded,
+              color: isSelected ? module.color : const Color(0xFFCBD5E1),
+              size: 19.r,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _stepBadge(String value) {
+    return Container(
+      width: 24.r,
+      height: 24.r,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: const Color(0xFF1E40AF),
+        borderRadius: BorderRadius.circular(8.r),
+      ),
+      child: Text(
+        value,
+        style: TextStyle(
+          fontSize: 11.sp,
+          fontWeight: FontWeight.w900,
+          color: Colors.white,
+        ),
       ),
     );
   }
@@ -409,19 +756,19 @@ class _AccountAccessScreenState extends State<AccountAccessScreen> {
     required VoidCallback onPressed,
   }) {
     return Container(
-      height: 50.h,
+      height: 52.h,
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [Color(0xFF1E40AF), Color(0xFF3B82F6)],
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
         ),
-        borderRadius: BorderRadius.circular(13.r),
+        borderRadius: BorderRadius.circular(14.r),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF1E40AF).withValues(alpha: 0.28),
-            blurRadius: 16,
-            offset: const Offset(0, 7),
+            color: const Color(0xFF1E40AF).withValues(alpha: 0.3),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
@@ -431,111 +778,33 @@ class _AccountAccessScreenState extends State<AccountAccessScreen> {
           backgroundColor: Colors.transparent,
           shadowColor: Colors.transparent,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(13.r),
+            borderRadius: BorderRadius.circular(14.r),
           ),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 13.5.sp,
-                fontWeight: FontWeight.w800,
-                color: Colors.white,
-                letterSpacing: 0.3,
+            Flexible(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                  letterSpacing: 0.3,
+                ),
               ),
             ),
             Gap(8.w),
             Icon(
               _isArabic ? Icons.arrow_back_rounded : icon,
               color: Colors.white,
-              size: 17.r,
+              size: 18.r,
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _OptionCard extends StatelessWidget {
-  final Color accent;
-  final IconData icon;
-  final String tag;
-  final String title;
-  final String description;
-  final Widget footer;
-
-  const _OptionCard({
-    required this.accent,
-    required this.icon,
-    required this.tag,
-    required this.title,
-    required this.description,
-    required this.footer,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(22.r),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18.r),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF0F172A).withValues(alpha: 0.05),
-            blurRadius: 18,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 48.r,
-            height: 48.r,
-            decoration: BoxDecoration(
-              color: accent.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(14.r),
-            ),
-            child: Icon(icon, color: accent, size: 24.r),
-          ),
-          Gap(16.h),
-          Text(
-            tag,
-            style: TextStyle(
-              fontSize: 9.sp,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 1.3,
-              color: accent,
-            ),
-          ),
-          Gap(6.h),
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 20.sp,
-              fontWeight: FontWeight.w900,
-              color: const Color(0xFF0F172A),
-              height: 1.2,
-            ),
-          ),
-          Gap(8.h),
-          Text(
-            description,
-            style: TextStyle(
-              fontSize: 12.sp,
-              height: 1.6,
-              color: const Color(0xFF64748B),
-            ),
-          ),
-          Gap(20.h),
-          footer,
-        ],
       ),
     );
   }

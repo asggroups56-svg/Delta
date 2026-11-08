@@ -15,6 +15,8 @@ import '../models/annual_ledger_report_request_model.dart';
 import '../models/accounts_comparison_report_request_model.dart';
 import '../models/account_centers_summary_for_main_accounts_report_request_model.dart';
 import '../models/accounts_centers_comparison_report_request_model.dart';
+import '../models/activity_center_data_report_request_model.dart';
+import '../models/activity_report_request_model.dart';
 import '../models/chart_of_account_report_request_model.dart';
 import '../models/cash_in_cash_out_voucher_report_request_model.dart';
 import '../models/center_on_center_analysis_report_request_model.dart';
@@ -36,6 +38,8 @@ import '../models/general_ledger_payable_aging_report_request_model.dart';
 import '../models/general_ledger_posting_report_request_model.dart';
 import '../models/general_ledger_report_request_model.dart';
 import '../models/income_and_expense_situation_report_request_model.dart';
+import '../models/indicator_data_addition_report_request_model.dart';
+import '../models/indicator_data_standard_report_request_model.dart';
 import '../models/integration_general_ledger_report_request_model.dart';
 import '../models/journal_report_request_model.dart';
 import '../models/ledger_report_request_model.dart';
@@ -51,6 +55,7 @@ import '../models/subsidiary_ledger_account_report_request_model.dart';
 import '../models/trial_balance_by_categories_report_request_model.dart';
 import '../models/trial_balance_report_request_model.dart';
 import '../models/trial_balances_report_for_period_request_model.dart';
+import '../models/withdraw_and_depositing_voucher_report_request_model.dart';
 
 abstract interface class ReportsRepo {
   Future<Either<Failure, File>> getChartOfAccountReport({
@@ -144,6 +149,46 @@ abstract interface class ReportsRepo {
     int? fromCashAccount,
     int? toCashAccount,
     String reportName = 'AGL019_1',
+    required String languageCode,
+    String exportType = 'pdf',
+  });
+
+  Future<Either<Failure, File>> getIndicatorDataStandardReport({
+    int? fromIndicatorCode,
+    int? toIndicatorCode,
+    String reportName = 'AGL066',
+    required String languageCode,
+    String exportType = 'pdf',
+  });
+
+  Future<Either<Failure, File>> getIndicatorDataAdditionReport({
+    int? fromIndicatorCode,
+    int? toIndicatorCode,
+    String reportName = 'AGL800A',
+    required String languageCode,
+    String exportType = 'pdf',
+  });
+
+  Future<Either<Failure, File>> getWithdrawAndDepositingVoucherReport({
+    int? fromBankCode,
+    int? toBankCode,
+    DateTime? fromDate,
+    DateTime? toDate,
+    String reportName = 'AGL065',
+    required String languageCode,
+    String exportType = 'pdf',
+  });
+
+  Future<Either<Failure, File>> getActivityReport({
+    int? fromCenterNoOne,
+    int? toCenterNoOne,
+    int? fromAccountNo,
+    int? toAccountNo,
+    int? fromCenterNoZero,
+    int? toCenterNoZero,
+    DateTime? fromDate,
+    DateTime? toDate,
+    String reportName = 'AGL111',
     required String languageCode,
     String exportType = 'pdf',
   });
@@ -445,7 +490,6 @@ abstract interface class ReportsRepo {
   });
 
   Future<Either<Failure, File>> getAdditionalFinalReport({
-    int? reportSerial,
     num? costCenterNo,
     String? reportTitle,
     int? fromLineSerial,
@@ -464,6 +508,21 @@ abstract interface class ReportsRepo {
     DateTime? toDate,
     required int costCenterType,
     required String reportName,
+    required String languageCode,
+    String exportType = 'pdf',
+  });
+
+  Future<Either<Failure, File>> getActivityCenterDataReport({
+    int? fromCostCenterNo,
+    int? toCostCenterNo,
+    int? fromLevel,
+    int? toLevel,
+    int centerType = 2,
+    int? fromCenterNoZero,
+    int? toCenterNoZero,
+    int? fromAccountNo,
+    int? toAccountNo,
+    String reportName = 'AGL007A',
     required String languageCode,
     String exportType = 'pdf',
   });
@@ -885,6 +944,134 @@ class ReportsRepoImpl implements ReportsRepo {
           endpoint: EndPoints.checksDataReport,
           body: requestModel.toJson(),
           fileNamePrefix: 'checks_data_report',
+          exportType: requestModel.exportType,
+          headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+        );
+      },
+    );
+  }
+
+  @override
+  Future<Either<Failure, File>> getIndicatorDataStandardReport({
+    int? fromIndicatorCode,
+    int? toIndicatorCode,
+    String reportName = 'AGL066',
+    required String languageCode,
+    String exportType = 'pdf',
+  }) {
+    return handleDioRequest(
+      request: () async {
+        final requestModel = IndicatorDataStandardReportRequestModel(
+          fromIndicatorCode: fromIndicatorCode,
+          toIndicatorCode: toIndicatorCode,
+          reportName: reportName,
+          exportType: exportType,
+        );
+
+        return _downloadReport(
+          endpoint: EndPoints.indicatorDataStandardReport,
+          body: requestModel.toJson(),
+          fileNamePrefix: 'indicator_data_standard_report',
+          exportType: requestModel.exportType,
+          headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+        );
+      },
+    );
+  }
+
+  @override
+  Future<Either<Failure, File>> getIndicatorDataAdditionReport({
+    int? fromIndicatorCode,
+    int? toIndicatorCode,
+    String reportName = 'AGL800A',
+    required String languageCode,
+    String exportType = 'pdf',
+  }) {
+    return handleDioRequest(
+      request: () async {
+        final requestModel = IndicatorDataAdditionReportRequestModel(
+          fromIndicatorCode: fromIndicatorCode,
+          toIndicatorCode: toIndicatorCode,
+          reportName: reportName,
+          exportType: exportType,
+        );
+
+        return _downloadReport(
+          endpoint: EndPoints.indicatorDataAdditionReport,
+          body: requestModel.toJson(),
+          fileNamePrefix: 'indicator_data_addition_report',
+          exportType: requestModel.exportType,
+          headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+        );
+      },
+    );
+  }
+
+  @override
+  Future<Either<Failure, File>> getWithdrawAndDepositingVoucherReport({
+    int? fromBankCode,
+    int? toBankCode,
+    DateTime? fromDate,
+    DateTime? toDate,
+    String reportName = 'AGL065',
+    required String languageCode,
+    String exportType = 'pdf',
+  }) {
+    return handleDioRequest(
+      request: () async {
+        final requestModel = WithdrawAndDepositingVoucherReportRequestModel(
+          fromBankCode: fromBankCode,
+          toBankCode: toBankCode,
+          fromDate: fromDate,
+          toDate: toDate,
+          reportName: reportName,
+          exportType: exportType,
+        );
+
+        return _downloadReport(
+          endpoint: EndPoints.withdrawAndDepositingVoucherReport,
+          body: requestModel.toJson(),
+          fileNamePrefix: 'withdraw_and_depositing_voucher_report',
+          exportType: requestModel.exportType,
+          headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+        );
+      },
+    );
+  }
+
+  @override
+  Future<Either<Failure, File>> getActivityReport({
+    int? fromCenterNoOne,
+    int? toCenterNoOne,
+    int? fromAccountNo,
+    int? toAccountNo,
+    int? fromCenterNoZero,
+    int? toCenterNoZero,
+    DateTime? fromDate,
+    DateTime? toDate,
+    String reportName = 'AGL111',
+    required String languageCode,
+    String exportType = 'pdf',
+  }) {
+    return handleDioRequest(
+      request: () async {
+        final requestModel = ActivityReportRequestModel(
+          fromCenterNoOne: fromCenterNoOne,
+          toCenterNoOne: toCenterNoOne,
+          fromAccountNo: fromAccountNo,
+          toAccountNo: toAccountNo,
+          fromCenterNoZero: fromCenterNoZero,
+          toCenterNoZero: toCenterNoZero,
+          fromDate: fromDate,
+          toDate: toDate,
+          reportName: reportName,
+          exportType: exportType,
+        );
+
+        return _downloadReport(
+          endpoint: EndPoints.activityReport,
+          body: requestModel.toJson(),
+          fileNamePrefix: 'activity_report',
           exportType: requestModel.exportType,
           headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
         );
@@ -1756,7 +1943,6 @@ class ReportsRepoImpl implements ReportsRepo {
 
   @override
   Future<Either<Failure, File>> getAdditionalFinalReport({
-    int? reportSerial,
     num? costCenterNo,
     String? reportTitle,
     int? fromLineSerial,
@@ -1768,7 +1954,6 @@ class ReportsRepoImpl implements ReportsRepo {
     return handleDioRequest(
       request: () async {
         final requestModel = AdditionalFinalReportRequestModel(
-          reportSerial: reportSerial,
           costCenterNo: costCenterNo,
           reportTitle: reportTitle,
           fromLineSerial: fromLineSerial,
@@ -1818,6 +2003,47 @@ class ReportsRepoImpl implements ReportsRepo {
           endpoint: EndPoints.costCentersReport,
           body: requestModel.toJson(),
           fileNamePrefix: 'cost_centers',
+          exportType: requestModel.exportType,
+          headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+        );
+      },
+    );
+  }
+
+  @override
+  Future<Either<Failure, File>> getActivityCenterDataReport({
+    int? fromCostCenterNo,
+    int? toCostCenterNo,
+    int? fromLevel,
+    int? toLevel,
+    int centerType = 2,
+    int? fromCenterNoZero,
+    int? toCenterNoZero,
+    int? fromAccountNo,
+    int? toAccountNo,
+    String reportName = 'AGL007A',
+    required String languageCode,
+    String exportType = 'pdf',
+  }) {
+    return handleDioRequest(
+      request: () async {
+        final requestModel = ActivityCenterDataReportRequestModel(
+          fromCostCenterNo: fromCostCenterNo,
+          toCostCenterNo: toCostCenterNo,
+          fromLevel: fromLevel,
+          toLevel: toLevel,
+          centerType: centerType,
+          fromCenterNoZero: fromCenterNoZero,
+          toCenterNoZero: toCenterNoZero,
+          fromAccountNo: fromAccountNo,
+          toAccountNo: toAccountNo,
+          reportName: reportName,
+          exportType: exportType,
+        );
+        return _downloadReport(
+          endpoint: EndPoints.costCentersReport,
+          body: requestModel.toJson(),
+          fileNamePrefix: 'activity_center_data_report',
           exportType: requestModel.exportType,
           headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
         );

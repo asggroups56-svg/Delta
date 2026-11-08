@@ -14,8 +14,13 @@ import 'package:my_template/core/utils/app_locale_key.dart';
 import 'package:my_template/core/utils/common_methods.dart';
 import 'package:my_template/features/reports/data/repository/reports_repo.dart';
 import 'package:my_template/features/reports/presentation/view/widget/file_download_service.dart';
+import 'package:my_template/features/reports/presentation/view/widget/activity_report_filter_bottom_sheet_widget.dart';
+import 'package:my_template/features/reports/presentation/view/widget/activity_center_data_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/cash_in_cash_out_voucher_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/checks_data_report_filter_bottom_sheet_widget.dart';
+import 'package:my_template/features/reports/presentation/view/widget/indicator_data_standard_report_filter_bottom_sheet_widget.dart';
+import 'package:my_template/features/reports/presentation/view/widget/indicator_data_addition_report_filter_bottom_sheet_widget.dart';
+import 'package:my_template/features/reports/presentation/view/widget/withdraw_and_depositing_voucher_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/center_on_center_analysis_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/master_accounts_or_centers_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/general_journal_for_level_report_filter_bottom_sheet_widget.dart';
@@ -624,6 +629,119 @@ class _ReportsScreenState extends State<ReportsScreen> {
               ),
               Gap(10.h),
               _buildExportOption(
+                icon: Icons.query_stats_rounded,
+                color: AppColor.emeraldTeal,
+                title: context.locale.languageCode == 'ar'
+                    ? 'بيانات المؤشر القياسي'
+                    : 'Standard Indicator Data',
+                subtitle:
+                    'Report/IndicatorDataStandardReport (AGL066 / AGL067)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: AppLocaleKey.statementStandardIndicatorData.tr(),
+                    description: AppLocaleKey.statementStandardIndicatorDataDesc
+                        .tr(),
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AGL066',
+                    isIndicatorDataStandardReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.stacked_line_chart_rounded,
+                color: AppColor.purpleAccent,
+                title: context.locale.languageCode == 'ar'
+                    ? 'بيانات المؤشرات الإضافية'
+                    : 'Additional Indicators Data',
+                subtitle:
+                    'Report/IndicatorDataAdditionReport (AGL800A / AGL800)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: AppLocaleKey.statementAdditionalIndicatorData.tr(),
+                    description: AppLocaleKey
+                        .statementAdditionalIndicatorDataDesc
+                        .tr(),
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AGL800A',
+                    isIndicatorDataAdditionReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.swap_vert_circle_outlined,
+                color: AppColor.warningOrange,
+                title: context.locale.languageCode == 'ar'
+                    ? 'حركات السحب والإيداع'
+                    : 'Withdrawal and Deposit Transactions',
+                subtitle: 'Report/WithdrawandDepositingVoucherReport (AGL065)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: AppLocaleKey.statementWithdrawalAndDeposit.tr(),
+                    description: AppLocaleKey.statementWithdrawalAndDepositDesc
+                        .tr(),
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AGL065',
+                    isWithdrawAndDepositingVoucherReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.timeline_rounded,
+                color: AppColor.oceanBlue,
+                title: AppLocaleKey.statementActivityReports.tr(),
+                subtitle: 'Report/VigorReport (AGL111)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: AppLocaleKey.statementActivityReports.tr(),
+                    description: AppLocaleKey.statementActivityReportsDesc.tr(),
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AGL111',
+                    isActivityReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.analytics_outlined,
+                color: AppColor.purpleAccent,
+                title: AppLocaleKey.statementActivityCenterData.tr(),
+                subtitle: 'Report/CostCentersReport (AGL007A)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: AppLocaleKey.statementActivityCenterData.tr(),
+                    description: AppLocaleKey.statementActivityCenterDataDesc
+                        .tr(),
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AGL007A',
+                    isActivityCenterDataReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
                 icon: Icons.account_balance_wallet_outlined,
                 color: AppColor.emeraldTeal,
                 title: AppLocaleKey.statementTrialBalanceByCategories.tr(),
@@ -1143,6 +1261,11 @@ class _ReportsScreenState extends State<ReportsScreen> {
     bool isGeneralJournalForLevelReport = false,
     bool isCashInCashOutVoucherReport = false,
     bool isChecksDataReport = false,
+    bool isIndicatorDataStandardReport = false,
+    bool isIndicatorDataAdditionReport = false,
+    bool isWithdrawAndDepositingVoucherReport = false,
+    bool isActivityReport = false,
+    bool isActivityCenterDataReport = false,
     bool isMasterAccountsOrCentersReport = false,
     int masterAccountsOrCentersReportPageType = 1,
     String masterAccountsOrCentersSummarizedReportName = 'AGL076',
@@ -1546,6 +1669,39 @@ class _ReportsScreenState extends State<ReportsScreen> {
       if (!mounted || cashVoucherReportFilter == null) return;
       exportType = cashVoucherReportFilter.exportType;
     }
+    WithdrawAndDepositingVoucherReportFilterSelection?
+    withdrawAndDepositingVoucherFilter;
+    if (isWithdrawAndDepositingVoucherReport) {
+      withdrawAndDepositingVoucherFilter =
+          await WithdrawAndDepositingVoucherReportFilterBottomSheetWidget.show(
+            context,
+            title: title,
+            initialExportType: exportType,
+          );
+      if (!mounted || withdrawAndDepositingVoucherFilter == null) return;
+      exportType = withdrawAndDepositingVoucherFilter.exportType;
+    }
+    ActivityReportFilterSelection? activityReportFilter;
+    if (isActivityReport) {
+      activityReportFilter = await ActivityReportFilterBottomSheetWidget.show(
+        context,
+        title: title,
+        initialExportType: exportType,
+      );
+      if (!mounted || activityReportFilter == null) return;
+      exportType = activityReportFilter.exportType;
+    }
+    ActivityCenterDataReportFilterSelection? activityCenterDataReportFilter;
+    if (isActivityCenterDataReport) {
+      activityCenterDataReportFilter =
+          await ActivityCenterDataReportFilterBottomSheetWidget.show(
+            context,
+            title: title,
+            initialExportType: exportType,
+          );
+      if (!mounted || activityCenterDataReportFilter == null) return;
+      exportType = activityCenterDataReportFilter.exportType;
+    }
     ChecksDataReportFilterSelection? checksDataReportFilter;
     if (isChecksDataReport) {
       checksDataReportFilter =
@@ -1556,6 +1712,32 @@ class _ReportsScreenState extends State<ReportsScreen> {
           );
       if (!mounted || checksDataReportFilter == null) return;
       exportType = checksDataReportFilter.exportType;
+    }
+    IndicatorDataStandardReportFilterSelection? indicatorDataStandardFilter;
+    if (isIndicatorDataStandardReport) {
+      indicatorDataStandardFilter =
+          await IndicatorDataStandardReportFilterBottomSheetWidget.show(
+            context,
+            title: title,
+            initialReportName: reportName ?? 'AGL066',
+            initialExportType: exportType,
+          );
+      if (!mounted || indicatorDataStandardFilter == null) return;
+      reportName = indicatorDataStandardFilter.reportName;
+      exportType = indicatorDataStandardFilter.exportType;
+    }
+    IndicatorDataAdditionReportFilterSelection? indicatorDataAdditionFilter;
+    if (isIndicatorDataAdditionReport) {
+      indicatorDataAdditionFilter =
+          await IndicatorDataAdditionReportFilterBottomSheetWidget.show(
+            context,
+            title: title,
+            initialReportName: reportName ?? 'AGL800A',
+            initialExportType: exportType,
+          );
+      if (!mounted || indicatorDataAdditionFilter == null) return;
+      reportName = indicatorDataAdditionFilter.reportName;
+      exportType = indicatorDataAdditionFilter.exportType;
     }
     MasterAccountsOrCentersReportFilterSelection? masterAccountsOrCentersFilter;
     if (isMasterAccountsOrCentersReport) {
@@ -1747,6 +1929,11 @@ class _ReportsScreenState extends State<ReportsScreen> {
           isGeneralJournalForLevelReport ||
           isCashInCashOutVoucherReport ||
           isChecksDataReport ||
+          isIndicatorDataStandardReport ||
+          isIndicatorDataAdditionReport ||
+          isWithdrawAndDepositingVoucherReport ||
+          isActivityReport ||
+          isActivityCenterDataReport ||
           isMasterAccountsOrCentersReport ||
           isCenterOnCenterAnalysisReport ||
           isExpensesWithVatReport ||
@@ -1830,6 +2017,24 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 languageCode: languageCode,
                 exportType: exportType,
               )
+            : isIndicatorDataStandardReport
+            ? await reportsRepo.getIndicatorDataStandardReport(
+                fromIndicatorCode:
+                    indicatorDataStandardFilter?.fromIndicatorCode,
+                toIndicatorCode: indicatorDataStandardFilter?.toIndicatorCode,
+                reportName: reportName ?? 'AGL066',
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isIndicatorDataAdditionReport
+            ? await reportsRepo.getIndicatorDataAdditionReport(
+                fromIndicatorCode:
+                    indicatorDataAdditionFilter?.fromIndicatorCode,
+                toIndicatorCode: indicatorDataAdditionFilter?.toIndicatorCode,
+                reportName: reportName ?? 'AGL800A',
+                languageCode: languageCode,
+                exportType: exportType,
+              )
             : isCashInCashOutVoucherReport
             ? await reportsRepo.getCashInCashOutVoucherReport(
                 receiptType: cashVoucherReportFilter?.receiptType ?? 1,
@@ -1840,6 +2045,45 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 fromDate: cashVoucherReportFilter?.fromDate,
                 toDate: cashVoucherReportFilter?.toDate,
                 reportName: 'AGL019',
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isWithdrawAndDepositingVoucherReport
+            ? await reportsRepo.getWithdrawAndDepositingVoucherReport(
+                fromBankCode: withdrawAndDepositingVoucherFilter?.fromBankCode,
+                toBankCode: withdrawAndDepositingVoucherFilter?.toBankCode,
+                fromDate: withdrawAndDepositingVoucherFilter?.fromDate,
+                toDate: withdrawAndDepositingVoucherFilter?.toDate,
+                reportName: reportName ?? 'AGL065',
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isActivityReport
+            ? await reportsRepo.getActivityReport(
+                fromCenterNoOne: activityReportFilter?.fromCenterNoOne,
+                toCenterNoOne: activityReportFilter?.toCenterNoOne,
+                fromAccountNo: activityReportFilter?.fromAccountNo,
+                toAccountNo: activityReportFilter?.toAccountNo,
+                fromCenterNoZero: activityReportFilter?.fromCenterNoZero,
+                toCenterNoZero: activityReportFilter?.toCenterNoZero,
+                fromDate: activityReportFilter?.fromDate,
+                toDate: activityReportFilter?.toDate,
+                reportName: reportName ?? 'AGL111',
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isActivityCenterDataReport
+            ? await reportsRepo.getActivityCenterDataReport(
+                fromCostCenterNo:
+                    activityCenterDataReportFilter?.fromCostCenterNo,
+                toCostCenterNo: activityCenterDataReportFilter?.toCostCenterNo,
+                fromLevel: activityCenterDataReportFilter?.fromLevel,
+                toLevel: activityCenterDataReportFilter?.toLevel,
+                centerType: activityCenterDataReportFilter?.centerType ?? 0,
+                fromCenterNoZero:
+                    activityCenterDataReportFilter?.fromCenterNoZero,
+                toCenterNoZero: activityCenterDataReportFilter?.toCenterNoZero,
+                reportName: reportName ?? 'AGL007A',
                 languageCode: languageCode,
                 exportType: exportType,
               )
@@ -2118,9 +2362,10 @@ class _ReportsScreenState extends State<ReportsScreen> {
               )
             : isAdditionalFinalReport
             ? await reportsRepo.getAdditionalFinalReport(
-                reportSerial: additionalFinalReportFilter?.reportSerial,
                 costCenterNo: additionalFinalReportFilter?.costCenterNo,
-                reportTitle: additionalFinalReportFilter?.reportTitle,
+                reportTitle: languageCode == 'ar'
+                    ? 'تقرير إضافي'
+                    : 'Additional Report',
                 fromLineSerial: additionalFinalReportFilter?.fromLineSerial,
                 toLineSerial: additionalFinalReportFilter?.toLineSerial,
                 reportName:
@@ -2888,6 +3133,66 @@ class _ReportsScreenState extends State<ReportsScreen> {
         'reportName': 'AGL037A',
         'isAdditionalFinalReport': true,
         'treeGroup': 'concluding',
+      },
+      {
+        'id': 'indicator_data_standard_report',
+        'title': AppLocaleKey.statementStandardIndicatorData.tr(),
+        'desc': AppLocaleKey.statementStandardIndicatorDataDesc.tr(),
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.query_stats_rounded,
+        'iconColor': AppColor.emeraldTeal,
+        'category': 1,
+        'reportName': 'AGL066',
+        'isIndicatorDataStandardReport': true,
+        'treeGroup': 'concluding',
+      },
+      {
+        'id': 'indicator_data_addition_report',
+        'title': AppLocaleKey.statementAdditionalIndicatorData.tr(),
+        'desc': AppLocaleKey.statementAdditionalIndicatorDataDesc.tr(),
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.stacked_line_chart_rounded,
+        'iconColor': AppColor.purpleAccent,
+        'category': 1,
+        'reportName': 'AGL800A',
+        'isIndicatorDataAdditionReport': true,
+        'treeGroup': 'concluding',
+      },
+      {
+        'id': 'withdraw_and_depositing_voucher_report',
+        'title': AppLocaleKey.statementWithdrawalAndDeposit.tr(),
+        'desc': AppLocaleKey.statementWithdrawalAndDepositDesc.tr(),
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.swap_vert_circle_outlined,
+        'iconColor': AppColor.warningOrange,
+        'category': 1,
+        'reportName': 'AGL065',
+        'isWithdrawAndDepositingVoucherReport': true,
+        'treeGroup': 'cashVouchers',
+      },
+      {
+        'id': 'activity_report',
+        'title': AppLocaleKey.statementActivityReports.tr(),
+        'desc': AppLocaleKey.statementActivityReportsDesc.tr(),
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.timeline_rounded,
+        'iconColor': AppColor.oceanBlue,
+        'category': 1,
+        'reportName': 'AGL111',
+        'isActivityReport': true,
+        'treeGroup': 'activityReports',
+      },
+      {
+        'id': 'activity_center_data_report',
+        'title': AppLocaleKey.statementActivityCenterData.tr(),
+        'desc': AppLocaleKey.statementActivityCenterDataDesc.tr(),
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.analytics_outlined,
+        'iconColor': AppColor.purpleAccent,
+        'category': 1,
+        'reportName': 'AGL007A',
+        'isActivityCenterDataReport': true,
+        'treeGroup': 'activityReports',
       },
       {
         'title': AppLocaleKey.statementDailyIncome.tr(),
@@ -3832,6 +4137,14 @@ class _ReportsScreenState extends State<ReportsScreen> {
         accent: AppColor.oceanBlue,
       ),
       (
+        id: 13,
+        key: 'activityReports',
+        titleAr: 'تقارير النشاط',
+        titleEn: 'Activity Reports',
+        icon: Icons.timeline_rounded,
+        accent: AppColor.oceanBlue,
+      ),
+      (
         id: 11,
         key: 'cashVouchers',
         titleAr: 'تقارير سندات القبض والدفع',
@@ -3932,6 +4245,15 @@ class _ReportsScreenState extends State<ReportsScreen> {
       isCashInCashOutVoucherReport:
           statement['isCashInCashOutVoucherReport'] == true,
       isChecksDataReport: statement['isChecksDataReport'] == true,
+      isIndicatorDataStandardReport:
+          statement['isIndicatorDataStandardReport'] == true,
+      isIndicatorDataAdditionReport:
+          statement['isIndicatorDataAdditionReport'] == true,
+      isWithdrawAndDepositingVoucherReport:
+          statement['isWithdrawAndDepositingVoucherReport'] == true,
+      isActivityReport: statement['isActivityReport'] == true,
+      isActivityCenterDataReport:
+          statement['isActivityCenterDataReport'] == true,
       isMasterAccountsOrCentersReport:
           statement['isMasterAccountsOrCentersReport'] == true,
       masterAccountsOrCentersReportPageType:

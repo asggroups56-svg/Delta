@@ -12,11 +12,14 @@ part 'auth_state.dart';
 class AuthCubit extends Cubit<AuthState> {
   final AuthRepo authRepo;
   AuthCubit(this.authRepo) : super(const AuthState()) {
-    final savedAddress = CacheHelper.sharedPreferences.getString(
-      CacheHelper.accountAddressKey,
-    );
+    final prefs = CacheHelper.sharedPreferences;
+    final savedAddress = prefs.getString(CacheHelper.accountAddressKey);
     if (savedAddress != null && savedAddress.isNotEmpty) {
       connectionNameController.text = savedAddress;
+    }
+    final savedModule = prefs.getString(CacheHelper.selectedModuleKey);
+    if (savedModule != null && savedModule.isNotEmpty) {
+      selectedModuleId = savedModule;
     }
   }
 
@@ -25,9 +28,9 @@ class AuthCubit extends Cubit<AuthState> {
   final TextEditingController connectionNameController =
       TextEditingController();
 
-  /// Module chosen on the module portal (accounting, payroll, sales, …).
-  /// Kept here so the login request can be scoped to it once the backend
-  /// exposes a module parameter.
+  /// Workspace chosen on the pre-login access page (accounting, assets,
+  /// sales, purchases, inventory). It is kept here so a signed-in session can
+  /// start in the section the user picked.
   String? selectedModuleId;
 
   void selectModule(String moduleId) => selectedModuleId = moduleId;

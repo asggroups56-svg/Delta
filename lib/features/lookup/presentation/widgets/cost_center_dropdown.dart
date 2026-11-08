@@ -23,6 +23,7 @@ class CostCenterDropdown extends StatefulWidget {
   final int? centerKind;
   final int? centerLevel;
   final int? accountType;
+  final String? idAsString;
   final int pageSize;
 
   const CostCenterDropdown({
@@ -35,6 +36,7 @@ class CostCenterDropdown extends StatefulWidget {
     this.centerKind = 0,
     this.centerLevel,
     this.accountType,
+    this.idAsString,
     this.pageSize = 20,
   });
 
@@ -73,6 +75,7 @@ class _CostCenterDropdownState extends State<CostCenterDropdown> {
         centerKind: widget.centerKind,
         centerLevel: widget.centerLevel,
         accountType: widget.accountType,
+        idAsString: widget.idAsString,
         selectedItem: _selected,
         pageSize: widget.pageSize,
         title: widget.title ?? defaultTitle,
@@ -108,10 +111,9 @@ class _CostCenterDropdownState extends State<CostCenterDropdown> {
         if (widget.title != null) ...[
           Text(
             widget.title!,
-            style: AppTextStyle.formTitleStyle(context).copyWith(
-              fontWeight: FontWeight.w600,
-              fontSize: 13.sp,
-            ),
+            style: AppTextStyle.formTitleStyle(
+              context,
+            ).copyWith(fontWeight: FontWeight.w600, fontSize: 13.sp),
           ),
           Gap(6.h),
         ],
@@ -177,9 +179,9 @@ class _CostCenterDropdownState extends State<CostCenterDropdown> {
                                 _selected!.centerName,
                                 style: AppTextStyle.textFormStyle(context)
                                     .copyWith(
-                                  fontSize: 13.sp,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                                      fontSize: 13.sp,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
@@ -187,9 +189,9 @@ class _CostCenterDropdownState extends State<CostCenterDropdown> {
                         )
                       : Text(
                           widget.hintText ?? _defaultHint,
-                          style: AppTextStyle.hintStyle(context).copyWith(
-                            fontSize: 13.sp,
-                          ),
+                          style: AppTextStyle.hintStyle(
+                            context,
+                          ).copyWith(fontSize: 13.sp),
                           overflow: TextOverflow.ellipsis,
                         ),
                 ),
@@ -231,6 +233,7 @@ class _CostCenterPickerModal extends StatefulWidget {
   final int? centerKind;
   final int? centerLevel;
   final int? accountType;
+  final String? idAsString;
   final CostCenterLightModel? selectedItem;
   final int pageSize;
   final String title;
@@ -240,6 +243,7 @@ class _CostCenterPickerModal extends StatefulWidget {
     required this.centerKind,
     this.centerLevel,
     this.accountType,
+    this.idAsString,
     required this.selectedItem,
     required this.pageSize,
     required this.title,
@@ -317,6 +321,7 @@ class _CostCenterPickerModalState extends State<_CostCenterPickerModal> {
       centerKind: widget.centerKind,
       centerLevel: widget.centerLevel,
       accountType: widget.accountType,
+      idAsString: widget.idAsString,
       searchWord: query.isEmpty ? null : query,
       page: page,
       pageSize: widget.pageSize,
@@ -405,10 +410,9 @@ class _CostCenterPickerModalState extends State<_CostCenterPickerModal> {
                   Expanded(
                     child: Text(
                       widget.title,
-                      style: AppTextStyle.formTitleStyle(context).copyWith(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: AppTextStyle.formTitleStyle(
+                        context,
+                      ).copyWith(fontSize: 16.sp, fontWeight: FontWeight.bold),
                     ),
                   ),
                   IconButton(
@@ -431,24 +435,22 @@ class _CostCenterPickerModalState extends State<_CostCenterPickerModal> {
                 decoration: BoxDecoration(
                   color: AppColor.textFormFillColor(context),
                   borderRadius: BorderRadius.circular(14.r),
-                  border: Border.all(
-                    color: foreground.withValues(alpha: 0.1),
-                  ),
+                  border: Border.all(color: foreground.withValues(alpha: 0.1)),
                 ),
                 child: TextField(
                   controller: _searchController,
                   onChanged: _onSearchChanged,
                   textInputAction: TextInputAction.search,
-                  style: AppTextStyle.textFormStyle(context).copyWith(
-                    fontSize: 13.sp,
-                  ),
+                  style: AppTextStyle.textFormStyle(
+                    context,
+                  ).copyWith(fontSize: 13.sp),
                   decoration: InputDecoration(
                     hintText: isAr
                         ? 'ابحث برقم أو اسم مركز التكلفة...'
                         : 'Search by cost center no or name...',
-                    hintStyle: AppTextStyle.hintStyle(context).copyWith(
-                      fontSize: 12.5.sp,
-                    ),
+                    hintStyle: AppTextStyle.hintStyle(
+                      context,
+                    ).copyWith(fontSize: 12.5.sp),
                     prefixIcon: Icon(
                       Icons.search_rounded,
                       color: accent,
@@ -479,9 +481,7 @@ class _CostCenterPickerModalState extends State<_CostCenterPickerModal> {
             Gap(12.h),
 
             // List of Cost Centers
-            Expanded(
-              child: _buildBody(foreground, accent, isAr),
-            ),
+            Expanded(child: _buildBody(foreground, accent, isAr)),
           ],
         ),
       ),
@@ -588,17 +588,15 @@ class _CostCenterPickerModalState extends State<_CostCenterPickerModal> {
               child: SizedBox(
                 width: 22.r,
                 height: 22.r,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: accent,
-                ),
+                child: CircularProgressIndicator(strokeWidth: 2, color: accent),
               ),
             ),
           );
         }
 
         final item = _items[index];
-        final isSelected = widget.selectedItem?.costCenterNo == item.costCenterNo;
+        final isSelected =
+            widget.selectedItem?.costCenterNo == item.costCenterNo;
 
         return Material(
           color: isSelected

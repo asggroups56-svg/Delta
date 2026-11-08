@@ -15,6 +15,13 @@ class EndPoints {
   static const String cashInCashOutVoucherReport =
       'Report/CashInCashOutVoucherReport';
   static const String checksDataReport = 'Report/ChecksDataReport';
+  static const String indicatorDataStandardReport =
+      'Report/IndicatorDataStandardReport';
+  static const String indicatorDataAdditionReport =
+      'Report/IndicatorDataAdditionReport';
+  static const String withdrawAndDepositingVoucherReport =
+      'Report/WithdrawandDepositingVoucherReport';
+  static const String activityReport = 'Report/VigorReport';
   static const String masterAccountsOrCentersReport =
       'Report/MasterAccountsOrCentersReport';
   static const String centerOnCenterAnalysisReport =

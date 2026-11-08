@@ -12,6 +12,7 @@ import 'package:my_template/core/theme/app_colors.dart';
 import 'package:my_template/core/utils/app_locale_key.dart';
 import 'package:my_template/core/utils/common_methods.dart';
 import 'package:my_template/core/utils/navigator_methods.dart';
+import 'package:my_template/features/auth/data/model/workspace_module.dart';
 import 'package:my_template/features/auth/presentation/view/cubit/auth_cubit.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -36,6 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     final cubit = context.read<AuthCubit>();
     final isArabic = context.locale.languageCode == 'ar';
+    final workspace = workspaceModuleById(cubit.selectedModuleId);
 
     return Scaffold(
       backgroundColor: AppColor.scaffoldColor(context),
@@ -225,29 +227,92 @@ class _LoginScreenState extends State<LoginScreen> {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            Container(
-                                              padding: EdgeInsets.symmetric(
-                                                horizontal: 10.w,
-                                                vertical: 4.h,
-                                              ),
-                                              decoration: BoxDecoration(
-                                                color: const Color(0xFFDBEAFE),
-                                                borderRadius:
-                                                    BorderRadius.circular(6.r),
-                                              ),
-                                              child: Text(
-                                                isArabic
-                                                    ? 'بوابة آمنة'
-                                                    : 'SECURE PORTAL',
-                                                style: TextStyle(
-                                                  fontSize: 9.sp,
-                                                  fontWeight: FontWeight.w800,
-                                                  letterSpacing: 1.5,
-                                                  color: const Color(
-                                                    0xFF1E40AF,
+                                            Wrap(
+                                              spacing: 8.w,
+                                              runSpacing: 6.h,
+                                              crossAxisAlignment:
+                                                  WrapCrossAlignment.center,
+                                              children: [
+                                                Container(
+                                                  padding: EdgeInsets.symmetric(
+                                                    horizontal: 10.w,
+                                                    vertical: 4.h,
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                    color: const Color(
+                                                      0xFFDBEAFE,
+                                                    ),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          6.r,
+                                                        ),
+                                                  ),
+                                                  child: Text(
+                                                    isArabic
+                                                        ? 'بوابة آمنة'
+                                                        : 'SECURE PORTAL',
+                                                    style: TextStyle(
+                                                      fontSize: 9.sp,
+                                                      fontWeight:
+                                                          FontWeight.w800,
+                                                      letterSpacing: 1.5,
+                                                      color: const Color(
+                                                        0xFF1E40AF,
+                                                      ),
+                                                    ),
                                                   ),
                                                 ),
-                                              ),
+                                                if (workspace != null)
+                                                  Container(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                          horizontal: 10.w,
+                                                          vertical: 4.h,
+                                                        ),
+                                                    decoration: BoxDecoration(
+                                                      color: workspace.color
+                                                          .withValues(
+                                                            alpha: 0.1,
+                                                          ),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            6.r,
+                                                          ),
+                                                      border: Border.all(
+                                                        color: workspace.color
+                                                            .withValues(
+                                                              alpha: 0.3,
+                                                            ),
+                                                      ),
+                                                    ),
+                                                    child: Row(
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
+                                                      children: [
+                                                        Icon(
+                                                          workspace.icon,
+                                                          size: 11.r,
+                                                          color:
+                                                              workspace.color,
+                                                        ),
+                                                        Gap(5.w),
+                                                        Text(
+                                                          workspace.title(
+                                                            isArabic,
+                                                          ),
+                                                          style: TextStyle(
+                                                            fontSize: 9.sp,
+                                                            fontWeight:
+                                                                FontWeight.w800,
+                                                            letterSpacing: 1,
+                                                            color:
+                                                                workspace.color,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                              ],
                                             ),
                                             Gap(12.h),
                                             Text(
@@ -488,15 +553,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
                                       Gap(18.h),
 
-                                      // Module portal entry
+                                      // Back to workspace & account selection
                                       SizedBox(
                                         width: double.infinity,
                                         height: 46.h,
                                         child: OutlinedButton.icon(
                                           onPressed: () =>
-                                              NavigatorMethods.pushNamed(
+                                              NavigatorMethods.pushReplacementNamed(
                                                 context,
-                                                RoutesName.modelSelectionScreen,
+                                                RoutesName.accountAccessScreen,
                                               ),
                                           icon: Icon(
                                             Icons.grid_view_rounded,
@@ -505,8 +570,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                           ),
                                           label: Text(
                                             isArabic
-                                                ? 'بوابة الوحدات — اختر وحدة أولاً'
-                                                : 'Module portal — choose a workspace',
+                                                ? 'تغيير القسم أو عنوان الحساب'
+                                                : 'Change workspace or account',
                                             textAlign: TextAlign.center,
                                             style: TextStyle(
                                               fontSize: 11.5.sp,
