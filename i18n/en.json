@@ -244,6 +244,8 @@
   "statementAdditionalIndicatorDataDesc": "Additional financial indicator data, total or detailed",
   "statementWithdrawalAndDeposit": "Withdrawal and Deposit Transactions",
   "statementWithdrawalAndDepositDesc": "Withdrawal and deposit transactions by bank and date",
+  "statementCheckVerification": "Check Verification Transactions",
+  "statementCheckVerificationDesc": "Check verification transactions by bank, date, recipient, and status",
   "statementActivityReports": "Activity Reports",
   "statementActivityReportsDesc": "Activity reports by account, cost center and date range",
   "statementActivityCenterData": "Activity Centers Data Report",

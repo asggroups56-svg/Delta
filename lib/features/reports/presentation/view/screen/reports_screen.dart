@@ -18,6 +18,7 @@ import 'package:my_template/features/reports/presentation/view/widget/activity_r
 import 'package:my_template/features/reports/presentation/view/widget/activity_center_data_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/cash_in_cash_out_voucher_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/checks_data_report_filter_bottom_sheet_widget.dart';
+import 'package:my_template/features/reports/presentation/view/widget/check_verification_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/indicator_data_standard_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/indicator_data_addition_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/withdraw_and_depositing_voucher_report_filter_bottom_sheet_widget.dart';
@@ -53,6 +54,7 @@ import 'package:my_template/features/reports/presentation/view/widget/ledger_rep
 import 'package:my_template/features/reports/presentation/view/widget/ledger_report_for_main_accounts_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/ledger_report_per_users_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/journal_report_filter_bottom_sheet_widget.dart';
+import 'package:my_template/features/reports/presentation/view/widget/operation_tracing_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/monthly_comparison_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/party_vat_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/pdf_export_service.dart';
@@ -1257,10 +1259,12 @@ class _ReportsScreenState extends State<ReportsScreen> {
     bool isIncomeAndExpenseSituationReport = false,
     bool isDailyIncomeAndExpenseReport = false,
     bool isJournalReport = false,
+    bool isOperationTracingReport = false,
     bool isMainAccountsJournalReport = false,
     bool isGeneralJournalForLevelReport = false,
     bool isCashInCashOutVoucherReport = false,
     bool isChecksDataReport = false,
+    bool isCheckVerificationReport = false,
     bool isIndicatorDataStandardReport = false,
     bool isIndicatorDataAdditionReport = false,
     bool isWithdrawAndDepositingVoucherReport = false,
@@ -1647,6 +1651,16 @@ class _ReportsScreenState extends State<ReportsScreen> {
       exportType = journalReportFilter.exportType;
       reportName = journalReportFilter.reportName;
     }
+    OperationTracingReportFilter? operationTracingFilter;
+    if (isOperationTracingReport) {
+      operationTracingFilter = await OperationTracingReportFilterBottomSheetWidget.show(
+        context,
+        title: title,
+        initialExportType: exportType,
+      );
+      if (!mounted || operationTracingFilter == null) return;
+      exportType = operationTracingFilter.exportType;
+    }
     GeneralJournalForLevelReportFilterSelection? generalJournalLevelFilter;
     if (isGeneralJournalForLevelReport) {
       generalJournalLevelFilter =
@@ -1712,6 +1726,12 @@ class _ReportsScreenState extends State<ReportsScreen> {
           );
       if (!mounted || checksDataReportFilter == null) return;
       exportType = checksDataReportFilter.exportType;
+    }
+    CheckVerificationFilter? checkVerificationFilter;
+    if (isCheckVerificationReport) {
+      checkVerificationFilter = await CheckVerificationReportFilterBottomSheetWidget.show(context, title: title, initialExportType: exportType);
+      if (!mounted || checkVerificationFilter == null) return;
+      exportType = checkVerificationFilter.exportType;
     }
     IndicatorDataStandardReportFilterSelection? indicatorDataStandardFilter;
     if (isIndicatorDataStandardReport) {
@@ -1925,10 +1945,12 @@ class _ReportsScreenState extends State<ReportsScreen> {
           isIncomeAndExpenseSituationReport ||
           isDailyIncomeAndExpenseReport ||
           isJournalReport ||
+          isOperationTracingReport ||
           isMainAccountsJournalReport ||
           isGeneralJournalForLevelReport ||
           isCashInCashOutVoucherReport ||
           isChecksDataReport ||
+          isCheckVerificationReport ||
           isIndicatorDataStandardReport ||
           isIndicatorDataAdditionReport ||
           isWithdrawAndDepositingVoucherReport ||
@@ -2017,6 +2039,17 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 languageCode: languageCode,
                 exportType: exportType,
               )
+            : isCheckVerificationReport
+            ? await reportsRepo.getCheckVerificationReport(
+                fromBankCode: checkVerificationFilter?.fromBankCode,
+                toBankCode: checkVerificationFilter?.toBankCode,
+                fromDate: checkVerificationFilter?.fromDate,
+                toDate: checkVerificationFilter?.toDate,
+                receiveName: checkVerificationFilter?.receiveName,
+                checkStatus: checkVerificationFilter?.checkStatus ?? 2,
+                languageCode: languageCode,
+                exportType: exportType,
+              )
             : isIndicatorDataStandardReport
             ? await reportsRepo.getIndicatorDataStandardReport(
                 fromIndicatorCode:
@@ -2095,6 +2128,17 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 fromDate: generalJournalLevelFilter?.fromDate,
                 toDate: generalJournalLevelFilter?.toDate,
                 reportName: 'AGL0104',
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isOperationTracingReport
+            ? await reportsRepo.getOperationTracingReport(
+                fromEntrySerial: operationTracingFilter?.fromEntrySerial,
+                toEntrySerial: operationTracingFilter?.toEntrySerial,
+                fromEntryNo: operationTracingFilter?.fromEntryNo,
+                toEntryNo: operationTracingFilter?.toEntryNo,
+                fromDate: operationTracingFilter?.fromDate,
+                toDate: operationTracingFilter?.toDate,
                 languageCode: languageCode,
                 exportType: exportType,
               )
@@ -3281,6 +3325,32 @@ class _ReportsScreenState extends State<ReportsScreen> {
         'treeGroup': 'cashVouchers',
       },
       {
+        'title': AppLocaleKey.statementCheckVerification.tr(),
+        'desc': AppLocaleKey.statementCheckVerificationDesc.tr(),
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.verified_rounded,
+        'iconColor': AppColor.oceanBlue,
+        'category': 1,
+        'reportName': 'Ams003',
+        'isCheckVerificationReport': true,
+        'treeGroup': 'cashVouchers',
+      },
+      {
+        'title': context.locale.languageCode == 'ar'
+            ? 'تقرير التتبع التاريخي لليومية العامة'
+            : 'General Journal Historical Tracing Report',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'تتبع قيود اليومية العامة حسب الرقم التسلسلي ورقم القيد والتاريخ'
+            : 'Trace general journal entries by serial, entry number, and date',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.manage_search_rounded,
+        'iconColor': AppColor.oceanBlue,
+        'category': 1,
+        'reportName': 'AGL038T',
+        'isOperationTracingReport': true,
+        'treeGroup': 'journalReports',
+      },
+      {
         'title': AppLocaleKey.statementExpensesWithVat.tr(),
         'desc': AppLocaleKey.statementExpensesWithVatDesc.tr(),
         'status': AppLocaleKey.statusAudited.tr(),
@@ -4139,7 +4209,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
       (
         id: 13,
         key: 'activityReports',
-        titleAr: 'تقارير النشاط',
+        titleAr: 'تقارير الأنشطة',
         titleEn: 'Activity Reports',
         icon: Icons.timeline_rounded,
         accent: AppColor.oceanBlue,
@@ -4238,6 +4308,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
       isDailyIncomeAndExpenseReport:
           statement['isDailyIncomeAndExpenseReport'] == true,
       isJournalReport: statement['isJournalReport'] == true,
+      isOperationTracingReport: statement['isOperationTracingReport'] == true,
       isMainAccountsJournalReport:
           statement['isMainAccountsJournalReport'] == true,
       isGeneralJournalForLevelReport:
@@ -4245,6 +4316,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
       isCashInCashOutVoucherReport:
           statement['isCashInCashOutVoucherReport'] == true,
       isChecksDataReport: statement['isChecksDataReport'] == true,
+      isCheckVerificationReport: statement['isCheckVerificationReport'] == true,
       isIndicatorDataStandardReport:
           statement['isIndicatorDataStandardReport'] == true,
       isIndicatorDataAdditionReport:

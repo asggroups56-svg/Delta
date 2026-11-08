@@ -21,6 +21,8 @@ import '../models/chart_of_account_report_request_model.dart';
 import '../models/cash_in_cash_out_voucher_report_request_model.dart';
 import '../models/center_on_center_analysis_report_request_model.dart';
 import '../models/checks_data_report_request_model.dart';
+import '../models/check_verification_report_request_model.dart';
+import '../models/operation_tracing_report_request_model.dart';
 import '../models/chart_of_account_monthly_balances_report_request_model.dart';
 import '../models/centers_comparison_report_request_model.dart';
 import '../models/centers_monthly_balance_report_request_model.dart';
@@ -115,6 +117,12 @@ abstract interface class ReportsRepo {
     String exportType = 'pdf',
   });
 
+  Future<Either<Failure, File>> getOperationTracingReport({
+    int? fromEntrySerial, int? toEntrySerial, String? fromEntryNo,
+    String? toEntryNo, DateTime? fromDate, DateTime? toDate,
+    required String languageCode, String exportType = 'pdf',
+  });
+
   Future<Either<Failure, File>> getGeneralJournalForLevelReport({
     int? accountLevel,
     int? fromEntrySerial,
@@ -150,6 +158,12 @@ abstract interface class ReportsRepo {
     int? toCashAccount,
     String reportName = 'AGL019_1',
     required String languageCode,
+    String exportType = 'pdf',
+  });
+
+  Future<Either<Failure, File>> getCheckVerificationReport({
+    int? fromBankCode, int? toBankCode, DateTime? fromDate, DateTime? toDate,
+    String? receiveName, int checkStatus = 2, required String languageCode,
     String exportType = 'pdf',
   });
 
@@ -798,6 +812,39 @@ class ReportsRepoImpl implements ReportsRepo {
   }
 
   @override
+  Future<Either<Failure, File>> getOperationTracingReport({
+    int? fromEntrySerial,
+    int? toEntrySerial,
+    String? fromEntryNo,
+    String? toEntryNo,
+    DateTime? fromDate,
+    DateTime? toDate,
+    required String languageCode,
+    String exportType = 'pdf',
+  }) {
+    return handleDioRequest(
+      request: () async {
+        final requestModel = OperationTracingReportRequestModel(
+          fromEntrySerial: fromEntrySerial,
+          toEntrySerial: toEntrySerial,
+          fromEntryNo: fromEntryNo,
+          toEntryNo: toEntryNo,
+          fromDate: fromDate,
+          toDate: toDate,
+          exportType: exportType,
+        );
+        return _downloadReport(
+          endpoint: EndPoints.operationTracingReport,
+          body: requestModel.toJson(),
+          fileNamePrefix: 'operation_tracing_report',
+          exportType: requestModel.exportType,
+          headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+        );
+      },
+    );
+  }
+
+  @override
   Future<Either<Failure, File>> getJournalReport({
     int? fromEntrySerial,
     int? toEntrySerial,
@@ -949,6 +996,28 @@ class ReportsRepoImpl implements ReportsRepo {
         );
       },
     );
+  }
+
+  @override
+  Future<Either<Failure, File>> getCheckVerificationReport({
+    int? fromBankCode, int? toBankCode, DateTime? fromDate, DateTime? toDate,
+    String? receiveName, int checkStatus = 2, required String languageCode,
+    String exportType = 'pdf',
+  }) {
+    return handleDioRequest(request: () async {
+      final requestModel = CheckVerificationReportRequestModel(
+        fromBankCode: fromBankCode, toBankCode: toBankCode,
+        fromDate: fromDate, toDate: toDate, receiveName: receiveName,
+        checkStatus: checkStatus, exportType: exportType,
+      );
+      return _downloadReport(
+        endpoint: EndPoints.checkVerificationReport,
+        body: requestModel.toJson(),
+        fileNamePrefix: 'check_verification_report',
+        exportType: requestModel.exportType,
+        headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+      );
+    });
   }
 
   @override

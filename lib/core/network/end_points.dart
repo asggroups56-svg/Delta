@@ -10,11 +10,14 @@ class EndPoints {
   static const String incomeAndExpenseSituationReport =
       'Report/IncomeAndExpenseSituationReport';
   static const String journalReport = 'Report/JournalReport';
+  static const String operationTracingReport = 'Report/OperationTracingReport';
   static const String generalJournalForLevelReport =
       'Report/GeneralJournalForLevelReport';
   static const String cashInCashOutVoucherReport =
       'Report/CashInCashOutVoucherReport';
   static const String checksDataReport = 'Report/ChecksDataReport';
+  static const String checkVerificationReport =
+      'Report/CheckVerificationReport';
   static const String indicatorDataStandardReport =
       'Report/IndicatorDataStandardReport';
   static const String indicatorDataAdditionReport =

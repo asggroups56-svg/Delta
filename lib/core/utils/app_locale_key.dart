@@ -299,6 +299,10 @@ class AppLocaleKey {
       'statementWithdrawalAndDeposit';
   static const String statementWithdrawalAndDepositDesc =
       'statementWithdrawalAndDepositDesc';
+  static const String statementCheckVerification =
+      'statementCheckVerification';
+  static const String statementCheckVerificationDesc =
+      'statementCheckVerificationDesc';
   static const String statementActivityReports = 'statementActivityReports';
   static const String statementActivityReportsDesc =
       'statementActivityReportsDesc';
