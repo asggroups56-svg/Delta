@@ -268,6 +268,20 @@ class AppLocaleKey {
   static const String statementIncomeStatement = 'statementIncomeStatement';
   static const String statementIncomeStatementDesc =
       'statementIncomeStatementDesc';
+  static const String statementMonthlyIncome = 'statementMonthlyIncome';
+  static const String statementMonthlyIncomeDesc = 'statementMonthlyIncomeDesc';
+  static const String statementMultiMonthIncome = 'statementMultiMonthIncome';
+  static const String statementMultiMonthIncomeDesc =
+      'statementMultiMonthIncomeDesc';
+  static const String statementQuarterlyIncome = 'statementQuarterlyIncome';
+  static const String statementQuarterlyIncomeDesc =
+      'statementQuarterlyIncomeDesc';
+  static const String statementCostCenterIncome = 'statementCostCenterIncome';
+  static const String statementCostCenterIncomeDesc =
+      'statementCostCenterIncomeDesc';
+  static const String statementMonthlyExpenses = 'statementMonthlyExpenses';
+  static const String statementMonthlyExpensesDesc =
+      'statementMonthlyExpensesDesc';
   static const String statementDailyIncome = 'statementDailyIncome';
   static const String statementDailyIncomeDesc = 'statementDailyIncomeDesc';
   static const String statementExpensesWithVat = 'statementExpensesWithVat';
@@ -299,8 +313,7 @@ class AppLocaleKey {
       'statementWithdrawalAndDeposit';
   static const String statementWithdrawalAndDepositDesc =
       'statementWithdrawalAndDepositDesc';
-  static const String statementCheckVerification =
-      'statementCheckVerification';
+  static const String statementCheckVerification = 'statementCheckVerification';
   static const String statementCheckVerificationDesc =
       'statementCheckVerificationDesc';
   static const String statementActivityReports = 'statementActivityReports';

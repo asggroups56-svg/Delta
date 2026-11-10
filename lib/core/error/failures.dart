@@ -58,13 +58,18 @@ class ServerFailure extends Failure {
         }
       }
 
-      // If we got a JSON map with a "message" field, return it immediately
-      if (map != null &&
-          map['message'] is String &&
-          (map['message'] as String).trim().isNotEmpty) {
-        return ServerFailure(map['message'] as String, statusCode: statusCode);
+      final languageCode = dioError.requestOptions.headers['Accept-Language']
+          ?.toString()
+          .toLowerCase();
+      final isArabic = languageCode?.startsWith('ar') ?? false;
+      if (map != null) {
+        final localizedMessage = _localizedResponseMessage(map, isArabic);
+        if (localizedMessage != null) {
+          return ServerFailure(localizedMessage, statusCode: statusCode);
+        }
       }
 
+      // If we got a JSON map with a "message" field, return it immediately
       // Otherwise fall back based on DioException type
       switch (dioError.type) {
         case DioExceptionType.connectionTimeout:
@@ -106,6 +111,13 @@ class ServerFailure extends Failure {
         return ServerFailure('لا توجد صلاحيات', statusCode: 403);
       }
 
+      if (statusCode == 422) {
+        final serverMessage = _responseMessage(response);
+        if (serverMessage != null) {
+          return ServerFailure(serverMessage, statusCode: statusCode);
+        }
+      }
+
       if (response is Map<String, dynamic> &&
           response['message'] is String &&
           (response['message'] as String).trim().isNotEmpty) {
@@ -124,6 +136,70 @@ class ServerFailure extends Failure {
       return ServerFailure('Failed to parse server response', statusCode: statusCode);
     }
   }
+}
+
+String? _responseMessage(dynamic response) {
+  if (response is String && response.trim().isNotEmpty) {
+    try {
+      final decoded = jsonDecode(response);
+      final decodedMessage = _responseMessage(decoded);
+      if (decodedMessage != null) return decodedMessage;
+    } catch (_) {
+      return response.trim();
+    }
+  }
+  if (response is Map) {
+    for (final key in const [
+      'message',
+      'Message',
+      'detail',
+      'title',
+      'error',
+    ]) {
+      final value = response[key];
+      if (value is String && value.trim().isNotEmpty) return value.trim();
+    }
+    final errors = response['errors'];
+    if (errors is Map) {
+      for (final value in errors.values) {
+        final message = _responseMessage(value);
+        if (message != null) return message;
+      }
+    } else if (errors is List) {
+      return _responseMessage(errors);
+    }
+  }
+  if (response is List) {
+    for (final value in response) {
+      final message = _responseMessage(value);
+      if (message != null) return message;
+    }
+  }
+  return null;
+}
+
+String? _localizedResponseMessage(Map<String, dynamic> response, bool isArabic) {
+  final localizedKeys = isArabic
+      ? const ['messageAr', 'MessageAr', 'errorAr', 'ErrorAr', 'titleAr']
+      : const ['messageEn', 'MessageEn', 'errorEn', 'ErrorEn', 'titleEn'];
+  for (final key in localizedKeys) {
+    final value = response[key];
+    if (value is String && value.trim().isNotEmpty) return value;
+  }
+  for (final key in const ['message', 'Message', 'detail', 'title', 'error']) {
+    final value = response[key];
+    if (value is String && value.trim().isNotEmpty) return value;
+  }
+  final errors = response['errors'];
+  if (errors is Map) {
+    for (final value in errors.values) {
+      if (value is String && value.trim().isNotEmpty) return value;
+      if (value is List && value.isNotEmpty) return value.first.toString();
+    }
+  } else if (errors is List && errors.isNotEmpty) {
+    return errors.first.toString();
+  }
+  return null;
 }
 
 /// Executes any Dio request and returns either the parsed data or a Failure.

@@ -292,7 +292,9 @@ class _CostCentersTransactionReportFilterBottomSheetWidgetState
                   ChartOfAccountDropdown(
                     title: _isArabic ? 'من حساب' : 'From account',
                     hintText: _isArabic ? 'كل الحسابات' : 'All accounts',
-                    accountType: 2,
+                    accountType: 1,
+                    includeAccountRangeFields: false,
+                    includeAccountsHasCostCenters: null,
                     initialValue: _fromAccount,
                     onSelected: (value) => setState(() {
                       _fromAccount = value;
@@ -303,7 +305,9 @@ class _CostCentersTransactionReportFilterBottomSheetWidgetState
                   ChartOfAccountDropdown(
                     title: _isArabic ? 'إلى حساب' : 'To account',
                     hintText: _isArabic ? 'كل الحسابات' : 'All accounts',
-                    accountType: 2,
+                    accountType: 1,
+                    includeAccountRangeFields: false,
+                    includeAccountsHasCostCenters: null,
                     initialValue: _toAccount,
                     onSelected: (value) => setState(() {
                       _toAccount = value;

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:my_template/core/theme/app_colors.dart';
@@ -13,6 +14,7 @@ class AccountCentersSummaryReportFilterSelection {
   final num? toAccountNo;
   final num? fromCostCenterNo;
   final num? toCostCenterNo;
+  final int accountLevel;
   final DateTime? fromDate;
   final DateTime? toDate;
   final String exportType;
@@ -22,6 +24,7 @@ class AccountCentersSummaryReportFilterSelection {
     this.toAccountNo,
     this.fromCostCenterNo,
     this.toCostCenterNo,
+    this.accountLevel = 1,
     this.fromDate,
     this.toDate,
     required this.exportType,
@@ -64,8 +67,15 @@ class _AccountCentersSummaryReportFilterBottomSheetWidgetState
   CostCenterLightModel? _toCostCenter;
   DateTime? _fromDate;
   DateTime? _toDate;
+  final _accountLevelController = TextEditingController(text: '1');
   String _exportType = 'pdf';
   String? _validationMessage;
+
+  @override
+  void dispose() {
+    _accountLevelController.dispose();
+    super.dispose();
+  }
 
   bool get _isArabic => Localizations.localeOf(context).languageCode == 'ar';
 
@@ -103,6 +113,15 @@ class _AccountCentersSummaryReportFilterBottomSheetWidgetState
   }
 
   void _submit() {
+    final accountLevel = int.tryParse(_accountLevelController.text.trim());
+    if (accountLevel == null || accountLevel < 1) {
+      setState(() {
+        _validationMessage = _isArabic
+            ? 'أدخل رقم مستوى صحيحاً'
+            : 'Enter a valid level number';
+      });
+      return;
+    }
     final fromAccountNo = _fromAccount?.accountNo;
     final toAccountNo = _toAccount?.accountNo;
     final fromCostCenterNo = _fromCostCenter?.costCenterNo;
@@ -144,6 +163,7 @@ class _AccountCentersSummaryReportFilterBottomSheetWidgetState
         toAccountNo: toAccountNo,
         fromCostCenterNo: fromCostCenterNo,
         toCostCenterNo: toCostCenterNo,
+        accountLevel: accountLevel,
         fromDate: _fromDate,
         toDate: _toDate,
         exportType: _exportType,
@@ -213,10 +233,34 @@ class _AccountCentersSummaryReportFilterBottomSheetWidgetState
                     foreground,
                   ),
                   Gap(8.h),
+                  TextField(
+                    controller: _accountLevelController,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    decoration: InputDecoration(
+                      labelText: _isArabic ? 'رقم المستوى' : 'Level number',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                    ),
+                    onChanged: (_) => setState(() {
+                      _fromAccount = null;
+                      _toAccount = null;
+                      _fromCostCenter = null;
+                      _toCostCenter = null;
+                      _validationMessage = null;
+                    }),
+                  ),
+                  Gap(12.h),
                   ChartOfAccountDropdown(
+                    key: ValueKey('from-account-${_accountLevelController.text}'),
                     title: _isArabic ? 'من حساب' : 'From account',
                     hintText: _isArabic ? 'كل الحسابات' : 'All accounts',
-                    accountType: 2,
+                    accountType: null,
+                    accountLevel:
+                        int.tryParse(_accountLevelController.text.trim()) ?? 1,
+                    includeAccountRangeFields: false,
+                    includeAccountsHasCostCenters: null,
                     initialValue: _fromAccount,
                     onSelected: (value) => setState(() {
                       _fromAccount = value;
@@ -225,9 +269,14 @@ class _AccountCentersSummaryReportFilterBottomSheetWidgetState
                   ),
                   Gap(12.h),
                   ChartOfAccountDropdown(
+                    key: ValueKey('to-account-${_accountLevelController.text}'),
                     title: _isArabic ? 'إلى حساب' : 'To account',
                     hintText: _isArabic ? 'كل الحسابات' : 'All accounts',
-                    accountType: 2,
+                    accountType: null,
+                    accountLevel:
+                        int.tryParse(_accountLevelController.text.trim()) ?? 1,
+                    includeAccountRangeFields: false,
+                    includeAccountsHasCostCenters: null,
                     initialValue: _toAccount,
                     onSelected: (value) => setState(() {
                       _toAccount = value;
@@ -241,8 +290,15 @@ class _AccountCentersSummaryReportFilterBottomSheetWidgetState
                   ),
                   Gap(8.h),
                   CostCenterDropdown(
+                    key: ValueKey('from-center-${_accountLevelController.text}'),
                     title: _isArabic ? 'من مركز تكلفة' : 'From cost center',
                     hintText: _isArabic ? 'كل المراكز' : 'All cost centers',
+                    centerType: null,
+                    centerKind: null,
+                    centerLevel:
+                        int.tryParse(_accountLevelController.text.trim()) ?? 1,
+                    accountType: 1,
+                    pageSize: 10,
                     initialValue: _fromCostCenter,
                     onSelected: (value) => setState(() {
                       _fromCostCenter = value;
@@ -251,8 +307,15 @@ class _AccountCentersSummaryReportFilterBottomSheetWidgetState
                   ),
                   Gap(12.h),
                   CostCenterDropdown(
+                    key: ValueKey('to-center-${_accountLevelController.text}'),
                     title: _isArabic ? 'إلى مركز تكلفة' : 'To cost center',
                     hintText: _isArabic ? 'كل المراكز' : 'All cost centers',
+                    centerType: null,
+                    centerKind: null,
+                    centerLevel:
+                        int.tryParse(_accountLevelController.text.trim()) ?? 1,
+                    accountType: 1,
+                    pageSize: 10,
                     initialValue: _toCostCenter,
                     onSelected: (value) => setState(() {
                       _toCostCenter = value;

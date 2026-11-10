@@ -10,6 +10,7 @@ class EndPoints {
   static const String incomeAndExpenseSituationReport =
       'Report/IncomeAndExpenseSituationReport';
   static const String journalReport = 'Report/JournalReport';
+  static const String journalSummarizedReport = 'Report/JournalSummarizedReport';
   static const String operationTracingReport = 'Report/OperationTracingReport';
   static const String generalJournalForLevelReport =
       'Report/GeneralJournalForLevelReport';
@@ -38,6 +39,16 @@ class EndPoints {
       'Report/LedgerReportForAllAccounts';
   static const String ledgerReportForAssistantAccounts =
       'Report/LedgerReportForAssistantAccounts';
+  static const String accountCentersAnalyticalDetailsReport =
+      'Report/AccountCentersAnalyticalDetailsReport';
+  static const String accountCentersAnalyticalGroupsReport =
+      'Report/AccountCentersAnalyticalGroupsReport';
+  static const String integratedVouchersStatusReport =
+      'Report/IntegratedVouchersStatusReport';
+  static const String statusOfTheDailyTransacitionsReport =
+      'Report/StatusOfTheDailyTransacitionsReport';
+  static const String testIntegrationVoucherReport =
+      'Report/TestIntegrationVoucherReport';
   static const String ledgerReportForMainAccounts =
       'Report/LedgerReportForMainAccounts';
   static const String ledgerReportPerUsers = 'Report/LedgerReportPerUsers';
@@ -57,11 +68,16 @@ class EndPoints {
       'Report/CostCentersTransactionAnnualReport';
   static const String costCentersProjectsReport =
       'Report/CostCentersProjectsReport';
+  static const String purchaseOfProjectsReport = 'Report/PurchaseOfProjectsReport';
   static const String accountCentersSummaryForMainAccountsReport =
       'Report/AccountCentersSummaryForMainAccountsReport';
   static const String accountStatementReport = 'Report/AccountStatementReport';
   static const String salesWithVatReport = 'Report/SalesWithVatReport';
   static const String purchasesWithVatReport = 'Report/PurchasesWithVatReport';
+  static const String customerSupplierNotificationsReport =
+      'Report/CustomerSupplierNotificationsReport';
+  static const String invoicesApprovedStatusReport =
+      'Report/InvoicesApprovedStatusReport';
   static const String monthlyAccountComparisonReport =
       'Report/MonthlyAccountComparsionReport';
   static const String accountsComparsionReport =

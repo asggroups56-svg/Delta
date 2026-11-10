@@ -18,8 +18,8 @@ class OperationTracingReportRequestModel {
     'ToEntryNo': toEntryNo,
     'FromDate': fromDate == null
         ? null
-        : '${formatReportDateOnly(fromDate!)}T00:00:00',
-    'ToDate': toDate == null ? null : '${formatReportDateOnly(toDate!)}T00:00:00',
+        : formatReportDateOnly(fromDate!),
+    'ToDate': toDate == null ? null : formatReportDateOnly(toDate!),
     'ReportName': 'AGL038T',
     'ExportType': exportType,
   };

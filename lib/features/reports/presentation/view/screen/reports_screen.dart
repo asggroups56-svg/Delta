@@ -6,7 +6,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:my_template/core/custom_widgets/custom_toast/custom_toast.dart';
 import 'package:my_template/core/custom_widgets/date_range_bottom_sheet_widget.dart';
-import 'package:my_template/core/custom_widgets/month_range_bottom_sheet_widget.dart';
 import 'package:my_template/core/services/services_locator.dart';
 import 'package:my_template/core/theme/app_colors.dart';
 import 'package:my_template/core/theme/app_text_style.dart';
@@ -45,6 +44,8 @@ import 'package:my_template/features/reports/presentation/view/widget/general_le
 import 'package:my_template/features/reports/presentation/view/widget/subsidiary_ledger_account_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/trial_balance_by_categories_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/final_reports_filter_bottom_sheet_widget.dart';
+import 'package:my_template/features/reports/presentation/view/widget/income_and_expense_situation_report_filter_bottom_sheet_widget.dart';
+import 'package:my_template/features/reports/presentation/view/widget/monthly_expenses_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/additional_final_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/trial_balance_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/trial_balances_report_for_period_filter_bottom_sheet_widget.dart';
@@ -54,9 +55,18 @@ import 'package:my_template/features/reports/presentation/view/widget/ledger_rep
 import 'package:my_template/features/reports/presentation/view/widget/ledger_report_for_main_accounts_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/ledger_report_per_users_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/journal_report_filter_bottom_sheet_widget.dart';
+import 'package:my_template/features/reports/presentation/view/widget/journal_summarized_report_filter_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/operation_tracing_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/monthly_comparison_report_filter_bottom_sheet_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/party_vat_report_filter_bottom_sheet_widget.dart';
+import 'package:my_template/features/reports/presentation/view/widget/customer_supplier_notifications_report_filter_widget.dart';
+import 'package:my_template/features/reports/presentation/view/widget/invoices_approved_status_report_filter_widget.dart';
+import 'package:my_template/features/reports/presentation/view/widget/account_centers_analytical_details_report_filter_widget.dart';
+import 'package:my_template/features/reports/presentation/view/widget/account_centers_analytical_groups_report_filter_widget.dart';
+import 'package:my_template/features/reports/presentation/view/widget/integrated_vouchers_status_report_filter_widget.dart';
+import 'package:my_template/features/reports/presentation/view/widget/status_of_daily_transactions_report_filter_widget.dart';
+import 'package:my_template/features/reports/presentation/view/widget/purchase_of_projects_report_filter_widget.dart';
+import 'package:my_template/features/reports/presentation/view/widget/test_integration_voucher_report_filter_widget.dart';
 import 'package:my_template/features/reports/presentation/view/widget/pdf_export_service.dart';
 import 'package:my_template/features/reports/presentation/view/widget/pdf_preview_panel.dart';
 import 'package:my_template/features/reports/presentation/view/widget/reports_screen_widgets.dart';
@@ -228,20 +238,118 @@ class _ReportsScreenState extends State<ReportsScreen> {
               ),
               Gap(10.h),
               _buildExportOption(
+                icon: Icons.sync_alt_rounded,
+                color: AppColor.emeraldTeal,
+                title: context.locale.languageCode == 'ar' ? 'تقرير حركات التكامل بدون قيود' : 'Integration Transactions Without Vouchers',
+                subtitle: 'Report/StatusOfTheDailyTransacitionsReport (AGL2000)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: context.locale.languageCode == 'ar' ? 'تقرير حركات التكامل بدون قيود' : 'Integration Transactions Without Vouchers',
+                    description: context.locale.languageCode == 'ar' ? 'حالة حركات التكامل حسب نوع الحركة' : 'Integration transaction status by transaction type',
+                    amount: '', date: '', status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AGL2000', isStatusOfDailyTransactionsReport: true,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
                 icon: Icons.show_chart_rounded,
                 color: AppColor.emeraldTeal,
-                title: AppLocaleKey.statementIncome.tr(),
+                title: AppLocaleKey.statementMonthlyIncome.tr(),
                 subtitle: 'Report/IncomeAndExpenseSituationReport (AGL300_M)',
                 onTap: () {
                   Navigator.pop(ctx);
                   _handleExportReport(
-                    title: AppLocaleKey.statementIncome.tr(),
-                    description: AppLocaleKey.statementIncomeDesc.tr(),
+                    title: AppLocaleKey.statementMonthlyIncome.tr(),
+                    description: AppLocaleKey.statementMonthlyIncomeDesc.tr(),
                     amount: '',
                     date: '',
                     status: AppLocaleKey.statusAudited.tr(),
                     reportName: 'AGL300_M',
                     isIncomeAndExpenseSituationReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.calendar_view_month_rounded,
+                color: AppColor.oceanBlue,
+                title: AppLocaleKey.statementMultiMonthIncome.tr(),
+                subtitle: 'Report/IncomeAndExpenseSituationReport (AGL300_MS)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: AppLocaleKey.statementMultiMonthIncome.tr(),
+                    description: AppLocaleKey.statementMultiMonthIncomeDesc
+                        .tr(),
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AGL300_MS',
+                    isIncomeAndExpenseSituationReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.calendar_view_week_rounded,
+                color: AppColor.purpleAccent,
+                title: AppLocaleKey.statementQuarterlyIncome.tr(),
+                subtitle: 'Report/IncomeAndExpenseSituationReport (AGL300_QS)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: AppLocaleKey.statementQuarterlyIncome.tr(),
+                    description: AppLocaleKey.statementQuarterlyIncomeDesc.tr(),
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AGL300_QS',
+                    isQuarterlyIncomeAndExpenseSituationReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.account_tree_outlined,
+                color: AppColor.emeraldTeal,
+                title: AppLocaleKey.statementCostCenterIncome.tr(),
+                subtitle: 'Report/IncomeAndExpenseSituationReport (AGL300C)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: AppLocaleKey.statementCostCenterIncome.tr(),
+                    description: AppLocaleKey.statementCostCenterIncomeDesc
+                        .tr(),
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AGL300C',
+                    isCostCenterIncomeAndExpenseSituationReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.money_off_csred_rounded,
+                color: AppColor.emeraldTeal,
+                title: AppLocaleKey.statementMonthlyExpenses.tr(),
+                subtitle: 'Report/IncomeAndExpenseSituationReport (AGL0400)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: AppLocaleKey.statementMonthlyExpenses.tr(),
+                    description: AppLocaleKey.statementMonthlyExpensesDesc.tr(),
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AGL0400',
+                    isMonthlyExpensesReport: true,
                     exportType: defaultExportType,
                   );
                 },
@@ -323,6 +431,58 @@ class _ReportsScreenState extends State<ReportsScreen> {
                     status: AppLocaleKey.statusAudited.tr(),
                     reportName: 'AAR1001',
                     isPurchasesWithVatReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.notifications_active_outlined,
+                color: AppColor.emeraldTeal,
+                title: context.locale.languageCode == 'ar'
+                    ? 'إشعارات العملاء والموردين'
+                    : 'Customer and Supplier Notifications',
+                subtitle: 'Report/CustomerSupplierNotificationsReport (AAR020V)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: context.locale.languageCode == 'ar'
+                        ? 'إشعارات العملاء والموردين'
+                        : 'Customer and Supplier Notifications',
+                    description: context.locale.languageCode == 'ar'
+                        ? 'عرض إشعارات العملاء أو الموردين حسب نوع المتعامل'
+                        : 'View customer or supplier notifications by party type',
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AAR020V',
+                    isCustomerSupplierNotificationsReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.fact_check_outlined,
+                color: AppColor.oceanBlue,
+                title: context.locale.languageCode == 'ar'
+                    ? 'موقف الفواتير من الاعتماد'
+                    : 'Invoice Approval Status',
+                subtitle: 'Report/InvoicesApprovedStatusReport (AAR206)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: context.locale.languageCode == 'ar'
+                        ? 'موقف الفواتير من الاعتماد'
+                        : 'Invoice Approval Status',
+                    description: context.locale.languageCode == 'ar'
+                        ? 'عرض حالة اعتماد الفواتير حسب العميل والتاريخ'
+                        : 'View invoice approval status by customer and date',
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AAR206',
+                    isInvoicesApprovedStatusReport: true,
                     exportType: defaultExportType,
                   );
                 },
@@ -649,6 +809,134 @@ class _ReportsScreenState extends State<ReportsScreen> {
                     status: AppLocaleKey.statusAudited.tr(),
                     reportName: 'AGL066',
                     isIndicatorDataStandardReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.analytics_rounded,
+                color: AppColor.purpleAccent,
+                title: context.locale.languageCode == 'ar'
+                    ? 'تحليلى الحركة الحالية لمراكز الحسابات - مستويات'
+                    : 'Current Analytical Movements of Account Centers - Levels',
+                subtitle: 'Report/AccountCentersAnalyticalGroupsReport (AGL026L / AGL099)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: context.locale.languageCode == 'ar'
+                        ? 'تحليلى الحركة الحالية لمراكز الحسابات - مستويات'
+                        : 'Current Analytical Movements of Account Centers - Levels',
+                    description: context.locale.languageCode == 'ar'
+                        ? 'تحليل حركة مراكز الحسابات حسب المستويات'
+                        : 'Analytical account center movements by level',
+                    amount: '', date: '', status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AGL026L',
+                    isAccountCentersAnalyticalGroupsReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.sync_alt_rounded,
+                color: AppColor.emeraldTeal,
+                title: context.locale.languageCode == 'ar'
+                    ? 'تقرير حالة قيود التكامل من الترحيل'
+                    : 'Integration Voucher Posting Status Report',
+                subtitle: 'Report/IntegratedVouchersStatusReport (TAGL111)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: context.locale.languageCode == 'ar'
+                        ? 'تقرير حالة قيود التكامل من الترحيل'
+                        : 'Integration Voucher Posting Status Report',
+                    description: context.locale.languageCode == 'ar'
+                        ? 'حالة قيود التكامل حسب حالة الترحيل والبرنامج'
+                        : 'Integration voucher status by posting state and program',
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'TAGL111',
+                    isIntegratedVouchersStatusReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.fact_check_outlined,
+                color: AppColor.emeraldTeal,
+                title: context.locale.languageCode == 'ar'
+                    ? 'تقرير مراجعة واختبار قيود يومية التكامل'
+                    : 'Integration Daily Vouchers Review and Test Report',
+                subtitle: 'Report/TestIntegrationVoucherReport (AGL063)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: context.locale.languageCode == 'ar'
+                        ? 'تقرير مراجعة واختبار قيود يومية التكامل'
+                        : 'Integration Daily Vouchers Review and Test Report',
+                    description: context.locale.languageCode == 'ar'
+                        ? 'مراجعة واختبار قيود يومية التكامل حسب الرقم التسلسلي والتاريخ'
+                        : 'Review and test integration daily vouchers by serial and date',
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AGL063',
+                    isTestIntegrationVoucherReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.rule_folder_outlined,
+                color: AppColor.emeraldTeal,
+                title: context.locale.languageCode == 'ar'
+                    ? 'اليومية إجمالي حسب نوع القيد'
+                    : 'Daily Summary by Entry Type',
+                subtitle: 'Report/JournalSummarizedReport (AGL900)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: context.locale.languageCode == 'ar'
+                        ? 'اليومية إجمالي حسب نوع القيد'
+                        : 'Daily Summary by Entry Type',
+                    description: context.locale.languageCode == 'ar'
+                        ? 'ملخص اليومية حسب نوع القيد'
+                        : 'Daily journal summary by entry type',
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AGL900',
+                    isJournalSummarizedReport: true,
+                    exportType: defaultExportType,
+                  );
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
+                icon: Icons.analytics_outlined,
+                color: AppColor.purpleAccent,
+                title: context.locale.languageCode == 'ar'
+                    ? 'تحليلى الحركة الحالية لمراكز الحسابات'
+                    : 'Current Account Center Analytical Movements',
+                subtitle: 'Report/AccountCentersAnalyticalDetailsReport (AGL098)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(
+                    title: context.locale.languageCode == 'ar'
+                        ? 'تحليلى الحركة الحالية لمراكز الحسابات'
+                        : 'Current Account Center Analytical Movements',
+                    description: context.locale.languageCode == 'ar'
+                        ? 'تحليل الحركة الحالية للحسابات ومراكز التكلفة'
+                        : 'Analytical details of current account center movements',
+                    amount: '',
+                    date: '',
+                    status: AppLocaleKey.statusAudited.tr(),
+                    reportName: 'AGL098',
+                    isAccountCentersAnalyticalDetailsReport: true,
                     exportType: defaultExportType,
                   );
                 },
@@ -1002,6 +1290,17 @@ class _ReportsScreenState extends State<ReportsScreen> {
               ),
               Gap(10.h),
               _buildExportOption(
+                icon: Icons.shopping_bag_outlined,
+                color: AppColor.oceanBlue,
+                title: context.locale.languageCode == 'ar' ? 'تقرير حركة مراكز المشتريات' : 'Purchase Centers Movement Report',
+                subtitle: 'Report/PurchaseOfProjectsReport (AGL1002)',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _handleExportReport(title: context.locale.languageCode == 'ar' ? 'تقرير حركة مراكز المشتريات' : 'Purchase Centers Movement Report', description: context.locale.languageCode == 'ar' ? 'حركة المشتريات حسب المورد ومركز التكلفة' : 'Purchases by supplier and cost center', amount: '', date: '', status: AppLocaleKey.statusAudited.tr(), reportName: 'AGL1002', isPurchaseOfProjectsReport: true);
+                },
+              ),
+              Gap(10.h),
+              _buildExportOption(
                 icon: Icons.domain_rounded,
                 color: AppColor.oceanBlue,
                 title: AppLocaleKey.statementCostCentersProjects.tr(),
@@ -1257,8 +1556,12 @@ class _ReportsScreenState extends State<ReportsScreen> {
     String? reportName,
     bool isApiReport = false,
     bool isIncomeAndExpenseSituationReport = false,
+    bool isQuarterlyIncomeAndExpenseSituationReport = false,
+    bool isCostCenterIncomeAndExpenseSituationReport = false,
+    bool isMonthlyExpensesReport = false,
     bool isDailyIncomeAndExpenseReport = false,
     bool isJournalReport = false,
+    bool isJournalSummarizedReport = false,
     bool isOperationTracingReport = false,
     bool isMainAccountsJournalReport = false,
     bool isGeneralJournalForLevelReport = false,
@@ -1279,6 +1582,13 @@ class _ReportsScreenState extends State<ReportsScreen> {
     bool isExpensesWithVatReport = false,
     bool isSalesWithVatReport = false,
     bool isPurchasesWithVatReport = false,
+    bool isCustomerSupplierNotificationsReport = false,
+    bool isInvoicesApprovedStatusReport = false,
+    bool isAccountCentersAnalyticalDetailsReport = false,
+    bool isAccountCentersAnalyticalGroupsReport = false,
+    bool isIntegratedVouchersStatusReport = false,
+    bool isStatusOfDailyTransactionsReport = false,
+    bool isTestIntegrationVoucherReport = false,
     bool isLedgerReport = false,
     bool isGeneralLedgerReport = false,
     bool isAnnualLedgerReport = false,
@@ -1313,6 +1623,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
     bool isCostCentersTransactionReport = false,
     bool isCostCentersTransactionAnnualReport = false,
     bool isCostCentersProjectsReport = false,
+    bool isPurchaseOfProjectsReport = false,
     bool isAccountCentersSummaryForMainAccountsReport = false,
     bool isMonthlyAccountComparisonReport = false,
     bool isMonthlyCostCentersComparisonReport = false,
@@ -1437,13 +1748,49 @@ class _ReportsScreenState extends State<ReportsScreen> {
       exportType = additionalFinalReportFilter.exportType;
     }
 
-    MonthRangeSelection? monthRange;
-    if (isIncomeAndExpenseSituationReport) {
-      monthRange = await MonthRangeBottomSheetWidget.show(
-        context,
-        title: AppLocaleKey.selectMonthRange.tr(),
-      );
-      if (!mounted || monthRange == null) return;
+    IncomeAndExpenseSituationReportFilterSelection? incomeExpenseFilter;
+    if (isIncomeAndExpenseSituationReport ||
+        isQuarterlyIncomeAndExpenseSituationReport ||
+        isCostCenterIncomeAndExpenseSituationReport) {
+      incomeExpenseFilter =
+          await IncomeAndExpenseSituationReportFilterBottomSheetWidget.show(
+            context,
+            title: title,
+            initialExportType: exportType,
+            initialReportName:
+                reportName ??
+                (isQuarterlyIncomeAndExpenseSituationReport
+                    ? 'AGL300_QS'
+                    : isCostCenterIncomeAndExpenseSituationReport
+                    ? 'AGL300C'
+                    : 'AGL300_M'),
+            initialReportPageType: isQuarterlyIncomeAndExpenseSituationReport
+                ? 4
+                : isCostCenterIncomeAndExpenseSituationReport
+                ? 5
+                : (reportName == 'AGL300_MS' ? 3 : 2),
+            initialAccountLevel:
+                isQuarterlyIncomeAndExpenseSituationReport ||
+                    isCostCenterIncomeAndExpenseSituationReport
+                ? null
+                : (reportName == 'AGL300_MS' ? 10 : 15),
+            initialYearQuarter: 5,
+          );
+      if (!mounted || incomeExpenseFilter == null) return;
+      exportType = incomeExpenseFilter.exportType;
+      reportName = incomeExpenseFilter.reportName;
+    }
+
+    MonthlyExpensesReportFilterSelection? monthlyExpensesFilter;
+    if (isMonthlyExpensesReport) {
+      monthlyExpensesFilter =
+          await MonthlyExpensesReportFilterBottomSheetWidget.show(
+            context,
+            title: title,
+            initialExportType: exportType,
+          );
+      if (!mounted || monthlyExpensesFilter == null) return;
+      exportType = monthlyExpensesFilter.exportType;
     }
     AnnualLedgerReportFilterSelection? annualLedgerFilter;
     if (isAnnualLedgerReport) {
@@ -1561,6 +1908,62 @@ class _ReportsScreenState extends State<ReportsScreen> {
       if (!mounted || assistantAccountsLedgerFilter == null) return;
       exportType = assistantAccountsLedgerFilter.exportType;
     }
+    TestIntegrationVoucherReportFilter? testIntegrationVoucherFilter;
+    if (isTestIntegrationVoucherReport) {
+      testIntegrationVoucherFilter =
+          await TestIntegrationVoucherReportFilterWidget.show(
+            context,
+            title: title,
+            initialExportType: exportType,
+            initialReportName: reportName ?? 'AGL063',
+          );
+      if (!mounted || testIntegrationVoucherFilter == null) return;
+      exportType = testIntegrationVoucherFilter.exportType;
+      reportName = testIntegrationVoucherFilter.reportName;
+    }
+    IntegratedVouchersStatusReportFilter? integratedVouchersStatusFilter;
+    if (isIntegratedVouchersStatusReport) {
+      integratedVouchersStatusFilter =
+          await IntegratedVouchersStatusReportFilterWidget.show(
+            context,
+            title: title,
+            initialExportType: exportType,
+          );
+      if (!mounted || integratedVouchersStatusFilter == null) return;
+      exportType = integratedVouchersStatusFilter.exportType;
+    }
+    StatusOfDailyTransactionsFilter? statusOfDailyTransactionsFilter;
+    if (isStatusOfDailyTransactionsReport) {
+      statusOfDailyTransactionsFilter = await StatusOfDailyTransactionsReportFilterWidget.show(context, title: title);
+      if (!mounted || statusOfDailyTransactionsFilter == null) return;
+      exportType = statusOfDailyTransactionsFilter.exportType;
+    }
+    AccountCentersAnalyticalGroupsReportFilter?
+    accountCentersAnalyticalGroupsFilter;
+    if (isAccountCentersAnalyticalGroupsReport) {
+      accountCentersAnalyticalGroupsFilter =
+          await AccountCentersAnalyticalGroupsReportFilterWidget.show(
+            context,
+            title: title,
+            initialExportType: exportType,
+            initialReportName: reportName ?? 'AGL026L',
+          );
+      if (!mounted || accountCentersAnalyticalGroupsFilter == null) return;
+      exportType = accountCentersAnalyticalGroupsFilter.exportType;
+      reportName = accountCentersAnalyticalGroupsFilter.reportName;
+    }
+    AccountCentersAnalyticalDetailsReportFilter?
+    accountCentersAnalyticalDetailsFilter;
+    if (isAccountCentersAnalyticalDetailsReport) {
+      accountCentersAnalyticalDetailsFilter =
+          await AccountCentersAnalyticalDetailsReportFilterWidget.show(
+            context,
+            title: title,
+            initialExportType: exportType,
+          );
+      if (!mounted || accountCentersAnalyticalDetailsFilter == null) return;
+      exportType = accountCentersAnalyticalDetailsFilter.exportType;
+    }
     LedgerReportForMainAccountsFilterSelection? mainAccountsLedgerFilter;
     if (isLedgerReportForMainAccounts) {
       mainAccountsLedgerFilter =
@@ -1619,25 +2022,55 @@ class _ReportsScreenState extends State<ReportsScreen> {
       reportName = 'AGL026C';
     }
     PartyVatReportFilterSelection? partyVatFilter;
-    if (isSalesWithVatReport || isPurchasesWithVatReport) {
+    if (isSalesWithVatReport ||
+        isPurchasesWithVatReport ||
+        isExpensesWithVatReport) {
       partyVatFilter = await PartyVatReportFilterBottomSheetWidget.show(
         context,
         title: title,
-        reportCode: isSalesWithVatReport ? 'AAR1000' : 'AAR1001',
+        reportCode: isSalesWithVatReport
+            ? 'AAR1000'
+            : isExpensesWithVatReport
+            ? 'AGL1001E'
+            : 'AAR1001',
         type: isSalesWithVatReport
             ? CustomerDatumType.customer
             : CustomerDatumType.supplier,
       );
       if (!mounted || partyVatFilter == null) return;
+      exportType = partyVatFilter.exportType;
+    }
+    CustomerSupplierNotificationsReportFilter?
+    customerSupplierNotificationsFilter;
+    if (isCustomerSupplierNotificationsReport) {
+      customerSupplierNotificationsFilter =
+          await CustomerSupplierNotificationsReportFilterWidget.show(
+            context,
+            title: title,
+          );
+      if (!mounted || customerSupplierNotificationsFilter == null) return;
+      exportType = customerSupplierNotificationsFilter.exportType;
+    }
+    InvoicesApprovedStatusReportFilter? invoicesApprovedStatusFilter;
+    if (isInvoicesApprovedStatusReport) {
+      invoicesApprovedStatusFilter =
+          await InvoicesApprovedStatusReportFilterWidget.show(
+            context,
+            title: title,
+          );
+      if (!mounted || invoicesApprovedStatusFilter == null) return;
+      exportType = invoicesApprovedStatusFilter.exportType;
     }
     DateRangeSelection? dateRange;
-    if (isDailyIncomeAndExpenseReport || isExpensesWithVatReport) {
+    if (isDailyIncomeAndExpenseReport) {
       dateRange = await DateRangeBottomSheetWidget.show(
         context,
-        title: AppLocaleKey.selectDateRange.tr(),
-        allowAllDates: isExpensesWithVatReport,
+        title: title,
+        confirmLabel: languageCode == 'ar' ? 'عرض التقرير' : 'Generate report',
+        showIncomeExpenseOptions: true,
       );
       if (!mounted || dateRange == null) return;
+      exportType = dateRange.exportType;
     }
     JournalReportFilterSelection? journalReportFilter;
     if (isJournalReport || isMainAccountsJournalReport) {
@@ -1651,13 +2084,20 @@ class _ReportsScreenState extends State<ReportsScreen> {
       exportType = journalReportFilter.exportType;
       reportName = journalReportFilter.reportName;
     }
+    JournalSummarizedReportFilter? journalSummarizedFilter;
+    if (isJournalSummarizedReport) {
+      journalSummarizedFilter = await JournalSummarizedReportFilterWidget.show(context, title: title);
+      if (!mounted || journalSummarizedFilter == null) return;
+      exportType = journalSummarizedFilter.exportType;
+    }
     OperationTracingReportFilter? operationTracingFilter;
     if (isOperationTracingReport) {
-      operationTracingFilter = await OperationTracingReportFilterBottomSheetWidget.show(
-        context,
-        title: title,
-        initialExportType: exportType,
-      );
+      operationTracingFilter =
+          await OperationTracingReportFilterBottomSheetWidget.show(
+            context,
+            title: title,
+            initialExportType: exportType,
+          );
       if (!mounted || operationTracingFilter == null) return;
       exportType = operationTracingFilter.exportType;
     }
@@ -1729,7 +2169,12 @@ class _ReportsScreenState extends State<ReportsScreen> {
     }
     CheckVerificationFilter? checkVerificationFilter;
     if (isCheckVerificationReport) {
-      checkVerificationFilter = await CheckVerificationReportFilterBottomSheetWidget.show(context, title: title, initialExportType: exportType);
+      checkVerificationFilter =
+          await CheckVerificationReportFilterBottomSheetWidget.show(
+            context,
+            title: title,
+            initialExportType: exportType,
+          );
       if (!mounted || checkVerificationFilter == null) return;
       exportType = checkVerificationFilter.exportType;
     }
@@ -1877,6 +2322,12 @@ class _ReportsScreenState extends State<ReportsScreen> {
           );
       if (!mounted || costCentersProjectsFilter == null) return;
     }
+    PurchaseOfProjectsReportFilter? purchaseOfProjectsFilter;
+    if (isPurchaseOfProjectsReport) {
+      purchaseOfProjectsFilter = await PurchaseOfProjectsReportFilterWidget.show(context, title: title);
+      if (!mounted || purchaseOfProjectsFilter == null) return;
+      exportType = purchaseOfProjectsFilter.exportType;
+    }
     AccountCentersSummaryReportFilterSelection? accountCentersSummaryFilter;
     if (isAccountCentersSummaryForMainAccountsReport) {
       accountCentersSummaryFilter =
@@ -1910,6 +2361,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
           await AccountsComparisonReportFilterBottomSheetWidget.show(
             context,
             title: title,
+            isAccountMovement: isAccountsComparisonReport,
             isMonthly: isAccountsMonthlyComparisonReport,
             isComparisonMonth: isAccountsComparisonByMonthReport,
             isBalancePeriodically: isAccountsBalancePeriodicallyReport,
@@ -1943,8 +2395,12 @@ class _ReportsScreenState extends State<ReportsScreen> {
       final File file;
       if (isApiReport ||
           isIncomeAndExpenseSituationReport ||
+          isQuarterlyIncomeAndExpenseSituationReport ||
+          isCostCenterIncomeAndExpenseSituationReport ||
+          isMonthlyExpensesReport ||
           isDailyIncomeAndExpenseReport ||
           isJournalReport ||
+          isJournalSummarizedReport ||
           isOperationTracingReport ||
           isMainAccountsJournalReport ||
           isGeneralJournalForLevelReport ||
@@ -1961,6 +2417,13 @@ class _ReportsScreenState extends State<ReportsScreen> {
           isExpensesWithVatReport ||
           isSalesWithVatReport ||
           isPurchasesWithVatReport ||
+          isCustomerSupplierNotificationsReport ||
+          isInvoicesApprovedStatusReport ||
+          isAccountCentersAnalyticalDetailsReport ||
+          isAccountCentersAnalyticalGroupsReport ||
+          isIntegratedVouchersStatusReport ||
+          isStatusOfDailyTransactionsReport ||
+          isTestIntegrationVoucherReport ||
           isGeneralLedgerReport ||
           isAnnualLedgerReport ||
           isIntegrationGeneralLedgerReport ||
@@ -1988,6 +2451,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
           isCostCentersTransactionReport ||
           isCostCentersTransactionAnnualReport ||
           isCostCentersProjectsReport ||
+          isPurchaseOfProjectsReport ||
           isAccountCentersSummaryForMainAccountsReport ||
           isMonthlyAccountComparisonReport ||
           isMonthlyCostCentersComparisonReport ||
@@ -2158,6 +2622,15 @@ class _ReportsScreenState extends State<ReportsScreen> {
                     (isMainAccountsJournalReport ? 'AGL0101C' : 'AGL009'),
                 languageCode: languageCode,
                 exportType: exportType,
+              )
+            : isJournalSummarizedReport
+            ? await reportsRepo.getJournalSummarizedReport(
+                entryType: journalSummarizedFilter?.entryType ?? 5,
+                fromEntrySerial: journalSummarizedFilter?.fromEntrySerial,
+                toEntrySerial: journalSummarizedFilter?.toEntrySerial,
+                fromDate: journalSummarizedFilter?.fromDate,
+                toDate: journalSummarizedFilter?.toDate,
+                reportName: 'AGL900', languageCode: languageCode, exportType: exportType,
               )
             : isAccountsComparisonReport
             ? await reportsRepo.getAccountsComparsionReport(
@@ -2376,7 +2849,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 toCostCenterNo: accountCentersSummaryFilter?.toCostCenterNo,
                 fromDate: accountCentersSummaryFilter?.fromDate,
                 toDate: accountCentersSummaryFilter?.toDate,
-                accountLevel: 1,
+                accountLevel: accountCentersSummaryFilter?.accountLevel ?? 1,
                 languageCode: languageCode,
                 exportType: exportType,
               )
@@ -2417,10 +2890,41 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 languageCode: languageCode,
                 exportType: exportType,
               )
-            : isIncomeAndExpenseSituationReport
+            : (isIncomeAndExpenseSituationReport ||
+                  isQuarterlyIncomeAndExpenseSituationReport ||
+                  isCostCenterIncomeAndExpenseSituationReport)
             ? await reportsRepo.getIncomeAndExpenseSituationReport(
-                fromMonth: monthRange?.fromMonth,
-                toMonth: monthRange?.toMonth,
+                accountLevel: incomeExpenseFilter?.accountLevel,
+                fromMonth: incomeExpenseFilter?.fromMonth,
+                toMonth: incomeExpenseFilter?.toMonth,
+                fromCostCenterNo: incomeExpenseFilter?.fromCostCenterNo,
+                toCostCenterNo: incomeExpenseFilter?.toCostCenterNo,
+                yearQuarter: incomeExpenseFilter?.yearQuarter,
+                finalAccountType: incomeExpenseFilter?.finalAccountType ?? 3,
+                reportPageType: incomeExpenseFilter?.reportPageType ?? 2,
+                reportName:
+                    incomeExpenseFilter?.reportName ??
+                    (isQuarterlyIncomeAndExpenseSituationReport
+                        ? 'AGL300_QS'
+                        : isCostCenterIncomeAndExpenseSituationReport
+                        ? 'AGL300C'
+                        : 'AGL300_M'),
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isMonthlyExpensesReport
+            ? await reportsRepo.getIncomeAndExpenseSituationReport(
+                fromAccountNo: monthlyExpensesFilter?.fromAccountNo,
+                toAccountNo: monthlyExpensesFilter?.toAccountNo,
+                fromCostCenterNo: monthlyExpensesFilter?.fromCostCenterNo,
+                toCostCenterNo: monthlyExpensesFilter?.toCostCenterNo,
+                fromChartAnaly: monthlyExpensesFilter?.fromChartAnaly,
+                toChartAnaly: monthlyExpensesFilter?.toChartAnaly,
+                finalAccountType: monthlyExpensesFilter?.finalAccountType ?? 3,
+                mainAccountsFilter:
+                    monthlyExpensesFilter?.mainAccountsFilter ?? 1,
+                reportPageType: 6,
+                reportName: 'AGL0400',
                 languageCode: languageCode,
                 exportType: exportType,
               )
@@ -2428,13 +2932,24 @@ class _ReportsScreenState extends State<ReportsScreen> {
             ? await reportsRepo.getDailyIncomeAndExpenseSituationReport(
                 fromDate: dateRange?.fromDate,
                 toDate: dateRange?.toDate,
+                accountLevel: dateRange?.accountLevel,
+                doNotDisplayAccountsWithZeroBalances:
+                    dateRange?.doNotDisplayAccountsWithZeroBalances ??
+                    false,
+                finalAccountType:
+                    dateRange?.finalAccountType ?? 3,
+                reportPageType: 1,
                 languageCode: languageCode,
                 exportType: exportType,
               )
             : isExpensesWithVatReport
             ? await reportsRepo.getExpensesWithVatReport(
-                fromVoucherDate: dateRange?.fromDate,
-                toVoucherDate: dateRange?.toDate,
+                fromCustomerNo: partyVatFilter?.fromCustomerNo,
+                toCustomerNo: partyVatFilter?.toCustomerNo,
+                fromVoucherDate: partyVatFilter?.fromTransDate,
+                toVoucherDate: partyVatFilter?.toTransDate,
+                taxTreatment: partyVatFilter?.taxTreatment ?? 3,
+                taxPeriod: partyVatFilter?.taxPeriod ?? 3,
                 languageCode: languageCode,
                 exportType: exportType,
               )
@@ -2442,8 +2957,16 @@ class _ReportsScreenState extends State<ReportsScreen> {
             ? await reportsRepo.getSalesWithVatReport(
                 fromCustomerNo: partyVatFilter?.fromCustomerNo,
                 toCustomerNo: partyVatFilter?.toCustomerNo,
+                fromItemCode: partyVatFilter?.fromItemCode,
+                toItemCode: partyVatFilter?.toItemCode,
+                fromDocId: partyVatFilter?.fromDocId,
+                toDocId: partyVatFilter?.toDocId,
                 fromTransDate: partyVatFilter?.fromTransDate,
                 toTransDate: partyVatFilter?.toTransDate,
+                documentType: partyVatFilter?.documentType ?? 5,
+                accountingSystem: partyVatFilter?.accountingSystem ?? 1,
+                taxTreatment: partyVatFilter?.taxTreatment ?? 1,
+                taxPeriod: partyVatFilter?.taxPeriod ?? 3,
                 languageCode: languageCode,
                 exportType: exportType,
               )
@@ -2451,8 +2974,60 @@ class _ReportsScreenState extends State<ReportsScreen> {
             ? await reportsRepo.getPurchasesWithVatReport(
                 fromCustomerNo: partyVatFilter?.fromCustomerNo,
                 toCustomerNo: partyVatFilter?.toCustomerNo,
+                fromItemCode: partyVatFilter?.fromItemCode,
+                toItemCode: partyVatFilter?.toItemCode,
+                fromDocId: partyVatFilter?.fromDocId,
+                toDocId: partyVatFilter?.toDocId,
                 fromTransDate: partyVatFilter?.fromTransDate,
                 toTransDate: partyVatFilter?.toTransDate,
+                documentType: partyVatFilter?.documentType ?? 3,
+                accountingSystem: partyVatFilter?.accountingSystem ?? 1,
+                taxTreatment: partyVatFilter?.taxTreatment ?? 1,
+                taxPeriod: partyVatFilter?.taxPeriod ?? 3,
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isCustomerSupplierNotificationsReport
+            ? await reportsRepo.getCustomerSupplierNotificationsReport(
+                dealingType: customerSupplierNotificationsFilter?.dealingType ?? 1,
+                fromCustomerNo:
+                    customerSupplierNotificationsFilter?.fromCustomerNo,
+                toCustomerNo:
+                    customerSupplierNotificationsFilter?.toCustomerNo,
+                fromVoucherNo:
+                    customerSupplierNotificationsFilter?.fromVoucherNo,
+                toVoucherNo:
+                    customerSupplierNotificationsFilter?.toVoucherNo,
+                fromTransNo:
+                    customerSupplierNotificationsFilter?.fromTransNo,
+                toTransNo:
+                    customerSupplierNotificationsFilter?.toTransNo,
+                fromTransDate:
+                    customerSupplierNotificationsFilter?.fromTransDate,
+                toTransDate:
+                    customerSupplierNotificationsFilter?.toTransDate,
+                fromAnalysisNo:
+                    customerSupplierNotificationsFilter?.fromAnalysisNo,
+                toAnalysisNo:
+                    customerSupplierNotificationsFilter?.toAnalysisNo,
+                typeTransacition:
+                    customerSupplierNotificationsFilter?.typeTransacition ?? 7,
+                accountingSystemType:
+                    customerSupplierNotificationsFilter?.accountingSystemType ?? 1,
+                impactType:
+                    customerSupplierNotificationsFilter?.impactType ?? 3,
+                paymentType:
+                    customerSupplierNotificationsFilter?.paymentType ?? 3,
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isInvoicesApprovedStatusReport
+            ? await reportsRepo.getInvoicesApprovedStatusReport(
+                fromCustomerNo: invoicesApprovedStatusFilter?.fromCustomerNo,
+                toCustomerNo: invoicesApprovedStatusFilter?.toCustomerNo,
+                fromTransDate: invoicesApprovedStatusFilter?.fromTransDate,
+                toTransDate: invoicesApprovedStatusFilter?.toTransDate,
+                invoiceType: invoicesApprovedStatusFilter?.invoiceType ?? 4,
                 languageCode: languageCode,
                 exportType: exportType,
               )
@@ -2650,6 +3225,66 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 languageCode: languageCode,
                 exportType: exportType,
               )
+            : isAccountCentersAnalyticalDetailsReport
+            ? await reportsRepo.getAccountCentersAnalyticalDetailsReport(
+                fromAccountNo: accountCentersAnalyticalDetailsFilter?.fromAccountNo,
+                toAccountNo: accountCentersAnalyticalDetailsFilter?.toAccountNo,
+                fromCostCenterNo: accountCentersAnalyticalDetailsFilter?.fromCostCenterNo,
+                toCostCenterNo: accountCentersAnalyticalDetailsFilter?.toCostCenterNo,
+                fromAccAnal: accountCentersAnalyticalDetailsFilter?.fromAccAnal,
+                toAccAnal: accountCentersAnalyticalDetailsFilter?.toAccAnal,
+                fromCentAnal: accountCentersAnalyticalDetailsFilter?.fromCentAnal,
+                toCentAnal: accountCentersAnalyticalDetailsFilter?.toCentAnal,
+                fromAnalytical: accountCentersAnalyticalDetailsFilter?.fromAnalytical,
+                toAnalytical: accountCentersAnalyticalDetailsFilter?.toAnalytical,
+                fromDate: accountCentersAnalyticalDetailsFilter?.fromDate,
+                toDate: accountCentersAnalyticalDetailsFilter?.toDate,
+                reportName: 'AGL098',
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isAccountCentersAnalyticalGroupsReport
+            ? await reportsRepo.getAccountCentersAnalyticalGroupsReport(
+                levelCenter: accountCentersAnalyticalGroupsFilter?.levelCenter,
+                fromAccountNo: accountCentersAnalyticalGroupsFilter?.fromAccountNo,
+                toAccountNo: accountCentersAnalyticalGroupsFilter?.toAccountNo,
+                fromCostCenterNo: accountCentersAnalyticalGroupsFilter?.fromCostCenterNo,
+                toCostCenterNo: accountCentersAnalyticalGroupsFilter?.toCostCenterNo,
+                fromDate: accountCentersAnalyticalGroupsFilter?.fromDate,
+                toDate: accountCentersAnalyticalGroupsFilter?.toDate,
+                reportName: reportName ?? 'AGL026L',
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isTestIntegrationVoucherReport
+            ? await reportsRepo.getTestIntegrationVoucherReport(
+                entryType: testIntegrationVoucherFilter?.entryType,
+                fromEntrySerial: testIntegrationVoucherFilter?.fromEntrySerial,
+                toEntrySerial: testIntegrationVoucherFilter?.toEntrySerial,
+                fromDate: testIntegrationVoucherFilter?.fromDate,
+                toDate: testIntegrationVoucherFilter?.toDate,
+                reportName: reportName ?? 'AGL063',
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isIntegratedVouchersStatusReport
+            ? await reportsRepo.getIntegratedVouchersStatusReport(
+                fromDate: integratedVouchersStatusFilter?.fromDate,
+                toDate: integratedVouchersStatusFilter?.toDate,
+                integratedVouchersStatusType:
+                    integratedVouchersStatusFilter?.integratedVouchersStatusType ?? 3,
+                programType: integratedVouchersStatusFilter?.programType ?? 6,
+                reportName: 'TAGL111',
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isStatusOfDailyTransactionsReport
+            ? await reportsRepo.getStatusOfDailyTransactionsReport(
+                fromDate: statusOfDailyTransactionsFilter?.fromDate,
+                toDate: statusOfDailyTransactionsFilter?.toDate,
+                transactionType: statusOfDailyTransactionsFilter?.transactionType ?? 12,
+                reportName: 'AGL2000', languageCode: languageCode, exportType: exportType,
+              )
             : isLedgerReport
             ? await reportsRepo.getLedgerReportForAllAccounts(
                 fromAccountNo: ledgerFilter?.fromAccountNo,
@@ -2781,6 +3416,18 @@ class _ReportsScreenState extends State<ReportsScreen> {
                     costCentersProjectsFilter?.reportName ??
                     reportName ??
                     'Agl026_Project2',
+                languageCode: languageCode,
+                exportType: exportType,
+              )
+            : isPurchaseOfProjectsReport
+            ? await reportsRepo.getPurchaseOfProjectsReport(
+                fromCustomerNo: purchaseOfProjectsFilter?.fromCustomerNo,
+                toCustomerNo: purchaseOfProjectsFilter?.toCustomerNo,
+                fromCostCenterNo: purchaseOfProjectsFilter?.fromCostCenterNo,
+                toCostCenterNo: purchaseOfProjectsFilter?.toCostCenterNo,
+                fromTransDate: purchaseOfProjectsFilter?.fromDate,
+                toTransDate: purchaseOfProjectsFilter?.toDate,
+                reportName: 'AGL1002',
                 languageCode: languageCode,
                 exportType: exportType,
               )
@@ -3179,6 +3826,98 @@ class _ReportsScreenState extends State<ReportsScreen> {
         'treeGroup': 'concluding',
       },
       {
+        'id': 'account_centers_analytical_details_report',
+        'title': context.locale.languageCode == 'ar'
+            ? 'تحليلى الحركة الحالية لمراكز الحسابات'
+            : 'Current Account Center Analytical Movements',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'تحليل الحركة الحالية للحسابات ومراكز التكلفة'
+            : 'Analytical details of current account center movements',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.analytics_outlined,
+        'iconColor': AppColor.purpleAccent,
+        'category': 1,
+        'reportName': 'AGL098',
+        'isAccountCentersAnalyticalDetailsReport': true,
+        'treeGroup': 'additional',
+      },
+      {
+        'id': 'account_centers_analytical_groups_report',
+        'title': context.locale.languageCode == 'ar'
+            ? 'تحليلى الحركة الحالية لمراكز الحسابات - مستويات'
+            : 'Current Analytical Movements of Account Centers - Levels',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'تقرير مجمع لحركة مراكز الحسابات حسب المستوى'
+            : 'Summarized account center analytical movements by level',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.analytics_rounded,
+        'iconColor': AppColor.purpleAccent,
+        'category': 1,
+        'reportName': 'AGL026L',
+        'isAccountCentersAnalyticalGroupsReport': true,
+        'treeGroup': 'additional',
+      },
+      {
+        'id': 'status_of_daily_transactions_report',
+        'title': context.locale.languageCode == 'ar' ? 'تقرير حركات التكامل بدون قيود' : 'Integration Transactions Without Vouchers',
+        'desc': context.locale.languageCode == 'ar' ? 'حالة حركات التكامل حسب نوع الحركة' : 'Integration transaction status by transaction type',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.sync_alt_rounded,
+        'iconColor': AppColor.emeraldTeal,
+        'category': 1,
+        'reportName': 'AGL2000',
+        'isStatusOfDailyTransactionsReport': true,
+        'treeGroup': 'additional',
+      },
+      {
+        'id': 'integrated_vouchers_status_report',
+        'title': context.locale.languageCode == 'ar'
+            ? 'تقرير حالة قيود التكامل من الترحيل'
+            : 'Integration Voucher Posting Status Report',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'حالة قيود التكامل حسب حالة الترحيل والبرنامج'
+            : 'Integration voucher status by posting state and program',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.sync_alt_rounded,
+        'iconColor': AppColor.emeraldTeal,
+        'category': 1,
+        'reportName': 'TAGL111',
+        'isIntegratedVouchersStatusReport': true,
+        'treeGroup': 'additional',
+      },
+      {
+        'id': 'test_integration_voucher_report',
+        'title': context.locale.languageCode == 'ar'
+            ? 'تقرير مراجعة واختبار قيود يومية التكامل'
+            : 'Integration Daily Vouchers Review and Test Report',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'مراجعة واختبار قيود يومية التكامل حسب الرقم التسلسلي والتاريخ'
+            : 'Review and test integration daily vouchers by serial and date',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.fact_check_outlined,
+        'iconColor': AppColor.emeraldTeal,
+        'category': 1,
+        'reportName': 'AGL063',
+        'isTestIntegrationVoucherReport': true,
+        'treeGroup': 'additional',
+      },
+      {
+        'id': 'integration_journal_summary_by_entry_type_report',
+        'title': context.locale.languageCode == 'ar'
+            ? 'اليومية إجمالي حسب نوع القيد'
+            : 'Daily Summary by Entry Type',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'ملخص اليومية حسب نوع القيد'
+            : 'Daily journal summary by entry type',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.rule_folder_outlined,
+        'iconColor': AppColor.emeraldTeal,
+        'category': 1,
+        'reportName': 'AGL900',
+        'isJournalSummarizedReport': true,
+        'treeGroup': 'additional',
+      },
+      {
         'id': 'indicator_data_standard_report',
         'title': AppLocaleKey.statementStandardIndicatorData.tr(),
         'desc': AppLocaleKey.statementStandardIndicatorDataDesc.tr(),
@@ -3239,6 +3978,66 @@ class _ReportsScreenState extends State<ReportsScreen> {
         'treeGroup': 'activityReports',
       },
       {
+        'id': 'monthly_income_and_expense_report',
+        'title': AppLocaleKey.statementMonthlyIncome.tr(),
+        'desc': AppLocaleKey.statementMonthlyIncomeDesc.tr(),
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.calendar_month_rounded,
+        'iconColor': AppColor.emeraldTeal,
+        'category': 1,
+        'reportName': 'AGL300_M',
+        'isIncomeAndExpenseSituationReport': true,
+        'treeGroup': 'operations',
+      },
+      {
+        'id': 'multi_month_income_and_expense_report',
+        'title': AppLocaleKey.statementMultiMonthIncome.tr(),
+        'desc': AppLocaleKey.statementMultiMonthIncomeDesc.tr(),
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.calendar_view_month_rounded,
+        'iconColor': AppColor.oceanBlue,
+        'category': 1,
+        'reportName': 'AGL300_MS',
+        'isIncomeAndExpenseSituationReport': true,
+        'treeGroup': 'operations',
+      },
+      {
+        'id': 'quarterly_income_and_expense_report',
+        'title': AppLocaleKey.statementQuarterlyIncome.tr(),
+        'desc': AppLocaleKey.statementQuarterlyIncomeDesc.tr(),
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.calendar_view_week_rounded,
+        'iconColor': AppColor.purpleAccent,
+        'category': 1,
+        'reportName': 'AGL300_QS',
+        'isQuarterlyIncomeAndExpenseSituationReport': true,
+        'treeGroup': 'operations',
+      },
+      {
+        'id': 'cost_center_income_and_expense_report',
+        'title': AppLocaleKey.statementCostCenterIncome.tr(),
+        'desc': AppLocaleKey.statementCostCenterIncomeDesc.tr(),
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.account_tree_outlined,
+        'iconColor': AppColor.emeraldTeal,
+        'category': 1,
+        'reportName': 'AGL300C',
+        'isCostCenterIncomeAndExpenseSituationReport': true,
+        'treeGroup': 'operations',
+      },
+      {
+        'id': 'monthly_expenses_report',
+        'title': AppLocaleKey.statementMonthlyExpenses.tr(),
+        'desc': AppLocaleKey.statementMonthlyExpensesDesc.tr(),
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.money_off_csred_rounded,
+        'iconColor': AppColor.emeraldTeal,
+        'category': 1,
+        'reportName': 'AGL0400',
+        'isMonthlyExpensesReport': true,
+        'treeGroup': 'operations',
+      },
+      {
         'title': AppLocaleKey.statementDailyIncome.tr(),
         'desc': AppLocaleKey.statementDailyIncomeDesc.tr(),
         'status': AppLocaleKey.statusAudited.tr(),
@@ -3248,6 +4047,17 @@ class _ReportsScreenState extends State<ReportsScreen> {
         'reportName': 'AGL300_D',
         'isDailyIncomeAndExpenseReport': true,
         'treeGroup': 'operations',
+      },
+      {
+        'title': context.locale.languageCode == 'ar' ? 'تقرير اليومية إجمالي حسب نوع القيد' : 'Journal Summary by Entry Type',
+        'desc': context.locale.languageCode == 'ar' ? 'إجمالي قيود اليومية حسب نوع القيد والفترة' : 'Journal totals by entry type and period',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.summarize_outlined,
+        'iconColor': AppColor.oceanBlue,
+        'category': 1,
+        'reportName': 'AGL900',
+        'isJournalSummarizedReport': true,
+        'treeGroup': 'additional',
       },
       {
         'title': context.locale.languageCode == 'ar'
@@ -3382,6 +4192,36 @@ class _ReportsScreenState extends State<ReportsScreen> {
         'reportName': 'AAR1001',
         'isPurchasesWithVatReport': true,
         'treeGroup': 'tax',
+      },
+      {
+        'title': context.locale.languageCode == 'ar'
+            ? 'إشعارات العملاء والموردين'
+            : 'Customer and Supplier Notifications',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'عرض الإشعارات حسب العملاء أو الموردين ونوع الحركة'
+            : 'View notifications by customer or supplier and transaction type',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.notifications_active_outlined,
+        'iconColor': AppColor.emeraldTeal,
+        'category': 2,
+        'reportName': 'AAR020V',
+        'isCustomerSupplierNotificationsReport': true,
+        'treeGroup': 'operations',
+      },
+      {
+        'title': context.locale.languageCode == 'ar'
+            ? 'موقف الفواتير من الاعتماد'
+            : 'Invoice Approval Status',
+        'desc': context.locale.languageCode == 'ar'
+            ? 'عرض حالة اعتماد الفواتير حسب العميل والتاريخ'
+            : 'View invoice approval status by customer and date',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.fact_check_outlined,
+        'iconColor': AppColor.oceanBlue,
+        'category': 2,
+        'reportName': 'AAR206',
+        'isInvoicesApprovedStatusReport': true,
+        'treeGroup': 'operations',
       },
       {
         'title': AppLocaleKey.statementLedger.tr(),
@@ -3748,6 +4588,17 @@ class _ReportsScreenState extends State<ReportsScreen> {
         'icon': Icons.calendar_view_month_outlined,
         'iconColor': AppColor.emeraldTeal,
         'category': 1,
+        'treeGroup': 'costCenters',
+      },
+      {
+        'title': context.locale.languageCode == 'ar' ? 'تقرير حركة مراكز المشتريات' : 'Purchase Centers Movement Report',
+        'desc': context.locale.languageCode == 'ar' ? 'حركة المشتريات حسب المورد ومركز التكلفة' : 'Purchases by supplier and cost center',
+        'status': AppLocaleKey.statusAudited.tr(),
+        'icon': Icons.shopping_bag_outlined,
+        'iconColor': AppColor.oceanBlue,
+        'category': 1,
+        'reportName': 'AGL1002',
+        'isPurchaseOfProjectsReport': true,
         'treeGroup': 'costCenters',
       },
       {
@@ -4151,30 +5002,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
     final isArabic = context.locale.languageCode == 'ar';
     const groups = [
       (
-        id: 3,
-        key: 'centersComparison',
-        titleAr: 'مقارنة المراكز',
-        titleEn: 'Cost Centers Comparison',
-        icon: Icons.compare_arrows_rounded,
-        accent: AppColor.purpleAccent,
-      ),
-      (
-        id: 9,
-        key: 'accountCentersComparison',
-        titleAr: 'مقارنة مراكز الحسابات',
-        titleEn: 'Account Centers Comparison',
-        icon: Icons.account_tree_outlined,
-        accent: AppColor.oceanBlue,
-      ),
-      (
-        id: 12,
-        key: 'masterAccountsOrCenters',
-        titleAr: 'أرصدة وأبواب',
-        titleEn: 'Balances and Categories',
-        icon: Icons.account_balance_wallet_outlined,
-        accent: AppColor.oceanBlue,
-      ),
-      (
         id: 1,
         key: 'accounts',
         titleAr: 'دليل الحسابات',
@@ -4197,6 +5024,22 @@ class _ReportsScreenState extends State<ReportsScreen> {
         titleEn: 'Account comparison reports',
         icon: Icons.insights_rounded,
         accent: AppColor.emeraldTeal,
+      ),
+      (
+        id: 3,
+        key: 'centersComparison',
+        titleAr: 'مقارنة المراكز',
+        titleEn: 'Cost Centers Comparison',
+        icon: Icons.compare_arrows_rounded,
+        accent: AppColor.purpleAccent,
+      ),
+      (
+        id: 9,
+        key: 'accountCentersComparison',
+        titleAr: 'مقارنة مراكز الحسابات',
+        titleEn: 'Account Centers Comparison',
+        icon: Icons.account_tree_outlined,
+        accent: AppColor.oceanBlue,
       ),
       (
         id: 10,
@@ -4223,6 +5066,46 @@ class _ReportsScreenState extends State<ReportsScreen> {
         accent: AppColor.emeraldTeal,
       ),
       (
+        id: 12,
+        key: 'masterAccountsOrCenters',
+        titleAr: 'أرصدة وأبواب',
+        titleEn: 'Balances and Categories',
+        icon: Icons.account_balance_wallet_outlined,
+        accent: AppColor.oceanBlue,
+      ),
+      (
+        id: 7,
+        key: 'ledger',
+        titleAr: 'تقارير الأستاذ والحسابات',
+        titleEn: 'Ledger and account reports',
+        icon: Icons.menu_book_rounded,
+        accent: AppColor.oceanBlue,
+      ),
+      (
+        id: 14,
+        key: 'trialBalance',
+        titleAr: 'ميزان مراجعة',
+        titleEn: 'Trial Balance',
+        icon: Icons.account_balance_rounded,
+        accent: AppColor.oceanBlue,
+      ),
+      (
+        id: 8,
+        key: 'concluding',
+        titleAr: 'التقارير الختامية',
+        titleEn: 'Concluding Reports',
+        icon: Icons.account_balance_rounded,
+        accent: AppColor.emeraldTeal,
+      ),
+      (
+        id: 13,
+        key: 'activityReports',
+        titleAr: 'تقارير الأنشطة',
+        titleEn: 'Activity Reports',
+        icon: Icons.timeline_rounded,
+        accent: AppColor.oceanBlue,
+      ),
+      (
         id: 5,
         key: 'operations',
         titleAr: 'تقارير العمليات',
@@ -4239,28 +5122,12 @@ class _ReportsScreenState extends State<ReportsScreen> {
         accent: AppColor.emeraldTeal,
       ),
       (
-        id: 7,
-        key: 'ledger',
-        titleAr: 'تقارير الأستاذ والحسابات',
-        titleEn: 'Ledger and account reports',
-        icon: Icons.menu_book_rounded,
-        accent: AppColor.oceanBlue,
-      ),
-      (
-        id: 8,
-        key: 'concluding',
-        titleAr: 'التقارير الختامية',
-        titleEn: 'Concluding Reports',
-        icon: Icons.account_balance_rounded,
-        accent: AppColor.emeraldTeal,
-      ),
-      (
-        id: 9,
-        key: 'trialBalance',
-        titleAr: 'ميزان مراجعة',
-        titleEn: 'Trial Balance',
-        icon: Icons.account_balance_rounded,
-        accent: AppColor.oceanBlue,
+        id: 15,
+        key: 'additional',
+        titleAr: 'التقارير الإضافية',
+        titleEn: 'Additional Reports',
+        icon: Icons.auto_awesome_mosaic_outlined,
+        accent: AppColor.purpleAccent,
       ),
     ];
 
@@ -4305,9 +5172,16 @@ class _ReportsScreenState extends State<ReportsScreen> {
       isApiReport: statement['isApiReport'] == true,
       isIncomeAndExpenseSituationReport:
           statement['isIncomeAndExpenseSituationReport'] == true,
+      isQuarterlyIncomeAndExpenseSituationReport:
+          statement['isQuarterlyIncomeAndExpenseSituationReport'] == true,
+      isCostCenterIncomeAndExpenseSituationReport:
+          statement['isCostCenterIncomeAndExpenseSituationReport'] == true,
+      isMonthlyExpensesReport: statement['isMonthlyExpensesReport'] == true,
       isDailyIncomeAndExpenseReport:
           statement['isDailyIncomeAndExpenseReport'] == true,
       isJournalReport: statement['isJournalReport'] == true,
+      isJournalSummarizedReport:
+          statement['isJournalSummarizedReport'] == true,
       isOperationTracingReport: statement['isOperationTracingReport'] == true,
       isMainAccountsJournalReport:
           statement['isMainAccountsJournalReport'] == true,
@@ -4342,6 +5216,20 @@ class _ReportsScreenState extends State<ReportsScreen> {
       isExpensesWithVatReport: statement['isExpensesWithVatReport'] == true,
       isSalesWithVatReport: statement['isSalesWithVatReport'] == true,
       isPurchasesWithVatReport: statement['isPurchasesWithVatReport'] == true,
+      isCustomerSupplierNotificationsReport:
+          statement['isCustomerSupplierNotificationsReport'] == true,
+      isInvoicesApprovedStatusReport:
+          statement['isInvoicesApprovedStatusReport'] == true,
+      isTestIntegrationVoucherReport:
+          statement['isTestIntegrationVoucherReport'] == true,
+      isAccountCentersAnalyticalDetailsReport:
+          statement['isAccountCentersAnalyticalDetailsReport'] == true,
+      isAccountCentersAnalyticalGroupsReport:
+          statement['isAccountCentersAnalyticalGroupsReport'] == true,
+      isIntegratedVouchersStatusReport:
+          statement['isIntegratedVouchersStatusReport'] == true,
+      isStatusOfDailyTransactionsReport:
+          statement['isStatusOfDailyTransactionsReport'] == true,
       isLedgerReport: statement['isLedgerReport'] == true,
       isGeneralLedgerReport: statement['isGeneralLedgerReport'] == true,
       isAnnualLedgerReport: statement['isAnnualLedgerReport'] == true,
@@ -4402,6 +5290,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
           statement['isCostCentersTransactionAnnualReport'] == true,
       isCostCentersProjectsReport:
           statement['isCostCentersProjectsReport'] == true,
+      isPurchaseOfProjectsReport:
+          statement['isPurchaseOfProjectsReport'] == true,
       isAccountCentersSummaryForMainAccountsReport:
           statement['isAccountCentersSummaryForMainAccountsReport'] == true,
       isMonthlyAccountComparisonReport:

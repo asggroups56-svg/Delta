@@ -189,7 +189,9 @@ class _ChartOfAccountMonthlyBalancesFilterBottomSheetWidgetState
               ChartOfAccountDropdown(
                 title: _isArabic ? 'من حساب' : 'From account',
                 hintText: _isArabic ? 'كل الحسابات' : 'All accounts',
-                accountType: 2,
+                accountType: null,
+                includeAccountRangeFields: false,
+                includeAccountsHasCostCenters: false,
                 initialValue: _fromAccount,
                 onSelected: (account) {
                   setState(() {
@@ -202,7 +204,9 @@ class _ChartOfAccountMonthlyBalancesFilterBottomSheetWidgetState
               ChartOfAccountDropdown(
                 title: _isArabic ? 'إلى حساب' : 'To account',
                 hintText: _isArabic ? 'كل الحسابات' : 'All accounts',
-                accountType: 2,
+                accountType: null,
+                includeAccountRangeFields: false,
+                includeAccountsHasCostCenters: false,
                 initialValue: _toAccount,
                 onSelected: (account) {
                   setState(() {

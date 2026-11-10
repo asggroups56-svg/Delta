@@ -24,8 +24,8 @@ class CheckVerificationReportRequestModel {
   Map<String, dynamic> toJson() => {
     'FromBANK_CODE': fromBankCode,
     'ToBANK_CODE': toBankCode,
-    'FromDate': fromDate == null ? null : '${formatReportDateOnly(fromDate!)}T00:00:00',
-    'ToDate': toDate == null ? null : '${formatReportDateOnly(toDate!)}T00:00:00',
+    'FromDate': fromDate == null ? null : formatReportDateOnly(fromDate!),
+    'ToDate': toDate == null ? null : formatReportDateOnly(toDate!),
     'ReceiveName': receiveName,
     'CheckStatus': checkStatus,
     'ReportName': reportName,

@@ -1,10 +1,15 @@
+import 'package:dartz/dartz.dart' show Either;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:my_template/core/custom_widgets/custom_form_field/custom_form_field.dart';
+import 'package:my_template/core/error/failures.dart';
+import 'package:my_template/core/services/services_locator.dart';
 import 'package:my_template/core/theme/app_colors.dart';
 import 'package:my_template/features/lookup/data/models/chart_of_account_light_model.dart';
+import 'package:my_template/features/lookup/data/models/currency_data_light_model.dart';
+import 'package:my_template/features/lookup/data/repository/lookup_repo.dart';
 import 'package:my_template/features/lookup/presentation/widgets/chart_of_account_dropdown.dart';
 
 class ChartOfAccountReportFilterSelection {
@@ -69,8 +74,6 @@ class _ChartOfAccountReportFilterBottomSheetWidgetState
     extends State<ChartOfAccountReportFilterBottomSheetWidget> {
   ChartOfAccountLightModel? _fromAccount;
   ChartOfAccountLightModel? _toAccount;
-  final _fromCurrencyController = TextEditingController();
-  final _toCurrencyController = TextEditingController();
   final _fromLevelController = TextEditingController();
   final _toLevelController = TextEditingController();
 
@@ -78,6 +81,9 @@ class _ChartOfAccountReportFilterBottomSheetWidgetState
   int _finalAccount = 4;
   String _reportName = 'AGL004';
   late String _exportType;
+  Future<Either<Failure, CurrencyDataLightResponse>>? _currencyDataFuture;
+  String? _fromCurrencyCode;
+  String? _toCurrencyCode;
   String? _validationMessage;
 
   bool get _isArabic => Localizations.localeOf(context).languageCode == 'ar';
@@ -89,9 +95,15 @@ class _ChartOfAccountReportFilterBottomSheetWidgetState
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _currencyDataFuture ??= sl<LookupRepo>().getCurrencyDataLight(
+      languageCode: Localizations.localeOf(context).languageCode,
+    );
+  }
+
+  @override
   void dispose() {
-    _fromCurrencyController.dispose();
-    _toCurrencyController.dispose();
     _fromLevelController.dispose();
     _toLevelController.dispose();
     super.dispose();
@@ -140,8 +152,8 @@ class _ChartOfAccountReportFilterBottomSheetWidgetState
       ChartOfAccountReportFilterSelection(
         fromAccountNo: fromAccountNo,
         toAccountNo: toAccountNo,
-        fromCurrencyCode: _optionalText(_fromCurrencyController),
-        toCurrencyCode: _optionalText(_toCurrencyController),
+        fromCurrencyCode: _fromCurrencyCode,
+        toCurrencyCode: _toCurrencyCode,
         fromAccountLevel: fromAccountLevel,
         toAccountLevel: toAccountLevel,
         accountType: _accountType,
@@ -154,11 +166,6 @@ class _ChartOfAccountReportFilterBottomSheetWidgetState
 
   int? _parseLevel(TextEditingController controller) =>
       int.tryParse(controller.text.trim());
-
-  String? _optionalText(TextEditingController controller) {
-    final value = controller.text.trim();
-    return value.isEmpty ? null : value;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -230,13 +237,15 @@ class _ChartOfAccountReportFilterBottomSheetWidgetState
                 ChartOfAccountDropdown(
                   title: _isArabic ? 'من حساب' : 'From account',
                   hintText: _isArabic ? 'كل الحسابات' : 'All accounts',
-                  accountType: 2,
+                  accountType: null,
+                  includeAccountRangeFields: false,
+                  includeAccountsHasCostCenters: false,
                   initialValue: _fromAccount,
                   onSelected: (account) {
                     setState(() {
                       _fromAccount = account;
-                      _fromCurrencyController.text =
-                          account?.currencyCode?.toString() ?? '';
+                      _fromCurrencyCode =
+                          account?.currencyCode?.toString();
                       _fromLevelController.text =
                           account?.accountLevel.toString() ?? '';
                       _validationMessage = null;
@@ -247,13 +256,14 @@ class _ChartOfAccountReportFilterBottomSheetWidgetState
                 ChartOfAccountDropdown(
                   title: _isArabic ? 'إلى حساب' : 'To account',
                   hintText: _isArabic ? 'كل الحسابات' : 'All accounts',
-                  accountType: 2,
+                  accountType: null,
+                  includeAccountRangeFields: false,
+                  includeAccountsHasCostCenters: false,
                   initialValue: _toAccount,
                   onSelected: (account) {
                     setState(() {
                       _toAccount = account;
-                      _toCurrencyController.text =
-                          account?.currencyCode?.toString() ?? '';
+                      _toCurrencyCode = account?.currencyCode?.toString();
                       _toLevelController.text =
                           account?.accountLevel.toString() ?? '';
                       _validationMessage = null;
@@ -261,23 +271,7 @@ class _ChartOfAccountReportFilterBottomSheetWidgetState
                   },
                 ),
                 Gap(12.h),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _textField(
-                        controller: _fromCurrencyController,
-                        label: _isArabic ? 'من عملة' : 'From currency',
-                      ),
-                    ),
-                    Gap(10.w),
-                    Expanded(
-                      child: _textField(
-                        controller: _toCurrencyController,
-                        label: _isArabic ? 'إلى عملة' : 'To currency',
-                      ),
-                    ),
-                  ],
-                ),
+                _buildCurrencyFields(),
                 Gap(12.h),
                 Row(
                   children: [
@@ -418,16 +412,95 @@ class _ChartOfAccountReportFilterBottomSheetWidgetState
     ),
   );
 
-  Widget _textField({
-    required TextEditingController controller,
-    required String label,
-  }) {
-    return CustomFormField(
-      width: double.infinity,
-      radius: 12.r,
-      controller: controller,
-      title: label,
-      textCapitalization: TextCapitalization.characters,
+  Widget _buildCurrencyFields() {
+    return FutureBuilder<Either<Failure, CurrencyDataLightResponse>>(
+      future: _currencyDataFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        final result = snapshot.data;
+        if (result == null) {
+          return Text(
+            _isArabic ? 'تعذر تحميل العملات' : 'Unable to load currency data',
+            style: TextStyle(color: Colors.red.shade700, fontSize: 12.sp),
+          );
+        }
+        return result.fold(
+          (failure) => Text(
+            failure.errMessage,
+            style: TextStyle(color: Colors.red.shade700, fontSize: 12.sp),
+          ),
+          (response) {
+            final currencies = response.currencies;
+            if (currencies.isEmpty) {
+              return Text(
+                _isArabic ? 'لا توجد عملات' : 'No currencies available',
+                style: TextStyle(color: Colors.red.shade700, fontSize: 12.sp),
+              );
+            }
+            final currencyCodes = currencies
+                .map((currency) => currency.currencyCode)
+                .toSet();
+            final fromCode = currencyCodes.contains(_fromCurrencyCode)
+                ? _fromCurrencyCode
+                : null;
+            final toCode = currencyCodes.contains(_toCurrencyCode)
+                ? _toCurrencyCode
+                : null;
+            return Column(
+              children: [
+                DropdownButtonFormField<String>(
+                  initialValue: fromCode,
+                  isExpanded: true,
+                  decoration: InputDecoration(
+                    labelText: _isArabic ? 'من عملة' : 'From currency',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                  ),
+                  items: currencies
+                      .map(
+                        (currency) => DropdownMenuItem(
+                          value: currency.currencyCode,
+                          child: Text(
+                            '${currency.currencyName} (${currency.currencyCode})',
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (value) =>
+                      setState(() => _fromCurrencyCode = value),
+                ),
+                Gap(8.h),
+                DropdownButtonFormField<String>(
+                  initialValue: toCode,
+                  isExpanded: true,
+                  decoration: InputDecoration(
+                    labelText: _isArabic ? 'إلى عملة' : 'To currency',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                  ),
+                  items: currencies
+                      .map(
+                        (currency) => DropdownMenuItem(
+                          value: currency.currencyCode,
+                          child: Text(
+                            '${currency.currencyName} (${currency.currencyCode})',
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (value) => setState(() => _toCurrencyCode = value),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 

@@ -18,6 +18,9 @@ enum TrialBalanceReportMode {
 
   /// AGL031 — trial balance with an optional account level.
   optionalAccountLevel,
+
+  /// AGL300_D — daily income and expense position for a date range.
+  dailyIncomeAndExpense,
 }
 
 class TrialBalanceReportFilterSelection {
@@ -27,6 +30,9 @@ class TrialBalanceReportFilterSelection {
   final int? fromMonth;
   final int? toMonth;
   final bool? isGeneral;
+  final DateTime? fromDate;
+  final DateTime? toDate;
+  final int finalAccountType;
   final int reportPageType;
   final String reportName;
   final String exportType;
@@ -38,6 +44,9 @@ class TrialBalanceReportFilterSelection {
     required this.fromMonth,
     required this.toMonth,
     required this.isGeneral,
+    this.fromDate,
+    this.toDate,
+    this.finalAccountType = 3,
     required this.reportPageType,
     required this.reportName,
     required this.exportType,
@@ -91,16 +100,29 @@ class _TrialBalanceReportFilterBottomSheetWidgetState
   bool _doNotDisplayAccountsWithZeroBalances = false;
   int? _fromMonth;
   int? _toMonth;
+  DateTime? _fromDate;
+  DateTime? _toDate;
+  int _finalAccountType = 3;
   late String _reportName;
   late String _exportType;
   String? _validationMessage;
 
   bool get _isArabic => Localizations.localeOf(context).languageCode == 'ar';
 
+  String _formatDate(DateTime date) =>
+      MaterialLocalizations.of(context).formatMediumDate(date);
+
+  ButtonStyle get _dateButtonStyle => OutlinedButton.styleFrom(
+    foregroundColor: AppColor.oceanBlue,
+    padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 12.h),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+  );
+
   bool get _showAccountLevel =>
       widget.mode == TrialBalanceReportMode.byLevel ||
       widget.mode == TrialBalanceReportMode.monthly ||
-      widget.mode == TrialBalanceReportMode.optionalAccountLevel;
+      widget.mode == TrialBalanceReportMode.optionalAccountLevel ||
+      widget.mode == TrialBalanceReportMode.dailyIncomeAndExpense;
 
   bool get _accountLevelRequired =>
       widget.mode == TrialBalanceReportMode.byLevel;
@@ -108,13 +130,20 @@ class _TrialBalanceReportFilterBottomSheetWidgetState
   bool get _showBalanceType => widget.mode == TrialBalanceReportMode.byLevel;
 
   bool get _showHideZeroBalances =>
-      widget.mode == TrialBalanceReportMode.byLevel;
+      widget.mode == TrialBalanceReportMode.byLevel ||
+      widget.mode == TrialBalanceReportMode.dailyIncomeAndExpense;
 
   bool get _showMonths =>
       widget.mode == TrialBalanceReportMode.monthly ||
       widget.mode == TrialBalanceReportMode.monthlyWithoutAccountLevel;
 
   bool get _showReportName => widget.mode == TrialBalanceReportMode.monthly;
+
+  bool get _showDateRange =>
+      widget.mode == TrialBalanceReportMode.dailyIncomeAndExpense;
+
+  bool get _showFinalAccountType =>
+      widget.mode == TrialBalanceReportMode.dailyIncomeAndExpense;
 
   int get _reportPageType {
     switch (widget.mode) {
@@ -126,6 +155,8 @@ class _TrialBalanceReportFilterBottomSheetWidgetState
         return 3;
       case TrialBalanceReportMode.optionalAccountLevel:
         return 4;
+      case TrialBalanceReportMode.dailyIncomeAndExpense:
+        return 1;
     }
   }
 
@@ -134,6 +165,9 @@ class _TrialBalanceReportFilterBottomSheetWidgetState
     super.initState();
     _reportName = widget.initialReportName;
     _exportType = widget.initialExportType;
+    if (widget.mode == TrialBalanceReportMode.dailyIncomeAndExpense) {
+      _accountLevelController.text = '10';
+    }
   }
 
   @override
@@ -157,12 +191,42 @@ class _TrialBalanceReportFilterBottomSheetWidgetState
     });
   }
 
+  Future<void> _selectDate({required bool isFromDate}) async {
+    final initial = (isFromDate ? _fromDate : _toDate) ?? DateTime.now();
+    final selected = await showDatePicker(
+      context: context,
+      initialDate: initial,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+    if (selected == null || !mounted) return;
+    setState(() {
+      if (isFromDate) {
+        _fromDate = DateUtils.dateOnly(selected);
+      } else {
+        _toDate = DateUtils.dateOnly(selected);
+      }
+      _validationMessage = null;
+    });
+  }
+
   void _submit() {
     final accountLevelText = _accountLevelController.text.trim();
     final accountLevel = accountLevelText.isEmpty
         ? null
         : int.tryParse(accountLevelText);
 
+    if (_showDateRange &&
+        _fromDate != null &&
+        _toDate != null &&
+        _fromDate!.isAfter(_toDate!)) {
+      setState(() {
+        _validationMessage = _isArabic
+            ? 'تاريخ البداية يجب أن يسبق تاريخ النهاية'
+            : 'From date must be before to date';
+      });
+      return;
+    }
     if (_accountLevelRequired && accountLevel == null) {
       setState(() {
         _validationMessage = _isArabic
@@ -191,6 +255,9 @@ class _TrialBalanceReportFilterBottomSheetWidgetState
         fromMonth: _fromMonth,
         toMonth: _toMonth,
         isGeneral: null,
+        fromDate: _showDateRange ? _fromDate : null,
+        toDate: _showDateRange ? _toDate : null,
+        finalAccountType: _showFinalAccountType ? _finalAccountType : 3,
         reportPageType: _reportPageType,
         reportName: _reportName,
         exportType: _exportType,
@@ -306,6 +373,87 @@ class _TrialBalanceReportFilterBottomSheetWidgetState
                               borderRadius: BorderRadius.circular(12.r),
                             ),
                           ),
+                        ),
+                        Gap(12.h),
+                      ],
+                      if (_showDateRange) ...[
+                        Row(
+                          children: [
+                            Expanded(
+                              child: OutlinedButton.icon(
+                                onPressed: () => _selectDate(isFromDate: true),
+                                icon: const Icon(
+                                  Icons.calendar_today_rounded,
+                                  size: 16,
+                                ),
+                                label: Text(
+                                  _fromDate == null
+                                      ? (_isArabic ? 'من تاريخ' : 'From date')
+                                      : _formatDate(_fromDate!),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                style: _dateButtonStyle,
+                              ),
+                            ),
+                            Gap(8.w),
+                            Expanded(
+                              child: OutlinedButton.icon(
+                                onPressed: () => _selectDate(isFromDate: false),
+                                icon: const Icon(
+                                  Icons.calendar_today_rounded,
+                                  size: 16,
+                                ),
+                                label: Text(
+                                  _toDate == null
+                                      ? (_isArabic ? 'إلى تاريخ' : 'To date')
+                                      : _formatDate(_toDate!),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                style: _dateButtonStyle,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Gap(12.h),
+                      ],
+                      if (_showFinalAccountType) ...[
+                        DropdownButtonFormField<int>(
+                          initialValue: _finalAccountType,
+                          decoration: InputDecoration(
+                            labelText: _isArabic
+                                ? 'نوع الحساب الختامي'
+                                : 'Final account type',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12.r),
+                            ),
+                          ),
+                          items: [
+                            DropdownMenuItem(
+                              value: 1,
+                              child: Text(
+                                _isArabic
+                                    ? 'متاجرة وتشغيل'
+                                    : 'Trading and operations',
+                              ),
+                            ),
+                            DropdownMenuItem(
+                              value: 2,
+                              child: Text(
+                                _isArabic
+                                    ? 'الأرباح والخسائر'
+                                    : 'Profit and loss',
+                              ),
+                            ),
+                            DropdownMenuItem(
+                              value: 3,
+                              child: Text(_isArabic ? 'الجميع' : 'All'),
+                            ),
+                          ],
+                          onChanged: (value) {
+                            if (value != null) {
+                              setState(() => _finalAccountType = value);
+                            }
+                          },
                         ),
                         Gap(12.h),
                       ],

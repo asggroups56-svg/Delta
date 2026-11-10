@@ -1,7 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:my_template/core/custom_widgets/custom_form_field/custom_form_field.dart';
 import 'package:my_template/core/theme/app_colors.dart';
 import 'package:my_template/core/theme/app_text_style.dart';
 import 'package:my_template/core/utils/app_locale_key.dart';
@@ -11,14 +13,32 @@ import 'package:my_template/features/lookup/presentation/widgets/customer_datum_
 class PartyVatReportFilterSelection {
   final double? fromCustomerNo;
   final double? toCustomerNo;
+  final String? fromItemCode;
+  final String? toItemCode;
+  final int? fromDocId;
+  final int? toDocId;
   final DateTime? fromTransDate;
   final DateTime? toTransDate;
+  final int documentType;
+  final int accountingSystem;
+  final int taxTreatment;
+  final int taxPeriod;
+  final String exportType;
 
   const PartyVatReportFilterSelection({
     this.fromCustomerNo,
     this.toCustomerNo,
+    this.fromItemCode,
+    this.toItemCode,
+    this.fromDocId,
+    this.toDocId,
     this.fromTransDate,
     this.toTransDate,
+    this.documentType = 5,
+    this.accountingSystem = 1,
+    this.taxTreatment = 1,
+    this.taxPeriod = 3,
+    this.exportType = 'pdf',
   });
 }
 
@@ -65,7 +85,37 @@ class _PartyVatReportFilterBottomSheetWidgetState
   bool _includeDates = false;
   CustomerDatumLightModel? _fromParty;
   CustomerDatumLightModel? _toParty;
+  final _fromItemCodeController = TextEditingController();
+  final _toItemCodeController = TextEditingController();
+  final _fromDocIdController = TextEditingController();
+  final _toDocIdController = TextEditingController();
+  int _documentType = 5;
+  int _accountingSystem = 1;
+  int _taxTreatment = 1;
+  int _taxPeriod = 3;
+  String _exportType = 'pdf';
   String? _validationMessage;
+
+  bool get _isArabic => context.locale.languageCode == 'ar';
+  bool get _isSales => widget.reportCode == 'AAR1000';
+  bool get _isPurchases => widget.reportCode == 'AAR1001';
+  bool get _isExpenses => widget.reportCode == 'AGL1001E';
+
+  @override
+  void initState() {
+    super.initState();
+    _documentType = _isSales ? 5 : 3;
+    if (_isExpenses) _taxTreatment = 3;
+  }
+
+  @override
+  void dispose() {
+    _fromItemCodeController.dispose();
+    _toItemCodeController.dispose();
+    _fromDocIdController.dispose();
+    _toDocIdController.dispose();
+    super.dispose();
+  }
 
   Future<void> _selectDate({required bool isFromDate}) async {
     final selected = await showDatePicker(
@@ -101,13 +151,59 @@ class _PartyVatReportFilterBottomSheetWidgetState
       return;
     }
 
+    final fromItemCode = _fromItemCodeController.text.trim();
+    final toItemCode = _toItemCodeController.text.trim();
+    if (fromItemCode.isEmpty != toItemCode.isEmpty) {
+      setState(() {
+        _validationMessage = _isArabic
+            ? 'أدخل رمز الصنف من وإلى معًا أو اتركهما فارغين'
+            : 'Enter both from and to item codes, or leave both empty';
+      });
+      return;
+    }
+
+    final fromDocIdText = _fromDocIdController.text.trim();
+    final toDocIdText = _toDocIdController.text.trim();
+    final fromDocId = fromDocIdText.isEmpty
+        ? null
+        : int.tryParse(fromDocIdText);
+    final toDocId = toDocIdText.isEmpty ? null : int.tryParse(toDocIdText);
+
+    if (fromDocIdText.isEmpty != toDocIdText.isEmpty ||
+        (fromDocIdText.isNotEmpty && fromDocId == null) ||
+        (toDocIdText.isNotEmpty && toDocId == null)) {
+      setState(() {
+        _validationMessage = _isArabic
+            ? 'أدخل معرف المستند من وإلى بشكل صحيح'
+            : 'Enter a valid from and to document ID';
+      });
+      return;
+    }
+    if (fromDocId != null && toDocId != null && fromDocId > toDocId) {
+      setState(() {
+        _validationMessage = _isArabic
+            ? 'معرف المستند (من) يجب أن يسبق أو يساوي (إلى)'
+            : 'From document ID must be less than or equal to To';
+      });
+      return;
+    }
+
     Navigator.pop(
       context,
       PartyVatReportFilterSelection(
         fromCustomerNo: _fromParty?.customerNo.toDouble(),
         toCustomerNo: _toParty?.customerNo.toDouble(),
+        fromItemCode: fromItemCode.isNotEmpty ? fromItemCode : null,
+        toItemCode: toItemCode.isNotEmpty ? toItemCode : null,
+        fromDocId: fromDocId,
+        toDocId: toDocId,
         fromTransDate: _includeDates ? _fromDate : null,
         toTransDate: _includeDates ? _toDate : null,
+        documentType: _documentType,
+        accountingSystem: _accountingSystem,
+        taxTreatment: _taxTreatment,
+        taxPeriod: _taxPeriod,
+        exportType: _exportType,
       ),
     );
   }
@@ -327,6 +423,313 @@ class _PartyVatReportFilterBottomSheetWidgetState
                     setState(() => _toParty = party);
                   },
                 ),
+                if (_isSales || _isPurchases || _isExpenses) ...[
+                  Gap(16.h),
+                  Text(
+                    _isArabic
+                        ? (_isExpenses ? 'خيارات الضريبة' : 'خيارات المستند والضريبة')
+                        : (_isExpenses ? 'Tax options' : 'Document & tax options'),
+                    style: AppTextStyle.formTitleStyle(
+                      context,
+                    ).copyWith(fontWeight: FontWeight.w600, fontSize: 13.sp),
+                  ),
+                  Gap(8.h),
+                  if (!_isExpenses) ...[
+                    DropdownButtonFormField<int>(
+                    initialValue: _documentType,
+                    decoration: InputDecoration(
+                      labelText: _isArabic ? 'نوع المستند' : 'Document type',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                    ),
+                    items: _isSales
+                        ? [
+                            DropdownMenuItem(
+                              value: 1,
+                              child: Text(
+                                _isArabic ? 'ف. مبيعات' : 'Sales invoice',
+                              ),
+                            ),
+                            DropdownMenuItem(
+                              value: 2,
+                              child: Text(
+                                _isArabic ? 'إشعار دائن' : 'Credit note',
+                              ),
+                            ),
+                            DropdownMenuItem(
+                              value: 3,
+                              child: Text(
+                                _isArabic ? 'إشعار مدين' : 'Debit note',
+                              ),
+                            ),
+                            DropdownMenuItem(
+                              value: 4,
+                              child: Text(
+                                _isArabic ? 'دفعة مقدمة' : 'Advance payment',
+                              ),
+                            ),
+                            DropdownMenuItem(
+                              value: 5,
+                              child: Text(_isArabic ? 'الجميع' : 'All'),
+                            ),
+                          ]
+                        : [
+                            DropdownMenuItem(
+                              value: 1,
+                              child: Text(_isArabic ? 'مشتريات' : 'Purchases'),
+                            ),
+                            DropdownMenuItem(
+                              value: 2,
+                              child: Text(
+                                _isArabic
+                                    ? 'مرتجع مشتريات'
+                                    : 'Purchase returns',
+                              ),
+                            ),
+                            DropdownMenuItem(
+                              value: 3,
+                              child: Text(_isArabic ? 'الجميع' : 'All'),
+                            ),
+                          ],
+                    onChanged: (value) {
+                      if (value != null) {
+                        setState(() => _documentType = value);
+                      }
+                    },
+                    ),
+                    Gap(12.h),
+                    DropdownButtonFormField<int>(
+                    initialValue: _accountingSystem,
+                    decoration: InputDecoration(
+                      labelText: _isArabic
+                          ? 'النظام المحاسبي'
+                          : 'Accounting system',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                    ),
+                    items: [
+                      DropdownMenuItem(
+                        value: 1,
+                        child: Text(
+                          _isSales
+                              ? (_isArabic
+                                    ? 'برنامج العملاء والمبيعات'
+                                    : 'Customers and sales')
+                              : (_isArabic
+                                    ? 'برنامج الموردين والمشتريات'
+                                    : 'Suppliers and purchases'),
+                        ),
+                      ),
+                      DropdownMenuItem(
+                        value: 2,
+                        child: Text(
+                          _isArabic
+                              ? 'برنامج الحسابات العامة'
+                              : 'General accounts',
+                        ),
+                      ),
+                    ],
+                    onChanged: (value) {
+                      if (value != null) {
+                        setState(() => _accountingSystem = value);
+                      }
+                    },
+                    ),
+                    Gap(12.h),
+                  ],
+                  DropdownButtonFormField<int>(
+                    initialValue: _taxTreatment,
+                    decoration: InputDecoration(
+                      labelText: _isArabic
+                          ? 'المعالجة الضريبية'
+                          : 'Tax treatment',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                    ),
+                    items: _isExpenses
+                        ? [
+                            DropdownMenuItem(
+                              value: 1,
+                              child: Text(_isArabic ? 'خاضع' : 'Taxable'),
+                            ),
+                            DropdownMenuItem(
+                              value: 2,
+                              child: Text(_isArabic ? 'صفري' : 'Zero-rated'),
+                            ),
+                            DropdownMenuItem(
+                              value: 3,
+                              child: Text(_isArabic ? 'الجميع' : 'All'),
+                            ),
+                          ]
+                        : _isSales
+                        ? [
+                            DropdownMenuItem(
+                              value: 1,
+                              child: Text(_isArabic ? 'الجميع' : 'All'),
+                            ),
+                            DropdownMenuItem(
+                              value: 2,
+                              child: Text(_isArabic ? 'خاضع' : 'Taxable'),
+                            ),
+                            DropdownMenuItem(
+                              value: 3,
+                              child: Text(_isArabic ? 'معفى' : 'Exempt'),
+                            ),
+                            DropdownMenuItem(
+                              value: 4,
+                              child: Text(_isArabic ? 'صفري' : 'Zero-rated'),
+                            ),
+                            DropdownMenuItem(
+                              value: 5,
+                              child: Text(
+                                _isArabic ? 'خارج النطاق' : 'Out of scope',
+                              ),
+                            ),
+                          ]
+                        : [
+                            DropdownMenuItem(
+                              value: 1,
+                              child: Text(_isArabic ? 'الجميع' : 'All'),
+                            ),
+                            DropdownMenuItem(
+                              value: 2,
+                              child: Text(_isArabic ? 'خاضع' : 'Taxable'),
+                            ),
+                            DropdownMenuItem(
+                              value: 3,
+                              child: Text(_isArabic ? 'صفري' : 'Zero-rated'),
+                            ),
+                            DropdownMenuItem(
+                              value: 4,
+                              child: Text(_isArabic ? 'معفى' : 'Exempt'),
+                            ),
+                          ],
+                    onChanged: (value) {
+                      if (value != null) {
+                        setState(() => _taxTreatment = value);
+                      }
+                    },
+                  ),
+                  Gap(12.h),
+                  DropdownButtonFormField<int>(
+                    initialValue: _taxPeriod,
+                    decoration: InputDecoration(
+                      labelText: _isArabic ? 'الفترة الضريبية' : 'Tax period',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                    ),
+                    items: [
+                      DropdownMenuItem(
+                        value: 1,
+                        child: Text(
+                          _isArabic ? 'الضريبة السابقة' : 'Previous tax period',
+                        ),
+                      ),
+                      DropdownMenuItem(
+                        value: 2,
+                        child: Text(
+                          _isArabic ? 'الضريبة الحالية' : 'Current tax period',
+                        ),
+                      ),
+                      DropdownMenuItem(
+                        value: 3,
+                        child: Text(_isArabic ? 'الجميع' : 'All'),
+                      ),
+                    ],
+                    onChanged: (value) {
+                      if (value != null) {
+                        setState(() => _taxPeriod = value);
+                      }
+                    },
+                  ),
+                  Gap(12.h),
+                  if (!_isExpenses) Row(
+                    children: [
+                      Expanded(
+                        child: CustomFormField(
+                          controller: _fromItemCodeController,
+                          title: _isArabic ? 'من رمز الصنف' : 'From item code',
+                          onChanged: (_) {
+                            setState(() => _validationMessage = null);
+                          },
+                        ),
+                      ),
+                      Gap(10.w),
+                      Expanded(
+                        child: CustomFormField(
+                          controller: _toItemCodeController,
+                          title: _isArabic ? 'إلى رمز الصنف' : 'To item code',
+                          onChanged: (_) {
+                            setState(() => _validationMessage = null);
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                  Gap(12.h),
+                  if (!_isExpenses) Row(
+                    children: [
+                      Expanded(
+                        child: CustomFormField(
+                          controller: _fromDocIdController,
+                          title: _isArabic
+                              ? 'من معرف المستند'
+                              : 'From document ID',
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                          ],
+                          onChanged: (_) {
+                            setState(() => _validationMessage = null);
+                          },
+                        ),
+                      ),
+                      Gap(10.w),
+                      Expanded(
+                        child: CustomFormField(
+                          controller: _toDocIdController,
+                          title: _isArabic
+                              ? 'إلى معرف المستند'
+                              : 'To document ID',
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                          ],
+                          onChanged: (_) {
+                            setState(() => _validationMessage = null);
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+                Gap(12.h),
+                DropdownButtonFormField<String>(
+                  initialValue: _exportType,
+                  decoration: InputDecoration(
+                    labelText: _isArabic ? 'صيغة التصدير' : 'Export format',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                  ),
+                  items: const [
+                    DropdownMenuItem(value: 'pdf', child: Text('PDF')),
+                    DropdownMenuItem(value: 'excel', child: Text('Excel')),
+                    DropdownMenuItem(
+                      value: 'excelformatted',
+                      child: Text('Excel formatted'),
+                    ),
+                    DropdownMenuItem(value: 'word', child: Text('Word')),
+                  ],
+                  onChanged: (value) {
+                    if (value != null) setState(() => _exportType = value);
+                  },
+                ),
+                Gap(12.h),
                 if (_validationMessage != null) ...[
                   Gap(12.h),
                   Row(

@@ -1,27 +1,42 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:my_template/core/custom_widgets/custom_form_field/custom_form_field.dart';
 import 'package:my_template/core/theme/app_colors.dart';
 import 'package:my_template/core/utils/app_locale_key.dart';
 
 class DateRangeSelection {
   final DateTime? fromDate;
   final DateTime? toDate;
+  final int? accountLevel;
+  final bool doNotDisplayAccountsWithZeroBalances;
+  final int finalAccountType;
+  final String exportType;
 
-  const DateRangeSelection({this.fromDate, this.toDate});
+  const DateRangeSelection({
+    this.fromDate,
+    this.toDate,
+    this.accountLevel,
+    this.doNotDisplayAccountsWithZeroBalances = false,
+    this.finalAccountType = 3,
+    this.exportType = 'pdf',
+  });
 }
 
 class DateRangeBottomSheetWidget extends StatefulWidget {
   final String title;
   final String? confirmLabel;
   final bool allowAllDates;
+  final bool showIncomeExpenseOptions;
 
   const DateRangeBottomSheetWidget({
     super.key,
     required this.title,
     this.confirmLabel,
     this.allowAllDates = false,
+    this.showIncomeExpenseOptions = false,
   });
 
   static Future<DateRangeSelection?> show(
@@ -29,6 +44,7 @@ class DateRangeBottomSheetWidget extends StatefulWidget {
     required String title,
     String? confirmLabel,
     bool allowAllDates = false,
+    bool showIncomeExpenseOptions = false,
   }) {
     return showModalBottomSheet<DateRangeSelection>(
       context: context,
@@ -39,6 +55,7 @@ class DateRangeBottomSheetWidget extends StatefulWidget {
         title: title,
         confirmLabel: confirmLabel,
         allowAllDates: allowAllDates,
+        showIncomeExpenseOptions: showIncomeExpenseOptions,
       ),
     );
   }
@@ -53,6 +70,10 @@ class _DateRangeBottomSheetWidgetState
   DateTime? _fromDate;
   DateTime? _toDate;
   bool _includeDates = false;
+  final _accountLevelController = TextEditingController(text: '10');
+  bool _hideZeroBalanceAccounts = false;
+  int _finalAccountType = 3;
+  String _exportType = 'pdf';
   String? _validationMessage;
 
   @override
@@ -85,6 +106,20 @@ class _DateRangeBottomSheetWidgetState
   }
 
   void _submit() {
+    final accountLevelText = _accountLevelController.text.trim();
+    final accountLevel = accountLevelText.isEmpty
+        ? null
+        : int.tryParse(accountLevelText);
+    if (widget.showIncomeExpenseOptions &&
+        accountLevelText.isNotEmpty &&
+        accountLevel == null) {
+      setState(() {
+        _validationMessage = isArabic
+            ? 'أدخل مستوى حساب صحيحاً'
+            : 'Enter a valid account level';
+      });
+      return;
+    }
     if (_includeDates &&
         _fromDate != null &&
         _toDate != null &&
@@ -100,8 +135,21 @@ class _DateRangeBottomSheetWidgetState
       DateRangeSelection(
         fromDate: _includeDates ? _fromDate : null,
         toDate: _includeDates ? _toDate : null,
+        accountLevel: widget.showIncomeExpenseOptions ? accountLevel : null,
+        doNotDisplayAccountsWithZeroBalances:
+            widget.showIncomeExpenseOptions && _hideZeroBalanceAccounts,
+        finalAccountType: _finalAccountType,
+        exportType: _exportType,
       ),
     );
+  }
+
+  bool get isArabic => context.locale.languageCode == 'ar';
+
+  @override
+  void dispose() {
+    _accountLevelController.dispose();
+    super.dispose();
   }
 
   void _submitAllDates() {
@@ -116,7 +164,7 @@ class _DateRangeBottomSheetWidgetState
 
     return Container(
       constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.88,
+        maxHeight: MediaQuery.of(context).size.height * 0.94,
       ),
       decoration: BoxDecoration(
         color: AppColor.cardColor(context),
@@ -125,9 +173,11 @@ class _DateRangeBottomSheetWidgetState
       ),
       child: SafeArea(
         top: false,
-        child: SingleChildScrollView(
-          padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 20.h),
-          child: Column(
+        child: Scrollbar(
+          thumbVisibility: true,
+          child: SingleChildScrollView(
+            padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 20.h),
+            child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -232,6 +282,99 @@ class _DateRangeBottomSheetWidgetState
                   onClear: () => setState(() => _toDate = null),
                 ),
               ],
+              if (widget.showIncomeExpenseOptions) ...[
+                Gap(16.h),
+                CustomFormField(
+                  controller: _accountLevelController,
+                  title: isAr ? 'مستوى الحساب' : 'Account level',
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                  ],
+                ),
+                Gap(8.h),
+                SwitchListTile.adaptive(
+                  contentPadding: EdgeInsets.zero,
+                  value: _hideZeroBalanceAccounts,
+                  activeThumbColor: accent,
+                  title: Text(
+                    isAr
+                        ? 'عدم عرض الحسابات ذات الأرصدة الصفرية'
+                        : 'Hide accounts with zero balances',
+                    style: TextStyle(color: foreground, fontSize: 13.sp),
+                  ),
+                  onChanged: (value) =>
+                      setState(() => _hideZeroBalanceAccounts = value),
+                ),
+                DropdownButtonFormField<int>(
+                  initialValue: _finalAccountType,
+                  decoration: InputDecoration(
+                    labelText: isAr
+                        ? 'نوع الحساب الختامي'
+                        : 'Final account type',
+                  ),
+                  items: [
+                    DropdownMenuItem(
+                      value: 1,
+                      child: Text(
+                        isAr ? 'متاجرة وتشغيل' : 'Trading and operations',
+                      ),
+                    ),
+                    DropdownMenuItem(
+                      value: 2,
+                      child: Text(
+                        isAr ? 'الأرباح والخسائر' : 'Profit and loss',
+                      ),
+                    ),
+                    DropdownMenuItem(
+                      value: 3,
+                      child: Text(isAr ? 'الجميع' : 'All'),
+                    ),
+                  ],
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() => _finalAccountType = value);
+                    }
+                  },
+                ),
+                Gap(8.h),
+                InputDecorator(
+                  decoration: InputDecoration(
+                    labelText: isAr
+                        ? 'نوع الصفحة (reportPageType)'
+                        : 'Page type (reportPageType)',
+                  ),
+                  child: const Text('1'),
+                ),
+                Gap(8.h),
+                InputDecorator(
+                  decoration: InputDecoration(
+                    labelText: isAr
+                        ? 'اسم التقرير (ReportName)'
+                        : 'Report name (ReportName)',
+                  ),
+                  child: const Text('AGL300_D'),
+                ),
+                Gap(8.h),
+                DropdownButtonFormField<String>(
+                  initialValue: _exportType,
+                  decoration: InputDecoration(
+                    labelText: isAr ? 'صيغة التصدير' : 'Export format',
+                  ),
+                  items: const [
+                    DropdownMenuItem(value: 'pdf', child: Text('PDF')),
+                    DropdownMenuItem(value: 'excel', child: Text('Excel')),
+                    DropdownMenuItem(
+                      value: 'excelformatted',
+                      child: Text('Excel formatted'),
+                    ),
+                    DropdownMenuItem(value: 'word', child: Text('Word')),
+                  ],
+                  onChanged: (value) {
+                    if (value != null) setState(() => _exportType = value);
+                  },
+                ),
+              ],
               if (_validationMessage != null) ...[
                 Gap(12.h),
                 Row(
@@ -288,6 +431,7 @@ class _DateRangeBottomSheetWidgetState
                 ),
               ],
             ],
+            ),
           ),
         ),
       ),

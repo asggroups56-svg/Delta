@@ -39,6 +39,7 @@ class AccountsComparisonReportFilterSelection {
 
 class AccountsComparisonReportFilterBottomSheetWidget extends StatefulWidget {
   final String title;
+  final bool isAccountMovement;
   final bool isMonthly;
   final bool isComparisonMonth;
   final bool isBalancePeriodically;
@@ -46,6 +47,7 @@ class AccountsComparisonReportFilterBottomSheetWidget extends StatefulWidget {
   const AccountsComparisonReportFilterBottomSheetWidget({
     super.key,
     required this.title,
+    this.isAccountMovement = false,
     this.isMonthly = false,
     this.isComparisonMonth = false,
     this.isBalancePeriodically = false,
@@ -54,6 +56,7 @@ class AccountsComparisonReportFilterBottomSheetWidget extends StatefulWidget {
   static Future<AccountsComparisonReportFilterSelection?> show(
     BuildContext context, {
     required String title,
+    bool isAccountMovement = false,
     bool isMonthly = false,
     bool isComparisonMonth = false,
     bool isBalancePeriodically = false,
@@ -65,6 +68,7 @@ class AccountsComparisonReportFilterBottomSheetWidget extends StatefulWidget {
       backgroundColor: Colors.transparent,
       builder: (_) => AccountsComparisonReportFilterBottomSheetWidget(
         title: title,
+        isAccountMovement: isAccountMovement,
         isMonthly: isMonthly,
         isComparisonMonth: isComparisonMonth,
         isBalancePeriodically: isBalancePeriodically,
@@ -229,7 +233,24 @@ class _AccountsComparisonReportFilterBottomSheetWidgetState
                   ChartOfAccountDropdown(
                     title: _isArabic ? 'من حساب' : 'From account',
                     hintText: _isArabic ? 'كل الحسابات' : 'All accounts',
-                    accountType: _accountType,
+                    accountType: (widget.isAccountMovement ||
+                            widget.isBalancePeriodically ||
+                            widget.isMonthly ||
+                            widget.isComparisonMonth)
+                        ? null
+                        : _accountType,
+                    includeAccountRangeFields:
+                        !(widget.isAccountMovement ||
+                            widget.isBalancePeriodically ||
+                            widget.isMonthly ||
+                            widget.isComparisonMonth),
+                    includeAccountsHasCostCenters:
+                        (widget.isAccountMovement ||
+                                widget.isBalancePeriodically ||
+                                widget.isMonthly ||
+                                widget.isComparisonMonth)
+                        ? false
+                        : true,
                     initialValue: _fromAccount,
                     onSelected: (account) => setState(() {
                       _fromAccount = account;
@@ -240,7 +261,24 @@ class _AccountsComparisonReportFilterBottomSheetWidgetState
                   ChartOfAccountDropdown(
                     title: _isArabic ? 'إلى حساب' : 'To account',
                     hintText: _isArabic ? 'كل الحسابات' : 'All accounts',
-                    accountType: _accountType,
+                    accountType: (widget.isAccountMovement ||
+                            widget.isBalancePeriodically ||
+                            widget.isMonthly ||
+                            widget.isComparisonMonth)
+                        ? null
+                        : _accountType,
+                    includeAccountRangeFields:
+                        !(widget.isAccountMovement ||
+                            widget.isBalancePeriodically ||
+                            widget.isMonthly ||
+                            widget.isComparisonMonth),
+                    includeAccountsHasCostCenters:
+                        (widget.isAccountMovement ||
+                                widget.isBalancePeriodically ||
+                                widget.isMonthly ||
+                                widget.isComparisonMonth)
+                        ? false
+                        : true,
                     initialValue: _toAccount,
                     onSelected: (account) => setState(() {
                       _toAccount = account;

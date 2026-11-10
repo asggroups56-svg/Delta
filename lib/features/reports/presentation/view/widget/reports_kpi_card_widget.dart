@@ -321,7 +321,7 @@ class _MiniSparklinePainter extends CustomPainter {
       Offset(lastX, lastY),
       5.0,
       Paint()
-        ..color = lineColor.withOpacity(0.25)
+        ..color = lineColor.withValues(alpha: 0.25)
         ..style = PaintingStyle.fill,
     );
   }

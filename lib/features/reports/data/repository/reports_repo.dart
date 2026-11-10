@@ -9,6 +9,8 @@ import '../../../../core/error/failures.dart';
 import '../../../../core/network/api_consumer.dart';
 import '../../../../core/network/end_points.dart';
 import '../models/account_centers_trial_balances_report_request_model.dart';
+import '../models/account_centers_analytical_details_report_request_model.dart';
+import '../models/account_centers_analytical_groups_report_request_model.dart';
 import '../models/account_statement_report_request_model.dart';
 import '../models/additional_final_report_request_model.dart';
 import '../models/annual_ledger_report_request_model.dart';
@@ -31,6 +33,7 @@ import '../models/cost_centers_projects_report_request_model.dart';
 import '../models/cost_centers_report_request_model.dart';
 import '../models/cost_centers_transaction_report_request_model.dart';
 import '../models/cost_centers_transaction_annual_report_request_model.dart';
+import '../models/customer_supplier_notifications_report_request_model.dart';
 import '../models/daily_income_and_expense_situation_report_request_model.dart';
 import '../models/expenses_with_vat_report_request_model.dart';
 import '../models/financial_statement_report_request_model.dart';
@@ -40,10 +43,16 @@ import '../models/general_ledger_payable_aging_report_request_model.dart';
 import '../models/general_ledger_posting_report_request_model.dart';
 import '../models/general_ledger_report_request_model.dart';
 import '../models/income_and_expense_situation_report_request_model.dart';
+import '../models/invoices_approved_status_report_request_model.dart';
 import '../models/indicator_data_addition_report_request_model.dart';
 import '../models/indicator_data_standard_report_request_model.dart';
 import '../models/integration_general_ledger_report_request_model.dart';
+import '../models/integrated_vouchers_status_report_request_model.dart';
+import '../models/status_of_daily_transactions_report_request_model.dart';
+import '../models/purchase_of_projects_report_request_model.dart';
+import '../models/test_integration_voucher_report_request_model.dart';
 import '../models/journal_report_request_model.dart';
+import '../models/journal_summarized_report_request_model.dart';
 import '../models/ledger_report_request_model.dart';
 import '../models/ledger_report_for_assistant_accounts_request_model.dart';
 import '../models/ledger_report_for_main_accounts_request_model.dart';
@@ -88,9 +97,20 @@ abstract interface class ReportsRepo {
   });
 
   Future<Either<Failure, File>> getIncomeAndExpenseSituationReport({
+    int? accountLevel,
     int? fromMonth,
     int? toMonth,
-    int? comparisonMonth,
+    int? fromAccountNo,
+    int? toAccountNo,
+    int? fromCostCenterNo,
+    int? toCostCenterNo,
+    int? fromChartAnaly,
+    int? toChartAnaly,
+    int? yearQuarter,
+    int finalAccountType = 3,
+    int mainAccountsFilter = 1,
+    int reportPageType = 2,
+    String reportName = 'AGL300_M',
     required String languageCode,
     String exportType = 'pdf',
   });
@@ -98,6 +118,10 @@ abstract interface class ReportsRepo {
   Future<Either<Failure, File>> getDailyIncomeAndExpenseSituationReport({
     DateTime? fromDate,
     DateTime? toDate,
+    int? accountLevel,
+    bool doNotDisplayAccountsWithZeroBalances = false,
+    int finalAccountType = 3,
+    int reportPageType = 1,
     required String languageCode,
     String exportType = 'pdf',
   });
@@ -117,10 +141,21 @@ abstract interface class ReportsRepo {
     String exportType = 'pdf',
   });
 
-  Future<Either<Failure, File>> getOperationTracingReport({
-    int? fromEntrySerial, int? toEntrySerial, String? fromEntryNo,
-    String? toEntryNo, DateTime? fromDate, DateTime? toDate,
+  Future<Either<Failure, File>> getJournalSummarizedReport({
+    int entryType = 5, int? fromEntrySerial, int? toEntrySerial,
+    DateTime? fromDate, DateTime? toDate, String reportName = 'AGL900',
     required String languageCode, String exportType = 'pdf',
+  });
+
+  Future<Either<Failure, File>> getOperationTracingReport({
+    int? fromEntrySerial,
+    int? toEntrySerial,
+    String? fromEntryNo,
+    String? toEntryNo,
+    DateTime? fromDate,
+    DateTime? toDate,
+    required String languageCode,
+    String exportType = 'pdf',
   });
 
   Future<Either<Failure, File>> getGeneralJournalForLevelReport({
@@ -162,8 +197,13 @@ abstract interface class ReportsRepo {
   });
 
   Future<Either<Failure, File>> getCheckVerificationReport({
-    int? fromBankCode, int? toBankCode, DateTime? fromDate, DateTime? toDate,
-    String? receiveName, int checkStatus = 2, required String languageCode,
+    int? fromBankCode,
+    int? toBankCode,
+    DateTime? fromDate,
+    DateTime? toDate,
+    String? receiveName,
+    int checkStatus = 2,
+    required String languageCode,
     String exportType = 'pdf',
   });
 
@@ -208,8 +248,12 @@ abstract interface class ReportsRepo {
   });
 
   Future<Either<Failure, File>> getExpensesWithVatReport({
+    double? fromCustomerNo,
+    double? toCustomerNo,
     DateTime? fromVoucherDate,
     DateTime? toVoucherDate,
+    int taxTreatment = 3,
+    int taxPeriod = 3,
     required String languageCode,
     String exportType = 'pdf',
   });
@@ -217,8 +261,16 @@ abstract interface class ReportsRepo {
   Future<Either<Failure, File>> getSalesWithVatReport({
     double? fromCustomerNo,
     double? toCustomerNo,
+    String? fromItemCode,
+    String? toItemCode,
+    int? fromDocId,
+    int? toDocId,
     DateTime? fromTransDate,
     DateTime? toTransDate,
+    int documentType = 5,
+    int accountingSystem = 1,
+    int taxTreatment = 1,
+    int taxPeriod = 3,
     required String languageCode,
     String exportType = 'pdf',
   });
@@ -226,8 +278,46 @@ abstract interface class ReportsRepo {
   Future<Either<Failure, File>> getPurchasesWithVatReport({
     double? fromCustomerNo,
     double? toCustomerNo,
+    String? fromItemCode,
+    String? toItemCode,
+    int? fromDocId,
+    int? toDocId,
     DateTime? fromTransDate,
     DateTime? toTransDate,
+    int documentType = 3,
+    int accountingSystem = 1,
+    int taxTreatment = 1,
+    int taxPeriod = 3,
+    required String languageCode,
+    String exportType = 'pdf',
+  });
+
+  Future<Either<Failure, File>> getCustomerSupplierNotificationsReport({
+    int dealingType = 1,
+    double? fromCustomerNo,
+    double? toCustomerNo,
+    String? fromVoucherNo,
+    String? toVoucherNo,
+    int? fromTransNo,
+    int? toTransNo,
+    DateTime? fromTransDate,
+    DateTime? toTransDate,
+    int? fromAnalysisNo,
+    int? toAnalysisNo,
+    int typeTransacition = 7,
+    int accountingSystemType = 1,
+    int impactType = 3,
+    int paymentType = 3,
+    required String languageCode,
+    String exportType = 'pdf',
+  });
+
+  Future<Either<Failure, File>> getInvoicesApprovedStatusReport({
+    double? fromCustomerNo,
+    double? toCustomerNo,
+    DateTime? fromTransDate,
+    DateTime? toTransDate,
+    int invoiceType = 4,
     required String languageCode,
     String exportType = 'pdf',
   });
@@ -389,6 +479,67 @@ abstract interface class ReportsRepo {
     int? toAnalytical,
     int sideType = 2,
     String reportName = 'AGL094',
+    required String languageCode,
+    String exportType = 'pdf',
+  });
+
+  Future<Either<Failure, File>> getAccountCentersAnalyticalDetailsReport({
+    num? fromAccountNo,
+    num? toAccountNo,
+    num? fromCostCenterNo,
+    num? toCostCenterNo,
+    int? fromAccAnal,
+    int? toAccAnal,
+    int? fromCentAnal,
+    int? toCentAnal,
+    int? fromAnalytical,
+    int? toAnalytical,
+    DateTime? fromDate,
+    DateTime? toDate,
+    String reportName = 'AGL098',
+    required String languageCode,
+    String exportType = 'pdf',
+  });
+
+  Future<Either<Failure, File>> getAccountCentersAnalyticalGroupsReport({
+    int? levelCenter,
+    num? fromAccountNo,
+    num? toAccountNo,
+    num? fromCostCenterNo,
+    num? toCostCenterNo,
+    DateTime? fromDate,
+    DateTime? toDate,
+    required String reportName,
+    required String languageCode,
+    String exportType = 'pdf',
+  });
+
+  Future<Either<Failure, File>> getIntegratedVouchersStatusReport({
+    DateTime? fromDate,
+    DateTime? toDate,
+    int integratedVouchersStatusType = 3,
+    int programType = 6,
+    String reportName = 'TAGL111',
+    required String languageCode,
+    String exportType = 'pdf',
+  });
+
+  Future<Either<Failure, File>> getStatusOfDailyTransactionsReport({
+    DateTime? fromDate,
+    DateTime? toDate,
+    int transactionType = 12,
+    String reportName = 'AGL2000',
+    required String languageCode,
+    String exportType = 'pdf',
+  });
+
+  Future<Either<Failure, File>> getTestIntegrationVoucherReport({
+    int? entryType,
+    num? fromEntrySerial,
+    num? toEntrySerial,
+    DateTime? fromDate,
+    DateTime? toDate,
+    String reportName = 'AGL063',
     required String languageCode,
     String exportType = 'pdf',
   });
@@ -587,6 +738,13 @@ abstract interface class ReportsRepo {
     String exportType = 'pdf',
   });
 
+  Future<Either<Failure, File>> getPurchaseOfProjectsReport({
+    num? fromCustomerNo, num? toCustomerNo, num? fromCostCenterNo,
+    num? toCostCenterNo, DateTime? fromTransDate, DateTime? toTransDate,
+    String reportName = 'AGL1002', required String languageCode,
+    String exportType = 'pdf',
+  });
+
   Future<Either<Failure, File>> getAccountCentersSummaryForMainAccountsReport({
     num? fromAccountNo,
     num? toAccountNo,
@@ -721,6 +879,125 @@ class ReportsRepoImpl implements ReportsRepo {
   }
 
   @override
+  Future<Either<Failure, File>> getAccountCentersAnalyticalGroupsReport({
+    int? levelCenter,
+    num? fromAccountNo,
+    num? toAccountNo,
+    num? fromCostCenterNo,
+    num? toCostCenterNo,
+    DateTime? fromDate,
+    DateTime? toDate,
+    required String reportName,
+    required String languageCode,
+    String exportType = 'pdf',
+  }) => handleDioRequest(
+    request: () async {
+      final requestModel = AccountCentersAnalyticalGroupsReportRequestModel(
+        levelCenter: levelCenter,
+        fromAccountNo: fromAccountNo,
+        toAccountNo: toAccountNo,
+        fromCostCenterNo: fromCostCenterNo,
+        toCostCenterNo: toCostCenterNo,
+        fromDate: fromDate,
+        toDate: toDate,
+        reportName: reportName,
+        exportType: exportType,
+      );
+      return _downloadReport(
+        endpoint: EndPoints.accountCentersAnalyticalGroupsReport,
+        body: requestModel.toJson(),
+        fileNamePrefix: 'account_centers_analytical_groups_report',
+        exportType: requestModel.exportType,
+        headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+      );
+    },
+  );
+
+  @override
+  Future<Either<Failure, File>> getInvoicesApprovedStatusReport({
+    double? fromCustomerNo,
+    double? toCustomerNo,
+    DateTime? fromTransDate,
+    DateTime? toTransDate,
+    int invoiceType = 4,
+    required String languageCode,
+    String exportType = 'pdf',
+  }) {
+    return handleDioRequest(
+      request: () async {
+        final requestModel = InvoicesApprovedStatusReportRequestModel(
+          fromCustomerNo: fromCustomerNo,
+          toCustomerNo: toCustomerNo,
+          fromTransDate: fromTransDate,
+          toTransDate: toTransDate,
+          invoiceType: invoiceType,
+          exportType: exportType,
+        );
+
+        return _downloadReport(
+          endpoint: EndPoints.invoicesApprovedStatusReport,
+          body: requestModel.toJson(),
+          fileNamePrefix: 'invoices_approved_status_report',
+          exportType: requestModel.exportType,
+          headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+        );
+      },
+    );
+  }
+
+  @override
+  Future<Either<Failure, File>> getCustomerSupplierNotificationsReport({
+    int dealingType = 1,
+    double? fromCustomerNo,
+    double? toCustomerNo,
+    String? fromVoucherNo,
+    String? toVoucherNo,
+    int? fromTransNo,
+    int? toTransNo,
+    DateTime? fromTransDate,
+    DateTime? toTransDate,
+    int? fromAnalysisNo,
+    int? toAnalysisNo,
+    int typeTransacition = 7,
+    int accountingSystemType = 1,
+    int impactType = 3,
+    int paymentType = 3,
+    required String languageCode,
+    String exportType = 'pdf',
+  }) {
+    return handleDioRequest(
+      request: () async {
+        final requestModel = CustomerSupplierNotificationsReportRequestModel(
+          dealingType: dealingType,
+          fromCustomerNo: fromCustomerNo,
+          toCustomerNo: toCustomerNo,
+          fromVoucherNo: fromVoucherNo,
+          toVoucherNo: toVoucherNo,
+          fromTransNo: fromTransNo,
+          toTransNo: toTransNo,
+          fromTransDate: fromTransDate,
+          toTransDate: toTransDate,
+          fromAnalysisNo: fromAnalysisNo,
+          toAnalysisNo: toAnalysisNo,
+          typeTransacition: typeTransacition,
+          accountingSystemType: accountingSystemType,
+          impactType: impactType,
+          paymentType: paymentType,
+          exportType: exportType,
+        );
+
+        return _downloadReport(
+          endpoint: EndPoints.customerSupplierNotificationsReport,
+          body: requestModel.toJson(),
+          fileNamePrefix: 'customer_supplier_notifications_report',
+          exportType: requestModel.exportType,
+          headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+        );
+      },
+    );
+  }
+
+  @override
   Future<Either<Failure, File>> getChartOfAccountMonthlyBalancesReport({
     num? fromAccountNo,
     num? toAccountNo,
@@ -760,17 +1037,40 @@ class ReportsRepoImpl implements ReportsRepo {
 
   @override
   Future<Either<Failure, File>> getIncomeAndExpenseSituationReport({
+    int? accountLevel,
     int? fromMonth,
     int? toMonth,
-    int? comparisonMonth,
+    int? fromAccountNo,
+    int? toAccountNo,
+    int? fromCostCenterNo,
+    int? toCostCenterNo,
+    int? fromChartAnaly,
+    int? toChartAnaly,
+    int? yearQuarter,
+    int finalAccountType = 3,
+    int mainAccountsFilter = 1,
+    int reportPageType = 2,
+    String reportName = 'AGL300_M',
     required String languageCode,
     String exportType = 'pdf',
   }) {
     return handleDioRequest(
       request: () async {
         final requestModel = IncomeAndExpenseSituationReportRequestModel(
+          accountLevel: accountLevel,
           fromMonth: fromMonth,
           toMonth: toMonth,
+          fromAccountNo: fromAccountNo,
+          toAccountNo: toAccountNo,
+          fromCostCenterNo: fromCostCenterNo,
+          toCostCenterNo: toCostCenterNo,
+          fromChartAnaly: fromChartAnaly,
+          toChartAnaly: toChartAnaly,
+          yearQuarter: yearQuarter,
+          finalAccountType: finalAccountType,
+          mainAccountsFilter: mainAccountsFilter,
+          reportPageType: reportPageType,
+          reportName: reportName,
           exportType: exportType,
         );
 
@@ -789,14 +1089,23 @@ class ReportsRepoImpl implements ReportsRepo {
   Future<Either<Failure, File>> getDailyIncomeAndExpenseSituationReport({
     DateTime? fromDate,
     DateTime? toDate,
+    int? accountLevel,
+    bool doNotDisplayAccountsWithZeroBalances = false,
+    int finalAccountType = 3,
+    int reportPageType = 1,
     required String languageCode,
     String exportType = 'pdf',
   }) {
     return handleDioRequest(
       request: () async {
         final requestModel = DailyIncomeAndExpenseSituationReportRequestModel(
+          accountLevel: accountLevel,
+          doNotDisplayAccountsWithZeroBalances:
+              doNotDisplayAccountsWithZeroBalances,
           fromDate: fromDate,
           toDate: toDate,
+          finalAccountType: finalAccountType,
+          reportPageType: reportPageType,
           exportType: exportType,
         );
 
@@ -885,6 +1194,23 @@ class ReportsRepoImpl implements ReportsRepo {
       },
     );
   }
+
+  @override
+  Future<Either<Failure, File>> getJournalSummarizedReport({
+    int entryType = 5, int? fromEntrySerial, int? toEntrySerial,
+    DateTime? fromDate, DateTime? toDate, String reportName = 'AGL900',
+    required String languageCode, String exportType = 'pdf',
+  }) => handleDioRequest(request: () async {
+    final requestModel = JournalSummarizedReportRequestModel(
+      entryType: entryType, fromEntrySerial: fromEntrySerial,
+      toEntrySerial: toEntrySerial, fromDate: fromDate, toDate: toDate,
+      reportName: reportName, exportType: exportType,
+    );
+    return _downloadReport(endpoint: EndPoints.journalSummarizedReport,
+      body: requestModel.toJson(), fileNamePrefix: 'journal_summarized_report',
+      exportType: requestModel.exportType,
+      headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'});
+  });
 
   @override
   Future<Either<Failure, File>> getGeneralJournalForLevelReport({
@@ -1000,24 +1326,35 @@ class ReportsRepoImpl implements ReportsRepo {
 
   @override
   Future<Either<Failure, File>> getCheckVerificationReport({
-    int? fromBankCode, int? toBankCode, DateTime? fromDate, DateTime? toDate,
-    String? receiveName, int checkStatus = 2, required String languageCode,
+    int? fromBankCode,
+    int? toBankCode,
+    DateTime? fromDate,
+    DateTime? toDate,
+    String? receiveName,
+    int checkStatus = 2,
+    required String languageCode,
     String exportType = 'pdf',
   }) {
-    return handleDioRequest(request: () async {
-      final requestModel = CheckVerificationReportRequestModel(
-        fromBankCode: fromBankCode, toBankCode: toBankCode,
-        fromDate: fromDate, toDate: toDate, receiveName: receiveName,
-        checkStatus: checkStatus, exportType: exportType,
-      );
-      return _downloadReport(
-        endpoint: EndPoints.checkVerificationReport,
-        body: requestModel.toJson(),
-        fileNamePrefix: 'check_verification_report',
-        exportType: requestModel.exportType,
-        headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
-      );
-    });
+    return handleDioRequest(
+      request: () async {
+        final requestModel = CheckVerificationReportRequestModel(
+          fromBankCode: fromBankCode,
+          toBankCode: toBankCode,
+          fromDate: fromDate,
+          toDate: toDate,
+          receiveName: receiveName,
+          checkStatus: checkStatus,
+          exportType: exportType,
+        );
+        return _downloadReport(
+          endpoint: EndPoints.checkVerificationReport,
+          body: requestModel.toJson(),
+          fileNamePrefix: 'check_verification_report',
+          exportType: requestModel.exportType,
+          headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+        );
+      },
+    );
   }
 
   @override
@@ -1150,16 +1487,24 @@ class ReportsRepoImpl implements ReportsRepo {
 
   @override
   Future<Either<Failure, File>> getExpensesWithVatReport({
+    double? fromCustomerNo,
+    double? toCustomerNo,
     DateTime? fromVoucherDate,
     DateTime? toVoucherDate,
+    int taxTreatment = 3,
+    int taxPeriod = 3,
     required String languageCode,
     String exportType = 'pdf',
   }) {
     return handleDioRequest(
       request: () async {
         final requestModel = ExpensesWithVatReportRequestModel(
+          fromCustomerNo: fromCustomerNo,
+          toCustomerNo: toCustomerNo,
           fromVoucherDate: fromVoucherDate,
           toVoucherDate: toVoucherDate,
+          taxTreatment: taxTreatment,
+          taxPeriod: taxPeriod,
           exportType: exportType,
         );
 
@@ -1178,8 +1523,16 @@ class ReportsRepoImpl implements ReportsRepo {
   Future<Either<Failure, File>> getSalesWithVatReport({
     double? fromCustomerNo,
     double? toCustomerNo,
+    String? fromItemCode,
+    String? toItemCode,
+    int? fromDocId,
+    int? toDocId,
     DateTime? fromTransDate,
     DateTime? toTransDate,
+    int documentType = 5,
+    int accountingSystem = 1,
+    int taxTreatment = 1,
+    int taxPeriod = 3,
     required String languageCode,
     String exportType = 'pdf',
   }) {
@@ -1188,8 +1541,16 @@ class ReportsRepoImpl implements ReportsRepo {
         final requestModel = SalesWithVatReportRequestModel(
           fromCustomerNo: fromCustomerNo,
           toCustomerNo: toCustomerNo,
+          fromItemCode: fromItemCode,
+          toItemCode: toItemCode,
+          fromDocId: fromDocId,
+          toDocId: toDocId,
           fromTransDate: fromTransDate,
           toTransDate: toTransDate,
+          documentType: documentType,
+          accountingSystem: accountingSystem,
+          taxTreatment: taxTreatment,
+          taxPeriod: taxPeriod,
           exportType: exportType,
         );
 
@@ -1208,8 +1569,16 @@ class ReportsRepoImpl implements ReportsRepo {
   Future<Either<Failure, File>> getPurchasesWithVatReport({
     double? fromCustomerNo,
     double? toCustomerNo,
+    String? fromItemCode,
+    String? toItemCode,
+    int? fromDocId,
+    int? toDocId,
     DateTime? fromTransDate,
     DateTime? toTransDate,
+    int documentType = 3,
+    int accountingSystem = 1,
+    int taxTreatment = 1,
+    int taxPeriod = 3,
     required String languageCode,
     String exportType = 'pdf',
   }) {
@@ -1218,8 +1587,16 @@ class ReportsRepoImpl implements ReportsRepo {
         final requestModel = PurchasesWithVatReportRequestModel(
           fromCustomerNo: fromCustomerNo,
           toCustomerNo: toCustomerNo,
+          fromItemCode: fromItemCode,
+          toItemCode: toItemCode,
+          fromDocId: fromDocId,
+          toDocId: toDocId,
           fromTransDate: fromTransDate,
           toTransDate: toTransDate,
+          documentType: documentType,
+          accountingSystem: accountingSystem,
+          taxTreatment: taxTreatment,
+          taxPeriod: taxPeriod,
           exportType: exportType,
         );
 
@@ -1350,6 +1727,93 @@ class ReportsRepoImpl implements ReportsRepo {
       },
     );
   }
+
+  @override
+  Future<Either<Failure, File>> getTestIntegrationVoucherReport({
+    int? entryType,
+    num? fromEntrySerial,
+    num? toEntrySerial,
+    DateTime? fromDate,
+    DateTime? toDate,
+    String reportName = 'AGL063',
+    required String languageCode,
+    String exportType = 'pdf',
+  }) => handleDioRequest(
+    request: () async {
+      final requestModel = TestIntegrationVoucherReportRequestModel(
+        entryType: entryType,
+        fromEntrySerial: fromEntrySerial,
+        toEntrySerial: toEntrySerial,
+        fromDate: fromDate,
+        toDate: toDate,
+        reportName: reportName,
+        exportType: exportType,
+      );
+      return _downloadReport(
+        endpoint: EndPoints.testIntegrationVoucherReport,
+        body: requestModel.toJson(),
+        fileNamePrefix: 'test_integration_voucher_report',
+        exportType: requestModel.exportType,
+        headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+      );
+    },
+  );
+
+  @override
+  Future<Either<Failure, File>> getIntegratedVouchersStatusReport({
+    DateTime? fromDate,
+    DateTime? toDate,
+    int integratedVouchersStatusType = 3,
+    int programType = 6,
+    String reportName = 'TAGL111',
+    required String languageCode,
+    String exportType = 'pdf',
+  }) => handleDioRequest(
+    request: () async {
+      final requestModel = IntegratedVouchersStatusReportRequestModel(
+        fromDate: fromDate,
+        toDate: toDate,
+        integratedVouchersStatusType: integratedVouchersStatusType,
+        programType: programType,
+        reportName: reportName,
+        exportType: exportType,
+      );
+      return _downloadReport(
+        endpoint: EndPoints.integratedVouchersStatusReport,
+        body: requestModel.toJson(),
+        fileNamePrefix: 'integrated_vouchers_status_report',
+        exportType: requestModel.exportType,
+        headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+      );
+    },
+  );
+
+  @override
+  Future<Either<Failure, File>> getStatusOfDailyTransactionsReport({
+    DateTime? fromDate,
+    DateTime? toDate,
+    int transactionType = 12,
+    String reportName = 'AGL2000',
+    required String languageCode,
+    String exportType = 'pdf',
+  }) => handleDioRequest(
+    request: () async {
+      final requestModel = StatusOfDailyTransactionsReportRequestModel(
+        fromDate: fromDate,
+        toDate: toDate,
+        transactionType: transactionType,
+        reportName: reportName,
+        exportType: exportType,
+      );
+      return _downloadReport(
+        endpoint: EndPoints.statusOfTheDailyTransacitionsReport,
+        body: requestModel.toJson(),
+        fileNamePrefix: 'status_of_daily_transactions_report',
+        exportType: requestModel.exportType,
+        headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+      );
+    },
+  );
 
   @override
   Future<Either<Failure, File>> getIntegrationGeneralLedgerReport({
@@ -1669,6 +2133,53 @@ class ReportsRepoImpl implements ReportsRepo {
           endpoint: EndPoints.ledgerReportForAssistantAccounts,
           body: requestModel.toJson(),
           fileNamePrefix: 'ledger_report_assistant_accounts',
+          exportType: requestModel.exportType,
+          headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+        );
+      },
+    );
+  }
+
+  @override
+  Future<Either<Failure, File>> getAccountCentersAnalyticalDetailsReport({
+    num? fromAccountNo,
+    num? toAccountNo,
+    num? fromCostCenterNo,
+    num? toCostCenterNo,
+    int? fromAccAnal,
+    int? toAccAnal,
+    int? fromCentAnal,
+    int? toCentAnal,
+    int? fromAnalytical,
+    int? toAnalytical,
+    DateTime? fromDate,
+    DateTime? toDate,
+    String reportName = 'AGL098',
+    required String languageCode,
+    String exportType = 'pdf',
+  }) {
+    return handleDioRequest(
+      request: () async {
+        final requestModel = AccountCentersAnalyticalDetailsReportRequestModel(
+          fromAccountNo: fromAccountNo,
+          toAccountNo: toAccountNo,
+          fromCostCenterNo: fromCostCenterNo,
+          toCostCenterNo: toCostCenterNo,
+          fromAccAnal: fromAccAnal,
+          toAccAnal: toAccAnal,
+          fromCentAnal: fromCentAnal,
+          toCentAnal: toCentAnal,
+          fromAnalytical: fromAnalytical,
+          toAnalytical: toAnalytical,
+          fromDate: fromDate,
+          toDate: toDate,
+          reportName: reportName,
+          exportType: exportType,
+        );
+        return _downloadReport(
+          endpoint: EndPoints.accountCentersAnalyticalDetailsReport,
+          body: requestModel.toJson(),
+          fileNamePrefix: 'account_centers_analytical_details_report',
           exportType: requestModel.exportType,
           headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
         );
@@ -2255,6 +2766,25 @@ class ReportsRepoImpl implements ReportsRepo {
       },
     );
   }
+
+  @override
+  Future<Either<Failure, File>> getPurchaseOfProjectsReport({
+    num? fromCustomerNo, num? toCustomerNo, num? fromCostCenterNo,
+    num? toCostCenterNo, DateTime? fromTransDate, DateTime? toTransDate,
+    String reportName = 'AGL1002', required String languageCode,
+    String exportType = 'pdf',
+  }) => handleDioRequest(request: () async {
+    final requestModel = PurchaseOfProjectsReportRequestModel(
+      fromCustomerNo: fromCustomerNo, toCustomerNo: toCustomerNo,
+      fromCostCenterNo: fromCostCenterNo, toCostCenterNo: toCostCenterNo,
+      fromTransDate: fromTransDate, toTransDate: toTransDate,
+      reportName: reportName, exportType: exportType,
+    );
+    return _downloadReport(endpoint: EndPoints.purchaseOfProjectsReport,
+      body: requestModel.toJson(), fileNamePrefix: 'purchase_of_projects_report',
+      exportType: requestModel.exportType,
+      headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'});
+  });
 
   @override
   Future<Either<Failure, File>> getAccountCentersSummaryForMainAccountsReport({
