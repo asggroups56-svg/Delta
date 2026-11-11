@@ -19,8 +19,8 @@ void main() {
       'ToAccountNo': 200,
       'FromCostCenterNo': 10,
       'ToCostCenterNo': 20,
-      'FromDate': '2025-01-02',
-      'ToDate': '2025-03-04',
+      'FromDate': '2025-01-02T00:00:00',
+      'ToDate': '2025-03-04T00:00:00',
       'ReportName': 'AGL026C',
       'ExportType': 'pdf',
     });

@@ -31,8 +31,8 @@ void main() {
     expect(request.toJson(), <String, dynamic>{
       'FromBANK_CODE': 1,
       'ToBANK_CODE': 4,
-      'FromDate': '2026-11-25',
-      'ToDate': '2026-11-30',
+      'FromDate': '2026-11-25T00:00:00',
+      'ToDate': '2026-11-30T00:00:00',
       'ReceiveName': 'Recipient',
       'CheckStatus': 0,
       'ReportName': 'Ams003',
