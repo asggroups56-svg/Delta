@@ -13,7 +13,7 @@ class IntegratedVouchersStatusReportRequestModel {
     this.toDate,
     this.integratedVouchersStatusType = 3,
     this.programType = 6,
-    this.reportName = 'TAGL111',
+    this.reportName = 'AGL111T',
     this.exportType = 'pdf',
   });
 

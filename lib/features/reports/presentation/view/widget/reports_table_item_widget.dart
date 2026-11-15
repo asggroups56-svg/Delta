@@ -178,100 +178,43 @@ class ReportsTableItemWidget extends StatelessWidget {
           onExportPdf();
         },
         onLongPress: () => _showExportFormats(context),
-        borderRadius: BorderRadius.circular(16.r),
+        borderRadius: BorderRadius.circular(14.r),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 220),
           curve: Curves.easeOut,
-          margin: EdgeInsets.symmetric(horizontal: 2.w, vertical: 4.h),
+          margin: EdgeInsets.symmetric(horizontal: 2.w, vertical: 5.h),
           decoration: BoxDecoration(
             color: AppColor.cardColor(context),
-            borderRadius: BorderRadius.circular(16.r),
+            borderRadius: BorderRadius.circular(14.r),
             border: Border.all(
               color: isSelected
-                  ? tint.withValues(alpha: 0.35)
+                  ? tint.withValues(alpha: 0.5)
                   : AppColor.borderColor(context),
-              width: isSelected ? 1.5 : 1.0,
+              width: isSelected ? 1.3 : 1.0,
             ),
-            boxShadow: [
-              BoxShadow(
-                color: isSelected
-                    ? tint.withValues(alpha: 0.12)
-                    : Colors.black.withValues(alpha: 0.04),
-                blurRadius: isSelected ? 16 : 8,
-                offset: const Offset(0, 3),
-              ),
-            ],
           ),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(16.r),
+            borderRadius: BorderRadius.circular(14.r),
             child: Stack(
               children: [
-                // ── Gradient background tint ─────────────────────────────
-                Positioned.fill(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          tint.withValues(alpha: isSelected ? 0.05 : 0.03),
-                          Colors.transparent,
-                        ],
-                        begin: AlignmentDirectional.centerStart,
-                        end: AlignmentDirectional.centerEnd,
-                      ),
-                    ),
-                  ),
-                ),
-
-                // ── Left accent bar ──────────────────────────────────────
-                PositionedDirectional(
-                  start: 0,
-                  top: 0,
-                  bottom: 0,
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 220),
-                    width: 4.w,
-                    decoration: BoxDecoration(
-                      color: tint,
-                      borderRadius: BorderRadiusDirectional.only(
-                        topStart: Radius.circular(16.r),
-                        bottomStart: Radius.circular(16.r),
-                      ),
-                    ),
-                  ),
-                ),
-
                 // ── Card Content ─────────────────────────────────────────
                 Padding(
                   padding: EdgeInsetsDirectional.fromSTEB(
-                    14.w,
-                    12.h,
                     12.w,
-                    12.h,
+                    11.h,
+                    11.w,
+                    11.h,
                   ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       // Icon container
                       Container(
-                        width: 44.r,
-                        height: 44.r,
+                        width: 42.r,
+                        height: 42.r,
                         decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              tint.withValues(
-                                alpha: isSelected ? 0.22 : 0.13,
-                              ),
-                              tint.withValues(
-                                alpha: isSelected ? 0.12 : 0.07,
-                              ),
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          borderRadius: BorderRadius.circular(13.r),
-                          border: Border.all(
-                            color: tint.withValues(alpha: 0.18),
-                          ),
+                          color: tint.withValues(alpha: 0.09),
+                          borderRadius: BorderRadius.circular(12.r),
                         ),
                         child: Icon(
                           icon ?? Icons.description_outlined,
@@ -298,34 +241,6 @@ class ReportsTableItemWidget extends StatelessWidget {
                                     isSelected ? tint : titleColor,
                                   ),
                                 ),
-                                if (reportCode != null &&
-                                    reportCode!.trim().isNotEmpty) ...[
-                                  Gap(6.w),
-                                  Container(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 7.w,
-                                      vertical: 3.h,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: tint.withValues(alpha: 0.1),
-                                      borderRadius:
-                                          BorderRadius.circular(20.r),
-                                      border: Border.all(
-                                        color: tint.withValues(alpha: 0.2),
-                                      ),
-                                    ),
-                                    child: Text(
-                                      reportCode!,
-                                      maxLines: 1,
-                                      style: TextStyle(
-                                        color: tint,
-                                        fontSize: 9.sp,
-                                        fontWeight: FontWeight.w700,
-                                        letterSpacing: 0.4,
-                                      ),
-                                    ),
-                                  ),
-                                ],
                               ],
                             ),
 
@@ -343,19 +258,17 @@ class ReportsTableItemWidget extends StatelessWidget {
                               ),
                             ],
 
-                            // Format chip row
-                            Gap(8.h),
-                            _FormatChipRow(
-                              tint: tint,
-                              isArabic: isArabic,
-                              onChipTap: (format) async {
-                                if (format == 'pdf') {
-                                  onExportPdf();
-                                } else {
-                                  onExportFormat(format);
-                                }
-                              },
-                            ),
+                            if (reportCode != null && reportCode!.isNotEmpty) ...[
+                              Gap(6.h),
+                              Text(
+                                isArabic ? 'كود التقرير: $reportCode' : 'Report code: $reportCode',
+                                style: TextStyle(
+                                  color: AppColor.darkTextColor(context).withValues(alpha: 0.82),
+                                  fontSize: 9.sp,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
                           ],
                         ),
                       ),
@@ -366,7 +279,7 @@ class ReportsTableItemWidget extends StatelessWidget {
                       Tooltip(
                         message: isArabic ? 'صيغ التصدير' : 'Export formats',
                         child: Material(
-                          color: tint.withValues(alpha: 0.09),
+                          color: tint,
                           borderRadius: BorderRadius.circular(11.r),
                           child: InkWell(
                             borderRadius: BorderRadius.circular(11.r),
@@ -376,7 +289,7 @@ class ReportsTableItemWidget extends StatelessWidget {
                               height: 36.r,
                               child: Icon(
                                 Icons.download_rounded,
-                                color: tint,
+                              color: Colors.white,
                                 size: 18.r,
                               ),
                             ),
@@ -447,89 +360,6 @@ class ReportsTableItemWidget extends StatelessWidget {
       ),
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
-    );
-  }
-}
-
-// ── Format Chip Row ────────────────────────────────────────────────────────────
-class _FormatChipRow extends StatelessWidget {
-  final Color tint;
-  final bool isArabic;
-  final Future<void> Function(String format) onChipTap;
-
-  const _FormatChipRow({
-    required this.tint,
-    required this.isArabic,
-    required this.onChipTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final chips = <(String, IconData, String, Color)>[
-      ('pdf', Icons.picture_as_pdf_rounded, 'PDF', AppColor.roseDanger),
-      (
-        'excel',
-        Icons.table_chart_rounded,
-        isArabic ? 'إكسل' : 'Excel',
-        AppColor.emeraldTeal,
-      ),
-      (
-        'word',
-        Icons.description_rounded,
-        isArabic ? 'وورد' : 'Word',
-        AppColor.oceanBlue,
-      ),
-      (
-        'excelformatted',
-        Icons.grid_on_rounded,
-        isArabic ? 'PRO' : 'PRO',
-        AppColor.purpleAccent,
-      ),
-    ];
-
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      physics: const BouncingScrollPhysics(),
-      child: Row(
-        children: chips.map((chip) {
-          final (format, chipIcon, label, color) = chip;
-          return Padding(
-            padding: EdgeInsetsDirectional.only(end: 6.w),
-            child: GestureDetector(
-              onTap: () => onChipTap(format),
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 8.w,
-                  vertical: 4.h,
-                ),
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.09),
-                  borderRadius: BorderRadius.circular(20.r),
-                  border: Border.all(
-                    color: color.withValues(alpha: 0.22),
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(chipIcon, color: color, size: 11.r),
-                    Gap(4.w),
-                    Text(
-                      label,
-                      style: TextStyle(
-                        color: color,
-                        fontSize: 9.5.sp,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.2,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        }).toList(),
-      ),
     );
   }
 }

@@ -8,7 +8,7 @@ class OnboardingItemModel {
   final Color accentColor;
   final OnboardingType type;
 
-  OnboardingItemModel({
+  const OnboardingItemModel({
     required this.titleKey,
     required this.subtitleKey,
     required this.accentColor,

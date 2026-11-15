@@ -16,8 +16,8 @@ final Color color;
         ZoomIn(
           duration: const Duration(milliseconds: 600),
           child: Container(
-            width: 240.w,
-            height: 240.h,
+            width: 290.w,
+            height: 290.h,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: color.withValues(alpha: 0.06),
@@ -29,8 +29,8 @@ final Color color;
         BounceInDown(
           duration: const Duration(milliseconds: 800),
           child: Container(
-            width: 100.w,
-            height: 100.h,
+            width: 112.w,
+            height: 112.h,
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [color, color.withValues(alpha: 0.8)],
@@ -46,7 +46,7 @@ final Color color;
                 )
               ],
             ),
-            child: Icon(Icons.hub_rounded, size: 48.r, color: AppColor.buttonTextColor(context)),
+            child: Icon(Icons.hub_rounded, size: 52.r, color: AppColor.buttonTextColor(context)),
           ),
         ),
 

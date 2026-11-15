@@ -87,6 +87,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
   final FocusNode _searchFocusNode = FocusNode();
   Timer? _searchDebounce;
   String _searchQuery = '';
+  int _selectedReportCategory = 0;
 
   // ── Preview state ────────────────────────────────────────────────────────
   _PreviewKind _previewKind = _PreviewKind.none;
@@ -4818,6 +4819,10 @@ class _ReportsScreenState extends State<ReportsScreen> {
 
     final normalizedQuery = _normalizeSearchText(_searchQuery);
     final filteredStatements = statements.where((item) {
+      if (_selectedReportCategory != 0 &&
+          item['category'] != _selectedReportCategory) {
+        return false;
+      }
       if (normalizedQuery.isEmpty) {
         return true;
       }
@@ -4877,7 +4882,76 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 resultCount: filteredStatements.length,
               ),
             ),
-            SliverToBoxAdapter(child: Gap(16.h)),
+            SliverToBoxAdapter(
+              child: ReportsCategoryFilterWidget(
+                categories: categoryTabs,
+                selectedCategory: _selectedReportCategory,
+                reportCounts: [
+                  statements.length,
+                  statements.where((item) => item['category'] == 1).length,
+                  statements.where((item) => item['category'] == 2).length,
+                  statements.where((item) => item['category'] == 3).length,
+                  statements.where((item) => item['category'] == 4).length,
+                ],
+                onSelected: (category) => setState(
+                  () => _selectedReportCategory = category,
+                ),
+              ),
+            ),
+            SliverToBoxAdapter(child: Gap(8.h)),
+            if (visibleSections.isNotEmpty)
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(18.w, 8.h, 18.w, 12.h),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              context.locale.languageCode == 'ar'
+                                  ? 'استكشف التقارير'
+                                  : 'Explore reports',
+                              style: TextStyle(
+                                color: AppColor.titleFormFiledColor(context),
+                                fontSize: 15.sp,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            Gap(2.h),
+                            Text(
+                              context.locale.languageCode == 'ar'
+                                  ? 'اختر القسم لعرض التقارير المتاحة'
+                                  : 'Choose a category to browse available reports',
+                              style: TextStyle(
+                                color: AppColor.darkTextColor(context),
+                                fontSize: 10.sp,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 9.w, vertical: 5.h),
+                        decoration: BoxDecoration(
+                          color: AppColor.cardColor(context),
+                          border: Border.all(color: AppColor.borderColor(context)),
+                          borderRadius: BorderRadius.circular(9.r),
+                        ),
+                        child: Text(
+                          '${filteredStatements.length}',
+                          style: TextStyle(
+                            color: AppColor.primaryColor(context),
+                            fontSize: 10.sp,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             if (visibleSections.isEmpty)
               SliverToBoxAdapter(
                 child: ReportsEmptyStateWidget(

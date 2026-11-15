@@ -16,7 +16,7 @@ final Color color;
         FadeInUp(
           duration: const Duration(milliseconds: 600),
           child: Container(
-            width: 270.w,
+            width: 300.w,
             padding: EdgeInsets.all(20.r),
             decoration: BoxDecoration(
               color: AppColor.buttonTextColor(context),

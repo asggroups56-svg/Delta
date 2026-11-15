@@ -43,6 +43,10 @@ class _LoginScreenState extends State<LoginScreen> {
       backgroundColor: AppColor.scaffoldColor(context),
       body: LayoutBuilder(
         builder: (context, constraints) {
+          final compactLayout =
+              constraints.maxHeight < 720 ||
+              MediaQuery.viewInsetsOf(context).bottom > 0;
+
           return BlocConsumer<AuthCubit, AuthState>(
             listener: (context, state) {
               if (state.loginStatus.isSuccess) {
@@ -65,13 +69,10 @@ class _LoginScreenState extends State<LoginScreen> {
             builder: (context, state) {
               final isLoading = state.loginStatus.isLoading;
 
-              return SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                  child: IntrinsicHeight(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
+              final loginRow = Row(
+                      crossAxisAlignment: compactLayout
+                          ? CrossAxisAlignment.start
+                          : CrossAxisAlignment.stretch,
 
                       children: [
                         // ═══════════════════════════════════════════════
@@ -91,8 +92,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: Container(
                             color: Colors.white,
                             padding: EdgeInsets.symmetric(
-                              horizontal: 42.w,
-                              vertical: 32.h,
+                              horizontal: compactLayout ? 24.w : 42.w,
+                              vertical: compactLayout ? 16.h : 32.h,
                             ),
                             child: Center(
                               child: ConstrainedBox(
@@ -216,7 +217,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                         ],
                                       ),
 
-                                      Gap(48.h),
+                                      Gap((compactLayout ? 20 : 48).h),
 
                                       // Welcome Title
                                       FadeInUp(
@@ -342,7 +343,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                         ),
                                       ),
 
-                                      Gap(32.h),
+                                      Gap((compactLayout ? 18 : 32).h),
 
                                       // Username
                                       _buildLabel(
@@ -380,7 +381,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                                   : 'Username is required')
                                             : null,
                                       ),
-                                      Gap(18.h),
+                                      Gap((compactLayout ? 10 : 18).h),
 
                                       // Password
                                       _buildLabel(AppLocaleKey.password.tr()),
@@ -418,7 +419,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                                   : 'Password is required')
                                             : null,
                                       ),
-                                      Gap(18.h),
+                                      Gap((compactLayout ? 10 : 18).h),
 
                                       // Connection Name
                                       _buildLabel(
@@ -460,7 +461,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                             : null,
                                       ),
 
-                                      Gap(30.h),
+                                      Gap((compactLayout ? 16 : 30).h),
 
                                       // Login Button
                                       SizedBox(
@@ -551,7 +552,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                         ),
                                       ),
 
-                                      Gap(18.h),
+                                      Gap((compactLayout ? 10 : 18).h),
 
                                       // Back to workspace & account selection
                                       SizedBox(
@@ -596,7 +597,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                         ),
                                       ),
 
-                                      Gap(18.h),
+                                      Gap((compactLayout ? 10 : 18).h),
 
                                       // Version Info
                                       Center(
@@ -617,8 +618,15 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                       ],
-                    ),
-                  ),
+                    );
+
+              return SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: compactLayout
+                      ? loginRow
+                      : IntrinsicHeight(child: loginRow),
                 ),
               );
             },

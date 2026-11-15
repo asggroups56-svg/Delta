@@ -26,75 +26,103 @@ class ReportsPageHeaderWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isArabic = context.locale.languageCode == 'ar';
-    final subtitle = isArabic
-        ? '$reportCount تقرير · $categoryCount أقسام'
-        : '$reportCount reports · $categoryCount sections';
+    final accent = AppColor.primaryColor(context);
 
     return Padding(
       padding: EdgeInsets.fromLTRB(16.w, 10.h, 16.w, 4.h),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
+      child: Container(
+        padding: EdgeInsets.all(16.r),
+        decoration: BoxDecoration(
+          color: AppColor.cardColor(context),
+          borderRadius: BorderRadius.circular(18.r),
+          border: Border.all(color: AppColor.borderColor(context)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               children: [
-                Text(
-                  isArabic ? 'التقارير' : 'Reports',
-                  style: TextStyle(
-                    color: AppColor.titleFormFiledColor(context),
-                    fontSize: 24.sp,
-                    fontWeight: FontWeight.w800,
-                    height: 1.1,
+                Container(
+                  width: 44.r,
+                  height: 44.r,
+                  decoration: BoxDecoration(
+                    color: accent.withValues(alpha: 0.09),
+                    borderRadius: BorderRadius.circular(13.r),
+                  ),
+                  child: Icon(Icons.analytics_outlined, color: accent, size: 23.r),
+                ),
+                Gap(11.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        isArabic ? 'مركز التقارير' : 'REPORT CENTER',
+                        style: TextStyle(color: accent, fontSize: 9.sp, fontWeight: FontWeight.w800, letterSpacing: 0.8),
+                      ),
+                      Gap(2.h),
+                      Text(
+                        isArabic ? 'التقارير والتحليلات' : 'Reports & analytics',
+                        style: TextStyle(color: AppColor.titleFormFiledColor(context), fontSize: 17.sp, fontWeight: FontWeight.w800),
+                      ),
+                    ],
                   ),
                 ),
-                Gap(5.h),
-                Row(
-                  children: [
-                    Container(
-                      width: 6.r,
-                      height: 6.r,
-                      decoration: const BoxDecoration(
-                        color: AppColor.emeraldTeal,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    Gap(6.w),
-                    Flexible(
-                      child: Text(
-                        subtitle,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: AppColor.darkTextColor(context),
-                          fontSize: 11.5.sp,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
+                _HeaderActionButton(
+                  icon: Icons.translate_rounded,
+                  tooltip: isArabic ? 'English' : 'العربية',
+                  onPressed: onToggleLanguage,
                 ),
               ],
             ),
-          ),
-          Gap(10.w),
-          _HeaderActionButton(
-            icon: Icons.download_rounded,
-            label: isArabic ? 'تصدير' : 'Export',
-            tooltip: AppLocaleKey.exportReport.tr(),
-            onPressed: onExport,
-            filled: true,
-          ),
-          Gap(8.w),
-          _HeaderActionButton(
-            icon: Icons.translate_rounded,
-            tooltip: isArabic ? 'English' : 'العربية',
-            onPressed: onToggleLanguage,
-          ),
-        ],
+            Gap(14.h),
+            Container(height: 1, color: AppColor.borderColor(context)),
+            Gap(12.h),
+            Row(
+              children: [
+                Expanded(child: _ReportHeaderMetric(value: '$reportCount', label: isArabic ? 'تقرير' : 'Reports', icon: Icons.description_outlined, color: accent)),
+                Container(width: 1, height: 34.h, color: AppColor.borderColor(context)),
+                Expanded(child: _ReportHeaderMetric(value: '$categoryCount', label: isArabic ? 'تصنيف' : 'Categories', icon: Icons.grid_view_rounded, color: AppColor.emeraldTeal)),
+                Gap(8.w),
+                _HeaderActionButton(
+                  icon: Icons.download_rounded,
+                  label: isArabic ? 'تصدير' : 'Export',
+                  tooltip: AppLocaleKey.exportReport.tr(),
+                  onPressed: onExport,
+                  filled: true,
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
+}
+
+class _ReportHeaderMetric extends StatelessWidget {
+  final String value;
+  final String label;
+  final IconData icon;
+  final Color color;
+
+  const _ReportHeaderMetric({required this.value, required this.label, required this.icon, required this.color});
+
+  @override
+  Widget build(BuildContext context) => Row(
+    children: [
+      Icon(icon, color: color, size: 16.r),
+      Gap(7.w),
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(value, style: TextStyle(color: AppColor.titleFormFiledColor(context), fontSize: 14.sp, fontWeight: FontWeight.w800, height: 1.0)),
+          Gap(3.h),
+          Text(label, style: TextStyle(color: AppColor.darkTextColor(context), fontSize: 9.5.sp)),
+        ],
+      ),
+    ],
+  );
 }
 
 class _HeaderActionButton extends StatelessWidget {
@@ -258,6 +286,89 @@ class ReportsSearchSummaryWidget extends StatelessWidget {
   }
 }
 
+class ReportsCategoryFilterWidget extends StatelessWidget {
+  final List<String> categories;
+  final List<int> reportCounts;
+  final int selectedCategory;
+  final ValueChanged<int> onSelected;
+
+  const ReportsCategoryFilterWidget({
+    super.key,
+    required this.categories,
+    required this.reportCounts,
+    required this.selectedCategory,
+    required this.onSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final accent = AppColor.primaryColor(context);
+    final available = List<int>.generate(categories.length, (index) => index)
+        .where((index) => index == 0 || reportCounts[index] > 0)
+        .toList();
+
+    return SizedBox(
+      height: 43.h,
+      child: ListView.separated(
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 3.h),
+        scrollDirection: Axis.horizontal,
+        itemCount: available.length,
+        separatorBuilder: (_, __) => Gap(8.w),
+        itemBuilder: (context, itemIndex) {
+          final category = available[itemIndex];
+          final isSelected = category == selectedCategory;
+          return Material(
+            color: isSelected ? accent : AppColor.cardColor(context),
+            borderRadius: BorderRadius.circular(12.r),
+            child: InkWell(
+              onTap: () => onSelected(category),
+              borderRadius: BorderRadius.circular(12.r),
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 13.w),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12.r),
+                  border: Border.all(
+                    color: isSelected ? accent : AppColor.borderColor(context),
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      categories[category],
+                      style: TextStyle(
+                        color: isSelected ? Colors.white : AppColor.darkTextColor(context),
+                        fontSize: 11.sp,
+                        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                      ),
+                    ),
+                    Gap(7.w),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                      decoration: BoxDecoration(
+                        color: isSelected ? Colors.white.withValues(alpha: 0.18) : accent.withValues(alpha: 0.08),
+                        borderRadius: BorderRadius.circular(7.r),
+                      ),
+                      child: Text(
+                        '${reportCounts[category]}',
+                        style: TextStyle(
+                          color: isSelected ? Colors.white : accent,
+                          fontSize: 9.sp,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Category sections
 // ─────────────────────────────────────────────────────────────────────────────
@@ -397,22 +508,15 @@ class _ReportsCategoryAccordionListWidgetState
     return DecoratedBox(
       decoration: BoxDecoration(
         color: AppColor.cardColor(context),
-        borderRadius: BorderRadius.circular(20.r),
+        borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
           color: isExpanded
-              ? accent.withValues(alpha: 0.28)
+              ? accent.withValues(alpha: 0.40)
               : AppColor.borderColor(context),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF0F172A).withValues(alpha: 0.035),
-            blurRadius: 18,
-            offset: const Offset(0, 8),
-          ),
-        ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(20.r),
+        borderRadius: BorderRadius.circular(16.r),
         child: Material(
           color: Colors.transparent,
           child: Column(
@@ -458,23 +562,15 @@ class _ReportsCategoryAccordionListWidgetState
         });
       },
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+        padding: EdgeInsets.symmetric(horizontal: 13.w, vertical: 12.h),
         child: Row(
           children: [
             Container(
-              width: 44.r,
-              height: 44.r,
+              width: 40.r,
+              height: 40.r,
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    accent.withValues(alpha: 0.18),
-                    accent.withValues(alpha: 0.07),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(14.r),
-                border: Border.all(color: accent.withValues(alpha: 0.18)),
+                color: accent.withValues(alpha: 0.09),
+                borderRadius: BorderRadius.circular(12.r),
               ),
               child: Icon(section.icon, color: accent, size: 21.r),
             ),
@@ -492,7 +588,7 @@ class _ReportsCategoryAccordionListWidgetState
                       color: isExpanded
                           ? accent
                           : AppColor.titleFormFiledColor(context),
-                      fontSize: 14.5.sp,
+                      fontSize: 13.5.sp,
                       fontWeight: FontWeight.w700,
                       height: 1.25,
                     ),

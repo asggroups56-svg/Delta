@@ -16,7 +16,7 @@ class AnalyticsIllustrationWidget extends StatelessWidget {
       duration: const Duration(milliseconds: 600),
       child: Container(
         padding: EdgeInsets.all(20.r),
-        width: 280.w,
+        width: 300.w,
         decoration: BoxDecoration(
           color: AppColor.buttonTextColor(context),
           borderRadius: BorderRadius.circular(24.r),
