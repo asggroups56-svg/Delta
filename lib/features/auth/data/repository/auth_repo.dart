@@ -33,7 +33,7 @@ class AuthRepoImpl implements AuthRepo {
           body: {
             'Username': username,
             'Password': password,
-            'connectionName': connectionName,
+            'code': connectionName,
           },
         );
         final authResponse = AuthResponseModel.fromJson(
