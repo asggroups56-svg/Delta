@@ -436,4 +436,31 @@ class AppLocaleKey {
   static const String kbPopular = 'kbPopular';
   static const String kbNew = 'kbNew';
   static const String kbRecentlyUpdated = 'kbRecentlyUpdated';
+ 
+  static const loginUsername = 'login_username';
+  static const loginUsernameHint = 'login_username_hint';
+  static const loginUsernameRequired = 'login_username_required';
+  static const loginPasswordHint = 'login_password_hint';
+  static const loginPasswordRequired = 'login_password_required';
+  static const loginConnectionName = 'login_connection_name';
+  static const loginConnectionNameHint = 'login_connection_name_hint';
+  static const loginConnectionNameRequired = 'login_connection_name_required';
+  static const loginOptional = 'login_optional';
+  static const loginSecurePortal = 'login_secure_portal';
+  static const loginDemoAccount = 'login_demo_account';
+  static const loginWelcomeBack = 'login_welcome_back';
+
+  static const loginChangeWorkspace = 'login_change_workspace';
+  static const brandingStatus = 'branding_status';
+  static const brandingTitle = 'branding_title';
+  static const brandingDescription = 'branding_description';
+  static const brandingInventory = 'branding_inventory';
+  static const brandingFinance = 'branding_finance';
+  static const brandingHr = 'branding_hr';
+  static const brandingSupplyChain = 'branding_supply_chain';
+  static const brandingAnalytics = 'branding_analytics';
+  static const brandingUptime = 'branding_uptime';
+  static const brandingEncryption = 'branding_encryption';
+  static const brandingSupport = 'branding_support';
+
 }

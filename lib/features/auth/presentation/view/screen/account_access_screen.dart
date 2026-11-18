@@ -226,7 +226,7 @@ class _AccountAccessScreenState extends State<AccountAccessScreen> {
               ),
             ],
           ),
-          child: Icon(Icons.hub_rounded, color: Colors.white, size: 22.r),
+          child: Icon(Icons.hub_rounded, color: AppColor.whiteColor(context), size: 22.r),
         ),
         Gap(12.w),
         Expanded(
@@ -333,7 +333,7 @@ class _AccountAccessScreenState extends State<AccountAccessScreen> {
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(26.r),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
+        border: Border.all(color: AppColor.whiteColor(context).withValues(alpha: 0.06)),
         boxShadow: [
           BoxShadow(
             color: const Color(0xFF1E40AF).withValues(alpha: 0.22),
@@ -372,7 +372,7 @@ class _AccountAccessScreenState extends State<AccountAccessScreen> {
               height: 220.r,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
+                border: Border.all(color: AppColor.whiteColor(context).withValues(alpha: 0.06)),
               ),
             ),
           ),
@@ -405,7 +405,7 @@ class _AccountAccessScreenState extends State<AccountAccessScreen> {
                         fontWeight: FontWeight.w900,
                         height: 1.16,
                         letterSpacing: -0.7,
-                        color: Colors.white,
+                        color: AppColor.whiteColor(context),
                       ),
                     ),
                     Gap(compact ? 8.h : 12.h),
@@ -416,7 +416,7 @@ class _AccountAccessScreenState extends State<AccountAccessScreen> {
                       style: TextStyle(
                         fontSize: compact ? 11.5.sp : 12.5.sp,
                         height: 1.65,
-                        color: Colors.white.withValues(alpha: 0.72),
+                        color: AppColor.whiteColor(context).withValues(alpha: 0.72),
                       ),
                     ),
                     Gap(compact ? 16.h : 26.h),
@@ -458,9 +458,9 @@ class _AccountAccessScreenState extends State<AccountAccessScreen> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 11.w, vertical: 6.h),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.1),
+        color: AppColor.whiteColor(context).withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(30.r),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+        border: Border.all(color: AppColor.whiteColor(context).withValues(alpha: 0.14)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -487,7 +487,7 @@ class _AccountAccessScreenState extends State<AccountAccessScreen> {
               fontSize: 9.5.sp,
               fontWeight: FontWeight.w800,
               letterSpacing: 1.2,
-              color: Colors.white.withValues(alpha: 0.92),
+              color: AppColor.whiteColor(context).withValues(alpha: 0.92),
             ),
           ),
         ],
@@ -499,9 +499,9 @@ class _AccountAccessScreenState extends State<AccountAccessScreen> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 11.w, vertical: 7.h),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.07),
+        color: AppColor.whiteColor(context).withValues(alpha: 0.07),
         borderRadius: BorderRadius.circular(10.r),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        border: Border.all(color: AppColor.whiteColor(context).withValues(alpha: 0.1)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -509,7 +509,7 @@ class _AccountAccessScreenState extends State<AccountAccessScreen> {
           Icon(
             module.icon,
             size: 13.r,
-            color: Color.lerp(module.color, Colors.white, 0.25),
+            color: Color.lerp(module.color, AppColor.whiteColor(context), 0.25),
           ),
           Gap(6.w),
           Text(
@@ -517,7 +517,7 @@ class _AccountAccessScreenState extends State<AccountAccessScreen> {
             style: TextStyle(
               fontSize: 10.5.sp,
               fontWeight: FontWeight.w700,
-              color: Colors.white.withValues(alpha: 0.9),
+              color: AppColor.whiteColor(context).withValues(alpha: 0.9),
             ),
           ),
         ],
@@ -555,7 +555,7 @@ class _AccountAccessScreenState extends State<AccountAccessScreen> {
                 width: 26.r,
                 height: 26.r,
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.08),
+                  color: AppColor.whiteColor(context).withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(8.r),
                 ),
                 child: Icon(
@@ -572,7 +572,7 @@ class _AccountAccessScreenState extends State<AccountAccessScreen> {
                     fontSize: 11.3.sp,
                     fontWeight: FontWeight.w600,
                     height: 1.3,
-                    color: Colors.white.withValues(alpha: 0.82),
+                    color: AppColor.whiteColor(context).withValues(alpha: 0.82),
                   ),
                 ),
               ),
@@ -587,9 +587,9 @@ class _AccountAccessScreenState extends State<AccountAccessScreen> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 13.w, vertical: 11.h),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.06),
+        color: AppColor.whiteColor(context).withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(14.r),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.09)),
+        border: Border.all(color: AppColor.whiteColor(context).withValues(alpha: 0.09)),
       ),
       child: Row(
         children: [
@@ -597,7 +597,7 @@ class _AccountAccessScreenState extends State<AccountAccessScreen> {
             width: 34.r,
             height: 34.r,
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.1),
+              color: AppColor.whiteColor(context).withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -616,7 +616,7 @@ class _AccountAccessScreenState extends State<AccountAccessScreen> {
                 fontSize: 10.8.sp,
                 height: 1.45,
                 fontWeight: FontWeight.w600,
-                color: Colors.white.withValues(alpha: 0.78),
+                color: AppColor.whiteColor(context).withValues(alpha: 0.78),
               ),
             ),
           ),
@@ -741,7 +741,7 @@ class _AccountAccessScreenState extends State<AccountAccessScreen> {
               style: TextStyle(
                 fontSize: 12.sp,
                 fontWeight: FontWeight.w900,
-                color: Colors.white,
+                color: AppColor.whiteColor(context),
               ),
             ),
           ),
@@ -948,7 +948,7 @@ class _AccountAccessScreenState extends State<AccountAccessScreen> {
                       ? Icon(
                           Icons.check_rounded,
                           size: 13.r,
-                          color: Colors.white,
+                          color: AppColor.whiteColor(context),
                         )
                       : null,
                 ),
@@ -1031,8 +1031,8 @@ class _AccountAccessScreenState extends State<AccountAccessScreen> {
               ? SizedBox(
                   width: 21.r,
                   height: 21.r,
-                  child: const CircularProgressIndicator(
-                    color: Colors.white,
+                  child:  CircularProgressIndicator(
+                    color: AppColor.whiteColor(context),
                     strokeWidth: 2.2,
                   ),
                 )
@@ -1050,7 +1050,7 @@ class _AccountAccessScreenState extends State<AccountAccessScreen> {
                           fontSize: 14.5.sp,
                           fontWeight: FontWeight.w800,
                           letterSpacing: 0.3,
-                          color: Colors.white,
+                          color: AppColor.whiteColor(context),
                         ),
                       ),
                     ),
@@ -1059,7 +1059,7 @@ class _AccountAccessScreenState extends State<AccountAccessScreen> {
                       _isArabic
                           ? Icons.arrow_back_rounded
                           : Icons.arrow_forward_rounded,
-                      color: Colors.white,
+                      color: AppColor.whiteColor(context),
                       size: 18.r,
                     ),
                   ],

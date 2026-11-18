@@ -494,8 +494,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     ? SizedBox(
                         width: 20.r,
                         height: 20.r,
-                        child: const CircularProgressIndicator(
-                          color: Colors.white,
+                        child:  CircularProgressIndicator(
+                          color: AppColor.whiteColor(context),
                           strokeWidth: 2,
                         ),
                       )
@@ -504,7 +504,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         style: TextStyle(
                           fontSize: 14.5.sp,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: AppColor.whiteColor(context),
                         ),
                       ),
               ),
@@ -680,8 +680,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     ? SizedBox(
                         width: 20.r,
                         height: 20.r,
-                        child: const CircularProgressIndicator(
-                          color: Colors.white,
+                        child:  CircularProgressIndicator(
+                          color: AppColor.whiteColor(context),
                           strokeWidth: 2,
                         ),
                       )
@@ -690,7 +690,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         style: TextStyle(
                           fontSize: 14.5.sp,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: AppColor.whiteColor(context),
                         ),
                       ),
               ),

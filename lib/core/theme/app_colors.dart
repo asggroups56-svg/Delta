@@ -159,7 +159,7 @@ class AppColor {
   static Color whiteColor(BuildContext context, {bool listen = true}) {
     return AppTheme.getByTheme(
       context,
-      light: const Color(0xFF0F172A),
+      light: const Color(0xFFFFFFFF),
       dark: const Color(0xFFFFFFFF),
       listen: listen,
     );

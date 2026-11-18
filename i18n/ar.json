@@ -362,5 +362,32 @@
   "kbBookmarkCount": "{count} محفوظ",
   "kbPopular": "رائج",
   "kbNew": "جديد",
-  "kbRecentlyUpdated": "محدّث مؤخراً"
+  "kbRecentlyUpdated": "محدّث مؤخراً",
+  
+  "login_username": "اسم المستخدم",
+  "login_username_hint": "أدخل اسم المستخدم",
+  "login_username_required": "اسم المستخدم مطلوب",
+  "login_password_hint": "أدخل كلمة المرور",
+  "login_password_required": "كلمة المرور مطلوبة",
+  "login_connection_name": "اسم الشركه",
+  "login_connection_name_hint": "أدخل اسم الشركه",
+  "login_connection_name_required": "اسم الشركه مطلوب",
+  "login_optional": "اختياري",
+  "login_secure_portal": "بوابة آمنة",
+  "login_demo_account": "حساب تجريبي",
+  "login_welcome_back": "مرحبًا بك مجددًا 👋",
+  "login_subtitle": "سجّل الدخول للوصول إلى لوحة التحكم وإدارة موارد المؤسسة",
+  "login_change_workspace": "تغيير مساحة العمل",
+  "branding_status": "النظام يعمل بكفاءة",
+  "branding_title": "إدارة ذكية\nلجميع موارد مؤسستك",
+  "branding_description": "نظام ERP متكامل يمنحك تحكمًا كاملاً في الموارد، العمليات المالية، سلسلة التوريد، والموارد البشرية من منصة واحدة.",
+  "branding_inventory": "المخزون",
+  "branding_finance": "المالية",
+  "branding_hr": "الموارد البشرية",
+  "branding_supply_chain": "التوريد",
+  "branding_analytics": "التقارير",
+  "branding_uptime": "وقت التشغيل",
+  "branding_encryption": "التشفير",
+  "branding_support": "الدعم الفني"
+
 }
