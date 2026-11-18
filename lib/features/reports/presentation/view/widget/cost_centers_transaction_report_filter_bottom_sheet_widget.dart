@@ -7,7 +7,6 @@ import 'package:my_template/features/lookup/data/models/chart_of_account_light_m
 import 'package:my_template/features/lookup/data/models/cost_center_light_model.dart';
 import 'package:my_template/features/lookup/presentation/widgets/chart_of_account_dropdown.dart';
 import 'package:my_template/features/lookup/presentation/widgets/cost_center_dropdown.dart';
-
 class CostCentersTransactionReportFilterSelection {
   final num? fromAccountNo;
   final num? toAccountNo;
@@ -18,7 +17,6 @@ class CostCentersTransactionReportFilterSelection {
   final bool prepareCostCentersTree;
   final String reportName;
   final String exportType;
-
   const CostCentersTransactionReportFilterSelection({
     this.fromAccountNo,
     this.toAccountNo,
@@ -31,7 +29,6 @@ class CostCentersTransactionReportFilterSelection {
     required this.exportType,
   });
 }
-
 class CostCentersTransactionReportFilterBottomSheetWidget
     extends StatefulWidget {
   final String title;
@@ -403,7 +400,14 @@ class _CostCentersTransactionReportFilterBottomSheetWidgetState
             ),
           ),
           Padding(
-            padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 16.h),
+            // Keep the button clear of the system navigation bar so Samsung
+            // three-button navigation does not cover it.
+            padding: EdgeInsets.fromLTRB(
+              20.w,
+              8.h,
+              20.w,
+              16.h + MediaQuery.viewPaddingOf(context).bottom,
+            ),
             child: SizedBox(
               width: double.infinity,
               child: FilledButton(

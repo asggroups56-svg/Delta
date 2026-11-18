@@ -6,14 +6,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:my_template/core/cache/shared_pref/shared_pref.dart';
-import 'package:my_template/core/custom_widgets/custom_form_field/custom_form_field.dart';
 import 'package:my_template/core/routes/routes_name.dart';
 import 'package:my_template/core/theme/app_colors.dart';
 import 'package:my_template/core/utils/app_locale_key.dart';
 import 'package:my_template/core/utils/navigator_methods.dart';
 import 'package:my_template/features/auth/data/model/workspace_module.dart';
 
-/// Pre-login page combining workspace selection, account address, and login.
+/// Pre-login page where the user picks the workspace to start from (or a
+/// demo account) and continues to the login screen.
 class AccountAccessScreen extends StatefulWidget {
   const AccountAccessScreen({super.key});
 
@@ -22,10 +22,8 @@ class AccountAccessScreen extends StatefulWidget {
 }
 
 class _AccountAccessScreenState extends State<AccountAccessScreen> {
-  final _addressController = TextEditingController();
   String? _selectedModuleId;
   String? _moduleError;
-  String? _addressError;
   bool _isSubmitting = false;
 
   bool get _isArabic => context.locale.languageCode == 'ar';
@@ -40,16 +38,6 @@ class _AccountAccessScreenState extends State<AccountAccessScreen> {
     if (workspaceModuleById(savedModule) != null) {
       _selectedModuleId = savedModule;
     }
-    final savedAddress = prefs.getString(CacheHelper.accountAddressKey);
-    if (savedAddress != null && savedAddress.isNotEmpty) {
-      _addressController.text = savedAddress;
-    }
-  }
-
-  @override
-  void dispose() {
-    _addressController.dispose();
-    super.dispose();
   }
 
   Future<void> _toggleLanguage() async {
@@ -67,9 +55,7 @@ class _AccountAccessScreenState extends State<AccountAccessScreen> {
   Future<void> _continueToLogin() async {
     if (_isSubmitting) return;
 
-    final address = _addressController.text.trim();
     final missingModule = _selectedModuleId == null;
-    final missingAddress = address.isEmpty;
 
     setState(() {
       _moduleError = missingModule
@@ -77,22 +63,13 @@ class _AccountAccessScreenState extends State<AccountAccessScreen> {
                 ? 'اختر القسم الذي تريد البدء منه'
                 : 'Choose the section you want to start with')
           : null;
-      _addressError = missingAddress
-          ? (_isArabic
-                ? 'أدخل عنوان الحساب للمتابعة'
-                : 'Enter your account address to continue')
-          : null;
     });
-    if (missingModule || missingAddress) return;
+    if (missingModule) return;
 
     setState(() => _isSubmitting = true);
     await CacheHelper().saveData(
       key: CacheHelper.selectedModuleKey,
       value: _selectedModuleId!,
-    );
-    await CacheHelper().saveData(
-      key: CacheHelper.accountAddressKey,
-      value: address,
     );
     if (!mounted) return;
     NavigatorMethods.pushReplacementNamed(context, RoutesName.loginScreen);
@@ -101,11 +78,7 @@ class _AccountAccessScreenState extends State<AccountAccessScreen> {
   Future<void> _continueAsTrial() async {
     if (_isSubmitting) return;
     setState(() => _isSubmitting = true);
-    await CacheHelper().saveData(
-      key: CacheHelper.selectedModuleKey,
-      value: _selectedModuleId ?? '',
-    );
-    await CacheHelper().saveData(key: CacheHelper.accountAddressKey, value: '');
+    await CacheHelper().saveData(key: CacheHelper.selectedModuleKey, value: '');
     if (!mounted) return;
     NavigatorMethods.pushReplacementNamed(context, RoutesName.loginScreen);
   }
@@ -438,8 +411,8 @@ class _AccountAccessScreenState extends State<AccountAccessScreen> {
                     Gap(compact ? 8.h : 12.h),
                     Text(
                       _isArabic
-                          ? 'اختر القسم الذي تريد البدء منه، أدخل عنوان حسابك، ثم تابع إلى تسجيل الدخول.'
-                          : 'Pick the section you want to start with, enter your account address, then continue to sign in.',
+                          ? 'اختر القسم الذي تريد البدء منه، ثم تابع إلى تسجيل الدخول لإدخال بياناتك.'
+                          : 'Pick the section you want to start with, then continue to sign in with your credentials.',
                       style: TextStyle(
                         fontSize: compact ? 11.5.sp : 12.5.sp,
                         height: 1.65,
@@ -698,7 +671,6 @@ class _AccountAccessScreenState extends State<AccountAccessScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildSectionHeader(
-            step: '1',
             title: _isArabic ? 'اختر مساحة العمل' : 'Choose your workspace',
             subtitle: _isArabic
                 ? 'يمكنك البدء من أي قسم وتغييره لاحقاً من داخل النظام.'
@@ -712,75 +684,31 @@ class _AccountAccessScreenState extends State<AccountAccessScreen> {
             _buildErrorBanner(_moduleError!),
           ],
           Gap(22.h),
-          Divider(height: 1, color: AppColor.borderColor(context)),
-          Gap(22.h),
-          _buildSectionHeader(
-            step: '2',
-            title: _isArabic ? 'حسابك' : 'Your account',
-            subtitle: _isArabic
-                ? 'أدخل عنوان الحساب الذي تريد الدخول إليه.'
-                : 'Enter the address of the account you want to access.',
-          ),
-          Gap(16.h),
-          Text(
-            _isArabic ? 'عنوان الحساب' : 'Account address',
-            style: TextStyle(
-              fontSize: 11.5.sp,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 0.2,
-              color: AppColor.titleFormFiledColor(context),
-            ),
-          ),
-          Gap(8.h),
-          CustomFormField(
-            controller: _addressController,
-            hintText: _isArabic
-                ? 'مثال: company.delta-icloud.com'
-                : 'e.g. company.delta-icloud.com',
-            keyboardType: TextInputType.url,
-            textDirection: ui.TextDirection.ltr,
-            prefixIcon: Icon(
-              Icons.language_rounded,
-              color: AppColor.primaryColor(context),
-              size: 19.r,
-            ),
-            radius: 12.r,
-            fillColor: AppColor.cardSurfaceColor(context),
-            unFocusColor: AppColor.borderColor(context),
-            focusColor: AppColor.primaryColor(context),
-            textStyle: TextStyle(
-              fontSize: 13.sp,
-              fontWeight: FontWeight.w600,
-              color: AppColor.textFormColor(context),
-            ),
-            hintStyle: TextStyle(
-              fontSize: 12.sp,
-              fontWeight: FontWeight.w500,
-              color: AppColor.hintColor(context),
-            ),
-            onChanged: (_) {
-              if (_addressError != null) {
-                setState(() => _addressError = null);
-              }
-            },
-          ),
-          if (_addressError != null) ...[
-            Gap(9.h),
-            _buildErrorBanner(_addressError!),
-          ],
-          Gap(20.h),
           _buildPrimaryButton(),
           Gap(14.h),
           _buildOrDivider(),
           Gap(10.h),
           _buildTrialButton(),
+          Gap(10.h),
+          Text(
+            _isArabic
+                ? 'الحساب التجريبي يُكمل من صفحة تسجيل الدخول.'
+                : 'Demo account — continue from the sign-in page.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 9.8.sp,
+              height: 1.4,
+              fontWeight: FontWeight.w500,
+              color: AppColor.hintColor(context),
+            ),
+          ),
         ],
       ),
     );
   }
 
   Widget _buildSectionHeader({
-    required String step,
+    String? step,
     required String title,
     required String subtitle,
     Widget? trailing,
@@ -788,35 +716,37 @@ class _AccountAccessScreenState extends State<AccountAccessScreen> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          width: 28.r,
-          height: 28.r,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFF1E3A8A), Color(0xFF3B82F6)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(9.r),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFF1E40AF).withValues(alpha: 0.24),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
+        if (step != null) ...[
+          Container(
+            width: 28.r,
+            height: 28.r,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFF1E3A8A), Color(0xFF3B82F6)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
-            ],
-          ),
-          child: Text(
-            step,
-            style: TextStyle(
-              fontSize: 12.sp,
-              fontWeight: FontWeight.w900,
-              color: Colors.white,
+              borderRadius: BorderRadius.circular(9.r),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF1E40AF).withValues(alpha: 0.24),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Text(
+              step,
+              style: TextStyle(
+                fontSize: 12.sp,
+                fontWeight: FontWeight.w900,
+                color: Colors.white,
+              ),
             ),
           ),
-        ),
-        Gap(10.w),
+          Gap(10.w),
+        ],
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1109,15 +1039,19 @@ class _AccountAccessScreenState extends State<AccountAccessScreen> {
               : Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      _isArabic
-                          ? 'متابعة إلى تسجيل الدخول'
-                          : 'Continue to sign in',
-                      style: TextStyle(
-                        fontSize: 14.5.sp,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 0.3,
-                        color: Colors.white,
+                    Flexible(
+                      child: Text(
+                        _isArabic
+                            ? 'متابعة إلى تسجيل الدخول'
+                            : 'Continue to sign in',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 14.5.sp,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.3,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                     Gap(8.w),
@@ -1168,7 +1102,7 @@ class _AccountAccessScreenState extends State<AccountAccessScreen> {
           color: AppColor.primaryColor(context),
         ),
         label: Text(
-          _isArabic ? 'أو ابدأ بحساب تجريبي' : 'Or start with a trial account',
+          _isArabic ? 'ابدأ بحساب تجريبي' : 'Start with a demo account',
           textAlign: TextAlign.center,
           style: TextStyle(fontSize: 11.5.sp, fontWeight: FontWeight.w700),
         ),

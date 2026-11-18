@@ -13,10 +13,6 @@ class AuthCubit extends Cubit<AuthState> {
   final AuthRepo authRepo;
   AuthCubit(this.authRepo) : super(const AuthState()) {
     final prefs = CacheHelper.sharedPreferences;
-    final savedAddress = prefs.getString(CacheHelper.accountAddressKey);
-    if (savedAddress != null && savedAddress.isNotEmpty) {
-      connectionNameController.text = savedAddress;
-    }
     final savedModule = prefs.getString(CacheHelper.selectedModuleKey);
     if (savedModule != null && savedModule.isNotEmpty) {
       selectedModuleId = savedModule;

@@ -103,11 +103,7 @@ void main() {
     testWidgets('workspace selection renders on tablet ${entry.key}', (
       tester,
     ) async {
-      await pumpScreen(
-        tester,
-        const AccountAccessScreen(),
-        size: entry.value,
-      );
+      await pumpScreen(tester, const AccountAccessScreen(), size: entry.value);
 
       expect(find.text('المحاسبة'), findsWidgets);
       expect(find.text('اختر مساحة العمل'), findsOneWidget);
@@ -123,7 +119,9 @@ void main() {
       );
 
       expect(find.text('DELTA ASG'), findsWidgets);
+      // Username, password and a connection name typed by the user.
       expect(find.byType(TextFormField), findsNWidgets(3));
+      expect(find.text('اسم الاتصال'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   }
@@ -138,6 +136,48 @@ void main() {
 
     expect(find.text('DELTA ASG'), findsOneWidget);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('trial login hides the connection name field', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    await CacheHelper().init();
+
+    await pumpScreen(
+      tester,
+      const LoginScreen(),
+      size: const Size(390, 844),
+      withAuthCubit: true,
+    );
+
+    expect(find.byType(TextFormField), findsNWidgets(2));
+    expect(find.text('اسم الاتصال'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('connection name is typed by the user, not derived', (
+    tester,
+  ) async {
+    // A workspace is selected, which previously auto-filled the connection.
+    await pumpScreen(
+      tester,
+      const LoginScreen(),
+      size: const Size(390, 844),
+      withAuthCubit: true,
+    );
+
+    final connectionField = find.byType(TextFormField).at(2);
+    expect(
+      tester.widget<TextFormField>(connectionField).controller?.text,
+      isEmpty,
+    );
+
+    await tester.enterText(connectionField, 'my-company.delta-icloud.com');
+    await tester.pump();
+
+    expect(
+      tester.widget<TextFormField>(connectionField).controller?.text,
+      'my-company.delta-icloud.com',
+    );
   });
 
   testWidgets('re-lays out when the tablet is rotated', (tester) async {

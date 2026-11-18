@@ -1,8 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:my_template/core/app_size/adaptive_screen_util.dart';
 import 'package:my_template/core/cache/shared_pref/shared_pref.dart';
 import 'package:my_template/core/theme/cubit/app_theme_cubit.dart';
 import 'package:my_template/features/auth/presentation/view/screen/account_access_screen.dart';
@@ -39,10 +39,7 @@ void main() {
         useFallbackTranslations: false,
         fallbackLocale: const Locale('ar'),
         startLocale: const Locale('ar'),
-        child: ScreenUtilInit(
-          designSize: const Size(360, 690),
-          minTextAdapt: true,
-          splitScreenMode: true,
+        child: AdaptiveScreenUtilInit(
           builder: (context, child) => BlocProvider(
             create: (_) => AppThemeCubit(),
             child: MaterialApp(
@@ -76,16 +73,24 @@ void main() {
   testWidgets('asks for a section before continuing', (tester) async {
     await pumpScreen(tester);
 
-    await tester.enterText(
-      find.byType(TextFormField).first,
-      'company.delta-icloud.com',
-    );
     await tester.ensureVisible(find.text('متابعة إلى تسجيل الدخول'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('متابعة إلى تسجيل الدخول'));
     await tester.pumpAndSettle();
 
     expect(find.text('اختر القسم الذي تريد البدء منه'), findsOneWidget);
+  });
+
+  testWidgets('leaves the connection name to the login screen', (tester) async {
+    await pumpScreen(tester);
+
+    expect(find.byType(TextFormField), findsNothing);
+    expect(find.text('اسم الاتصال'), findsNothing);
+
+    await tester.tap(find.text('المحاسبة').last);
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('delta-icloud'), findsNothing);
   });
 
   testWidgets('renders at tablet width without overflow', (tester) async {

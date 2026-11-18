@@ -439,7 +439,14 @@ class _AccountsComparisonReportFilterBottomSheetWidgetState
             ),
           ),
           Padding(
-            padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 16.h),
+            // Keep the button clear of the system navigation bar so Samsung
+            // three-button navigation does not cover it.
+            padding: EdgeInsets.fromLTRB(
+              20.w,
+              8.h,
+              20.w,
+              16.h + MediaQuery.viewPaddingOf(context).bottom,
+            ),
             child: SizedBox(
               width: double.infinity,
               child: FilledButton(
