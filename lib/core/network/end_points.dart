@@ -1,6 +1,8 @@
 class EndPoints {
   static const String login = 'auth/login';
+  static const String logout = 'auth/logout';
   static const String users = 'users';
+  static const String company = 'Company';
   static const String incomeAndExpensesChart =
       'Dashboard/IncomeAndExpensesChart';
   static const String salesAndReturnsChart = 'Dashboard/SalesAndReturnsChart';

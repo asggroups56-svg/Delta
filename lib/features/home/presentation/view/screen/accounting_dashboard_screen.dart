@@ -4,9 +4,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:my_template/core/cache/shared_pref/shared_pref.dart';
 import 'package:my_template/core/routes/routes_name.dart';
+import 'package:my_template/core/services/services_locator.dart';
 import 'package:my_template/core/theme/app_colors.dart';
 import 'package:my_template/core/utils/app_locale_key.dart';
 import 'package:my_template/core/utils/navigator_methods.dart';
+import 'package:my_template/features/auth/presentation/view/cubit/auth_cubit.dart';
 import 'package:my_template/features/home/presentation/view/widget/ai_fab_widget.dart';
 import 'package:my_template/features/home/presentation/view/widget/bank_card_widget.dart';
 import 'package:my_template/features/home/presentation/view/widget/cash_card_widget.dart';
@@ -55,7 +57,7 @@ class _AccountingDashboardScreenState extends State<AccountingDashboardScreen> {
   }
 
   Future<void> _logout() async {
-    await CacheHelper().clearAuthData();
+    await sl<AuthCubit>().logout();
     if (!mounted) return;
     NavigatorMethods.pushReplacementNamed(context, RoutesName.loginScreen);
   }

@@ -41,6 +41,13 @@ class AppRouters {
         return MaterialPageRoute(builder: (_) => const AiCopilotScreen());
       case RoutesName.purchaseOcrScreen:
         return MaterialPageRoute(builder: (_) => const PurchaseOcrScreen());
+      case RoutesName.companyProfileScreen:
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (context) => sl<CompanyCubit>(),
+            child: const CompanyProfileScreen(),
+          ),
+        );
 
       default:
         return null;

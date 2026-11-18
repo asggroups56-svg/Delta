@@ -8,9 +8,11 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton<Dio>(() => Dio());
   sl.registerFactory<ApiConsumer>(() => DioConsumer(client: sl()));
   sl.registerLazySingleton<AuthRepo>(() => AuthRepoImpl(sl(), sl()));
+  sl.registerLazySingleton<CompanyRepo>(() => CompanyRepoImpl(sl()));
   sl.registerLazySingleton<HomeRepo>(() => HomeRepo(sl()));
   sl.registerLazySingleton<ReportsRepo>(() => ReportsRepoImpl(sl()));
   sl.registerLazySingleton<LookupRepo>(() => LookupRepoImpl(sl()));
   sl.registerFactory<AuthCubit>(() => AuthCubit(sl()));
+  sl.registerFactory<CompanyCubit>(() => CompanyCubit(sl()));
   sl.registerFactory<ReportsCubit>(() => ReportsCubit(sl()));
 }

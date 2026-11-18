@@ -53,6 +53,23 @@ class AuthCubit extends Cubit<AuthState> {
     );
   }
 
+  /// Calls `auth/logout`, clears local cache, then notifies UI.
+  Future<void> logout() async {
+    if (isClosed) return;
+    emit(state.copyWith(logoutStatus: const StatusState.loading()));
+    final result = await authRepo.logout();
+    if (isClosed) return;
+    result.fold(
+      (failure) {
+        // Even on failure, local data was already cleared in the repo.
+        emit(state.copyWith(logoutStatus: const StatusState.success(null)));
+      },
+      (_) {
+        emit(state.copyWith(logoutStatus: const StatusState.success(null)));
+      },
+    );
+  }
+
   @override
   Future<void> close() {
     usernameController.dispose();

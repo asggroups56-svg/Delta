@@ -9,7 +9,13 @@ import 'package:my_template/core/theme/app_text_style.dart';
 import 'package:my_template/core/theme/cubit/app_theme_cubit.dart';
 import 'package:my_template/core/theme/theme_enum.dart';
 import 'package:my_template/core/utils/app_locale_key.dart';
+import 'package:my_template/core/routes/routes_name.dart';
+import 'package:my_template/core/utils/navigator_methods.dart';
+import 'package:my_template/features/company/data/models/company_model.dart';
+import 'package:my_template/features/company/presentation/view/cubit/company_cubit.dart';
+import 'package:my_template/features/company/presentation/view/cubit/company_state.dart';
 import 'package:my_template/features/home/presentation/view/widget/ai_chat_bottom_sheet_widget.dart';
+
 class ProfileScreen extends StatefulWidget {
   final VoidCallback? onLogout;
   final VoidCallback? onToggleLanguage;
@@ -23,6 +29,17 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   bool _notificationsEnabled = true;
   bool _biometricEnabled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<CompanyCubit>().getCompany(
+        languageCode: context.locale.languageCode,
+      );
+    });
+  }
+
   void _openAiChat() {
     showModalBottomSheet(
       context: context,
@@ -36,245 +53,292 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     final isDarkMode = context.watch<AppThemeCubit>().theme == ThemeEnum.dark;
 
-    return Scaffold(
-      backgroundColor: AppColor.scaffoldColor(context),
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Column(
-          children: [
-            // ── Profile Hero Header ─────────────────────────────────
-            _buildProfileHeader(context),
+    return BlocBuilder<CompanyCubit, CompanyState>(
+      builder: (context, companyState) {
+        final company = companyState.status.isSuccess
+            ? companyState.status.data?.first
+            : null;
 
-            Gap(20.h),
+        return Scaffold(
+          backgroundColor: AppColor.scaffoldColor(context),
+          body: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Column(
+              children: [
+                // ── Profile Hero Header ─────────────────────────────────
+                _buildProfileHeader(context, company),
 
-            // ── Stats Row ───────────────────────────────────────────
-            FadeInUp(
-              delay: const Duration(milliseconds: 100),
-              duration: const Duration(milliseconds: 400),
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20.w),
-                child: _buildStatsRow(context),
-              ),
-            ),
+                Gap(20.h),
 
-            Gap(24.h),
-
-            // ── Account Settings ────────────────────────────────────
-            FadeInUp(
-              delay: const Duration(milliseconds: 150),
-              duration: const Duration(milliseconds: 400),
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20.w),
-                child: _buildSectionTitle(
-                  context,
-                  'Account Settings',
-                  Icons.manage_accounts_outlined,
+                // ── Stats Row ───────────────────────────────────────────
+                FadeInUp(
+                  delay: const Duration(milliseconds: 100),
+                  duration: const Duration(milliseconds: 400),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20.w),
+                    child: _buildStatsRow(context),
+                  ),
                 ),
-              ),
-            ),
-            Gap(10.h),
-            FadeInUp(
-              delay: const Duration(milliseconds: 180),
-              duration: const Duration(milliseconds: 400),
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20.w),
-                child: _buildSettingsCard(context, [
-                  _buildProfileTile(
-                    context,
-                    icon: Icons.person_outline_rounded,
-                    iconColor: AppColor.emeraldTeal,
-                    title: 'Ahmed Al-Rashidi',
-                    subtitle: 'System Administrator',
-                    trailing: _buildChip(
+
+                Gap(24.h),
+
+                // ── Company Info Card ────────────────────────────────────
+                if (company != null) ...[
+                  FadeInUp(
+                    delay: const Duration(milliseconds: 130),
+                    duration: const Duration(milliseconds: 400),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 20.w),
+                      child: _buildSectionTitle(
+                        context,
+                        'بيانات الشركة',
+                        Icons.business_rounded,
+                      ),
+                    ),
+                  ),
+                  Gap(10.h),
+                  FadeInUp(
+                    delay: const Duration(milliseconds: 160),
+                    duration: const Duration(milliseconds: 400),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 20.w),
+                      child: _buildCompanyCard(context, company),
+                    ),
+                  ),
+                  Gap(20.h),
+                ],
+
+                // ── Account Settings ────────────────────────────────────
+                FadeInUp(
+                  delay: const Duration(milliseconds: 150),
+                  duration: const Duration(milliseconds: 400),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20.w),
+                    child: _buildSectionTitle(
                       context,
-                      'Admin',
-                      AppColor.emeraldTeal,
+                      'Account Settings',
+                      Icons.manage_accounts_outlined,
                     ),
                   ),
-                  _buildDivider(context),
-                  _buildProfileTile(
-                    context,
-                    icon: Icons.business_outlined,
-                    iconColor: AppColor.oceanBlue,
-                    title: 'Delta Enterprise Co.',
-                    subtitle: 'Organization · Saudi Arabia',
-                    trailing: null,
+                ),
+                Gap(10.h),
+                FadeInUp(
+                  delay: const Duration(milliseconds: 180),
+                  duration: const Duration(milliseconds: 400),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20.w),
+                    child: _buildSettingsCard(context, [
+                      _buildProfileTile(
+                        context,
+                        icon: Icons.person_outline_rounded,
+                        iconColor: AppColor.emeraldTeal,
+                        title: 'Ahmed Al-Rashidi',
+                        subtitle: 'System Administrator',
+                        trailing: _buildChip(
+                          context,
+                          'Admin',
+                          AppColor.emeraldTeal,
+                        ),
+                      ),
+                      _buildDivider(context),
+                      _buildProfileTile(
+                        context,
+                        icon: Icons.business_outlined,
+                        iconColor: AppColor.oceanBlue,
+                        title: company?.companyName ?? company?.companyEname ?? 'Delta Enterprise Co.',
+                        subtitle: [
+                          company?.countryName,
+                          company?.cityName,
+                        ].where((e) => e != null && e.isNotEmpty).join(' · '),
+                        onTap: () => NavigatorMethods.pushNamed(
+                          context,
+                          RoutesName.companyProfileScreen,
+                        ),
+                        trailing: Icon(
+                          Icons.chevron_right_rounded,
+                          color: AppColor.darkTextColor(context),
+                          size: 18.r,
+                        ),
+                      ),
+                      _buildDivider(context),
+                      _buildProfileTile(
+                        context,
+                        icon: Icons.email_outlined,
+                        iconColor: AppColor.purpleAccent,
+                        title: company?.eMail ?? 'admin@delta-erp.sa',
+                        subtitle: 'Primary Email · Verified',
+                        trailing: Icon(
+                          Icons.verified_rounded,
+                          color: AppColor.emeraldTeal,
+                          size: 16.r,
+                        ),
+                      ),
+                    ]),
                   ),
-                  _buildDivider(context),
-                  _buildProfileTile(
-                    context,
-                    icon: Icons.email_outlined,
-                    iconColor: AppColor.purpleAccent,
-                    title: 'admin@delta-erp.sa',
-                    subtitle: 'Primary Email · Verified',
-                    trailing: Icon(
-                      Icons.verified_rounded,
-                      color: AppColor.emeraldTeal,
-                      size: 16.r,
+                ),
+
+                Gap(20.h),
+
+                // ── Preferences ─────────────────────────────────────────
+                FadeInUp(
+                  delay: const Duration(milliseconds: 220),
+                  duration: const Duration(milliseconds: 400),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20.w),
+                    child: _buildSectionTitle(
+                      context,
+                      'Preferences',
+                      Icons.tune_rounded,
                     ),
                   ),
-                ]),
-              ),
-            ),
-
-            Gap(20.h),
-
-            // ── Preferences ─────────────────────────────────────────
-            FadeInUp(
-              delay: const Duration(milliseconds: 220),
-              duration: const Duration(milliseconds: 400),
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20.w),
-                child: _buildSectionTitle(
-                  context,
-                  'Preferences',
-                  Icons.tune_rounded,
                 ),
-              ),
-            ),
-            Gap(10.h),
-            FadeInUp(
-              delay: const Duration(milliseconds: 250),
-              duration: const Duration(milliseconds: 400),
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20.w),
-                child: _buildSettingsCard(context, [
-                  _buildToggleTile(
-                    context,
-                    icon: Icons.notifications_outlined,
-                    iconColor: AppColor.warningOrange,
-                    title: 'Push Notifications',
-                    subtitle: 'Alerts, reminders & updates',
-                    value: _notificationsEnabled,
-                    onChanged: (v) => setState(() => _notificationsEnabled = v),
+                Gap(10.h),
+                FadeInUp(
+                  delay: const Duration(milliseconds: 250),
+                  duration: const Duration(milliseconds: 400),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20.w),
+                    child: _buildSettingsCard(context, [
+                      _buildToggleTile(
+                        context,
+                        icon: Icons.notifications_outlined,
+                        iconColor: AppColor.warningOrange,
+                        title: 'Push Notifications',
+                        subtitle: 'Alerts, reminders & updates',
+                        value: _notificationsEnabled,
+                        onChanged: (v) => setState(() => _notificationsEnabled = v),
+                      ),
+                      _buildDivider(context),
+                      _buildToggleTile(
+                        context,
+                        icon: Icons.fingerprint_rounded,
+                        iconColor: AppColor.mintTeal,
+                        title: 'Biometric Login',
+                        subtitle: 'Face ID / Fingerprint access',
+                        value: _biometricEnabled,
+                        onChanged: (v) => setState(() => _biometricEnabled = v),
+                      ),
+                      _buildDivider(context),
+                      _buildToggleTile(
+                        context,
+                        icon: isDarkMode
+                            ? Icons.dark_mode_outlined
+                            : Icons.light_mode_outlined,
+                        iconColor: AppColor.purpleAccent,
+                        title: AppLocaleKey.appTheme.tr(),
+                        subtitle:
+                            '${AppLocaleKey.themeModeSubtitle.tr()} · ${isDarkMode ? AppLocaleKey.darkMode.tr() : AppLocaleKey.lightMode.tr()}',
+                        value: isDarkMode,
+                        onChanged: (isDark) {
+                          context.read<AppThemeCubit>().setTheme(
+                            isDark ? ThemeEnum.dark : ThemeEnum.light,
+                          );
+                        },
+                      ),
+                      _buildDivider(context),
+                      _buildActionTile(
+                        context,
+                        icon: Icons.language_rounded,
+                        iconColor: AppColor.skyBlue,
+                        title: 'Language / اللغة',
+                        subtitle: context.locale.languageCode == 'ar'
+                            ? 'العربية'
+                            : 'English',
+                        onTap: widget.onToggleLanguage,
+                      ),
+                    ]),
                   ),
-                  _buildDivider(context),
-                  _buildToggleTile(
-                    context,
-                    icon: Icons.fingerprint_rounded,
-                    iconColor: AppColor.mintTeal,
-                    title: 'Biometric Login',
-                    subtitle: 'Face ID / Fingerprint access',
-                    value: _biometricEnabled,
-                    onChanged: (v) => setState(() => _biometricEnabled = v),
-                  ),
-                  _buildDivider(context),
-                  _buildToggleTile(
-                    context,
-                    icon: isDarkMode
-                        ? Icons.dark_mode_outlined
-                        : Icons.light_mode_outlined,
-                    iconColor: AppColor.purpleAccent,
-                    title: AppLocaleKey.appTheme.tr(),
-                    subtitle:
-                        '${AppLocaleKey.themeModeSubtitle.tr()} · ${isDarkMode ? AppLocaleKey.darkMode.tr() : AppLocaleKey.lightMode.tr()}',
-                    value: isDarkMode,
-                    onChanged: (isDark) {
-                      context.read<AppThemeCubit>().setTheme(
-                        isDark ? ThemeEnum.dark : ThemeEnum.light,
-                      );
-                    },
-                  ),
-                  _buildDivider(context),
-                  _buildActionTile(
-                    context,
-                    icon: Icons.language_rounded,
-                    iconColor: AppColor.skyBlue,
-                    title: 'Language / اللغة',
-                    subtitle: context.locale.languageCode == 'ar'
-                        ? 'العربية'
-                        : 'English',
-                    onTap: widget.onToggleLanguage,
-                  ),
-                ]),
-              ),
-            ),
-
-            Gap(20.h),
-
-            // ── AI Assistant ────────────────────────────────────────
-            FadeInUp(
-              delay: const Duration(milliseconds: 300),
-              duration: const Duration(milliseconds: 400),
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20.w),
-                child: _buildAiAssistantBanner(context),
-              ),
-            ),
-
-            Gap(20.h),
-
-            // ── System ──────────────────────────────────────────────
-            FadeInUp(
-              delay: const Duration(milliseconds: 340),
-              duration: const Duration(milliseconds: 400),
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20.w),
-                child: _buildSectionTitle(
-                  context,
-                  'System',
-                  Icons.settings_outlined,
                 ),
-              ),
-            ),
-            Gap(10.h),
-            FadeInUp(
-              delay: const Duration(milliseconds: 360),
-              duration: const Duration(milliseconds: 400),
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20.w),
-                child: _buildSettingsCard(context, [
-                  _buildActionTile(
-                    context,
-                    icon: Icons.help_outline_rounded,
-                    iconColor: AppColor.mintTeal,
-                    title: 'Help & Support',
-                    subtitle: 'Documentation, FAQs',
-                    onTap: () {},
-                  ),
-                  _buildDivider(context),
-                  _buildActionTile(
-                    context,
-                    icon: Icons.shield_outlined,
-                    iconColor: AppColor.oceanBlue,
-                    title: 'Privacy & Security',
-                    subtitle: 'Data protection settings',
-                    onTap: () {},
-                  ),
-                  _buildDivider(context),
-                  _buildActionTile(
-                    context,
-                    icon: Icons.info_outline_rounded,
-                    iconColor: const Color(0xFF636E72),
-                    title: 'About Delta ERP',
-                    subtitle: 'Version 1.0.0 · Build 2026',
-                    onTap: () {},
-                  ),
-                ]),
-              ),
-            ),
 
-            Gap(20.h),
+                Gap(20.h),
 
-            // ── Logout Button ───────────────────────────────────────
-            FadeInUp(
-              delay: const Duration(milliseconds: 400),
-              duration: const Duration(milliseconds: 400),
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20.w),
-                child: _buildLogoutButton(context),
-              ),
+                // ── AI Assistant ────────────────────────────────────────
+                FadeInUp(
+                  delay: const Duration(milliseconds: 300),
+                  duration: const Duration(milliseconds: 400),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20.w),
+                    child: _buildAiAssistantBanner(context),
+                  ),
+                ),
+
+                Gap(20.h),
+
+                // ── System ──────────────────────────────────────────────
+                FadeInUp(
+                  delay: const Duration(milliseconds: 340),
+                  duration: const Duration(milliseconds: 400),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20.w),
+                    child: _buildSectionTitle(
+                      context,
+                      'System',
+                      Icons.settings_outlined,
+                    ),
+                  ),
+                ),
+                Gap(10.h),
+                FadeInUp(
+                  delay: const Duration(milliseconds: 360),
+                  duration: const Duration(milliseconds: 400),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20.w),
+                    child: _buildSettingsCard(context, [
+                      _buildActionTile(
+                        context,
+                        icon: Icons.help_outline_rounded,
+                        iconColor: AppColor.mintTeal,
+                        title: 'Help & Support',
+                        subtitle: 'Documentation, FAQs',
+                        onTap: () {},
+                      ),
+                      _buildDivider(context),
+                      _buildActionTile(
+                        context,
+                        icon: Icons.shield_outlined,
+                        iconColor: AppColor.oceanBlue,
+                        title: 'Privacy & Security',
+                        subtitle: 'Data protection settings',
+                        onTap: () {},
+                      ),
+                      _buildDivider(context),
+                      _buildActionTile(
+                        context,
+                        icon: Icons.info_outline_rounded,
+                        iconColor: const Color(0xFF636E72),
+                        title: 'About Delta ERP',
+                        subtitle: 'Version 1.0.0 · Build 2026',
+                        onTap: () {},
+                      ),
+                    ]),
+                  ),
+                ),
+
+                Gap(20.h),
+
+                // ── Logout Button ───────────────────────────────────────
+                FadeInUp(
+                  delay: const Duration(milliseconds: 400),
+                  duration: const Duration(milliseconds: 400),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20.w),
+                    child: _buildLogoutButton(context),
+                  ),
+                ),
+
+                Gap(100.h),
+              ],
             ),
-
-            Gap(100.h),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
   // ── Profile Header ─────────────────────────────────────────────────────────
-  Widget _buildProfileHeader(BuildContext context) {
+  Widget _buildProfileHeader(BuildContext context, CompanyModel? company) {
+    final companyName = company?.companyName ?? company?.companyEname ?? 'Delta Enterprise';
+    final country = company?.countryName ?? 'Saudi Arabia';
     return Container(
       width: double.infinity,
       padding: EdgeInsets.fromLTRB(20.w, 56.h, 20.w, 28.h),
@@ -372,17 +436,36 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
                 Gap(5.w),
-                Text(
-                  'System Administrator · Delta Enterprise',
-                  style: AppTextStyle.bodySmall(context).copyWith(
-                    fontSize: 11.sp,
-                    color: AppColor.darkTextColor(context),
-                    fontFamily: 'Tajawal',
+                Flexible(
+                  child: Text(
+                    'System Administrator · $companyName',
+                    style: AppTextStyle.bodySmall(context).copyWith(
+                      fontSize: 11.sp,
+                      color: AppColor.darkTextColor(context),
+                      fontFamily: 'Tajawal',
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
             ),
           ),
+          Gap(8.h),
+          // Company country badge
+          if (company != null)
+            FadeInUp(
+              delay: const Duration(milliseconds: 170),
+              duration: const Duration(milliseconds: 400),
+              child: Text(
+                '📍 ${company.cityName ?? ''} · $country',
+                style: AppTextStyle.bodySmall(context).copyWith(
+                  fontSize: 10.sp,
+                  color: AppColor.darkTextColor(context),
+                  fontFamily: 'Tajawal',
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
           Gap(16.h),
           FadeInUp(
             delay: const Duration(milliseconds: 200),
@@ -420,6 +503,178 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  // ── Company Card ───────────────────────────────────────────────────────────
+  Widget _buildCompanyCard(BuildContext context, CompanyModel company) {
+    final isAr = context.locale.languageCode == 'ar';
+    return GestureDetector(
+      onTap: () => NavigatorMethods.pushNamed(
+        context,
+        RoutesName.companyProfileScreen,
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColor.cardColor(context),
+          borderRadius: BorderRadius.circular(20.r),
+          border: Border.all(color: AppColor.borderColor(context)),
+        ),
+        child: Column(
+          children: [
+            // Header gradient bar
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    AppColor.primaryColor(context).withValues(alpha: 0.1),
+                    AppColor.secondAppColor(context).withValues(alpha: 0.08),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(8.r),
+                    decoration: BoxDecoration(
+                      color: AppColor.primaryColor(context).withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                    child: Icon(
+                      Icons.business_rounded,
+                      color: AppColor.primaryColor(context),
+                      size: 20.r,
+                    ),
+                  ),
+                  Gap(10.w),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          isAr
+                              ? (company.companyName ?? company.companyEname ?? '')
+                              : (company.companyEname ?? company.companyName ?? ''),
+                          style: AppTextStyle.bodySmall(context).copyWith(
+                            fontSize: 13.sp,
+                            fontWeight: FontWeight.w700,
+                            color: AppColor.titleFormFiledColor(context),
+                            fontFamily: 'Tajawal',
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        if (company.tradeReg != null)
+                          Text(
+                            'س.ت: ${company.tradeReg}',
+                            style: AppTextStyle.bodySmall(context).copyWith(
+                              fontSize: 10.sp,
+                              color: AppColor.darkTextColor(context),
+                              fontFamily: 'Tajawal',
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    Icons.chevron_right_rounded,
+                    color: AppColor.darkTextColor(context),
+                    size: 18.r,
+                  ),
+                ],
+              ),
+            ),
+            Divider(height: 1, color: AppColor.borderColor(context)),
+            // Info rows
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+              child: Column(
+                children: [
+                  if (company.cityName != null || company.countryName != null)
+                    _buildCompanyInfoRow(
+                      context,
+                      icon: Icons.location_on_outlined,
+                      color: const Color(0xFF0984E3),
+                      label: [
+                        company.cityName,
+                        company.districtName,
+                        company.countryName,
+                      ].where((e) => e != null && e.isNotEmpty).join('، '),
+                    ),
+                  if (company.telNo1 != null) ...[
+                    Gap(6.h),
+                    _buildCompanyInfoRow(
+                      context,
+                      icon: Icons.phone_outlined,
+                      color: const Color(0xFF00B894),
+                      label: company.telNo1!,
+                    ),
+                  ],
+                  if (company.eMail != null) ...[
+                    Gap(6.h),
+                    _buildCompanyInfoRow(
+                      context,
+                      icon: Icons.email_outlined,
+                      color: AppColor.purpleAccent,
+                      label: company.eMail!,
+                    ),
+                  ],
+                  if (company.taxReg != null) ...[
+                    Gap(6.h),
+                    _buildCompanyInfoRow(
+                      context,
+                      icon: Icons.receipt_long_outlined,
+                      color: AppColor.warningOrange,
+                      label: 'الرقم الضريبي: ${company.taxReg}',
+                    ),
+                  ],
+                  if (company.currency != null) ...[
+                    Gap(6.h),
+                    _buildCompanyInfoRow(
+                      context,
+                      icon: Icons.monetization_on_outlined,
+                      color: const Color(0xFFE17055),
+                      label:
+                          '${company.currency} · ضريبة ${(company.taxNew ?? company.taxVal ?? 0).toStringAsFixed(0)}%',
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCompanyInfoRow(
+    BuildContext context, {
+    required IconData icon,
+    required Color color,
+    required String label,
+  }) {
+    return Row(
+      children: [
+        Icon(icon, size: 14.r, color: color),
+        Gap(8.w),
+        Expanded(
+          child: Text(
+            label,
+            style: AppTextStyle.bodySmall(context).copyWith(
+              fontSize: 11.sp,
+              color: AppColor.darkTextColor(context),
+              fontFamily: 'Tajawal',
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
     );
   }
 
@@ -525,46 +780,51 @@ class _ProfileScreenState extends State<ProfileScreen> {
     required String title,
     required String subtitle,
     required Widget? trailing,
+    VoidCallback? onTap,
   }) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-      child: Row(
-        children: [
-          Container(
-            padding: EdgeInsets.all(8.r),
-            decoration: BoxDecoration(
-              color: iconColor.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(10.r),
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(10.r),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+        child: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(8.r),
+              decoration: BoxDecoration(
+                color: iconColor.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(10.r),
+              ),
+              child: Icon(icon, color: iconColor, size: 18.r),
             ),
-            child: Icon(icon, color: iconColor, size: 18.r),
-          ),
-          Gap(12.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: AppTextStyle.bodySmall(context).copyWith(
-                    fontSize: 13.sp,
-                    fontWeight: FontWeight.w600,
-                    color: AppColor.titleFormFiledColor(context),
-                    fontFamily: 'Tajawal',
+            Gap(12.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: AppTextStyle.bodySmall(context).copyWith(
+                      fontSize: 13.sp,
+                      fontWeight: FontWeight.w600,
+                      color: AppColor.titleFormFiledColor(context),
+                      fontFamily: 'Tajawal',
+                    ),
                   ),
-                ),
-                Text(
-                  subtitle,
-                  style: AppTextStyle.bodySmall(context).copyWith(
-                    fontSize: 10.5.sp,
-                    color: AppColor.darkTextColor(context),
-                    fontFamily: 'Tajawal',
+                  Text(
+                    subtitle,
+                    style: AppTextStyle.bodySmall(context).copyWith(
+                      fontSize: 10.5.sp,
+                      color: AppColor.darkTextColor(context),
+                      fontFamily: 'Tajawal',
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          ?trailing,
-        ],
+            ?trailing,
+          ],
+        ),
       ),
     );
   }

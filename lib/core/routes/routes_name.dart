@@ -15,4 +15,5 @@ class RoutesName {
   static const String scanUploadScreen = 'scanUploadScreen';
   static const String aiCopilotScreen = 'aiCopilotScreen';
   static const String purchaseOcrScreen = 'purchaseOcrScreen';
+  static const String companyProfileScreen = 'companyProfileScreen';
 }

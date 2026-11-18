@@ -4,10 +4,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:my_template/core/cache/shared_pref/shared_pref.dart';
 import 'package:my_template/core/routes/routes_name.dart';
+import 'package:my_template/core/services/services_locator.dart';
 import 'package:my_template/core/theme/app_colors.dart';
 import 'package:my_template/core/theme/app_text_style.dart';
 import 'package:my_template/core/utils/app_locale_key.dart';
 import 'package:my_template/core/utils/navigator_methods.dart';
+import 'package:my_template/features/auth/presentation/view/cubit/auth_cubit.dart';
 import 'package:my_template/features/home/presentation/view/widget/ai_chat_bottom_sheet_widget.dart';
 import 'package:my_template/features/home/presentation/view/widget/ai_fab_widget.dart';
 import 'package:my_template/features/home/presentation/view/widget/annual_financial_overview_widget.dart';
@@ -56,7 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _logout() async {
-    await CacheHelper().clearAuthData();
+    await sl<AuthCubit>().logout();
     if (!mounted) return;
     NavigatorMethods.pushReplacementNamed(context, RoutesName.loginScreen);
   }
@@ -195,87 +197,87 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: const AnnualFinancialOverviewWidget(),
               ),
 
-              Gap(24.h),
+              // Gap(24.h),
 
-              // 4. Quick Shortcuts (اختصارات العمل - الوصول السريع)
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
-                child: QuickShortcutsWidget(onAiTap: _openAiChat),
-              ),
+              // // 4. Quick Shortcuts (اختصارات العمل - الوصول السريع)
+              // Padding(
+              //   padding: EdgeInsets.symmetric(horizontal: 16.w),
+              //   child: QuickShortcutsWidget(onAiTap: _openAiChat),
+              // ),
 
-              Gap(22.h),
+              // Gap(22.h),
 
-              // 5. Main Modules Section
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      AppLocaleKey.mainModules.tr(),
-                      style: AppTextStyle.bodyMedium(context).copyWith(
-                        fontSize: 15.sp,
-                        fontWeight: FontWeight.w800,
-                        color: AppColor.titleFormFiledColor(context),
-                        letterSpacing: -0.2,
-                      ),
-                    ),
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 8.w,
-                        vertical: 3.h,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColor.primaryColor(
-                          context,
-                        ).withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                      child: Text(
-                        '${gridModules.length} Modules',
-                        style: AppTextStyle.bodySmall(context).copyWith(
-                          fontSize: 10.sp,
-                          color: AppColor.primaryColor(context),
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Gap(12.h),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
-                child: GridModulesWidget(modules: gridModules),
-              ),
+              // // 5. Main Modules Section
+              // Padding(
+              //   padding: EdgeInsets.symmetric(horizontal: 16.w),
+              //   child: Row(
+              //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //     children: [
+              //       Text(
+              //         AppLocaleKey.mainModules.tr(),
+              //         style: AppTextStyle.bodyMedium(context).copyWith(
+              //           fontSize: 15.sp,
+              //           fontWeight: FontWeight.w800,
+              //           color: AppColor.titleFormFiledColor(context),
+              //           letterSpacing: -0.2,
+              //         ),
+              //       ),
+              //       Container(
+              //         padding: EdgeInsets.symmetric(
+              //           horizontal: 8.w,
+              //           vertical: 3.h,
+              //         ),
+              //         decoration: BoxDecoration(
+              //           color: AppColor.primaryColor(
+              //             context,
+              //           ).withValues(alpha: 0.1),
+              //           borderRadius: BorderRadius.circular(12.r),
+              //         ),
+              //         child: Text(
+              //           '${gridModules.length} Modules',
+              //           style: AppTextStyle.bodySmall(context).copyWith(
+              //             fontSize: 10.sp,
+              //             color: AppColor.primaryColor(context),
+              //             fontWeight: FontWeight.w700,
+              //           ),
+              //         ),
+              //       ),
+              //     ],
+              //   ),
+              // ),
+              // Gap(12.h),
+              // Padding(
+              //   padding: EdgeInsets.symmetric(horizontal: 16.w),
+              //   child: GridModulesWidget(modules: gridModules),
+              // ),
 
-              Gap(20.h),
+              // Gap(20.h),
 
-              // 5. Recent Activity Feed
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
-                child: const RecentActivitiesWidget(),
-              ),
+              // // 5. Recent Activity Feed
+              // Padding(
+              //   padding: EdgeInsets.symmetric(horizontal: 16.w),
+              //   child: const RecentActivitiesWidget(),
+              // ),
 
-              Gap(24.h),
+              // Gap(24.h),
 
-              // 6. Documents & Files Section
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
-                child: const DocumentsHeaderWidget(),
-              ),
-              Gap(14.h),
-              Padding(
-                padding: EdgeInsets.only(left: 16.w),
-                child: const CategoryFiltersWidget(),
-              ),
-              Gap(14.h),
-              Padding(
-                 padding: EdgeInsets.symmetric(horizontal: 16.w),
-                child: FolderListWidget(folders: documentFolders),
-              ),
+              // // 6. Documents & Files Section
+              // Padding(
+              //   padding: EdgeInsets.symmetric(horizontal: 16.w),
+              //   child: const DocumentsHeaderWidget(),
+              // ),
+              // Gap(14.h),
+              // Padding(
+              //   padding: EdgeInsets.only(left: 16.w),
+              //   child: const CategoryFiltersWidget(),
+              // ),
+              // Gap(14.h),
+              // Padding(
+              //    padding: EdgeInsets.symmetric(horizontal: 16.w),
+              //   child: FolderListWidget(folders: documentFolders),
+              // ),
 
-              Gap(widget.embeddedInShell ? 110.h : 90.h),
+             // Gap(widget.embeddedInShell ? 110.h : 90.h),
             ],
           ),
         ),

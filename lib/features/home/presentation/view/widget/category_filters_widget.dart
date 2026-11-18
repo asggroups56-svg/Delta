@@ -63,7 +63,7 @@ class _CategoryFiltersWidgetState extends State<CategoryFiltersWidget> {
                     border: Border.all(
                       color: isSelected
                           ? AppColor.emeraldTeal.withValues(alpha: 0.6)
-                          : AppColor.whiteColor(context).withValues(alpha: 0.08),
+                          : Colors.black.withValues(alpha: 0.08),
                       width: 1,
                     ),
                     boxShadow: isSelected
@@ -84,7 +84,7 @@ class _CategoryFiltersWidgetState extends State<CategoryFiltersWidget> {
                         size: 13.r,
                         color: isSelected
                             ? Colors.white
-                            : AppColor.whiteColor(context).withValues(alpha: 0.5),
+                            : Colors.black.withValues(alpha: 0.5),
                       ),
                       Gap(5.w),
                       Text(
@@ -93,7 +93,7 @@ class _CategoryFiltersWidgetState extends State<CategoryFiltersWidget> {
                           fontSize: 11.5.sp,
                           color: isSelected
                               ? Colors.white
-                              : AppColor.whiteColor(context).withValues(alpha: 0.7),
+                              : Colors.black.withValues(alpha: 0.7),
                           fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                         ),
                       ),

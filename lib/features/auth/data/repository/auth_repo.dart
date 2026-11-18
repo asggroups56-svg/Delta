@@ -13,6 +13,10 @@ abstract interface class AuthRepo {
     required String password,
     required String connectionName,
   });
+
+  /// Calls `POST auth/logout` with `{"connectionName": null}`,
+  /// then clears local auth data regardless of the API response.
+  Future<Either<Failure, void>> logout();
 }
 
 class AuthRepoImpl implements AuthRepo {
@@ -59,6 +63,23 @@ class AuthRepoImpl implements AuthRepo {
           value: connectionName,
         );
         return authResponse;
+      },
+    );
+  }
+
+  @override
+  Future<Either<Failure, void>> logout() {
+    return handleDioRequest<void>(
+      request: () async {
+        try {
+          await apiConsumer.post(
+            EndPoints.logout,
+            body: {'connectionName': null},
+          );
+        } catch (_) {
+          // Ignore API errors — always clear local data
+        }
+        await cacheHelper.clearAuthData();
       },
     );
   }

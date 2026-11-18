@@ -32,14 +32,14 @@ class _FolderListWidgetState extends State<FolderListWidget> {
               style: AppTextStyle.bodyMedium(context).copyWith(
                 fontWeight: FontWeight.bold,
                 fontSize: 13.sp,
-                color: AppColor.whiteColor(context).withValues(alpha: 0.8),
+                color:Colors.black.withValues(alpha: 0.8),
               ),
             ),
             Text(
               '${widget.folders.length} Directories',
               style: TextStyle(
                 fontSize: 10.5.sp,
-                color: AppColor.whiteColor(context).withValues(alpha: 0.4),
+                color: Colors.black.withValues(alpha: 0.4),
               ),
             ),
           ],
@@ -64,7 +64,7 @@ class _FolderListWidgetState extends State<FolderListWidget> {
                   color: AppColor.cardColor(context),
                   borderRadius: BorderRadius.circular(16.r),
                   border: Border.all(
-                    color: AppColor.whiteColor(context).withValues(alpha: 0.06),
+                    color: Colors.black.withValues(alpha: 0.06),
                   ),
                   boxShadow: [
                     BoxShadow(
@@ -126,7 +126,7 @@ class _FolderListWidgetState extends State<FolderListWidget> {
                                   style: AppTextStyle.bodyMedium(context).copyWith(
                                     fontWeight: FontWeight.w700,
                                     fontSize: 13.5.sp,
-                                    color: AppColor.whiteColor(context),
+                                    color: Colors.black,
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -147,7 +147,7 @@ class _FolderListWidgetState extends State<FolderListWidget> {
                                       folder['count'] as String,
                                       style: TextStyle(
                                         fontSize: 11.sp,
-                                        color: AppColor.whiteColor(context).withValues(alpha: 0.45),
+                                        color: Colors.black.withValues(alpha: 0.45),
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
@@ -159,7 +159,7 @@ class _FolderListWidgetState extends State<FolderListWidget> {
                           IconButton(
                             icon: Icon(
                               isFav ? Icons.star_rounded : Icons.star_outline_rounded,
-                              color: isFav ? const Color(0xFFFDCB6E) : AppColor.whiteColor(context).withValues(alpha: 0.3),
+                              color: isFav ? const Color(0xFFFDCB6E) : Colors.black.withValues(alpha: 0.3),
                               size: 22.r,
                             ),
                             onPressed: () => setState(() {
@@ -173,7 +173,7 @@ class _FolderListWidgetState extends State<FolderListWidget> {
                           Icon(
                             Icons.chevron_right_rounded,
                             size: 18.r,
-                            color: AppColor.whiteColor(context).withValues(alpha: 0.25),
+                            color: Colors.black.withValues(alpha: 0.25),
                           ),
                         ],
                       ),

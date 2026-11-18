@@ -1,15 +1,19 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
-import 'package:my_template/core/cache/shared_pref/shared_pref.dart';
 import 'package:my_template/core/routes/routes_name.dart';
+import 'package:my_template/core/services/services_locator.dart';
+
 import 'package:my_template/core/theme/app_colors.dart';
 import 'package:my_template/core/utils/navigator_methods.dart';
+import 'package:my_template/features/auth/presentation/view/cubit/auth_cubit.dart';
+import 'package:my_template/features/company/presentation/view/cubit/company_cubit.dart';
+import 'package:my_template/features/company/presentation/view/screen/company_profile_screen.dart';
 import 'package:my_template/features/home/presentation/view/screen/accounting_dashboard_screen.dart';
 import 'package:my_template/features/home/presentation/view/screen/home_screen.dart';
-import 'package:my_template/features/home/presentation/view/screen/profile_screen.dart';
 import 'package:my_template/features/home/presentation/view/widget/ai_chat_bottom_sheet_widget.dart';
 import 'package:my_template/features/home/presentation/view/widget/bottom_nav_bar_widget.dart';
 import 'package:my_template/features/knowledge/presentation/view/screen/knowledge_screen.dart';
@@ -37,7 +41,8 @@ class _MainShellScreenState extends State<MainShellScreen>
   }
 
   Future<void> _logout() async {
-    await CacheHelper().clearAuthData();
+    // Call auth/logout API first, then navigate to login
+    await sl<AuthCubit>().logout();
     if (!mounted) return;
     NavigatorMethods.pushReplacementNamed(context, RoutesName.loginScreen);
   }
@@ -88,7 +93,13 @@ class _MainShellScreenState extends State<MainShellScreen>
     const AccountingDashboardShell(),
     const ReportsScreen(),
     const KnowledgeScreen(),
-    ProfileScreen(onLogout: _logout, onToggleLanguage: _toggleLanguage),
+    BlocProvider<CompanyCubit>(
+      create: (_) => sl<CompanyCubit>(),
+      child: CompanyProfileScreen(
+        onLogout: _logout,
+        onToggleLanguage: _toggleLanguage,
+      ),
+    ),
   ];
 
   @override
