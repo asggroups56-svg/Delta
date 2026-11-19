@@ -8,28 +8,22 @@ import 'package:my_template/core/custom_widgets/exception_widget/exception_widge
 import 'package:my_template/core/theme/app_colors.dart';
 import 'package:my_template/core/theme/app_text_style.dart';
 import 'package:my_template/core/utils/app_locale_key.dart';
-import 'package:my_template/features/lookup/presentation/widgets/accounts_tree_section.dart';
-
 import '../../../data/models/company_model.dart';
+import '../../../data/models/journal_config.dart';
 import '../cubit/company_cubit.dart';
 import '../cubit/company_state.dart';
-
+import '../widget/company_info_section.dart';
 class CompanyProfileScreen extends StatefulWidget {
   final Future<void> Function()? onLogout;
   final VoidCallback? onToggleLanguage;
-
   const CompanyProfileScreen({super.key, this.onLogout, this.onToggleLanguage});
-
   @override
   State<CompanyProfileScreen> createState() => _CompanyProfileScreenState();
 }
-
 class _CompanyProfileScreenState extends State<CompanyProfileScreen> {
   bool get _isAr => context.locale.languageCode == 'ar';
   String _t(String ar, String en) => _isAr ? ar : en;
-
   bool _isLoggingOut = false;
-
   @override
   void initState() {
     super.initState();
@@ -38,6 +32,7 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen> {
         languageCode: context.locale.languageCode,
       );
     });
+    
   }
 
   Future<void> _load() => context.read<CompanyCubit>().getCompany(
@@ -50,7 +45,6 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen> {
       builder: (context, state) {
         final status = state.status;
         final company = status.isSuccess ? status.data?.first : null;
-
         return Scaffold(
           backgroundColor: AppColor.scaffoldColor(context),
           body: RefreshIndicator(
@@ -63,7 +57,6 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen> {
               slivers: [
                 // ── Hero Header ──────────────────────────────────────
                 _buildHeroSliver(context, company),
-
                 // ── Body Content ─────────────────────────────────────
                 SliverPadding(
                   padding: EdgeInsets.symmetric(
@@ -89,9 +82,27 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen> {
                         _buildQuickStats(context, company),
                         Gap(16.h),
 
-                        // 2. National Address & Communications
-                        _buildSection(
-                          context,
+                        // 2. Fiscal Year (priority company setting)
+                        CompanyInfoSection(
+                          icon: Icons.calendar_month_rounded,
+                          color: const Color(0xFF6C5CE7),
+                          title: _t('السنة المالية', 'Fiscal Year'),
+                          rows: _fiscalRows(context, company),
+                        ),
+                        Gap(14.h),
+
+                        // 3. Journal Settings
+                        //    (currency & cost centers follow vouichCurrCntr)
+                        CompanyInfoSection(
+                          icon: Icons.menu_book_rounded,
+                          color: const Color(0xFF0891B2),
+                          title: _t('إعدادات اليومية', 'Journal Settings'),
+                          rows: _journalRows(context, company),
+                        ),
+                        Gap(14.h),
+
+                        // 4. National Address & Communications
+                        CompanyInfoSection(
                           icon: Icons.location_on_rounded,
                           color: const Color(0xFF0984E3),
                           title: _t(
@@ -102,9 +113,8 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen> {
                         ),
                         Gap(14.h),
 
-                        // 3. Tax & Commercial Registration
-                        _buildSection(
-                          context,
+                        // 5. Tax & Commercial Registration
+                        CompanyInfoSection(
                           icon: Icons.receipt_long_rounded,
                           color: const Color(0xFFE17055),
                           title: _t(
@@ -115,28 +125,8 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen> {
                         ),
                         Gap(14.h),
 
-                        // 4. Fiscal Year & Currency
-                        _buildSection(
-                          context,
-                          icon: Icons.calendar_month_rounded,
-                          color: const Color(0xFF6C5CE7),
-                          title: _t(
-                            'السنة المالية والعملات',
-                            'Fiscal Year & Currencies',
-                          ),
-                          rows: _fiscalRows(context, company),
-                        ),
-                        // 5. Default General Ledger Accounts
-                        Gap(14.h),
-
-                        // 6. Live chart of accounts tree
-                        //    (built from ChartOfAccount/GetLight)
-                        const AccountsTreeSection(),
-                        Gap(14.h),
-
-                        // 7. System Configuration & Document Signs
-                        _buildSection(
-                          context,
+                        // 6. System Configuration & Document Signs
+                        CompanyInfoSection(
                           icon: Icons.tune_rounded,
                           color: const Color(0xFF475569),
                           title: _t(
@@ -147,7 +137,7 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen> {
                         ),
                         Gap(20.h),
 
-                        // 8. Logout Button
+                        // 7. Logout Button
                         _buildLogoutButton(context),
                         Gap(80.h),
                       ],
@@ -364,6 +354,10 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen> {
   }
 
   // ── Quick Stats Highlights ──────────────────────────────────────────────────
+  String _fmtDate(DateTime? d) => d != null
+      ? '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}'
+      : '—';
+
   Widget _buildQuickStats(BuildContext context, CompanyModel c) {
     final taxPct = (c.taxNew ?? c.taxVal ?? 15.0).toStringAsFixed(0);
     final fiscalYear = c.fiscalYearBegin != null
@@ -394,8 +388,10 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen> {
         _statCard(
           context,
           value: fiscalYear,
-          subValue: c.jrlUpdate == 1 ? 'اليومية محدثة' : 'اليومية: 1',
-          label: _t('السنة واليومية', 'Fiscal & Journal'),
+          subValue: c.fiscalYearEnd != null
+              ? '${_t('ينتهي', 'Ends')} ${_fmtDate(c.fiscalYearEnd)}'
+              : _t('غير محددة', 'Not set'),
+          label: _t('السنة المالية', 'Fiscal Year'),
           icon: Icons.calendar_today_rounded,
           color: const Color(0xFF6C5CE7),
         ),
@@ -475,91 +471,6 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen> {
         ),
       ),
     );
-  }
-
-  // ── Generic Section Container ───────────────────────────────────────────────
-  Widget _buildSection(
-    BuildContext context, {
-    required IconData icon,
-    required Color color,
-    required String title,
-    required List<Widget> rows,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColor.cardColor(context),
-        borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(color: AppColor.borderColor(context)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header Bar
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
-              border: Border(
-                bottom: BorderSide(color: color.withValues(alpha: 0.18)),
-              ),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  padding: EdgeInsets.all(7.r),
-                  decoration: BoxDecoration(
-                    color: color.withValues(alpha: 0.16),
-                    borderRadius: BorderRadius.circular(10.r),
-                  ),
-                  child: Icon(icon, size: 16.r, color: color),
-                ),
-                Gap(10.w),
-                Expanded(
-                  child: Text(
-                    title,
-                    style: AppTextStyle.bodySmall(context).copyWith(
-                      fontSize: 13.sp,
-                      fontWeight: FontWeight.w800,
-                      color: AppColor.titleFormFiledColor(context),
-                      fontFamily: 'Tajawal',
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // Content Rows
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-            child: Column(children: _intersperseDividers(context, rows)),
-          ),
-        ],
-      ),
-    );
-  }
-
-  List<Widget> _intersperseDividers(BuildContext context, List<Widget> items) {
-    final list = <Widget>[];
-    for (var i = 0; i < items.length; i++) {
-      list.add(items[i]);
-      if (i < items.length - 1) {
-        list.add(
-          Divider(
-            height: 16.h,
-            color: AppColor.borderColor(context).withValues(alpha: 0.6),
-          ),
-        );
-      }
-    }
-    return list;
   }
 
   // ── Info Row Widget ─────────────────────────────────────────────────────────
@@ -795,44 +706,63 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen> {
         icon: Icons.event_repeat_rounded,
         iconColor: color,
       ),
-      _infoRow(
-        context,
-        label: _t(
-          'عداد عملات السندات (vouichCurrCntr)',
-          'Voucher Currency Counter',
-        ),
-        value: c.vouichCurrCntr?.toString(),
-        icon: Icons.pin_rounded,
-        iconColor: color,
-      ),
     ];
   }
 
-  // ── Section 3: Fiscal Year & Currency Rows ──────────────────────────────────
+  // ── Section 3: Fiscal Year Rows ─────────────────────────────────────────────
   List<Widget> _fiscalRows(BuildContext context, CompanyModel c) {
     const color = Color(0xFF6C5CE7);
-    String? fmtDate(DateTime? d) => d != null
-        ? '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}'
-        : null;
 
     return [
       _infoRow(
         context,
         label: _t('بداية السنة المالية (fiscalYearBegin)', 'Fiscal Year Begin'),
-        value: fmtDate(c.fiscalYearBegin),
+        value: _fmtDate(c.fiscalYearBegin),
         icon: Icons.play_circle_rounded,
         iconColor: color,
       ),
       _infoRow(
         context,
         label: _t('نهاية السنة المالية (fiscalYearEnd)', 'Fiscal Year End'),
-        value: fmtDate(c.fiscalYearEnd),
+        value: _fmtDate(c.fiscalYearEnd),
         icon: Icons.stop_circle_rounded,
         iconColor: const Color(0xFFE17055),
       ),
+    ];
+  }
+
+  // ── Section 4: Journal Settings Rows ────────────────────────────────────────
+  List<Widget> _journalRows(BuildContext context, CompanyModel c) {
+    const color = Color(0xFF0891B2);
+    final config = c.journalConfig;
+
+    return [
+      _journalConfigCard(context, config),
       _infoRow(
         context,
-        label: _t('العملة الأساسية (currency)', 'Primary Currency'),
+        label: _t(
+          'معرّف تهيئة اليومية (vouichCurrCntr)',
+          'Journal Configuration ID (vouichCurrCntr)',
+        ),
+        value: config.id?.toString(),
+        icon: Icons.tag_rounded,
+        iconColor: color,
+      ),
+      _infoRow(
+        context,
+        label: _t(
+          'تحديث اليومية التلقائي (jrlUpdate)',
+          'Daily Journal Auto Update (jrlUpdate)',
+        ),
+        value: c.jrlUpdate == 1
+            ? _t('مفعل (1)', 'Enabled (1)')
+            : _t('معطل (0)', 'Disabled (0)'),
+        icon: Icons.auto_mode_rounded,
+        iconColor: color,
+      ),
+      _infoRow(
+        context,
+        label: _t('العملة الأساسية (currency)', 'Base Currency (currency)'),
         value: c.currency,
         icon: Icons.monetization_on_rounded,
         iconColor: const Color(0xFF00B894),
@@ -841,20 +771,206 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen> {
         context,
         label: _t(
           'كسر العملة (currencyFraction)',
-          'Currency Fraction / Sub-unit',
+          'Currency Fraction (currencyFraction)',
         ),
         value: c.currencyFraction,
         icon: Icons.money_rounded,
         iconColor: const Color(0xFF00B894),
       ),
-      _infoRow(
-        context,
-        label: _t('العملة الأجنبية (ecurrency)', 'Foreign Currency'),
-        value: c.ecurrency,
-        icon: Icons.currency_exchange_rounded,
-        iconColor: color,
-      ),
+      if (config.usesCurrency && c.ecurrency != null)
+        _infoRow(
+          context,
+          label: _t(
+            'العملة الأجنبية (ecurrency)',
+            'Foreign Currency (ecurrency)',
+          ),
+          value: c.ecurrency,
+          icon: Icons.currency_exchange_rounded,
+          iconColor: color,
+        ),
     ];
+  }
+
+  /// Summary card that visualises the id-driven journal configuration.
+  Widget _journalConfigCard(BuildContext context, JournalConfig config) {
+    const color = Color(0xFF0891B2);
+    final costCenterLabel = switch (config.costCenters) {
+      CostCenterMode.none => _t('بدون مراكز تكلفة', 'No cost centers'),
+      CostCenterMode.multiple => _t('مع مراكز التكلفة', 'With cost centers'),
+      CostCenterMode.single => _t('مركز تكلفة واحد', 'One cost center'),
+    };
+
+    return Container(
+      padding: EdgeInsets.all(12.r),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            color.withValues(alpha: 0.12),
+            color.withValues(alpha: 0.035),
+          ],
+          begin: AlignmentDirectional.topStart,
+          end: AlignmentDirectional.bottomEnd,
+        ),
+        borderRadius: BorderRadius.circular(14.r),
+        border: Border.all(color: color.withValues(alpha: 0.22)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 34.r,
+                height: 34.r,
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.16),
+                  borderRadius: BorderRadius.circular(10.r),
+                ),
+                child: Icon(Icons.menu_book_rounded, size: 17.r, color: color),
+              ),
+              Gap(9.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _t('تهيئة اليومية', 'Journal configuration'),
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w800,
+                        color: AppColor.titleFormFiledColor(context),
+                        fontFamily: 'Tajawal',
+                      ),
+                    ),
+                    Gap(2.h),
+                    Text(
+                      config.isKnown
+                          ? _t(
+                              'مبنية على المعرّف ${config.id}',
+                              'Based on configuration id ${config.id}',
+                            )
+                          : _t(
+                              'معرّف غير معروف — الإعدادات الافتراضية',
+                              'Unknown id — default settings',
+                            ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 9.5.sp,
+                        color: AppColor.darkTextColor(context),
+                        fontFamily: 'Tajawal',
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Gap(8.w),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
+                decoration: BoxDecoration(
+                  color: color,
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+                child: Text(
+                  '#${config.id ?? '—'}',
+                  style: TextStyle(
+                    fontSize: 11.sp,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                    fontFamily: 'Tajawal',
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Gap(10.h),
+          Row(
+            children: [
+              Expanded(
+                child: _journalFeatureTile(
+                  context,
+                  icon: Icons.monetization_on_rounded,
+                  label: _t('العملة', 'Currency'),
+                  value: config.usesCurrency
+                      ? _t('مفعلة', 'Enabled')
+                      : _t('غير مفعلة', 'Disabled'),
+                  enabled: config.usesCurrency,
+                  color: color,
+                ),
+              ),
+              Gap(8.w),
+              Expanded(
+                child: _journalFeatureTile(
+                  context,
+                  icon: Icons.hub_rounded,
+                  label: _t('مراكز التكلفة', 'Cost centers'),
+                  value: costCenterLabel,
+                  enabled: config.usesCostCenters,
+                  color: color,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _journalFeatureTile(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required String value,
+    required bool enabled,
+    required Color color,
+  }) {
+    final tone = enabled
+        ? color
+        : AppColor.darkTextColor(context).withValues(alpha: 0.55);
+
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 9.w, vertical: 8.h),
+      decoration: BoxDecoration(
+        color: AppColor.cardColor(context).withValues(alpha: 0.75),
+        borderRadius: BorderRadius.circular(10.r),
+        border: Border.all(color: tone.withValues(alpha: 0.22)),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, size: 14.r, color: tone),
+          Gap(6.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 8.5.sp,
+                    color: AppColor.darkTextColor(context),
+                    fontFamily: 'Tajawal',
+                  ),
+                ),
+                Gap(1.h),
+                Text(
+                  value,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 10.sp,
+                    fontWeight: FontWeight.w700,
+                    color: tone,
+                    fontFamily: 'Tajawal',
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   // ── Section 5: System Configuration & Document Signs ────────────────────────
@@ -910,16 +1026,6 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen> {
         label: _t('رقم تهيئة دلتا (deltaconfig)', 'Delta Configuration ID'),
         value: c.deltaconfig,
         icon: Icons.settings_rounded,
-        iconColor: color,
-      ),
-      _infoRow(
-        context,
-        label: _t(
-          'تحديث اليومية التلقائي (jrlUpdate)',
-          'Daily Journal Auto Update',
-        ),
-        value: yn(c.jrlUpdate),
-        icon: Icons.auto_mode_rounded,
         iconColor: color,
       ),
       _infoRow(

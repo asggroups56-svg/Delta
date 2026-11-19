@@ -1,4 +1,3 @@
-import 'package:animate_do/animate_do.dart';
 import 'package:dio/dio.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -129,9 +128,7 @@ class _NetSalesAnnualCardWidgetState extends State<NetSalesAnnualCardWidget> {
     final chartScale = highestNetSales <= 0 ? 1.0 : highestNetSales;
     final axisNumberFormat = NumberFormat.compact(locale: isArabic ? 'ar' : 'en');
 
-    return FadeInUp(
-      duration: const Duration(milliseconds: 400),
-      child: Container(
+    return Container(
         padding: EdgeInsets.all(16.r),
         decoration: BoxDecoration(
           color: cardColor,
@@ -600,8 +597,7 @@ class _NetSalesAnnualCardWidgetState extends State<NetSalesAnnualCardWidget> {
             ],
           ],
         ),
-      ),
-    );
+      );
   }
 
   Widget _buildYAxisLabel(BuildContext context, String text) {

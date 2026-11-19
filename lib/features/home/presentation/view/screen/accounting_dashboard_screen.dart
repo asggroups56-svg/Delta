@@ -2,11 +2,13 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:my_template/core/cache/shared_pref/shared_pref.dart';
 import 'package:my_template/core/routes/routes_name.dart';
 import 'package:my_template/core/services/services_locator.dart';
 import 'package:my_template/core/theme/app_colors.dart';
 import 'package:my_template/core/utils/app_locale_key.dart';
 import 'package:my_template/core/utils/navigator_methods.dart';
+import 'package:my_template/features/lookup/presentation/widgets/accounts_tree_section.dart';
 import 'package:my_template/features/auth/presentation/view/cubit/auth_cubit.dart';
 import 'package:my_template/features/home/presentation/view/widget/ai_fab_widget.dart';
 import 'package:my_template/features/home/presentation/view/widget/bank_card_widget.dart';
@@ -87,6 +89,8 @@ class _AccountingDashboardScreenState extends State<AccountingDashboardScreen> {
                 padding: EdgeInsets.symmetric(horizontal: 16.w),
                 child: Column(
                   children: [
+                    const AccountsTreeSection(),
+                    Gap(16.h),
                     const SalesCardWidget(),
                     Gap(16.h),
                     const PurchasesCardWidget(),

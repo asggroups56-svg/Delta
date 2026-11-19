@@ -1,4 +1,3 @@
-import 'package:animate_do/animate_do.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -32,11 +31,9 @@ class _AnnualFinancialOverviewWidgetState
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // ── Section Header Row ───────────────────────────────────────────────
-        FadeInDown(
-          duration: const Duration(milliseconds: 350),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
               // Title & Subtitle Column
               Expanded(
                 child: Column(
@@ -184,7 +181,6 @@ class _AnnualFinancialOverviewWidgetState
               ),
             ],
           ),
-        ),
 
         Gap(16.h),
 

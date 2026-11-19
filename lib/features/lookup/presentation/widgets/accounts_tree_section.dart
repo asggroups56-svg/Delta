@@ -16,18 +16,43 @@ import '../../data/repository/lookup_repo.dart';
 ///
 /// Loads the flat account rows from `ChartOfAccount/GetLight`, merges paged
 /// results and renders the hierarchy with expandable/collapsible levels.
+///
+/// When [autoLoad] is `false` the initial fetch is deferred until an external
+/// caller (e.g. the parent collapsible section) calls [fetchIfNeeded] via a
+/// [GlobalKey<AccountsTreeSectionState>].
 class AccountsTreeSection extends StatefulWidget {
   /// Page size used while loading the tree. Large enough to render most charts
   /// in one request; a "load more" action is shown while `hasMore` is true.
   final int pageSize;
 
-  const AccountsTreeSection({super.key, this.pageSize = 100});
+  /// Drops the card background/border so the tree can sit inside another
+  /// container (e.g. the collapsible company section) without a nested card.
+  final bool embedded;
+
+  /// Whether the widget loads data automatically on first build.
+  /// Set to [false] when embedding inside a collapsed section so the API call
+  /// is deferred until the section is actually opened by the user.
+  final bool autoLoad;
+
+  const AccountsTreeSection({
+    super.key,
+    this.pageSize = 100,
+    this.embedded = false,
+    this.autoLoad = true,
+  });
 
   @override
-  State<AccountsTreeSection> createState() => _AccountsTreeSectionState();
+  State<AccountsTreeSection> createState() => AccountsTreeSectionState();
 }
 
-class _AccountsTreeSectionState extends State<AccountsTreeSection> {
+class AccountsTreeSectionState extends State<AccountsTreeSection>
+    with AutomaticKeepAliveClientMixin<AccountsTreeSection> {
+  /// Keeps loaded pages and manually collapsed/expanded nodes alive while the
+  /// section scrolls out of view, instead of rebuilding (and re-expanding)
+  /// the tree when it comes back.
+  @override
+  bool get wantKeepAlive => true;
+
   static const _accent = Color(0xFF7C3AED);
   static const _gradientStart = Color(0xFF3F3D9E);
   static const _gradientMiddle = Color(0xFF6D28D9);
@@ -62,9 +87,20 @@ class _AccountsTreeSectionState extends State<AccountsTreeSection> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _fetch(page: 1, reset: true);
-    });
+    if (widget.autoLoad) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _fetch(page: 1, reset: true);
+      });
+    }
+  }
+
+  /// Called externally (e.g. when the parent accordion opens) to trigger the
+  /// first load only once.  Safe to call multiple times – subsequent calls are
+  /// no-ops once data has been fetched.
+  void fetchIfNeeded() {
+    if (_accounts.isEmpty && !_isLoading && _error == null) {
+      _fetch(page: 1, reset: true);
+    }
   }
 
   @override
@@ -188,6 +224,7 @@ class _AccountsTreeSectionState extends State<AccountsTreeSection> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final forest = buildAccountsForest(_accounts);
     final foreground = AppColor.titleFormFiledColor(context);
     final maxLevel = _accounts.fold<int>(
@@ -200,34 +237,39 @@ class _AccountsTreeSectionState extends State<AccountsTreeSection> {
     return Container(
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: AppColor.cardColor(context),
-        borderRadius: BorderRadius.circular(22.r),
-        border: Border.all(
-          color: AppColor.borderColor(context).withValues(alpha: 0.9),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: _accent.withValues(alpha: 0.08),
-            blurRadius: 28,
-            offset: const Offset(0, 12),
-          ),
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.025),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        color: widget.embedded ? Colors.transparent : AppColor.cardColor(context),
+        borderRadius: widget.embedded ? null : BorderRadius.circular(22.r),
+        border: widget.embedded
+            ? null
+            : Border.all(
+                color: AppColor.borderColor(context).withValues(alpha: 0.9),
+              ),
+        boxShadow: widget.embedded
+            ? null
+            : [
+                BoxShadow(
+                  color: _accent.withValues(alpha: 0.08),
+                  blurRadius: 28,
+                  offset: const Offset(0, 12),
+                ),
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.025),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _buildHeader(
-            context,
-            foreground,
-            total: valueOrDash ?? '$accountCount',
-            roots: valueOrDash ?? '${forest.length}',
-            levels: valueOrDash ?? '$maxLevel',
-          ),
+          if (!widget.embedded)
+            // _buildHeader(
+            //   context,
+            //   foreground,
+            //   total: valueOrDash ?? '$accountCount',
+            //   roots: valueOrDash ?? '${forest.length}',
+            //   levels: valueOrDash ?? '$maxLevel',
+            // ),
           if (_accounts.isNotEmpty && !_isLoading)
             _buildToolbar(context, foreground),
           _buildContent(context, forest, foreground),
@@ -239,26 +281,10 @@ class _AccountsTreeSectionState extends State<AccountsTreeSection> {
 
   // ── Header ────────────────────────────────────────────────────────────────
 
-  Widget _buildHeader(
-    BuildContext context,
-    Color foreground, {
-    required String total,
-    required String roots,
-    required String levels,
-  }) {
-    return Container(
-      decoration: const BoxDecoration(
-       
-        borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
-      ),
-      child: Stack(
-        children: [
-       
-         
-        ],
-      ),
-    );
-  }
+  
+
+
+
   // ── Toolbar ───────────────────────────────────────────────────────────────
 
   Widget _buildToolbar(BuildContext context, Color foreground) {
@@ -281,7 +307,7 @@ class _AccountsTreeSectionState extends State<AccountsTreeSection> {
           Gap(6.w),
           Flexible(
             child: Text(
-              _t('تصنيف الأرصدة', 'Balance nature'),
+              _t("شجرة الحسابات", 'Accounts tree'),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
