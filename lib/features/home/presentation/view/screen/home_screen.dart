@@ -277,7 +277,7 @@ class _HomeScreenState extends State<HomeScreen> {
               //   child: FolderListWidget(folders: documentFolders),
               // ),
 
-             // Gap(widget.embeddedInShell ? 110.h : 90.h),
+              // Gap(widget.embeddedInShell ? 110.h : 90.h),
             ],
           ),
         ),

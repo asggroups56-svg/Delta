@@ -7,19 +7,12 @@ import 'package:gap/gap.dart';
 import 'package:my_template/core/custom_widgets/exception_widget/exception_widget.dart';
 import 'package:my_template/core/theme/app_colors.dart';
 import 'package:my_template/core/theme/app_text_style.dart';
-import 'package:my_template/core/theme/cubit/app_theme_cubit.dart';
-import 'package:my_template/core/theme/theme_enum.dart';
 import 'package:my_template/core/utils/app_locale_key.dart';
 
 import '../../../data/models/company_model.dart';
 import '../cubit/company_cubit.dart';
 import '../cubit/company_state.dart';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// CompanyProfileScreen
-// Displayed as the "الملف" tab in the BottomBar.
-// Shows full company data fetched from the API + settings actions.
-// ─────────────────────────────────────────────────────────────────────────────
 class CompanyProfileScreen extends StatefulWidget {
   final Future<void> Function()? onLogout;
   final VoidCallback? onToggleLanguage;
@@ -34,62 +27,32 @@ class CompanyProfileScreen extends StatefulWidget {
   State<CompanyProfileScreen> createState() => _CompanyProfileScreenState();
 }
 
-class _CompanyProfileScreenState extends State<CompanyProfileScreen>
-    with SingleTickerProviderStateMixin {
+class _CompanyProfileScreenState extends State<CompanyProfileScreen> {
   bool get _isAr => context.locale.languageCode == 'ar';
   String _t(String ar, String en) => _isAr ? ar : en;
 
-  late AnimationController _animCtrl;
-  late Animation<double> _fadeAnim;
-  late Animation<Offset> _slideAnim;
-
-  bool _notificationsEnabled = true;
   bool _isLoggingOut = false;
 
   @override
   void initState() {
     super.initState();
-    _animCtrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 650),
-    );
-    _fadeAnim =
-        CurvedAnimation(parent: _animCtrl, curve: Curves.easeOut);
-    _slideAnim = Tween<Offset>(
-      begin: const Offset(0, -0.08),
-      end: Offset.zero,
-    ).animate(
-        CurvedAnimation(parent: _animCtrl, curve: Curves.easeOutCubic));
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<CompanyCubit>().getCompany(
             languageCode: context.locale.languageCode,
           );
-      _animCtrl.forward();
     });
-  }
-
-  @override
-  void dispose() {
-    _animCtrl.dispose();
-    super.dispose();
   }
 
   Future<void> _load() => context.read<CompanyCubit>().getCompany(
         languageCode: context.locale.languageCode,
       );
 
-  // ── Build ───────────────────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
-    final isDark =
-        context.watch<AppThemeCubit>().theme == ThemeEnum.dark;
-
     return BlocBuilder<CompanyCubit, CompanyState>(
       builder: (context, state) {
         final status = state.status;
-        final company =
-            status.isSuccess ? status.data?.first : null;
+        final company = status.isSuccess ? status.data?.first : null;
 
         return Scaffold(
           backgroundColor: AppColor.scaffoldColor(context),
@@ -102,155 +65,92 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen>
               ),
               slivers: [
                 // ── Hero Header ──────────────────────────────────────
-                _buildHeroSliver(context, company, status),
+                _buildHeroSliver(context, company),
 
-                // ── Body ─────────────────────────────────────────────
+                // ── Body Content ─────────────────────────────────────
                 SliverPadding(
                   padding: EdgeInsets.symmetric(
-                      horizontal: 18.w, vertical: 20.h),
+                    horizontal: 16.w,
+                    vertical: 16.h,
+                  ),
                   sliver: SliverList(
                     delegate: SliverChildListDelegate([
-                      // loading / error states
                       if (status.isLoading || status.isInitial)
                         _loadingPlaceholder(context),
 
                       if (status.isFailure)
-                        ExceptionWidget(
-                          message: status.error,
-                          onReload: _load,
+                        Padding(
+                          padding: EdgeInsets.symmetric(vertical: 40.h),
+                          child: ExceptionWidget(
+                            message: status.error,
+                            onReload: _load,
+                          ),
                         ),
 
-                      // ── Company data sections ──────────────────────
                       if (company != null) ...[
+                        // 1. Quick KPI Highlights
                         _buildQuickStats(context, company),
-                        Gap(20.h),
+                        Gap(16.h),
+
+                        // 2. National Address & Communications
                         _buildSection(
                           context,
                           icon: Icons.location_on_rounded,
                           color: const Color(0xFF0984E3),
-                          title: _t('العنوان والتواصل', 'Address & Contact'),
+                          title: _t('العنوان الوطني وبيانات الاتصال',
+                              'National Address & Contact'),
                           rows: _addressRows(context, company),
                         ),
                         Gap(14.h),
+
+                        // 3. Tax & Commercial Registration
                         _buildSection(
                           context,
                           icon: Icons.receipt_long_rounded,
                           color: const Color(0xFFE17055),
-                          title:
-                              _t('الضرائب والتسجيل', 'Tax & Registration'),
+                          title: _t('الضرائب والسجل التجاري',
+                              'Tax & Commercial Registration'),
                           rows: _taxRows(context, company),
                         ),
                         Gap(14.h),
+
+                        // 4. Fiscal Year & Currency
                         _buildSection(
                           context,
                           icon: Icons.calendar_month_rounded,
                           color: const Color(0xFF6C5CE7),
-                          title: _t(
-                              'السنة المالية والعملة', 'Fiscal & Currency'),
+                          title: _t('السنة المالية والعملات',
+                              'Fiscal Year & Currencies'),
                           rows: _fiscalRows(context, company),
                         ),
                         Gap(14.h),
+
+                        // 5. Default General Ledger Accounts
                         _buildSection(
                           context,
                           icon: Icons.account_balance_rounded,
                           color: const Color(0xFF00B894),
-                          title: _t(
-                              'الحسابات الافتراضية', 'Default Accounts'),
+                          title: _t('شجرة الحسابات الافتراضية',
+                              'Default General Ledger Accounts'),
                           rows: _accountRows(context, company),
                         ),
                         Gap(14.h),
+
+                        // 6. System Configuration & Document Signs
                         _buildSection(
                           context,
                           icon: Icons.tune_rounded,
-                          color: const Color(0xFF636E72),
-                          title: _t('إعدادات النظام', 'System Settings'),
+                          color: const Color(0xFF475569),
+                          title: _t('خصائص النظام ورموز المستندات',
+                              'System Configuration & Document Signs'),
                           rows: _systemRows(context, company),
                         ),
                         Gap(20.h),
+
+                        // 7. Logout Button
+                        _buildLogoutButton(context),
+                        Gap(80.h),
                       ],
-
-                      // ── Preferences ────────────────────────────────
-                      _buildSectionTitle(
-                          context, _t('التفضيلات', 'Preferences'),
-                          Icons.tune_rounded),
-                      Gap(10.h),
-                      _buildSettingsCard(context, [
-                        _buildToggle(
-                          context,
-                          icon: Icons.notifications_outlined,
-                          iconColor: AppColor.warningOrange,
-                          title: _t('الإشعارات', 'Notifications'),
-                          subtitle: _t('تنبيهات وتذكيرات', 'Alerts & reminders'),
-                          value: _notificationsEnabled,
-                          onChanged: (v) =>
-                              setState(() => _notificationsEnabled = v),
-                        ),
-                        _divider(context),
-                        _buildToggle(
-                          context,
-                          icon: isDark
-                              ? Icons.dark_mode_outlined
-                              : Icons.light_mode_outlined,
-                          iconColor: const Color(0xFF6C5CE7),
-                          title: AppLocaleKey.appTheme.tr(),
-                          subtitle:
-                              '${AppLocaleKey.themeModeSubtitle.tr()} · ${isDark ? AppLocaleKey.darkMode.tr() : AppLocaleKey.lightMode.tr()}',
-                          value: isDark,
-                          onChanged: (v) => context
-                              .read<AppThemeCubit>()
-                              .setTheme(v ? ThemeEnum.dark : ThemeEnum.light),
-                        ),
-                        _divider(context),
-                        _buildActionTile(
-                          context,
-                          icon: Icons.language_rounded,
-                          iconColor: AppColor.skyBlue,
-                          title: _t('اللغة', 'Language'),
-                          subtitle: _isAr ? 'العربية' : 'English',
-                          onTap: widget.onToggleLanguage,
-                        ),
-                      ]),
-
-                      Gap(14.h),
-
-                      // ── Support ────────────────────────────────────
-                      _buildSectionTitle(
-                          context, _t('الدعم', 'Support'), Icons.help_outline_rounded),
-                      Gap(10.h),
-                      _buildSettingsCard(context, [
-                        _buildActionTile(
-                          context,
-                          icon: Icons.help_outline_rounded,
-                          iconColor: AppColor.mintTeal,
-                          title: _t('المساعدة', 'Help & Support'),
-                          subtitle: _t('الوثائق والأسئلة الشائعة', 'Docs & FAQs'),
-                          onTap: () {},
-                        ),
-                        _divider(context),
-                        _buildActionTile(
-                          context,
-                          icon: Icons.shield_outlined,
-                          iconColor: AppColor.oceanBlue,
-                          title: _t('الخصوصية', 'Privacy & Security'),
-                          subtitle: _t('إعدادات الخصوصية', 'Data protection'),
-                          onTap: () {},
-                        ),
-                        _divider(context),
-                        _buildActionTile(
-                          context,
-                          icon: Icons.info_outline_rounded,
-                          iconColor: const Color(0xFF636E72),
-                          title: _t('حول التطبيق', 'About Delta ERP'),
-                          subtitle: 'Version 1.0.0 · Build 2026',
-                          onTap: () {},
-                        ),
-                      ]),
-
-                      Gap(16.h),
-
-                      // ── Logout ─────────────────────────────────────
-                      _buildLogoutButton(context),
-                      Gap(90.h),
                     ]),
                   ),
                 ),
@@ -263,182 +163,159 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen>
   }
 
   // ── Hero SliverAppBar ───────────────────────────────────────────────────────
-  Widget _buildHeroSliver(
-      BuildContext context, CompanyModel? c, dynamic status) {
-    final name = c != null
-        ? (_isAr
-            ? (c.companyName ?? c.companyEname ?? '')
-            : (c.companyEname ?? c.companyName ?? ''))
-        : '';
+  Widget _buildHeroSliver(BuildContext context, CompanyModel? c) {
+    final companyNameAr = c?.companyName ?? '';
+    final companyNameEn = c?.companyEname ?? '';
+    final primaryName = _isAr
+        ? (companyNameAr.isNotEmpty ? companyNameAr : companyNameEn)
+        : (companyNameEn.isNotEmpty ? companyNameEn : companyNameAr);
 
-    final initials = name.trim().isNotEmpty
-        ? name.trim().split(RegExp(r'\s+')).take(2).map((w) => w[0]).join()
-        : '؟';
+    final addressPreview = [c?.cityName, c?.countryName]
+        .where((e) => e != null && e.isNotEmpty)
+        .join(' · ');
 
     return SliverAppBar(
-      expandedHeight: 220.h,
+      expandedHeight: 230.h,
       floating: false,
       pinned: true,
-      stretch: true,
       backgroundColor: AppColor.primaryColor(context),
       surfaceTintColor: Colors.transparent,
       automaticallyImplyLeading: false,
       actions: [
+        if (widget.onToggleLanguage != null)
+          IconButton(
+            onPressed: widget.onToggleLanguage,
+            icon: const Icon(Icons.language_rounded,
+                size: 20, color: Colors.white),
+            tooltip: _t('تغيير اللغة', 'Toggle Language'),
+          ),
         IconButton(
           onPressed: _load,
-          icon: Icon(Icons.refresh_rounded, size: 20.r, color: Colors.white),
+          icon: const Icon(Icons.refresh_rounded, size: 20, color: Colors.white),
           tooltip: _t('تحديث', 'Refresh'),
         ),
-        SizedBox(width: 4.w),
+        SizedBox(width: 6.w),
       ],
       flexibleSpace: FlexibleSpaceBar(
-        stretchModes: const [StretchMode.zoomBackground],
-        background: SlideTransition(
-          position: _slideAnim,
-          child: FadeTransition(
-            opacity: _fadeAnim,
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    AppColor.primaryColor(context),
-                    AppColor.secondAppColor(context),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-              ),
-              child: Stack(
+        background: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                AppColor.primaryColor(context),
+                AppColor.secondAppColor(context),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+          child: SafeArea(
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(18.w, 12.h, 18.w, 16.h),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  // Decorative blobs
-                  Positioned(
-                    top: -40.h,
-                    right: -40.w,
-                    child: _blob(170.r, Colors.white.withValues(alpha: 0.06)),
-                  ),
-                  Positioned(
-                    bottom: -20.h,
-                    left: -50.w,
-                    child: _blob(130.r, Colors.white.withValues(alpha: 0.05)),
-                  ),
-                  Positioned(
-                    top: 60.h,
-                    left: 40.w,
-                    child: _blob(60.r, Colors.white.withValues(alpha: 0.04)),
-                  ),
-
-                  // Content
-                  SafeArea(
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(20.w, 10.h, 20.w, 20.h),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              // Monogram
-                              Container(
-                                width: 64.r,
-                                height: 64.r,
-                                decoration: BoxDecoration(
-                                  color:
-                                      Colors.white.withValues(alpha: 0.18),
-                                  borderRadius:
-                                      BorderRadius.circular(20.r),
-                                  border: Border.all(
-                                    color:
-                                        Colors.white.withValues(alpha: 0.4),
-                                    width: 1.5,
-                                  ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Monogram Icon
+                      Container(
+                        width: 56.r,
+                        height: 56.r,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(16.r),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.4),
+                            width: 1.5,
+                          ),
+                        ),
+                        child: Icon(
+                          Icons.apartment_rounded,
+                          size: 30.r,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Gap(12.w),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              primaryName.isNotEmpty
+                                  ? primaryName
+                                  : _t('ملف الشركة', 'Company File'),
+                              style: TextStyle(
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.white,
+                                fontFamily: 'Tajawal',
+                                height: 1.25,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            if (companyNameEn.isNotEmpty && _isAr) ...[
+                              Gap(2.h),
+                              Text(
+                                companyNameEn,
+                                style: TextStyle(
+                                  fontSize: 11.sp,
+                                  color: Colors.white.withValues(alpha: 0.75),
+                                  fontFamily: 'Tajawal',
                                 ),
-                                child: Center(
-                                  child: Text(
-                                    initials,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                            if (addressPreview.isNotEmpty) ...[
+                              Gap(4.h),
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.location_on_rounded,
+                                    size: 12.r,
+                                    color: const Color(0xFF67E8F9),
+                                  ),
+                                  Gap(4.w),
+                                  Text(
+                                    addressPreview,
                                     style: TextStyle(
-                                      fontSize: 22.sp,
-                                      fontWeight: FontWeight.w900,
-                                      color: Colors.white,
+                                      fontSize: 10.5.sp,
+                                      color: Colors.white.withValues(alpha: 0.9),
                                       fontFamily: 'Tajawal',
                                     ),
                                   ),
-                                ),
-                              ),
-                              Gap(14.w),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.start,
-                                  children: [
-                                    if (name.isNotEmpty)
-                                      Text(
-                                        name,
-                                        style: TextStyle(
-                                          fontSize: 16.sp,
-                                          fontWeight: FontWeight.w800,
-                                          color: Colors.white,
-                                          fontFamily: 'Tajawal',
-                                          height: 1.3,
-                                        ),
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                      )
-                                    else
-                                      Container(
-                                        height: 18.h,
-                                        width: 160.w,
-                                        decoration: BoxDecoration(
-                                          color: Colors.white
-                                              .withValues(alpha: 0.2),
-                                          borderRadius:
-                                              BorderRadius.circular(6.r),
-                                        ),
-                                      ),
-                                    Gap(4.h),
-                                    if (c?.companyEname != null &&
-                                        _isAr &&
-                                        c!.companyEname!.isNotEmpty)
-                                      Text(
-                                        c.companyEname!,
-                                        style: TextStyle(
-                                          fontSize: 11.sp,
-                                          color: Colors.white70,
-                                          fontFamily: 'Tajawal',
-                                        ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                  ],
-                                ),
+                                ],
                               ),
                             ],
-                          ),
-                          Gap(14.h),
-                          // badges
-                          Wrap(
-                            spacing: 8.w,
-                            runSpacing: 6.h,
-                            children: [
-                              if (c?.tradeReg != null)
-                                _heroBadge(
-                                    Icons.business_center_rounded,
-                                    'س.ت: ${c!.tradeReg}'),
-                              if (c?.cityName != null)
-                                _heroBadge(
-                                    Icons.location_on_rounded, c!.cityName!),
-                              if (c?.countryName != null)
-                                _heroBadge(
-                                    Icons.flag_rounded, c!.countryName!),
-                              if (c?.currency != null)
-                                _heroBadge(
-                                    Icons.monetization_on_outlined,
-                                    c!.currency!),
-                            ],
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
+                    ],
+                  ),
+                  Gap(12.h),
+                  // Badges: CR, VAT, Delta Config
+                  Wrap(
+                    spacing: 8.w,
+                    runSpacing: 6.h,
+                    children: [
+                      if (c?.tradeReg != null)
+                        _heroBadge(
+                          Icons.business_center_rounded,
+                          'س.ت: ${c!.tradeReg}',
+                        ),
+                      if (c?.taxReg != null)
+                        _heroBadge(
+                          Icons.receipt_rounded,
+                          'الضريبي: ${c!.taxReg}',
+                        ),
+                      if (c?.deltaconfig != null)
+                        _heroBadge(
+                          Icons.tune_rounded,
+                          'تهيئة: ${c!.deltaconfig}',
+                        ),
+                    ],
                   ),
                 ],
               ),
@@ -449,64 +326,71 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen>
     );
   }
 
-  Widget _blob(double size, Color color) => Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(shape: BoxShape.circle, color: color),
-      );
-
-  Widget _heroBadge(IconData icon, String label) => Container(
-        padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.15),
-          borderRadius: BorderRadius.circular(20.r),
-          border:
-              Border.all(color: Colors.white.withValues(alpha: 0.3)),
+  Widget _heroBadge(IconData icon, String label) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.16),
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.3),
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 11.r, color: Colors.white),
-            Gap(4.w),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 10.sp,
-                color: Colors.white,
-                fontFamily: 'Tajawal',
-                fontWeight: FontWeight.w600,
-              ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 11.r, color: Colors.white),
+          Gap(4.w),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 10.sp,
+              color: Colors.white,
+              fontFamily: 'Tajawal',
+              fontWeight: FontWeight.w700,
             ),
-          ],
-        ),
-      );
+          ),
+        ],
+      ),
+    );
+  }
 
-  // ── Quick Stats ─────────────────────────────────────────────────────────────
+  // ── Quick Stats Highlights ──────────────────────────────────────────────────
   Widget _buildQuickStats(BuildContext context, CompanyModel c) {
-    final taxPct = (c.taxNew ?? c.taxVal ?? 0).toStringAsFixed(0);
-    final fiscalStart = c.fiscalYearBegin != null
-        ? '${c.fiscalYearBegin!.month}/${c.fiscalYearBegin!.year}'
-        : '—';
+    final taxPct = (c.taxNew ?? c.taxVal ?? 15.0).toStringAsFixed(0);
+    final fiscalYear = c.fiscalYearBegin != null
+        ? '${c.fiscalYearBegin!.year}'
+        : '2026';
+    final currencyLabel = c.currency ?? 'ريال سعودي';
 
     return Row(
       children: [
-        _statCard(context,
-            value: '$taxPct%',
-            label: _t('الضريبة', 'VAT'),
-            icon: Icons.percent_rounded,
-            color: const Color(0xFFE17055)),
+        _statCard(
+          context,
+          value: '$taxPct%',
+          subValue: 'السابقة: ${(c.taxVal ?? 5.0).toStringAsFixed(0)}%',
+          label: _t('نسبة الضريبة', 'VAT Rate'),
+          icon: Icons.percent_rounded,
+          color: const Color(0xFFE17055),
+        ),
         Gap(10.w),
-        _statCard(context,
-            value: c.currency ?? '—',
-            label: _t('العملة', 'Currency'),
-            icon: Icons.monetization_on_outlined,
-            color: const Color(0xFF0984E3)),
+        _statCard(
+          context,
+          value: currencyLabel,
+          subValue: c.currencyFraction ?? 'هلله',
+          label: _t('العملة والكسر', 'Currency'),
+          icon: Icons.monetization_on_outlined,
+          color: const Color(0xFF0984E3),
+        ),
         Gap(10.w),
-        _statCard(context,
-            value: fiscalStart,
-            label: _t('السنة المالية', 'Fiscal Year'),
-            icon: Icons.calendar_today_rounded,
-            color: const Color(0xFF6C5CE7)),
+        _statCard(
+          context,
+          value: fiscalYear,
+          subValue: c.jrlUpdate == 1 ? 'اليومية محدثة' : 'اليومية: 1',
+          label: _t('السنة واليومية', 'Fiscal & Journal'),
+          icon: Icons.calendar_today_rounded,
+          color: const Color(0xFF6C5CE7),
+        ),
       ],
     );
   }
@@ -514,40 +398,41 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen>
   Widget _statCard(
     BuildContext context, {
     required String value,
+    required String subValue,
     required String label,
     required IconData icon,
     required Color color,
   }) {
     return Expanded(
       child: Container(
-        padding: EdgeInsets.symmetric(vertical: 14.h, horizontal: 8.w),
+        padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 8.w),
         decoration: BoxDecoration(
           color: AppColor.cardColor(context),
           borderRadius: BorderRadius.circular(16.r),
           border: Border.all(color: color.withValues(alpha: 0.2)),
           boxShadow: [
             BoxShadow(
-              color: color.withValues(alpha: 0.08),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
+              color: color.withValues(alpha: 0.06),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
             ),
           ],
         ),
         child: Column(
           children: [
             Container(
-              padding: EdgeInsets.all(7.r),
+              padding: EdgeInsets.all(6.r),
               decoration: BoxDecoration(
                 color: color.withValues(alpha: 0.12),
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, size: 15.r, color: color),
+              child: Icon(icon, size: 14.r, color: color),
             ),
             Gap(6.h),
             Text(
               value,
               style: AppTextStyle.bodyLarge(context).copyWith(
-                fontSize: 13.sp,
+                fontSize: 12.sp,
                 fontWeight: FontWeight.w800,
                 color: AppColor.titleFormFiledColor(context),
                 fontFamily: 'Tajawal',
@@ -557,8 +442,21 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen>
               textAlign: TextAlign.center,
             ),
             Text(
+              subValue,
+              style: TextStyle(
+                fontSize: 9.sp,
+                color: color,
+                fontWeight: FontWeight.w600,
+                fontFamily: 'Tajawal',
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+            ),
+            Gap(2.h),
+            Text(
               label,
-              style: AppTextStyle.bodySmall(context).copyWith(
+              style: TextStyle(
                 fontSize: 9.sp,
                 color: AppColor.darkTextColor(context),
                 fontFamily: 'Tajawal',
@@ -571,7 +469,7 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen>
     );
   }
 
-  // ── Generic Section ─────────────────────────────────────────────────────────
+  // ── Generic Section Container ───────────────────────────────────────────────
   Widget _buildSection(
     BuildContext context, {
     required IconData icon,
@@ -579,9 +477,6 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen>
     required String title,
     required List<Widget> rows,
   }) {
-    final filtered = rows.whereType<_InfoRow>().toList();
-    if (filtered.isEmpty) return const SizedBox.shrink();
-
     return Container(
       decoration: BoxDecoration(
         color: AppColor.cardColor(context),
@@ -598,47 +493,46 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header
+          // Header Bar
           Container(
-            padding: EdgeInsets.symmetric(
-                horizontal: 16.w, vertical: 12.h),
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
             decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.07),
-              borderRadius:
-                  BorderRadius.vertical(top: Radius.circular(20.r)),
+              color: color.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
               border: Border(
-                  bottom:
-                      BorderSide(color: color.withValues(alpha: 0.15))),
+                bottom: BorderSide(color: color.withValues(alpha: 0.18)),
+              ),
             ),
             child: Row(
               children: [
                 Container(
                   padding: EdgeInsets.all(7.r),
                   decoration: BoxDecoration(
-                    color: color.withValues(alpha: 0.14),
+                    color: color.withValues(alpha: 0.16),
                     borderRadius: BorderRadius.circular(10.r),
                   ),
                   child: Icon(icon, size: 16.r, color: color),
                 ),
                 Gap(10.w),
-                Text(
-                  title,
-                  style: AppTextStyle.bodySmall(context).copyWith(
-                    fontSize: 13.sp,
-                    fontWeight: FontWeight.w700,
-                    color: AppColor.titleFormFiledColor(context),
-                    fontFamily: 'Tajawal',
+                Expanded(
+                  child: Text(
+                    title,
+                    style: AppTextStyle.bodySmall(context).copyWith(
+                      fontSize: 13.sp,
+                      fontWeight: FontWeight.w800,
+                      color: AppColor.titleFormFiledColor(context),
+                      fontFamily: 'Tajawal',
+                    ),
                   ),
                 ),
               ],
             ),
           ),
-          // Rows
+          // Content Rows
           Padding(
-            padding:
-                EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
             child: Column(
-              children: _intersperse(context, rows),
+              children: _intersperseDividers(context, rows),
             ),
           ),
         ],
@@ -646,24 +540,23 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen>
     );
   }
 
-  List<Widget> _intersperse(BuildContext context, List<Widget> rows) {
-    final result = <Widget>[];
-    for (var i = 0; i < rows.length; i++) {
-      if (rows[i] is SizedBox) continue;
-      result.add(rows[i]);
-      if (i < rows.length - 1) {
-        result.add(
+  List<Widget> _intersperseDividers(BuildContext context, List<Widget> items) {
+    final list = <Widget>[];
+    for (var i = 0; i < items.length; i++) {
+      list.add(items[i]);
+      if (i < items.length - 1) {
+        list.add(
           Divider(
-            height: 18.h,
+            height: 16.h,
             color: AppColor.borderColor(context).withValues(alpha: 0.6),
           ),
         );
       }
     }
-    return result;
+    return list;
   }
 
-  // ── Info Row ────────────────────────────────────────────────────────────────
+  // ── Info Row Widget ─────────────────────────────────────────────────────────
   Widget _infoRow(
     BuildContext context, {
     required String label,
@@ -672,272 +565,465 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen>
     required Color iconColor,
     bool copyable = false,
   }) {
-    if (value == null || value.trim().isEmpty) return const SizedBox.shrink();
-    return _InfoRow(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: EdgeInsets.all(6.r),
-            decoration: BoxDecoration(
-              color: iconColor.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8.r),
-            ),
-            child: Icon(icon, size: 14.r, color: iconColor),
+    final displayVal = (value != null && value.trim().isNotEmpty)
+        ? value.trim()
+        : '—';
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: EdgeInsets.all(6.r),
+          decoration: BoxDecoration(
+            color: iconColor.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(8.r),
           ),
-          Gap(12.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: AppTextStyle.bodySmall(context).copyWith(
-                    fontSize: 10.sp,
-                    color: AppColor.darkTextColor(context),
-                    fontFamily: 'Tajawal',
-                  ),
-                ),
-                Gap(2.h),
-                Text(
-                  value,
-                  style: AppTextStyle.bodySmall(context).copyWith(
-                    fontSize: 13.sp,
-                    fontWeight: FontWeight.w600,
-                    color: AppColor.titleFormFiledColor(context),
-                    fontFamily: 'Tajawal',
-                  ),
-                ),
-              ],
-            ),
-          ),
-          if (copyable)
-            GestureDetector(
-              onTap: () {
-                Clipboard.setData(ClipboardData(text: value));
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      _t('تم النسخ ✓', 'Copied ✓'),
-                      style: const TextStyle(fontFamily: 'Tajawal'),
-                    ),
-                    behavior: SnackBarBehavior.floating,
-                    duration: const Duration(seconds: 1),
-                    backgroundColor: AppColor.primaryColor(context),
-                  ),
-                );
-              },
-              child: Padding(
-                padding: EdgeInsets.only(top: 4.h),
-                child: Icon(
-                  Icons.copy_rounded,
-                  size: 15.r,
-                  color: AppColor.darkTextColor(context)
-                      .withValues(alpha: 0.45),
+          child: Icon(icon, size: 14.r, color: iconColor),
+        ),
+        Gap(12.w),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 10.sp,
+                  color: AppColor.darkTextColor(context),
+                  fontFamily: 'Tajawal',
                 ),
               ),
+              Gap(2.h),
+              Text(
+                displayVal,
+                style: TextStyle(
+                  fontSize: 12.5.sp,
+                  fontWeight: FontWeight.w700,
+                  color: AppColor.titleFormFiledColor(context),
+                  fontFamily: 'Tajawal',
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (copyable && displayVal != '—')
+          GestureDetector(
+            onTap: () {
+              Clipboard.setData(ClipboardData(text: displayVal));
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    _t('تم النسخ: $displayVal', 'Copied: $displayVal'),
+                    style: const TextStyle(fontFamily: 'Tajawal'),
+                  ),
+                  behavior: SnackBarBehavior.floating,
+                  duration: const Duration(seconds: 1),
+                  backgroundColor: AppColor.primaryColor(context),
+                ),
+              );
+            },
+            child: Padding(
+              padding: EdgeInsets.only(top: 4.h),
+              child: Icon(
+                Icons.copy_rounded,
+                size: 15.r,
+                color: AppColor.darkTextColor(context).withValues(alpha: 0.5),
+              ),
             ),
-        ],
-      ),
+          ),
+      ],
     );
   }
 
-  // ── Account Row ─────────────────────────────────────────────────────────────
+  // ── Account Row Widget ──────────────────────────────────────────────────────
   Widget _accountRow(
     BuildContext context, {
-    required String label,
-    required int? value,
+    required String labelAr,
+    required String labelEn,
+    required int? code,
     required Color color,
   }) {
-    if (value == null) return const SizedBox.shrink();
-    return _InfoRow(
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              label,
-              style: AppTextStyle.bodySmall(context).copyWith(
-                fontSize: 12.sp,
-                color: AppColor.darkTextColor(context),
-                fontFamily: 'Tajawal',
-              ),
-            ),
-          ),
-          Container(
-            padding:
-                EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8.r),
-              border: Border.all(color: color.withValues(alpha: 0.25)),
-            ),
-            child: Text(
-              value.toString(),
-              style: AppTextStyle.bodySmall(context).copyWith(
-                fontSize: 11.sp,
-                fontWeight: FontWeight.w700,
-                color: color,
-                fontFamily: 'Tajawal',
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+    final label = _isAr ? labelAr : labelEn;
+    final displayCode = code != null ? code.toString() : '—';
 
-  // ── Settings Widgets ────────────────────────────────────────────────────────
-  Widget _buildSectionTitle(
-      BuildContext context, String title, IconData icon) {
     return Row(
       children: [
-        Icon(icon, color: AppColor.darkTextColor(context), size: 15.r),
-        Gap(6.w),
-        Text(
-          title,
-          style: AppTextStyle.bodySmall(context).copyWith(
-            fontSize: 11.5.sp,
-            fontWeight: FontWeight.w700,
-            color: AppColor.darkTextColor(context),
-            fontFamily: 'Tajawal',
-            letterSpacing: 0.3,
+        Container(
+          width: 8.r,
+          height: 8.r,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+          ),
+        ),
+        Gap(10.w),
+        Expanded(
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 12.sp,
+              fontWeight: FontWeight.w600,
+              color: AppColor.titleFormFiledColor(context),
+              fontFamily: 'Tajawal',
+            ),
+          ),
+        ),
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(8.r),
+            border: Border.all(color: color.withValues(alpha: 0.3)),
+          ),
+          child: Text(
+            displayCode,
+            style: TextStyle(
+              fontSize: 11.5.sp,
+              fontWeight: FontWeight.w800,
+              color: color,
+              fontFamily: 'Tajawal',
+            ),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildSettingsCard(BuildContext context, List<Widget> children) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColor.cardColor(context),
-        borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(color: AppColor.borderColor(context)),
-      ),
-      child: Column(children: children),
-    );
+  // ── Section 1: Address & Contacts Rows ──────────────────────────────────────
+  List<Widget> _addressRows(BuildContext context, CompanyModel c) {
+    const color = Color(0xFF0984E3);
+    return [
+      _infoRow(context,
+          label: _t('العنوان المسجل (عربي)', 'Registered Address (AR)'),
+          value: c.address,
+          icon: Icons.store_rounded,
+          iconColor: color),
+      _infoRow(context,
+          label: _t('العنوان المسجل (إنجليزي)', 'Registered Address (EN)'),
+          value: c.addressE,
+          icon: Icons.language_rounded,
+          iconColor: color),
+      _infoRow(context,
+          label: _t('الشارع', 'Street Name'),
+          value: c.streetName,
+          icon: Icons.signpost_rounded,
+          iconColor: color),
+      _infoRow(context,
+          label: _t('الحي', 'District Name'),
+          value: _isAr ? c.districtName : (c.districtEname ?? c.districtName),
+          icon: Icons.map_rounded,
+          iconColor: color),
+      _infoRow(context,
+          label: _t('رقم المبنى', 'Building Number'),
+          value: c.buildingNo,
+          icon: Icons.home_rounded,
+          iconColor: color),
+      _infoRow(context,
+          label: _t('الرمز البريدي', 'Postal Code'),
+          value: c.postalNo,
+          icon: Icons.markunread_mailbox_rounded,
+          iconColor: color),
+      _infoRow(context,
+          label: _t('الرقم الإضافي', 'Additional Number'),
+          value: c.additionNo,
+          icon: Icons.numbers_rounded,
+          iconColor: color),
+      _infoRow(context,
+          label: _t('المدينة', 'City'),
+          value: '${c.cityName ?? '—'} (كود: ${c.cityCode ?? '—'})',
+          icon: Icons.location_city_rounded,
+          iconColor: color),
+      _infoRow(context,
+          label: _t('الدولة', 'Country'),
+          value: '${c.countryName ?? '—'} (كود: ${c.countryCode ?? '—'})',
+          icon: Icons.flag_rounded,
+          iconColor: color),
+      _infoRow(context,
+          label: _t('رقم الهاتف 1', 'Phone 1'),
+          value: c.telNo1,
+          icon: Icons.phone_rounded,
+          iconColor: const Color(0xFF00B894),
+          copyable: true),
+      _infoRow(context,
+          label: _t('رقم الهاتف 2', 'Phone 2'),
+          value: c.telNo2,
+          icon: Icons.phone_rounded,
+          iconColor: const Color(0xFF00B894),
+          copyable: true),
+      _infoRow(context,
+          label: _t('البريد الإلكتروني', 'Email'),
+          value: c.eMail,
+          icon: Icons.email_rounded,
+          iconColor: const Color(0xFF6C5CE7),
+          copyable: true),
+      _infoRow(context,
+          label: _t('طبيعة المستند / النشاط', 'Document / Business Nature'),
+          value: c.docNature?.toString(),
+          icon: Icons.badge_rounded,
+          iconColor: color),
+    ];
   }
 
-  Widget _divider(BuildContext context) => Divider(
-        height: 1,
-        color: AppColor.borderColor(context),
-        indent: 54.w,
-      );
-
-  Widget _buildToggle(
-    BuildContext context, {
-    required IconData icon,
-    required Color iconColor,
-    required String title,
-    required String subtitle,
-    required bool value,
-    required ValueChanged<bool> onChanged,
-  }) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
-      child: Row(
-        children: [
-          Container(
-            padding: EdgeInsets.all(8.r),
-            decoration: BoxDecoration(
-              color: iconColor.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(10.r),
-            ),
-            child: Icon(icon, color: iconColor, size: 18.r),
-          ),
-          Gap(12.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title,
-                    style: AppTextStyle.bodySmall(context).copyWith(
-                      fontSize: 13.sp,
-                      fontWeight: FontWeight.w600,
-                      color: AppColor.titleFormFiledColor(context),
-                      fontFamily: 'Tajawal',
-                    )),
-                Text(subtitle,
-                    style: AppTextStyle.bodySmall(context).copyWith(
-                      fontSize: 10.5.sp,
-                      color: AppColor.darkTextColor(context),
-                      fontFamily: 'Tajawal',
-                    )),
-              ],
-            ),
-          ),
-          Transform.scale(
-            scale: 0.8,
-            child: Switch(
-              value: value,
-              onChanged: onChanged,
-              activeThumbColor: iconColor,
-              activeTrackColor: iconColor.withValues(alpha: 0.3),
-              inactiveThumbColor: AppColor.darkTextColor(context),
-              inactiveTrackColor: AppColor.borderColor(context),
-            ),
-          ),
-        ],
-      ),
-    );
+  // ── Section 2: Tax & Registration Rows ──────────────────────────────────────
+  List<Widget> _taxRows(BuildContext context, CompanyModel c) {
+    const color = Color(0xFFE17055);
+    return [
+      _infoRow(context,
+          label: _t('الرقم الضريبي (VAT Registration)', 'VAT Registration Number'),
+          value: c.taxReg,
+          icon: Icons.receipt_long_rounded,
+          iconColor: color,
+          copyable: true),
+      _infoRow(context,
+          label: _t('السجل التجاري (Commercial Registration)', 'Commercial Registration Number'),
+          value: c.tradeReg,
+          icon: Icons.business_center_rounded,
+          iconColor: color,
+          copyable: true),
+      _infoRow(context,
+          label: _t('نسبة الضريبة الجديدة / الحالية (taxNew)', 'Current VAT Rate'),
+          value: c.taxNew != null ? '${c.taxNew!.toStringAsFixed(2)}%' : '15%',
+          icon: Icons.percent_rounded,
+          iconColor: const Color(0xFFFD79A8)),
+      _infoRow(context,
+          label: _t('نسبة الضريبة الأساسية / السابقة (taxVal)', 'Base/Previous VAT Rate'),
+          value: c.taxVal != null ? '${c.taxVal!.toStringAsFixed(2)}%' : '5%',
+          icon: Icons.percent_rounded,
+          iconColor: const Color(0xFFBDC3C7)),
+      _infoRow(context,
+          label: _t('الفترة الضريبية (taxTerm)', 'Tax Period Term'),
+          value: c.taxTerm != null ? '${c.taxTerm} (ربع سنوي)' : '—',
+          icon: Icons.event_repeat_rounded,
+          iconColor: color),
+      _infoRow(context,
+          label: _t('عداد عملات السندات (vouichCurrCntr)', 'Voucher Currency Counter'),
+          value: c.vouichCurrCntr?.toString(),
+          icon: Icons.pin_rounded,
+          iconColor: color),
+    ];
   }
 
-  Widget _buildActionTile(
-    BuildContext context, {
-    required IconData icon,
-    required Color iconColor,
-    required String title,
-    required String subtitle,
-    required VoidCallback? onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(20.r),
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-        child: Row(
-          children: [
-            Container(
-              padding: EdgeInsets.all(8.r),
-              decoration: BoxDecoration(
-                color: iconColor.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(10.r),
-              ),
-              child: Icon(icon, color: iconColor, size: 18.r),
-            ),
-            Gap(12.w),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title,
-                      style: AppTextStyle.bodySmall(context).copyWith(
-                        fontSize: 13.sp,
-                        fontWeight: FontWeight.w600,
-                        color: AppColor.titleFormFiledColor(context),
-                        fontFamily: 'Tajawal',
-                      )),
-                  Text(subtitle,
-                      style: AppTextStyle.bodySmall(context).copyWith(
-                        fontSize: 10.5.sp,
-                        color: AppColor.darkTextColor(context),
-                        fontFamily: 'Tajawal',
-                      )),
-                ],
-              ),
-            ),
-            Icon(
-              Icons.chevron_right_rounded,
-              color: AppColor.darkTextColor(context)
-                  .withValues(alpha: 0.4),
-              size: 18.r,
-            ),
-          ],
-        ),
-      ),
-    );
+  // ── Section 3: Fiscal Year & Currency Rows ──────────────────────────────────
+  List<Widget> _fiscalRows(BuildContext context, CompanyModel c) {
+    const color = Color(0xFF6C5CE7);
+    String? fmtDate(DateTime? d) =>
+        d != null ? '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}' : null;
+
+    return [
+      _infoRow(context,
+          label: _t('بداية السنة المالية (fiscalYearBegin)', 'Fiscal Year Begin'),
+          value: fmtDate(c.fiscalYearBegin),
+          icon: Icons.play_circle_rounded,
+          iconColor: color),
+      _infoRow(context,
+          label: _t('نهاية السنة المالية (fiscalYearEnd)', 'Fiscal Year End'),
+          value: fmtDate(c.fiscalYearEnd),
+          icon: Icons.stop_circle_rounded,
+          iconColor: const Color(0xFFE17055)),
+      _infoRow(context,
+          label: _t('العملة الأساسية (currency)', 'Primary Currency'),
+          value: c.currency,
+          icon: Icons.monetization_on_rounded,
+          iconColor: const Color(0xFF00B894)),
+      _infoRow(context,
+          label: _t('كسر العملة (currencyFraction)', 'Currency Fraction / Sub-unit'),
+          value: c.currencyFraction,
+          icon: Icons.money_rounded,
+          iconColor: const Color(0xFF00B894)),
+      _infoRow(context,
+          label: _t('العملة الأجنبية (ecurrency)', 'Foreign Currency'),
+          value: c.ecurrency,
+          icon: Icons.currency_exchange_rounded,
+          iconColor: color),
+    ];
   }
 
+  // ── Section 4: General Ledger Accounts Rows ─────────────────────────────────
+  List<Widget> _accountRows(BuildContext context, CompanyModel c) {
+    const cashColor = Color(0xFF00B894);
+    const plColor = Color(0xFF6C5CE7);
+    const salesColor = Color(0xFF0984E3);
+    const purchColor = Color(0xFFE17055);
+    const taxColor = Color(0xFFFD79A8);
+    const clientColor = Color(0xFF00CEC9);
+
+    return [
+      _accountRow(context,
+          labelAr: 'حساب الصندوق (cashAcc)',
+          labelEn: 'Cash Account (cashAcc)',
+          code: c.cashAcc,
+          color: cashColor),
+      _accountRow(context,
+          labelAr: 'حساب الأرباح والخسائر (profitLossAcctNo)',
+          labelEn: 'Profit & Loss Account (profitLossAcctNo)',
+          code: c.profitLossAcctNo,
+          color: plColor),
+      _accountRow(context,
+          labelAr: 'حساب المبيعات (salesAcc)',
+          labelEn: 'Sales Account (salesAcc)',
+          code: c.salesAcc,
+          color: salesColor),
+      _accountRow(context,
+          labelAr: 'حساب مردودات المبيعات (salesRetAcc)',
+          labelEn: 'Sales Returns Account (salesRetAcc)',
+          code: c.salesRetAcc,
+          color: salesColor),
+      _accountRow(context,
+          labelAr: 'حساب خصم المبيعات (salesDisAcc)',
+          labelEn: 'Sales Discount Account (salesDisAcc)',
+          code: c.salesDisAcc,
+          color: salesColor),
+      _accountRow(context,
+          labelAr: 'حساب المشتريات (purchaseAcc)',
+          labelEn: 'Purchases Account (purchaseAcc)',
+          code: c.purchaseAcc,
+          color: purchColor),
+      _accountRow(context,
+          labelAr: 'حساب مردودات المشتريات (purchRetAcc)',
+          labelEn: 'Purchases Returns Account (purchRetAcc)',
+          code: c.purchRetAcc,
+          color: purchColor),
+      _accountRow(context,
+          labelAr: 'حساب خصم المشتريات (purDisAcc)',
+          labelEn: 'Purchases Discount Account (purDisAcc)',
+          code: c.purDisAcc,
+          color: purchColor),
+      _accountRow(context,
+          labelAr: 'حساب العملاء (cusAcc)',
+          labelEn: 'Customers Account (cusAcc)',
+          code: c.cusAcc,
+          color: clientColor),
+      _accountRow(context,
+          labelAr: 'حساب الموردين (suppAcc)',
+          labelEn: 'Suppliers Account (suppAcc)',
+          code: c.suppAcc,
+          color: clientColor),
+      _accountRow(context,
+          labelAr: 'حساب ضريبة المبيعات (salTaxAcc)',
+          labelEn: 'Sales Tax Account (salTaxAcc)',
+          code: c.salTaxAcc,
+          color: taxColor),
+      _accountRow(context,
+          labelAr: 'حساب ضريبة المشتريات (purTaxAcc)',
+          labelEn: 'Purchase Tax Account (purTaxAcc)',
+          code: c.purTaxAcc,
+          color: taxColor),
+      _accountRow(context,
+          labelAr: 'حساب الدفعات المقدمة / العربون (advAcc)',
+          labelEn: 'Advances Account (advAcc)',
+          code: c.advAcc,
+          color: cashColor),
+      _accountRow(context,
+          labelAr: 'حساب المرتجع / التأمينات (retAcc)',
+          labelEn: 'Returns Account (retAcc)',
+          code: c.retAcc,
+          color: purchColor),
+    ];
+  }
+
+  // ── Section 5: System Configuration & Document Signs ────────────────────────
+  List<Widget> _systemRows(BuildContext context, CompanyModel c) {
+    const color = Color(0xFF475569);
+    String yn(int? v) => v == 1 ? _t('مفعل (1)', 'Enabled (1)') : _t('معطل (0)', 'Disabled (0)');
+
+    return [
+      // Document Signs
+      _infoRow(context,
+          label: _t('رمز الفاتورة (invoiceSign)', 'Invoice Sign'),
+          value: c.invoiceSign,
+          icon: Icons.tag_rounded,
+          iconColor: const Color(0xFF0984E3)),
+      _infoRow(context,
+          label: _t('رمز إشعار المدين (debitSign)', 'Debit Note Sign'),
+          value: c.debitSign,
+          icon: Icons.tag_rounded,
+          iconColor: const Color(0xFF0984E3)),
+      _infoRow(context,
+          label: _t('رمز إشعار الدائن (creditSign)', 'Credit Note Sign'),
+          value: c.creditSign,
+          icon: Icons.tag_rounded,
+          iconColor: const Color(0xFF0984E3)),
+      _infoRow(context,
+          label: _t('رمز الدفعة المقدمة (advanceSign)', 'Advance Payment Sign'),
+          value: c.advanceSign,
+          icon: Icons.tag_rounded,
+          iconColor: const Color(0xFF00B894)),
+      _infoRow(context,
+          label: _t('رمز إشعار دائن دفعة مقدمة (advCrnSign)', 'Advance Credit Note Sign'),
+          value: c.advCrnSign,
+          icon: Icons.tag_rounded,
+          iconColor: const Color(0xFF00B894)),
+
+      // Core System Flags
+      _infoRow(context,
+          label: _t('رقم تهيئة دلتا (deltaconfig)', 'Delta Configuration ID'),
+          value: c.deltaconfig,
+          icon: Icons.settings_rounded,
+          iconColor: color),
+      _infoRow(context,
+          label: _t('تحديث اليومية التلقائي (jrlUpdate)', 'Daily Journal Auto Update'),
+          value: yn(c.jrlUpdate),
+          icon: Icons.auto_mode_rounded,
+          iconColor: color),
+      _infoRow(context,
+          label: _t('صلاحية حذف السندات (delVoucher)', 'Delete Voucher Permission'),
+          value: yn(c.delVoucher),
+          icon: Icons.delete_sweep_rounded,
+          iconColor: color),
+      _infoRow(context,
+          label: _t('التثبيت مرة أخرى (instAgain)', 'Install Again'),
+          value: yn(c.instAgain),
+          icon: Icons.repeat_rounded,
+          iconColor: color),
+      _infoRow(context,
+          label: _t('عدد مستويات شجرة الحسابات (noOfLevels)', 'Account Tree Levels'),
+          value: c.noOfLevels?.toString(),
+          icon: Icons.account_tree_rounded,
+          iconColor: color),
+      _infoRow(context,
+          label: _t('إظهار الحساب المساعد (showAssistant)', 'Show Assistant Account'),
+          value: yn(c.showAssistant),
+          icon: Icons.assistant_rounded,
+          iconColor: color),
+      _infoRow(context,
+          label: _t('استخدام الفواصل الرقمية (separator)', 'Number Separator'),
+          value: yn(c.separator),
+          icon: Icons.space_bar_rounded,
+          iconColor: color),
+      _infoRow(context,
+          label: _t('الخانات العشرية للمبالغ (decimal3)', 'Decimal Places (Amounts)'),
+          value: c.decimal3?.toString(),
+          icon: Icons.pin_rounded,
+          iconColor: color),
+      _infoRow(context,
+          label: _t('الخانات العشرية للكميات (decimal4)', 'Decimal Places (Quantities)'),
+          value: c.decimal4?.toString(),
+          icon: Icons.pin_rounded,
+          iconColor: color),
+      _infoRow(context,
+          label: _t('الخانات العشرية للأسعار (decimal5)', 'Decimal Places (Prices)'),
+          value: c.decimal5?.toString(),
+          icon: Icons.pin_rounded,
+          iconColor: color),
+      _infoRow(context,
+          label: _t('ميزان مراجعة الحسابات (accBal)', 'Accounts Balance Check'),
+          value: yn(c.accBal),
+          icon: Icons.balance_rounded,
+          iconColor: color),
+      _infoRow(context,
+          label: _t('ميزان مراكز التكلفة (cenBal)', 'Cost Centers Balance Check'),
+          value: yn(c.cenBal),
+          icon: Icons.balance_rounded,
+          iconColor: color),
+      _infoRow(context,
+          label: _t('ميزان الحسابات والمراكز المشترك (cenAccBal)', 'Combined Acc/Center Bal Check'),
+          value: yn(c.cenAccBal),
+          icon: Icons.balance_rounded,
+          iconColor: color),
+    ];
+  }
+
+  // ── Logout Action ───────────────────────────────────────────────────────────
   Future<void> _handleLogout() async {
     if (_isLoggingOut || widget.onLogout == null) return;
 
@@ -956,10 +1042,10 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen>
                 color: const Color(0xFFFF7675).withValues(alpha: 0.12),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.logout_rounded,
-                color: const Color(0xFFFF7675),
-                size: 20.r,
+                color: Color(0xFFFF7675),
+                size: 20,
               ),
             ),
             Gap(10.w),
@@ -1037,7 +1123,8 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen>
           color: const Color(0xFFFF7675).withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(16.r),
           border: Border.all(
-              color: const Color(0xFFFF7675).withValues(alpha: 0.25)),
+            color: const Color(0xFFFF7675).withValues(alpha: 0.25),
+          ),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -1062,8 +1149,8 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen>
                 ),
               ),
             ] else ...[
-              Icon(Icons.logout_rounded,
-                  color: const Color(0xFFFF7675), size: 18.r),
+              const Icon(Icons.logout_rounded,
+                  color: Color(0xFFFF7675), size: 18),
               Gap(8.w),
               Text(
                 AppLocaleKey.logout.tr(),
@@ -1081,10 +1168,9 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen>
     );
   }
 
-  // ── Loading ─────────────────────────────────────────────────────────────────
   Widget _loadingPlaceholder(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 40.h),
+      padding: EdgeInsets.symmetric(vertical: 60.h),
       child: Center(
         child: Column(
           children: [
@@ -1096,12 +1182,14 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen>
                 color: AppColor.primaryColor(context),
               ),
             ),
-            Gap(12.h),
+            Gap(14.h),
             Text(
-              _t('جاري تحميل بيانات الشركة...', 'Loading company data...'),
-              style: AppTextStyle.bodySmall(context).copyWith(
+              _t('جاري تحميل بيانات ملف الشركة...',
+                  'Loading company profile data...'),
+              style: TextStyle(
                 fontFamily: 'Tajawal',
                 color: AppColor.darkTextColor(context),
+                fontSize: 12.sp,
               ),
             ),
           ],
@@ -1109,174 +1197,4 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen>
       ),
     );
   }
-
-  // ── Sections Data ───────────────────────────────────────────────────────────
-  List<Widget> _addressRows(BuildContext context, CompanyModel c) => [
-        _infoRow(context,
-            label: _t('الدولة', 'Country'),
-            value: c.countryName,
-            icon: Icons.flag_rounded,
-            iconColor: const Color(0xFF0984E3)),
-        _infoRow(context,
-            label: _t('المدينة', 'City'),
-            value: c.cityName,
-            icon: Icons.location_city_rounded,
-            iconColor: const Color(0xFF0984E3)),
-        _infoRow(context,
-            label: _t('الحي', 'District'),
-            value: _isAr ? c.districtName : (c.districtEname ?? c.districtName),
-            icon: Icons.map_rounded,
-            iconColor: const Color(0xFF74B9FF)),
-        _infoRow(context,
-            label: _t('الشارع', 'Street'),
-            value: c.streetName,
-            icon: Icons.signpost_rounded,
-            iconColor: const Color(0xFF74B9FF)),
-        _infoRow(context,
-            label: _t('رقم المبنى', 'Building No.'),
-            value: c.buildingNo,
-            icon: Icons.home_rounded,
-            iconColor: const Color(0xFF0984E3)),
-        _infoRow(context,
-            label: _t('الرمز البريدي', 'Postal Code'),
-            value: c.postalNo,
-            icon: Icons.markunread_mailbox_rounded,
-            iconColor: const Color(0xFF74B9FF)),
-        _infoRow(context,
-            label: _t('رقم الهاتف 1', 'Phone 1'),
-            value: c.telNo1,
-            icon: Icons.phone_rounded,
-            iconColor: const Color(0xFF00B894),
-            copyable: true),
-        _infoRow(context,
-            label: _t('رقم الهاتف 2', 'Phone 2'),
-            value: c.telNo2,
-            icon: Icons.phone_rounded,
-            iconColor: const Color(0xFF00B894),
-            copyable: true),
-        _infoRow(context,
-            label: _t('البريد الإلكتروني', 'Email'),
-            value: c.eMail,
-            icon: Icons.email_rounded,
-            iconColor: const Color(0xFF6C5CE7),
-            copyable: true),
-      ];
-
-  List<Widget> _taxRows(BuildContext context, CompanyModel c) => [
-        _infoRow(context,
-            label: _t('الرقم الضريبي', 'Tax Registration No.'),
-            value: c.taxReg,
-            icon: Icons.receipt_long_rounded,
-            iconColor: const Color(0xFFE17055),
-            copyable: true),
-        _infoRow(context,
-            label: _t('السجل التجاري', 'Trade Registration'),
-            value: c.tradeReg,
-            icon: Icons.business_center_rounded,
-            iconColor: const Color(0xFFE17055),
-            copyable: true),
-        _infoRow(context,
-            label: _t('نسبة الضريبة الحالية', 'Current VAT Rate'),
-            value: c.taxNew != null ? '${c.taxNew!.toStringAsFixed(0)}%' : null,
-            icon: Icons.percent_rounded,
-            iconColor: const Color(0xFFFD79A8)),
-        _infoRow(context,
-            label: _t('نسبة الضريبة القديمة', 'Old VAT Rate'),
-            value: c.taxVal != null ? '${c.taxVal!.toStringAsFixed(0)}%' : null,
-            icon: Icons.percent_rounded,
-            iconColor: const Color(0xFFBDC3C7)),
-      ];
-
-  List<Widget> _fiscalRows(BuildContext context, CompanyModel c) {
-    String? fmt(DateTime? d) => d != null ? '${d.day}/${d.month}/${d.year}' : null;
-    return [
-      _infoRow(context,
-          label: _t('بداية السنة المالية', 'Fiscal Year Start'),
-          value: fmt(c.fiscalYearBegin),
-          icon: Icons.play_circle_rounded,
-          iconColor: const Color(0xFF6C5CE7)),
-      _infoRow(context,
-          label: _t('نهاية السنة المالية', 'Fiscal Year End'),
-          value: fmt(c.fiscalYearEnd),
-          icon: Icons.stop_circle_rounded,
-          iconColor: const Color(0xFFE17055)),
-      _infoRow(context,
-          label: _t('العملة', 'Currency'),
-          value: c.currency,
-          icon: Icons.monetization_on_rounded,
-          iconColor: const Color(0xFF00B894)),
-      _infoRow(context,
-          label: _t('الكسر (الهللة)', 'Currency Fraction'),
-          value: c.currencyFraction,
-          icon: Icons.money_rounded,
-          iconColor: const Color(0xFF55EFC4)),
-    ];
-  }
-
-  List<Widget> _accountRows(BuildContext context, CompanyModel c) {
-    const color = Color(0xFF00B894);
-    return [
-      _accountRow(context,
-          label: _t('الصندوق', 'Cash'), value: c.cashAcc, color: color),
-      _accountRow(context,
-          label: _t('الأرباح والخسائر', 'P&L'), value: c.profitLossAcctNo, color: color),
-      _accountRow(context,
-          label: _t('المبيعات', 'Sales'), value: c.salesAcc, color: color),
-      _accountRow(context,
-          label: _t('المشتريات', 'Purchases'), value: c.purchaseAcc, color: color),
-      _accountRow(context,
-          label: _t('العملاء', 'Customers'), value: c.cusAcc, color: color),
-      _accountRow(context,
-          label: _t('الموردون', 'Suppliers'), value: c.suppAcc, color: color),
-      _accountRow(context,
-          label: _t('ضريبة المبيعات', 'Sales Tax'), value: c.salTaxAcc, color: color),
-      _accountRow(context,
-          label: _t('ضريبة المشتريات', 'Purchase Tax'), value: c.purTaxAcc, color: color),
-      _accountRow(context,
-          label: _t('العربون', 'Advance'), value: c.advAcc, color: color),
-      _accountRow(context,
-          label: _t('المرتجع', 'Returns'), value: c.retAcc, color: color),
-    ];
-  }
-
-  List<Widget> _systemRows(BuildContext context, CompanyModel c) {
-    String yn(int? v) => v == 1 ? _t('نعم', 'Yes') : _t('لا', 'No');
-    const color = Color(0xFF636E72);
-    return [
-      _infoRow(context,
-          label: _t('عدد مستويات الموافقة', 'Approval Levels'),
-          value: c.noOfLevels?.toString(),
-          icon: Icons.layers_rounded,
-          iconColor: color),
-      _infoRow(context,
-          label: _t('حذف القيد', 'Delete Voucher'),
-          value: yn(c.delVoucher),
-          icon: Icons.delete_outline_rounded,
-          iconColor: color),
-      _infoRow(context,
-          label: _t('شعار القيد', 'Debit Sign'),
-          value: c.debitSign,
-          icon: Icons.text_fields_rounded,
-          iconColor: color),
-      _infoRow(context,
-          label: _t('شعار الدائن', 'Credit Sign'),
-          value: c.creditSign,
-          icon: Icons.text_fields_rounded,
-          iconColor: color),
-      _infoRow(context,
-          label: _t('الأرقام العشرية', 'Decimal Places'),
-          value: c.decimal3?.toString(),
-          icon: Icons.format_list_numbered_rounded,
-          iconColor: color),
-    ];
-  }
-}
-
-/// Sentinel wrapper so empty rows can be filtered properly.
-class _InfoRow extends StatelessWidget {
-  final Widget child;
-  const _InfoRow({required this.child});
-
-  @override
-  Widget build(BuildContext context) => child;
 }

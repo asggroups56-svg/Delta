@@ -157,139 +157,94 @@ class CompanyModel {
   });
 
   factory CompanyModel.fromJson(Map<String, dynamic> json) {
+    dynamic v(String key) {
+      if (json.containsKey(key)) return json[key];
+      final lower = key.toLowerCase();
+      for (final e in json.entries) {
+        if (e.key.toLowerCase() == lower) return e.value;
+      }
+      return null;
+    }
+
     return CompanyModel(
-      deltaconfig: _asString(json['deltaconfig']),
-      companyName: _asString(json['companyName']),
-      companyEname: _asString(json['companyEname']),
-      address: _asString(json['address']),
-      addressE: _asString(json['addressE']),
-      fiscalYearBegin: _asDate(json['fiscalYearBegin']),
-      fiscalYearEnd: _asDate(json['fiscalYearEnd']),
-      countryName: _asString(json['countryName']),
-      countryCode: _asInt(json['countryCode']),
-      cityName: _asString(json['cityName']),
-      cityCode: _asInt(json['cityCode']),
-      districtName: _asString(json['districtName']),
-      districtEname: _asString(json['districtEname']),
-      streetName: _asString(json['streetName']),
-      buildingNo: _asString(json['buildingNo']),
-      postalNo: _asString(json['postalNo']),
-      additionNo: _asString(json['additionNo']),
-      telNo1: _asString(json['telNo1']),
-      telNo2: _asString(json['telNo2']),
-      telNo3: _asString(json['telNo3']),
-      fax: _asString(json['fax']),
-      docNature: _asInt(json['docNature']),
-      tradeReg: _asString(json['tradeReg']),
-      eMail: _asString(json['eMail']),
-      currency: _asString(json['currency']),
-      ecurrency: _asString(json['ecurrency']),
-      currencyFraction: _asString(json['currencyFraction']),
-      ecurrencyFraction: _asString(json['ecurrencyFraction']),
-      cashAcc: _asInt(json['cashAcc']),
-      currReavalAcc: _asInt(json['currReavalAcc']),
-      profitLossAcctNo: _asInt(json['profitLossAcctNo']),
-      taxAcc: _asInt(json['taxAcc']),
-      purchRetAcc: _asInt(json['purchRetAcc']),
-      purchaseAcc: _asInt(json['purchaseAcc']),
-      salesAcc: _asInt(json['salesAcc']),
-      salesDisAcc: _asInt(json['salesDisAcc']),
-      salesRetAcc: _asInt(json['salesRetAcc']),
-      purDisAcc: _asInt(json['purDisAcc']),
-      cusAcc: _asInt(json['cusAcc']),
-      suppAcc: _asInt(json['suppAcc']),
-      salTaxAcc: _asInt(json['salTaxAcc']),
-      purTaxAcc: _asInt(json['purTaxAcc']),
-      advAcc: _asInt(json['advAcc']),
-      retAcc: _asInt(json['retAcc']),
-      taxTerm: _asInt(json['taxTerm']),
-      taxVal: _asDouble(json['taxVal']),
-      taxReg: _asString(json['taxReg']),
-      taxNew: _asDouble(json['taxNew']),
-      vouichCurrCntr: _asInt(json['vouichCurrCntr']),
-      noOfLevels: _asInt(json['noOfLevels']),
-      delVoucher: _asInt(json['delVoucher']),
-      instAgain: _asInt(json['instAgain']),
-      noOfGrids: _asInt(json['noOfGrids']),
-      vouchline: _asInt(json['vouchline']),
-      descCode: _asInt(json['descCode']),
-      modName: _asInt(json['modName']),
-      jrlUpdate: _asInt(json['jrlUpdate']),
-      reportsRange: _asInt(json['reportsRange']),
-      multiDiv: _asInt(json['multiDiv']),
-      integral: _asInt(json['integral']),
-      showAssistant: _asInt(json['showAssistant']),
-      modDate: _asInt(json['modDate']),
-      subMan: _asInt(json['subMan']),
-      linkInvoice: _asInt(json['linkInvoice']),
-      invoiceSign: _asString(json['invoiceSign']),
-      debitSign: _asString(json['debitSign']),
-      creditSign: _asString(json['creditSign']),
-      advanceSign: _asString(json['advanceSign']),
-      advCrnSign: _asString(json['advCrnSign']),
-      decimal3: _asInt(json['decimal3']),
-      decimal4: _asInt(json['decimal4']),
-      decimal5: _asInt(json['decimal5']),
-      separator: _asInt(json['separator']),
-      accBal: _asInt(json['accBal']),
-      cenBal: _asInt(json['cenBal']),
-      cenAccBal: _asInt(json['cenAccBal']),
+      deltaconfig: _asString(v('deltaconfig')),
+      companyName: _asString(v('companyName')),
+      companyEname: _asString(v('companyEname')),
+      address: _asString(v('address')),
+      addressE: _asString(v('addressE')),
+      fiscalYearBegin: _asDate(v('fiscalYearBegin')),
+      fiscalYearEnd: _asDate(v('fiscalYearEnd')),
+      countryName: _asString(v('countryName')),
+      countryCode: _asInt(v('countryCode')),
+      cityName: _asString(v('cityName')),
+      cityCode: _asInt(v('cityCode')),
+      districtName: _asString(v('districtName')),
+      districtEname: _asString(v('districtEname')),
+      streetName: _asString(v('streetName')),
+      buildingNo: _asString(v('buildingNo')),
+      postalNo: _asString(v('postalNo')),
+      additionNo: _asString(v('additionNo')),
+      telNo1: _asString(v('telNo1')),
+      telNo2: _asString(v('telNo2')),
+      telNo3: _asString(v('telNo3')),
+      fax: _asString(v('fax')),
+      docNature: _asInt(v('docNature')),
+      tradeReg: _asString(v('tradeReg')),
+      eMail: _asString(v('eMail')),
+      currency: _asString(v('currency')),
+      ecurrency: _asString(v('ecurrency')),
+      currencyFraction: _asString(v('currencyFraction')),
+      ecurrencyFraction: _asString(v('ecurrencyFraction')),
+      cashAcc: _asInt(v('cashAcc')),
+      currReavalAcc: _asInt(v('currReavalAcc')),
+      profitLossAcctNo: _asInt(v('profitLossAcctNo')),
+      taxAcc: _asInt(v('taxAcc')),
+      purchRetAcc: _asInt(v('purchRetAcc')),
+      purchaseAcc: _asInt(v('purchaseAcc')),
+      salesAcc: _asInt(v('salesAcc')),
+      salesDisAcc: _asInt(v('salesDisAcc')),
+      salesRetAcc: _asInt(v('salesRetAcc')),
+      purDisAcc: _asInt(v('purDisAcc')),
+      cusAcc: _asInt(v('cusAcc')),
+      suppAcc: _asInt(v('suppAcc')),
+      salTaxAcc: _asInt(v('salTaxAcc')),
+      purTaxAcc: _asInt(v('purTaxAcc')),
+      advAcc: _asInt(v('advAcc')),
+      retAcc: _asInt(v('retAcc')),
+      taxTerm: _asInt(v('taxTerm')),
+      taxVal: _asDouble(v('taxVal')),
+      taxReg: _asString(v('taxReg')),
+      taxNew: _asDouble(v('taxNew')),
+      vouichCurrCntr: _asInt(v('vouichCurrCntr')),
+      noOfLevels: _asInt(v('noOfLevels')),
+      delVoucher: _asInt(v('delVoucher')),
+      instAgain: _asInt(v('instAgain')),
+      noOfGrids: _asInt(v('noOfGrids')),
+      vouchline: _asInt(v('vouchline')),
+      descCode: _asInt(v('descCode')),
+      modName: _asInt(v('modName')),
+      jrlUpdate: _asInt(v('jrlUpdate')),
+      reportsRange: _asInt(v('reportsRange')),
+      multiDiv: _asInt(v('multiDiv')),
+      integral: _asInt(v('integral')),
+      showAssistant: _asInt(v('showAssistant')),
+      modDate: _asInt(v('modDate')),
+      subMan: _asInt(v('subMan')),
+      linkInvoice: _asInt(v('linkInvoice')),
+      invoiceSign: _asString(v('invoiceSign')),
+      debitSign: _asString(v('debitSign')),
+      creditSign: _asString(v('creditSign')),
+      advanceSign: _asString(v('advanceSign')),
+      advCrnSign: _asString(v('advCrnSign')),
+      decimal3: _asInt(v('decimal3')),
+      decimal4: _asInt(v('decimal4')),
+      decimal5: _asInt(v('decimal5')),
+      separator: _asInt(v('separator')),
+      accBal: _asInt(v('accBal')),
+      cenBal: _asInt(v('cenBal')),
+      cenAccBal: _asInt(v('cenAccBal')),
     );
   }
-
-  /// Primary name for the requested language.
-  String name(bool isArabic) {
-    final primary = isArabic ? companyName : companyEname;
-    final secondary = isArabic ? companyEname : companyName;
-    return primary ?? secondary ?? '';
-  }
-
-  /// Secondary name for subtitle display.
-  String? secondaryName(bool isArabic) {
-    final primary = isArabic ? companyName : companyEname;
-    final secondary = isArabic ? companyEname : companyName;
-    final value = secondary ?? '';
-    if (value.isEmpty || value == primary) return null;
-    return value;
-  }
-
-  /// Combined full street address.
-  String? fullAddress(bool isArabic) {
-    final parts = <String?>[
-      isArabic ? address : (addressE ?? address),
-      streetName,
-      isArabic ? districtName : (districtEname ?? districtName),
-      cityName,
-      countryName,
-    ].where((part) => part != null && part.trim().isNotEmpty).toList();
-    if (parts.isEmpty) return null;
-    return parts.join(', ');
-  }
-
-  /// Available phone numbers.
-  List<String> get phones => [telNo1, telNo2, telNo3]
-      .where((phone) => phone != null && phone.trim().isNotEmpty)
-      .cast<String>()
-      .toList();
-
-  /// Currency with fraction, e.g. "ريال سعودي (هلله)".
-  String? get currencyLabel {
-    final name = currency ?? ecurrency;
-    if (name == null) return null;
-    final fraction = currencyFraction ?? ecurrencyFraction;
-    return fraction == null ? name : '$name ($fraction)';
-  }
-
-  String? get taxValLabel => _formatRate(taxVal);
-  String? get taxNewLabel => _formatRate(taxNew);
-}
-
-String? _formatRate(double? value) {
-  if (value == null) return null;
-  final text = value == value.roundToDouble()
-      ? value.toStringAsFixed(0)
-      : value.toString();
-  return '$text%';
 }
 
 /// Wrapper for `{ "companies": [ ... ] }`.
@@ -312,7 +267,18 @@ class CompanyResponse {
     }
 
     if (json is Map) {
-      final raw = json['companies'] ?? json['Companies'] ?? json['data'] ?? json['items'];
+      dynamic findKey(Map map, String target) {
+        final t = target.toLowerCase();
+        for (final e in map.entries) {
+          if (e.key.toString().toLowerCase() == t) return e.value;
+        }
+        return null;
+      }
+
+      final raw = findKey(json, 'companies') ??
+          findKey(json, 'data') ??
+          findKey(json, 'items');
+
       if (raw is List) {
         return CompanyResponse(
           companies: [
@@ -323,9 +289,8 @@ class CompanyResponse {
         );
       }
 
-      if (json.containsKey('companyName') ||
-          json.containsKey('companyname') ||
-          json.containsKey('deltaconfig')) {
+      if (findKey(json, 'companyname') != null ||
+          findKey(json, 'deltaconfig') != null) {
         return CompanyResponse(
           companies: [CompanyModel.fromJson(Map<String, dynamic>.from(json))],
         );
