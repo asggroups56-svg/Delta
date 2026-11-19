@@ -69,6 +69,7 @@ class AccountsTreeSectionState extends State<AccountsTreeSection>
 
   final TextEditingController _searchController = TextEditingController();
   final Set<int> _collapsed = <int>{};
+  int? _natureFilter; // null = all, 0 = debit, 1 = credit
 
   Timer? _debounce;
   List<AccountsTreeModel> _accounts = <AccountsTreeModel>[];
@@ -222,158 +223,54 @@ class AccountsTreeSectionState extends State<AccountsTreeSection>
       ? _t('طبيعة دائنة', 'Credit nature')
       : _t('طبيعة مدينة', 'Debit nature');
 
+  List<AccountsTreeNode> _filterForestByNature(List<AccountsTreeNode> nodes) {
+    if (_natureFilter == null) return nodes;
+    final result = <AccountsTreeNode>[];
+    for (final node in nodes) {
+      final filteredChildren = _filterForestByNature(node.children);
+      final matches = _natureFilter == 1
+          ? (node.account.acctNature == 1)
+          : (node.account.acctNature != 1);
+      if (matches || filteredChildren.isNotEmpty) {
+        result.add(AccountsTreeNode(
+          account: node.account,
+          children: filteredChildren.isNotEmpty ? filteredChildren : node.children,
+        ));
+      }
+    }
+    return result;
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final forest = buildAccountsForest(_accounts);
+    final rawForest = buildAccountsForest(_accounts);
+    final forest = _filterForestByNature(rawForest);
     final foreground = AppColor.titleFormFiledColor(context);
     final maxLevel = _accounts.fold<int>(
       0,
       (max, account) => account.accountLevel > max ? account.accountLevel : max,
     );
-    final accountCount = _totalRecords > 0 ? _totalRecords : _accounts.length;
-    final valueOrDash = _isLoading ? '—' : null;
 
-    return Container(
-      clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(
-        color: widget.embedded ? Colors.transparent : AppColor.cardColor(context),
-        borderRadius: widget.embedded ? null : BorderRadius.circular(22.r),
-        border: widget.embedded
-            ? null
-            : Border.all(
-                color: AppColor.borderColor(context).withValues(alpha: 0.9),
-              ),
-        boxShadow: widget.embedded
-            ? null
-            : [
-                BoxShadow(
-                  color: _accent.withValues(alpha: 0.08),
-                  blurRadius: 28,
-                  offset: const Offset(0, 12),
-                ),
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.025),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          if (!widget.embedded)
-            // _buildHeader(
-            //   context,
-            //   foreground,
-            //   total: valueOrDash ?? '$accountCount',
-            //   roots: valueOrDash ?? '${forest.length}',
-            //   levels: valueOrDash ?? '$maxLevel',
-            // ),
-          if (_accounts.isNotEmpty && !_isLoading)
-            _buildToolbar(context, foreground),
-          _buildContent(context, forest, foreground),
-          if (_hasMore) _buildLoadMore(context),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _buildContent(context, forest, foreground, maxLevel),
+        if (_hasMore) ...[
+          Gap(12.h),
+          _buildLoadMore(context),
         ],
-      ),
+      ],
     );
   }
 
-  // ── Header ────────────────────────────────────────────────────────────────
-
-  
-
-
-
-  // ── Toolbar ───────────────────────────────────────────────────────────────
-
-  Widget _buildToolbar(BuildContext context, Color foreground) {
-    final debitCount = _accounts
-        .where((account) => account.acctNature != 1)
-        .length;
-    final creditCount = _accounts
-        .where((account) => account.acctNature == 1)
-        .length;
-
-    return Padding(
-      padding: EdgeInsets.fromLTRB(14.w, 12.h, 14.w, 2.h),
-      child: Row(
-        children: [
-          Icon(
-            Icons.hub_rounded,
-            size: 14.r,
-            color: _accent.withValues(alpha: 0.8),
-          ),
-          Gap(6.w),
-          Flexible(
-            child: Text(
-              _t("شجرة الحسابات", 'Accounts tree'),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 10.5.sp,
-                fontWeight: FontWeight.w700,
-                color: foreground.withValues(alpha: 0.62),
-                fontFamily: 'Tajawal',
-              ),
-            ),
-          ),
-          const Spacer(),
-          _legendChip(_debitColor, _t('مدين', 'Debit'), debitCount),
-          Gap(6.w),
-          _legendChip(_creditColor, _t('دائن', 'Credit'), creditCount),
-        ],
-      ),
-    );
-  }
-
-  Widget _legendChip(Color color, String label, int count) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 7.w, vertical: 3.h),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.09),
-        borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(color: color.withValues(alpha: 0.18)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 6.r,
-            height: 6.r,
-            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-          ),
-          Gap(4.w),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 9.sp,
-              fontWeight: FontWeight.w600,
-              color: color,
-              fontFamily: 'Tajawal',
-            ),
-          ),
-          Gap(3.w),
-          Text(
-            '$count',
-            style: TextStyle(
-              fontSize: 9.sp,
-              fontWeight: FontWeight.w800,
-              color: color,
-              fontFamily: 'Tajawal',
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ── Content states ────────────────────────────────────────────────────────
+  // ── Tree Header & Controls ────────────────────────────────────────────────
 
   Widget _buildContent(
     BuildContext context,
     List<AccountsTreeNode> forest,
     Color foreground,
+    int maxLevel,
   ) {
     if (_isLoading) return _buildSkeleton(context);
 
@@ -385,14 +282,179 @@ class AccountsTreeSectionState extends State<AccountsTreeSection>
       return _buildEmptyState(foreground);
     }
 
-    return Padding(
-      padding: EdgeInsets.fromLTRB(12.w, 10.h, 12.w, 10.h),
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColor.cardColor(context),
+        borderRadius: BorderRadius.circular(18.r),
+        border: Border.all(color: AppColor.borderColor(context)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 14,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 14.h),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          for (final root in forest) _buildRootGroup(context, root, foreground),
+          // ── Header Row ──
+          Row(
+            children: [
+              // ايقونة المدرسة بجانب كلمة شجرة الحسابات
+              Container(
+                padding: EdgeInsets.all(8.r),
+                decoration: BoxDecoration(
+                  color: AppColor.primaryColor(context).withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12.r),
+                  border: Border.all(
+                    color: AppColor.primaryColor(context).withValues(alpha: 0.22),
+                  ),
+                ),
+                child: Icon(
+                  Icons.school_rounded,
+                  size: 20.r,
+                  color: AppColor.primaryColor(context),
+                ),
+              ),
+              Gap(10.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _t('شجرة الحسابات', 'Chart of Accounts'),
+                      style: TextStyle(
+                        fontSize: 15.5.sp,
+                        fontWeight: FontWeight.w800,
+                        color: foreground,
+                        fontFamily: 'Tajawal',
+                        letterSpacing: -0.2,
+                      ),
+                    ),
+                    Gap(2.h),
+                    Text(
+                      '${_totalRecords > 0 ? _totalRecords : _accounts.length} ${_t('حساب', 'accounts')}${maxLevel > 0 ? ' · $maxLevel ${_t('مستويات', 'levels')}' : ''}',
+                      style: TextStyle(
+                        fontSize: 10.5.sp,
+                        color: AppColor.darkTextColor(context),
+                        fontFamily: 'Tajawal',
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              _actionIconButton(
+                context,
+                icon: _collapsed.isEmpty
+                    ? Icons.unfold_less_rounded
+                    : Icons.unfold_more_rounded,
+                tooltip: _collapsed.isEmpty
+                    ? _t('طي الكل', 'Collapse all')
+                    : _t('توسيع الكل', 'Expand all'),
+                onTap: _accounts.isEmpty ? null : _toggleAll,
+              ),
+              Gap(6.w),
+              _actionIconButton(
+                context,
+                icon: Icons.refresh_rounded,
+                tooltip: _t('تحديث', 'Refresh'),
+                onTap: _isLoading ? null : () => _fetch(page: 1, reset: true),
+              ),
+              Gap(8.w),
+              // وفي النهاية أيقونة الشجرة
+              Container(
+                padding: EdgeInsets.all(8.r),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [_gradientStart, _gradientEnd],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(12.r),
+                  boxShadow: [
+                    BoxShadow(
+                      color: _accent.withValues(alpha: 0.28),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  Icons.account_tree_rounded,
+                  size: 20.r,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+         
+
+          // ── Nature Filter Chips ──
+        
+          Gap(12.h),
+          Divider(
+            height: 1,
+            color: AppColor.borderColor(context).withValues(alpha: 0.45),
+          ),
+          Gap(10.h),
+
+          // ── Tree Nodes or Filter Empty State ──
+          if (forest.isEmpty)
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 24.h),
+              child: Center(
+                child: Column(
+                  children: [
+                    Icon(
+                      Icons.filter_list_off_rounded,
+                      size: 32.r,
+                      color: foreground.withValues(alpha: 0.4),
+                    ),
+                    Gap(8.h),
+                    Text(
+                      _t('لا توجد حسابات مطابقة للفلتر', 'No accounts match the filter'),
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        color: foreground.withValues(alpha: 0.6),
+                        fontFamily: 'Tajawal',
+                      ),
+                    ),
+                    Gap(8.h),
+                    TextButton(
+                      onPressed: () {
+                        setState(() {
+                          _natureFilter = null;
+                        });
+                        if (_query.isNotEmpty) _clearSearch();
+                      },
+                      child: Text(_t('إعادة تعيين الفلتر', 'Reset filter')),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          else
+            for (var i = 0; i < forest.length; i++) ...[
+              _buildTreeNode(
+                context,
+                forest[i],
+                foreground,
+                depth: 0,
+                isLast: i == forest.length - 1,
+              ),
+              if (i < forest.length - 1)
+                Divider(
+                  height: 14.h,
+                  thickness: 0.8,
+                  color: AppColor.borderColor(context).withValues(alpha: 0.35),
+                ),
+            ],
+
           if (_error != null) ...[
-            Gap(4.h),
+            Gap(10.h),
             Center(
               child: TextButton.icon(
                 onPressed: () => _fetch(page: 1, reset: true),
@@ -408,6 +470,42 @@ class AccountsTreeSectionState extends State<AccountsTreeSection>
     );
   }
 
+  Widget _actionIconButton(
+    BuildContext context, {
+    required IconData icon,
+    required String tooltip,
+    required VoidCallback? onTap,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: Tooltip(
+        message: tooltip,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(10.r),
+          child: Container(
+            padding: EdgeInsets.all(7.r),
+            decoration: BoxDecoration(
+              color: AppColor.borderColor(context).withValues(alpha: 0.25),
+              borderRadius: BorderRadius.circular(10.r),
+              border: Border.all(
+                color: AppColor.borderColor(context).withValues(alpha: 0.5),
+              ),
+            ),
+            child: Icon(
+              icon,
+              size: 18.r,
+              color: onTap == null
+                  ? AppColor.darkTextColor(context).withValues(alpha: 0.4)
+                  : AppColor.titleFormFiledColor(context),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  
   Widget _buildSkeleton(BuildContext context) {
     final fill = AppColor.borderColor(context).withValues(alpha: 0.55);
     final shimmer = AppColor.cardColor(context).withValues(alpha: 0.7);
@@ -581,215 +679,21 @@ class AccountsTreeSectionState extends State<AccountsTreeSection>
     );
   }
 
-  // ── Tree ──────────────────────────────────────────────────────────────────
+  // ── Tree Renderer ─────────────────────────────────────────────────────────
 
-  Widget _buildRootGroup(
+  Widget _buildTreeNode(
     BuildContext context,
     AccountsTreeNode node,
-    Color foreground,
-  ) {
+    Color foreground, {
+    required int depth,
+    bool isLast = false,
+  }) {
     final account = node.account;
     final color = _levelColor(account.accountLevel);
     final hasChildren = node.children.isNotEmpty;
     final isCollapsed = _collapsed.contains(account.accountNo);
     final isRtl = Directionality.of(context) == ui.TextDirection.rtl;
-
-    return Container(
-      margin: EdgeInsets.only(bottom: 12.h),
-      clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(
-        color: AppColor.cardColor(context),
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: color.withValues(alpha: 0.18)),
-        boxShadow: [
-          BoxShadow(
-            color: color.withValues(alpha: 0.07),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: hasChildren ? () => _toggleNode(account.accountNo) : null,
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      color.withValues(alpha: 0.11),
-                      color.withValues(alpha: 0.035),
-                    ],
-                    begin: AlignmentDirectional.centerStart,
-                    end: AlignmentDirectional.centerEnd,
-                  ),
-                  border: BorderDirectional(
-                    start: BorderSide(color: color, width: 3.5.w),
-                    bottom: BorderSide(color: color.withValues(alpha: 0.12)),
-                  ),
-                ),
-                padding: EdgeInsetsDirectional.fromSTEB(10.w, 10.h, 12.w, 10.h),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 38.r,
-                      height: 38.r,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [color, color.withValues(alpha: 0.72)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.circular(11.r),
-                        boxShadow: [
-                          BoxShadow(
-                            color: color.withValues(alpha: 0.28),
-                            blurRadius: 9,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        Icons.account_balance_rounded,
-                        size: 19.r,
-                        color: Colors.white,
-                      ),
-                    ),
-                    Gap(10.w),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            account.nameFor(isArabic: _isAr),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 13.sp,
-                              height: 1.25,
-                              fontWeight: FontWeight.w800,
-                              color: foreground,
-                              fontFamily: 'Tajawal',
-                            ),
-                          ),
-                          Gap(5.h),
-                          Row(
-                            children: [
-                              _numberPill(
-                                account.accountNo,
-                                color,
-                                filled: true,
-                              ),
-                              Gap(6.w),
-                              Flexible(
-                                child: Text(
-                                  hasChildren
-                                      ? _t(
-                                          '${node.children.length} حساب فرعي',
-                                          '${node.children.length} sub-accounts',
-                                        )
-                                      : _t('حساب رئيسي', 'Main account'),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: 9.3.sp,
-                                    fontWeight: FontWeight.w600,
-                                    color: color.withValues(alpha: 0.92),
-                                    fontFamily: 'Tajawal',
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    Gap(6.w),
-                    _natureDot(account.acctNature),
-                    if (hasChildren) ...[
-                      Gap(8.w),
-                      AnimatedRotation(
-                        turns: isCollapsed ? (isRtl ? 0.25 : -0.25) : 0,
-                        duration: const Duration(milliseconds: 180),
-                        curve: Curves.easeOutCubic,
-                        child: Container(
-                          width: 30.r,
-                          height: 30.r,
-                          decoration: BoxDecoration(
-                            color: color.withValues(alpha: 0.12),
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: color.withValues(alpha: 0.18),
-                            ),
-                          ),
-                          child: Icon(
-                            Icons.expand_more_rounded,
-                            size: 20.r,
-                            color: color,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-            ),
-          ),
-          AnimatedSize(
-            duration: const Duration(milliseconds: 180),
-            curve: Curves.easeOutCubic,
-            alignment: Alignment.topCenter,
-            child: hasChildren && !isCollapsed
-                ? _buildChildren(context, node.children, foreground, color)
-                : const SizedBox.shrink(),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildChildren(
-    BuildContext context,
-    List<AccountsTreeNode> children,
-    Color foreground,
-    Color color,
-  ) {
-    final railColor = color.withValues(alpha: 0.32);
-
-    return Padding(
-      padding: EdgeInsetsDirectional.only(start: 14.w, end: 8.w, bottom: 4.h),
-      child: Container(
-        padding: EdgeInsetsDirectional.only(start: 9.w),
-        decoration: BoxDecoration(
-          border: BorderDirectional(
-            start: BorderSide(color: railColor, width: 1.4),
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            for (final child in children)
-              _buildChildNode(context, child, foreground),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildChildNode(
-    BuildContext context,
-    AccountsTreeNode node,
-    Color foreground,
-  ) {
-    final account = node.account;
-    final color = _levelColor(account.accountLevel);
-    final hasChildren = node.children.isNotEmpty;
-    final isCollapsed = _collapsed.contains(account.accountNo);
-    final isRtl = Directionality.of(context) == ui.TextDirection.rtl;
-    final railColor = color.withValues(alpha: 0.32);
+    final isRoot = depth == 0;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -799,14 +703,34 @@ class AccountsTreeSectionState extends State<AccountsTreeSection>
           child: InkWell(
             onTap: hasChildren ? () => _toggleNode(account.accountNo) : null,
             borderRadius: BorderRadius.circular(10.r),
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 6.h),
+            child: Container(
+              padding: EdgeInsets.symmetric(
+                vertical: isRoot ? 8.h : 6.h,
+                horizontal: isRoot ? 8.w : 4.w,
+              ),
+              decoration: isRoot
+                  ? BoxDecoration(
+                      color: color.withValues(alpha: 0.07),
+                      borderRadius: BorderRadius.circular(10.r),
+                      border: Border.all(color: color.withValues(alpha: 0.18)),
+                    )
+                  : null,
               child: Row(
                 children: [
-                  Container(width: 9.w, height: 1.2, color: railColor),
-                  Gap(5.w),
+                  // Branch connector for child nodes
+                  if (!isRoot) ...[
+                    Container(
+                      width: 8.w,
+                      height: 1.4,
+                      color: color.withValues(alpha: 0.35),
+                    ),
+                    Gap(4.w),
+                  ],
+
+                  // Expand/collapse indicator or terminal bullet
                   SizedBox(
-                    width: 22.w,
+                    width: 20.w,
+                    height: 20.w,
                     child: hasChildren
                         ? AnimatedRotation(
                             turns: isCollapsed ? (isRtl ? 0.25 : -0.25) : 0,
@@ -814,7 +738,7 @@ class AccountsTreeSectionState extends State<AccountsTreeSection>
                             curve: Curves.easeOutCubic,
                             child: Icon(
                               Icons.expand_more_rounded,
-                              size: 19.sp,
+                              size: 18.r,
                               color: color,
                             ),
                           )
@@ -824,52 +748,116 @@ class AccountsTreeSectionState extends State<AccountsTreeSection>
                               height: 5.r,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: color.withValues(alpha: 0.55),
-                                  width: 1.2,
-                                ),
+                                color: color.withValues(alpha: 0.7),
                               ),
                             ),
                           ),
                   ),
-                  Gap(5.w),
-                  _numberPill(account.accountNo, color),
+                  Gap(4.w),
+
+                  // Node icon: Folder for parent, Document for leaf
+                  Icon(
+                    hasChildren
+                        ? (isCollapsed
+                            ? Icons.folder_rounded
+                            : Icons.folder_open_rounded)
+                        : Icons.description_outlined,
+                    size: isRoot ? 18.r : 16.r,
+                    color: color,
+                  ),
+                  Gap(6.w),
+
+                  // Account number pill
+                  _numberPill(account.accountNo, color, filled: isRoot),
                   Gap(8.w),
+
+                  // Account name
                   Expanded(
-                    child: Text(
-                      account.nameFor(isArabic: _isAr),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        height: 1.3,
-                        fontWeight: hasChildren
-                            ? FontWeight.w700
-                            : FontWeight.w500,
-                        color: foreground.withValues(
-                          alpha: hasChildren ? 1 : 0.88,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          account.nameFor(isArabic: _isAr),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: isRoot ? 13.sp : 11.5.sp,
+                            fontWeight: isRoot
+                                ? FontWeight.w800
+                                : (hasChildren ? FontWeight.w700 : FontWeight.w600),
+                            color: foreground.withValues(alpha: isRoot ? 1 : 0.92),
+                            fontFamily: 'Tajawal',
+                            height: 1.25,
+                          ),
                         ),
-                        fontFamily: 'Tajawal',
-                      ),
+                        if (account.eaccountName != null &&
+                            account.eaccountName!.isNotEmpty &&
+                            _isAr &&
+                            isRoot)
+                          Text(
+                            account.eaccountName!,
+                            style: TextStyle(
+                              fontSize: 9.5.sp,
+                              color: foreground.withValues(alpha: 0.55),
+                              fontFamily: 'Tajawal',
+                            ),
+                          ),
+                      ],
                     ),
                   ),
+
+                  // Child count badge if parent
                   if (hasChildren) ...[
                     Gap(6.w),
                     _childCountBadge(node.children.length, color),
                   ],
-                  Gap(7.w),
-                  _natureDot(account.acctNature),
+                  Gap(6.w),
+
+                  // Nature badge (مدين / دائن)
+                  _natureBadge(account.acctNature),
                 ],
               ),
             ),
           ),
         ),
+
+        // ── Children branch connected with vertical guide line ──
         AnimatedSize(
-          duration: const Duration(milliseconds: 180),
+          duration: const Duration(milliseconds: 200),
           curve: Curves.easeOutCubic,
           alignment: Alignment.topCenter,
           child: hasChildren && !isCollapsed
-              ? _buildChildren(context, node.children, foreground, color)
+              ? Padding(
+                  padding: EdgeInsetsDirectional.only(
+                    start: isRoot ? 18.w : 14.w,
+                    top: 2.h,
+                    bottom: 2.h,
+                  ),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: BorderDirectional(
+                        start: BorderSide(
+                          color: color.withValues(alpha: 0.3),
+                          width: 1.5,
+                        ),
+                      ),
+                    ),
+                    padding: EdgeInsetsDirectional.only(start: 8.w),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        for (var c = 0; c < node.children.length; c++)
+                          _buildTreeNode(
+                            context,
+                            node.children[c],
+                            foreground,
+                            depth: depth + 1,
+                            isLast: c == node.children.length - 1,
+                          ),
+                      ],
+                    ),
+                  ),
+                )
               : const SizedBox.shrink(),
         ),
       ],
@@ -882,9 +870,7 @@ class AccountsTreeSectionState extends State<AccountsTreeSection>
       decoration: BoxDecoration(
         color: filled ? color : color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(6.r),
-        border: filled
-            ? null
-            : Border.all(color: color.withValues(alpha: 0.16)),
+        border: filled ? null : Border.all(color: color.withValues(alpha: 0.18)),
       ),
       child: Text(
         '$accountNo',
@@ -901,15 +887,15 @@ class AccountsTreeSectionState extends State<AccountsTreeSection>
 
   Widget _childCountBadge(int count, Color color) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 1.5.h),
+      padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(20.r),
+        borderRadius: BorderRadius.circular(10.r),
       ),
       child: Text(
-        '$count',
+        '$count ${_t('مستوي', 'sub')}',
         style: TextStyle(
-          fontSize: 9.sp,
+          fontSize: 8.5.sp,
           fontWeight: FontWeight.w700,
           color: color,
           fontFamily: 'Tajawal',
@@ -918,23 +904,24 @@ class AccountsTreeSectionState extends State<AccountsTreeSection>
     );
   }
 
-  Widget _natureDot(int? nature) {
+  Widget _natureBadge(int? nature) {
     final color = _natureColor(nature);
-    return Tooltip(
-      message: _natureLabel(nature),
-      child: Container(
-        width: 7.r,
-        height: 7.r,
-        decoration: BoxDecoration(
+    final label = nature == 1 ? _t('دائن', 'Cr') : _t('مدين', 'Dr');
+
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(6.r),
+        border: Border.all(color: color.withValues(alpha: 0.25)),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 8.5.sp,
+          fontWeight: FontWeight.w700,
           color: color,
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: color.withValues(alpha: 0.35),
-              blurRadius: 5,
-              spreadRadius: 0.5,
-            ),
-          ],
+          fontFamily: 'Tajawal',
         ),
       ),
     );

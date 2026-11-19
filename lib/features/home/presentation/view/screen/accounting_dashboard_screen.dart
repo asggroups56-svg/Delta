@@ -2,7 +2,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
-import 'package:my_template/core/cache/shared_pref/shared_pref.dart';
 import 'package:my_template/core/routes/routes_name.dart';
 import 'package:my_template/core/services/services_locator.dart';
 import 'package:my_template/core/theme/app_colors.dart';
@@ -13,7 +12,6 @@ import 'package:my_template/features/auth/presentation/view/cubit/auth_cubit.dar
 import 'package:my_template/features/home/presentation/view/widget/ai_fab_widget.dart';
 import 'package:my_template/features/home/presentation/view/widget/bank_card_widget.dart';
 import 'package:my_template/features/home/presentation/view/widget/cash_card_widget.dart';
-import 'package:my_template/features/home/presentation/view/widget/dashboard_sub_action_bar_widget.dart';
 import 'package:my_template/features/home/presentation/view/widget/dashboard_top_header_widget.dart';
 import 'package:my_template/features/home/presentation/view/widget/ifrs_16_card_widget.dart';
 import 'package:my_template/features/home/presentation/view/widget/new_entry_bottom_sheet_widget.dart';
@@ -41,6 +39,10 @@ class AccountingDashboardScreen extends StatefulWidget {
 
 class _AccountingDashboardScreenState extends State<AccountingDashboardScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  int _currentView = 0; // 0 = شجرة الحسابات (Tree View), 1 = لوحة المؤشرات والعمليات (Dashboard)
+
+  bool get _isAr => context.locale.languageCode == 'ar';
+  String _t(String ar, String en) => _isAr ? ar : en;
 
   Future<void> _toggleLanguage() async {
     if (widget.onToggleLanguage != null) {
@@ -74,24 +76,31 @@ class _AccountingDashboardScreenState extends State<AccountingDashboardScreen> {
       floatingActionButton: widget.embeddedInShell ? null : const AiFabWidget(),
       body: SafeArea(
         child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               DashboardTopHeaderWidget(
                 title: AppLocaleKey.moduleAccounting.tr(),
-                subtitle: AppLocaleKey.accountingDashboard.tr(),
+                subtitle: _t('دليل الحسابات واللوحة المالية', 'Chart of Accounts & Dashboard'),
                 onToggleLanguage: _toggleLanguage,
                 onOpenDrawer: () => _scaffoldKey.currentState?.openDrawer(),
               ),
-              const DashboardSubActionBarWidget(),
-              Gap(16.h),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
-                child: Column(
-                  children: [
-                    const AccountsTreeSection(),
-                    Gap(16.h),
-                    const SalesCardWidget(),
+              _buildViewSwitcher(context),
+              Gap(10.h),
+              if (_currentView == 0)
+                // ── شجرة الحسابات بالكامل من أعلى إلى أسفل ──
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  child: const AccountsTreeSection(),
+                )
+              else
+                // ── بطاقات العمليات والمؤشرات ──
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  child: Column(
+                    children: [
+                      const SalesCardWidget(),
                     Gap(16.h),
                     const PurchasesCardWidget(),
                     Gap(16.h),
@@ -143,5 +152,110 @@ class _AccountingDashboardScreenState extends State<AccountingDashboardScreen> {
         ),
       ),
     );
+ 
+  }
+   Widget _buildViewSwitcher(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
+      child: Container(
+        padding: EdgeInsets.all(4.r),
+        decoration: BoxDecoration(
+          color: AppColor.cardColor(context),
+          borderRadius: BorderRadius.circular(14.r),
+          border: Border.all(
+            color: AppColor.borderColor(context).withValues(alpha: 0.8),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.03),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: _switcherTab(
+                context,
+                index: 0,
+                icon: Icons.account_tree_rounded,
+                label: _t('شجرة الحسابات', 'Chart of Accounts'),
+              ),
+            ),
+            Gap(6.w),
+            Expanded(
+              child: _switcherTab(
+                context,
+                index: 1,
+                icon: Icons.dashboard_customize_rounded,
+                label: _t('لوحة المؤشرات', 'Dashboard Cards'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _switcherTab(
+    BuildContext context, {
+    required int index,
+    required IconData icon,
+    required String label,
+  }) {
+    final isSelected = _currentView == index;
+    final primary = AppColor.primaryColor(context);
+
+    return GestureDetector(
+      onTap: () {
+        if (_currentView != index) {
+          setState(() => _currentView = index);
+        }
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOutCubic,
+        padding: EdgeInsets.symmetric(vertical: 9.h),
+        decoration: BoxDecoration(
+          color: isSelected ? primary : Colors.transparent,
+          borderRadius: BorderRadius.circular(10.r),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: primary.withValues(alpha: 0.28),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ]
+              : null,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 16.r,
+              color: isSelected
+                  ? Colors.white
+                  : AppColor.darkTextColor(context),
+            ),
+            Gap(7.w),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12.sp,
+                fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                color: isSelected
+                    ? Colors.white
+                    : AppColor.titleFormFiledColor(context),
+                fontFamily: 'Tajawal',
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
+ 
