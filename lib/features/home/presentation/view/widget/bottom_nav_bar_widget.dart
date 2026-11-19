@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:gap/gap.dart';
 import 'package:my_template/core/theme/app_colors.dart';
-
+import 'package:my_template/features/home/data/models/_nav_item_data_widget.dart';
+import 'package:my_template/features/home/presentation/view/widget/nav_bar_Items_row_widget.dart';
 class BottomNavBarWidget extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
@@ -14,35 +13,35 @@ class BottomNavBarWidget extends StatelessWidget {
     required this.onTap,
   });
 
-  static const List<_NavItemData> _items = [
-    _NavItemData(
+  static const List<NavItemData> _items = [
+    NavItemData(
       icon: Icons.grid_view_rounded,
       inactiveIcon: Icons.grid_view_outlined,
       labelAr: 'الرئيسية',
       labelEn: 'Home',
     ),
-    _NavItemData(
+    NavItemData(
       icon: Icons.account_balance_wallet_rounded,
       inactiveIcon: Icons.account_balance_wallet_outlined,
       labelAr: 'الحسابات',
       labelEn: 'Accounts',
     ),
-    _NavItemData(
+    NavItemData(
       icon: Icons.analytics_rounded,
       inactiveIcon: Icons.analytics_outlined,
       labelAr: 'التقارير',
       labelEn: 'Reports',
     ),
-    _NavItemData(
+    NavItemData(
       icon: Icons.auto_stories_rounded,
       inactiveIcon: Icons.auto_stories_outlined,
       labelAr: 'المعرفة',
       labelEn: 'Knowledge',
     ),
-    _NavItemData(
+    NavItemData(
       icon: Icons.person_rounded,
       inactiveIcon: Icons.person_outline_rounded,
-      labelAr: 'الملف',
+      labelAr: 'المنشاه',
       labelEn: 'Profile',
     ),
   ];
@@ -111,93 +110,7 @@ class BottomNavBarWidget extends StatelessWidget {
                 ),
 
                 // ── Nav Bar Items Row ─────────────────────────────────────
-                Padding(
-                  padding: EdgeInsets.only(top: 4.h),
-                  child: Row(
-                    children: List.generate(_items.length, (index) {
-                      final item = _items[index];
-                      final isSelected = currentIndex == index;
-                      final isArabic =
-                          Localizations.localeOf(context).languageCode == 'ar';
-                      final label = isArabic ? item.labelAr : item.labelEn;
-
-                      return Expanded(
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            onTap: () {
-                              HapticFeedback.selectionClick();
-                              onTap(index);
-                            },
-                            borderRadius: BorderRadius.circular(16.r),
-                            splashColor: const Color(
-                              0xFF1E40AF,
-                            ).withValues(alpha: 0.1),
-                            highlightColor: Colors.transparent,
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(vertical: 4.h),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  // Icon with light ambient container when active
-                                  AnimatedContainer(
-                                    duration: const Duration(milliseconds: 250),
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: isSelected ? 12.w : 6.w,
-                                      vertical: 3.h,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: isSelected
-                                          ? accentColor.withValues(alpha: 0.1)
-                                          : Colors.transparent,
-                                      borderRadius: BorderRadius.circular(14.r),
-                                    ),
-                                    child: AnimatedScale(
-                                      scale: isSelected ? 1.1 : 1.0,
-                                      duration: const Duration(
-                                        milliseconds: 250,
-                                      ),
-                                      curve: Curves.easeOutBack,
-                                      child: Icon(
-                                        isSelected
-                                            ? item.icon
-                                            : item.inactiveIcon,
-                                        size: isSelected ? 22.r : 20.r,
-                                        color: isSelected
-                                            ? accentColor
-                                            : inactiveColor,
-                                      ),
-                                    ),
-                                  ),
-                                  Gap(2.h),
-                                  AnimatedDefaultTextStyle(
-                                    duration: const Duration(milliseconds: 200),
-                                    style: TextStyle(
-                                      fontSize: isSelected ? 10.5.sp : 9.5.sp,
-                                      fontWeight: isSelected
-                                          ? FontWeight.w800
-                                          : FontWeight.w600,
-                                      color: isSelected
-                                          ? accentColor
-                                          : inactiveColor,
-                                      fontFamily: 'Tajawal',
-                                    ),
-                                    child: Text(
-                                      label,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    }),
-                  ),
-                ),
+                NavBarItemsRowWidget(items: _items, currentIndex: currentIndex, onTap: onTap, accentColor: accentColor, inactiveColor: inactiveColor),
               ],
             );
           },
@@ -207,16 +120,3 @@ class BottomNavBarWidget extends StatelessWidget {
   }
 }
 
-class _NavItemData {
-  final IconData icon;
-  final IconData inactiveIcon;
-  final String labelAr;
-  final String labelEn;
-
-  const _NavItemData({
-    required this.icon,
-    required this.inactiveIcon,
-    required this.labelAr,
-    required this.labelEn,
-  });
-}
