@@ -5,6 +5,7 @@ import '../../../../core/error/failures.dart';
 import '../../../../core/network/api_consumer.dart';
 import '../../../../core/network/end_points.dart';
 import '../../../home/data/models/banks_data_model.dart';
+import '../models/accounts_tree_model.dart';
 import '../models/assistant_code_light_model.dart';
 import '../models/chart_of_account_light_model.dart';
 import '../models/cash_voucher_light_model.dart';
@@ -46,6 +47,20 @@ abstract interface class LookupRepo {
     String? searchWord,
     int page = 1,
     int pageSize = 100,
+  });
+
+  /// Loads the chart-of-accounts hierarchy used by the organization page.
+  ///
+  /// The API accepts the filters below and returns a flat page that the
+  /// repository/model converts into a tree.
+  Future<Either<Failure, AccountsTreeResponse>> getAccountsTree({
+    required String languageCode,
+    int? accountNo,
+    String? accountName,
+    int? accountType,
+    int? accountLevel,
+    int page = 1,
+    int pageSize = 10,
   });
 
   Future<Either<Failure, CustomerDatumLightResponse>> getCustomerDatumLight({
@@ -218,6 +233,50 @@ class LookupRepoImpl implements LookupRepo {
           ),
         );
         return ChartOfAccountLightResponse.fromJson(
+          response as Map<String, dynamic>,
+        );
+      },
+    );
+  }
+
+  @override
+  Future<Either<Failure, AccountsTreeResponse>> getAccountsTree({
+    required String languageCode,
+    int? accountNo,
+    String? accountName,
+    int? accountType,
+    int? accountLevel,
+    int page = 1,
+    int pageSize = 10,
+  }) {
+    // The API does not expose a dedicated `ChartOfAccount/AccountsTree` route
+    // (it returns 404). The web chart is built from `ChartOfAccount/GetLight`,
+    // so request the same flat rows here and build the hierarchy client-side.
+    return handleDioRequest(
+      request: () async {
+        final trimmedName = accountName?.trim();
+        final body = <String, dynamic>{
+          'idAsString': null,
+          'SearchWord': (trimmedName != null && trimmedName.isNotEmpty)
+              ? trimmedName
+              : accountNo?.toString(),
+          'FromAccountNo': accountNo,
+          'ToAccountNo': accountNo,
+          'IncludeAccountsHasCostCenters': true,
+          'page': page.toString(),
+          'pageSize': pageSize.toString(),
+        };
+        if (accountType != null) body['AccountType'] = accountType;
+        if (accountLevel != null) body['AccountLevel'] = accountLevel;
+
+        final response = await apiConsumer.post(
+          EndPoints.chartOfAccountLight,
+          body: body,
+          options: Options(
+            headers: {'Accept-Language': languageCode == 'ar' ? 'ar' : 'en'},
+          ),
+        );
+        return AccountsTreeResponse.fromJson(
           response as Map<String, dynamic>,
         );
       },
